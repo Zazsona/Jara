@@ -10,6 +10,7 @@ public class Boot
 		Core.initialiseDiscordConnection(args[0]); //Pass the client token.
 		HashMap<String, Boolean> temp = new HashMap<String, Boolean>();
 		temp.put("Ping", true);						//TODO: Read this HashMap from a config file
+		temp.put("Report", true);
 		Core.enableCommands(temp); 
 	}
 }
