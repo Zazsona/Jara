@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import commands.Ping;
+import commands.Report;
 import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 
@@ -37,8 +38,9 @@ public class Core //A class for covering the global manners of the bot.
 	}
 	public static void enableCommands(HashMap<String, Boolean> enabledCommandList)
 	{
-		CommandConfiguration[] commandRegister = new CommandConfiguration[1];
+		CommandConfiguration[] commandRegister = new CommandConfiguration[2];
 		commandRegister[0] = new CommandConfiguration(enabledCommandList.get("Ping"), new String[] {"Ping", "Pong"}, Ping.class);
+		commandRegister[1] = new CommandConfiguration(enabledCommandList.get("Report"), new String[] {"Report", "Info", "Status"}, Report.class);
 		
 		
 		shardManager.addEventListener(new CommandHandler(commandRegister));
