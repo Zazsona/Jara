@@ -21,7 +21,7 @@ public class CommandConfiguration
 	/**
 	 * 
 	 * Simple get method for the command's corresponding class.
-	 * Do not use this method for instanciating a command as it
+	 * Do not use this method for instantiating a command as it
 	 * does not perform an enabled check. 
 	 * 
 	 * Instead, use execute()
@@ -38,8 +38,8 @@ public class CommandConfiguration
 	 * Creates a new instance of the command and runs it.
 	 * 
 	 * Returns:
-	 * true - Command instanciated successfully
-	 * false - Error occured. Check the console for details. Command is not run.
+	 * true - Command instantiated successfully
+	 * false - Error occurred. Check the console for details. Command is not run.
 	 */
 	public boolean execute(GuildMessageReceivedEvent msgEvent, String...parameters)
 	{
