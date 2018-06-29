@@ -22,14 +22,23 @@ public class Report extends Command
 		reportSB.append("Channel: #"+msgEvent.getChannel().getName()+"\n");
 		reportSB.append("Ping: "+msgEvent.getJDA().getPing()+"ms\n");
 		reportSB.append("Command Author: "  + msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator());
-		if (msgEvent.getMember().getNickname() != "")
+		if (msgEvent.getMember().getNickname() != null)
 		{
 			reportSB.append(" (" + msgEvent.getMember().getNickname() + ")");   //Display guild specific nickname, too.
 		}
 		EmbedBuilder reportEmbed = new EmbedBuilder();
 		reportEmbed.setTitle(msgEvent.getJDA().getSelfUser().getName()+" Report:");
 		reportEmbed.setDescription(reportSB.toString());
-		reportEmbed.setColor(Color.decode("#5967cf"));
+		
+		try
+		{
+			reportEmbed.setColor(msgEvent.getGuild().getSelfMember().getRoles().get(0).getColor()); //Try to set it to the bot's primary role color
+		}
+		catch (IndexOutOfBoundsException e)	//If the bot has no role
+		{
+			reportEmbed.setColor(Color.decode("#5967cf"));	//Use a default theme.
+		}
+		
         msgEvent.getChannel().sendMessage(reportEmbed.build()).queue();
 	}
 
