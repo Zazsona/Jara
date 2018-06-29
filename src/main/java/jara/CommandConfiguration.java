@@ -32,8 +32,6 @@ public class CommandConfiguration
 	}
 	/**
 	 * 
-	 * @param msgEvent
-	 * @param parameters
 	 * 
 	 * Creates a new instance of the command and runs it.
 	 * 
