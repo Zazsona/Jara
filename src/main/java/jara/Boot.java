@@ -13,6 +13,7 @@ public class Boot
 		temp.put("Report", true);
 		temp.put("About", true);
 		temp.put("CoinFlip", true);
+		temp.put("EightBall", true);
 		Core.enableCommands(temp); 
 	}
 }
