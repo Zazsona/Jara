@@ -4,16 +4,17 @@ import java.awt.Color;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
-public class About 
+public class About extends Command
 {
-	public static void Start(GuildMessageReceivedEvent msgEvent)
+	@Override
+	public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
 	{
 		EmbedBuilder embed = new EmbedBuilder();
-		embed.setTitle("About\n======");
-		embed.setDescription("Jara - A general purpose Discord bot built with smaller guilds in mind."
-				+ "**Contributors**\n"							//Feel free to add your details here
+		embed.setTitle("======About======");
+		embed.setDescription("Jara - A general purpose Discord bot built with smaller guilds in mind.\n"
+				+ "\n**Contributors**\n"							//Feel free to add your details here
 				+ "Zazsona\n"										//If forking, I ask that you retain the contributor list here in some capacity.
-				+ "Source code available here:\n"				
+				+ "\nSource code available here:\n"				
 				+ "https://github.com/Zazsona/Jara");
 		
 		try
@@ -24,7 +25,6 @@ public class About
 		{
 			embed.setColor(Color.decode("#5967cf"));	//Use a default theme.
 		}
-		msgEvent.getChannel().sendMessage(embed.build()).queue();
-
+		msgEvent.getChannel().sendMessage(embed.build()).queue();	
 	}
 }
