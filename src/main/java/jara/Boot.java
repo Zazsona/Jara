@@ -12,6 +12,7 @@ public class Boot
 		temp.put("Ping", true);						//TODO: Read this HashMap from a config file
 		temp.put("Report", true);
 		temp.put("About", true);
+		temp.put("CoinFlip", true);
 		Core.enableCommands(temp); 
 	}
 }

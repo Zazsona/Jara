@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import commands.About;
+import commands.CoinFlip;
 import commands.Ping;
 import commands.Report;
 import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
@@ -39,11 +40,11 @@ public class Core //A class for covering the global manners of the bot.
 	}
 	public static void enableCommands(HashMap<String, Boolean> enabledCommandList)
 	{
-		CommandConfiguration[] commandRegister = new CommandConfiguration[3];
+		CommandConfiguration[] commandRegister = new CommandConfiguration[4];
 		commandRegister[0] = new CommandConfiguration(enabledCommandList.get("Ping"), new String[] {"Ping", "Pong"}, Ping.class);
 		commandRegister[1] = new CommandConfiguration(enabledCommandList.get("Report"), new String[] {"Report", "Info", "Status"}, Report.class);
-		commandRegister[2] = new CommandConfiguration(enabledCommandList.get("About"), new String[] {"About", "Author", "Source"}, About.class);		
-		
+		commandRegister[2] = new CommandConfiguration(enabledCommandList.get("About"), new String[] {"About", "Author", "Source"}, About.class);
+		commandRegister[3] = new CommandConfiguration(enabledCommandList.get("CoinFlip"), new String[] {"FlipCoin", "Coin", "TossCoin", "CoinToss", "cf", "fc"}, CoinFlip.class);	
 		shardManager.addEventListener(new CommandHandler(commandRegister));
 	}
 }
