@@ -11,6 +11,7 @@ public class Boot
 		HashMap<String, Boolean> temp = new HashMap<String, Boolean>();
 		temp.put("Ping", true);						//TODO: Read this HashMap from a config file
 		temp.put("Report", true);
+		temp.put("About", true);
 		Core.enableCommands(temp); 
 	}
 }
