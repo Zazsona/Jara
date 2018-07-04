@@ -39,29 +39,31 @@ public class CommandConfiguration
 	 * true - Command instantiated successfully
 	 * false - Error occurred. Check the console for details. Command is not run.
 	 */
-	public boolean execute(GuildMessageReceivedEvent msgEvent, String...parameters)
+	public void execute(GuildMessageReceivedEvent msgEvent, String...parameters)
 	{
 		if (isEnabled())
 		{
-			try
-			{
-				getCommandClass().newInstance().run(msgEvent, parameters);
-				return true;
-			} 
-			catch (InstantiationException | IllegalAccessException e)
-			{
-				msgEvent.getChannel().sendMessage("Sorry, I was unable to run the command.").queue();
-				Logger logger = LoggerFactory.getLogger(CommandConfiguration.class);
-				logger.error("A command request was sent but could not be fulfilled: "+parameters.toString()); //TODO: Provide more details (Guild, user, channel, etc.)
-				e.printStackTrace();
-				return false;
-			}
+			Runnable commandRunnable = () -> {
+				try
+				{
+					getCommandClass().newInstance().run(msgEvent, parameters);
+				}
+				catch (InstantiationException | IllegalAccessException e)
+				{
+					msgEvent.getChannel().sendMessage("Sorry, I was unable to run the command.").queue();
+					Logger logger = LoggerFactory.getLogger(CommandConfiguration.class);
+					logger.error("A command request was sent but could not be fulfilled: "+parameters.toString()); //TODO: Provide more details (Guild, user, channel, etc.)
+					e.printStackTrace();
+				}
+			};
+			Thread commandThread = new Thread(commandRunnable);
+			commandThread.setName(aliases[0]+"-Thread"); //TODO: Reimplement failure feedback
+			commandThread.start();
 		}
 		else
 		{
 			Logger logger = LoggerFactory.getLogger(CommandConfiguration.class);
 			logger.info("The command called with "+parameters[0]+" is disabled. Please enable it in the config.");
-			return false;
 		}
 
 	}
