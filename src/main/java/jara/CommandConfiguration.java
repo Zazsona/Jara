@@ -25,19 +25,20 @@ public class CommandConfiguration
 	 * does not perform an enabled check. 
 	 * 
 	 * Instead, use execute()
+	 * 
+	 * @return
+	 * Class<? extends Command> - The comand class.
 	 */
 	public Class<? extends Command> getCommandClass()
 	{
 		return commandClass;
 	}
 	/**
-	 * 
-	 * 
-	 * Creates a new instance of the command and runs it.
-	 * 
-	 * Returns:
-	 * true - Command instantiated successfully
-	 * false - Error occurred. Check the console for details. Command is not run.
+	 *Creates a new instance of the command and runs it on a separate thread.
+	 *
+	 *@param
+	 *msgEvent - Used to context
+	 *parameters - Command parameters
 	 */
 	public void execute(GuildMessageReceivedEvent msgEvent, String...parameters)
 	{
@@ -71,6 +72,9 @@ public class CommandConfiguration
 	 * 
 	 * Simple get for all the different text strings
 	 * that will call the command.
+	 * 
+	 * @return
+	 * String[] - List of all command aliases
 	 */
 	public String[] getAliases()
 	{
@@ -80,6 +84,10 @@ public class CommandConfiguration
 	 * 
 	 * Reports back if the command is enabled in the
 	 * config. If this returns false, execute will also fail.
+	 * 
+	 * @return
+	 * true - Command is enabled
+	 * false - Command is disabled
 	 */
 	public boolean isEnabled()
 	{
