@@ -4,12 +4,12 @@ import java.util.ArrayList;
 
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class MessageListener extends ListenerAdapter 
 {
+	private Object lock = new Object();
 	private ArrayList<Message> messageLog = new ArrayList<Message>();
 	private int messagesToGet = 0;
 	/**
@@ -22,27 +22,42 @@ public class MessageListener extends ListenerAdapter
 	 * 
 	 * This function will block the thread until a message has been received.
 	 */
-	public Message getNextMessage(Guild guild)
+	public Message getNextMessage(Guild guild, int timeout)
 	{
 		messagesToGet = 0;
-		Runnable msgListener = () -> {guild.getJDA().addEventListener(this);};
-		Thread msgListenerThread = new Thread(msgListener);
-		msgListenerThread.start();
+		guild.getJDA().addEventListener(this);
 		try 
 		{
-			msgListenerThread.join();
-			return messageLog.get(messageLog.size()-1)
+			int messageLogSize = messageLog.size();
+			synchronized (lock)
+			{
+				while (messageLogSize == messageLog.size()) //If no new entries have been added, continue the wait, as the thread wasn't meant to notify.
+				{
+					lock.wait(timeout);
+				}
+			}
+			guild.getJDA().removeEventListener(this);
+			return messageLog.get(messageLog.size()-1);
 		} 
 		catch (InterruptedException e) 
 		{
 			e.printStackTrace();
+			guild.getJDA().removeEventListener(this);
 			return null; //Let the calling method handle this.
 		}
 		
 	}
+	/*public Message getNextMessage(TextChannel channel, int timeout)
+	{
+		TODO: Uncomment this and below methods
+	}
 	public Message getNextMessage(TextChannel channel)
 	{
-		
+		//return getNextMessage(channel, 0);
+	}
+	public Message getNextMessage(Guild guild)
+	{
+		return getNextMessage(guild, 0);
 	}
 	public Message[] getNextMessages(Guild guild, int count)
 	{
@@ -51,7 +66,7 @@ public class MessageListener extends ListenerAdapter
 	public Message[] getNextMessages(TextChannel channel, int count)
 	{
 		
-	}
+	}*/
 	public Message[] getMessageHistory()
 	{
 		return (Message[]) messageLog.toArray();
@@ -77,8 +92,7 @@ public class MessageListener extends ListenerAdapter
 	public Message getLastMessage()
 	{
 		return messageLog.get(messageLog.size()-1);
-	}
-	
+	} 
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent msgEvent)
 	{
@@ -86,7 +100,10 @@ public class MessageListener extends ListenerAdapter
 		messagesToGet--;
 		if (messagesToGet <= 0)
 		{
-			//TODO: End thread
+			synchronized (lock)
+			{
+				lock.notifyAll();
+			}
 		}
 	}
 }
