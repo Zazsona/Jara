@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
+import javax.swing.JOptionPane;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,12 +18,15 @@ public class FileManager
 {
 	/**
 	 * 
-	 * When adding new methods to this class ****ALWAYS**** call getDirectory(), as this 
+	 * When adding new methods to this class ****ALWAYS**** call getDirectory(), or getXFile() as this 
 	 * always ensures the directory has been set, and allows for OS specific organisation.
+	 * 
+	 * Also be sure to save any modifications via updateStoredSettings().
 	 * 
 	 */
 	private static File directory;
-	public File getDirectory()
+	private static SettingsJson settings;
+	public static File getDirectory()
 	{
 		if (directory != null)
 		{
@@ -55,7 +60,7 @@ public class FileManager
 		}
 		return directory;				
 	}
-	public File getSettingsFile()
+	public static File getSettingsFile()
 	{
 		Logger logger = LoggerFactory.getLogger(FileManager.class);
 		File settingsFile = new File(getDirectory().getAbsolutePath()+"settings.json");
@@ -80,34 +85,42 @@ public class FileManager
 			return settingsFile;
 		}
 	}
-	public SettingsJson getCurrentSettings()
+	public static SettingsJson getCurrentSettings()
 	{
 		Logger logger = LoggerFactory.getLogger(FileManager.class);
-		try
+		if (settings != null)
 		{
-			File settingsFile = getSettingsFile();
-			FileReader fileReader = new FileReader(settingsFile);
-			Scanner scanner = new Scanner(fileReader);
-			StringBuilder settingsFileDataBuilder = new StringBuilder();
-			while (scanner.hasNext())
-			{
-				settingsFileDataBuilder.append(scanner.nextLine());
-			}
-			scanner.close();
-			fileReader.close();
-			Gson gson = new Gson();
-			SettingsJson settings = gson.fromJson(settingsFileDataBuilder.toString(), SettingsJson.class);
 			return settings;
-		} 
-		catch (IOException e)
-		{
-			logger.error("Unable to read settings file.");
-			e.printStackTrace();
-			return new SettingsJson();
 		}
-
+		else
+		{
+			try
+			{
+				File settingsFile = getSettingsFile();
+				FileReader fileReader = new FileReader(settingsFile);
+				Scanner scanner = new Scanner(fileReader);
+				StringBuilder settingsFileDataBuilder = new StringBuilder();
+				while (scanner.hasNext())
+				{
+					settingsFileDataBuilder.append(scanner.nextLine());
+				}
+				scanner.close();
+				fileReader.close();
+				Gson gson = new Gson();
+				settings = gson.fromJson(settingsFileDataBuilder.toString(), SettingsJson.class);
+				return settings;
+			} 
+			catch (IOException e)
+			{
+				logger.error("Unable to read settings file.");
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, "Jara was unable to access the settings file. Please ensure the program has sufficient file access permissions.");
+				System.exit(0);
+				return null;
+			}
+		}
 	}
-	public void setSettings(SettingsJson newSettings)
+	public static void updateStoredSettings()
 	{
 		Logger logger = LoggerFactory.getLogger(FileManager.class);
 		try
@@ -116,7 +129,7 @@ public class FileManager
 			FileWriter fileWriter = new FileWriter(settingsFile, false);
 			PrintWriter printWriter = new PrintWriter(fileWriter);
 			Gson gson = new Gson();
-			printWriter.print(gson.toJson(newSettings));
+			printWriter.print(gson.toJson(settings));
 			printWriter.close();
 			fileWriter.close();
 		} 
@@ -130,15 +143,36 @@ public class FileManager
 	private class SettingsJson
 	{
 		String token;
+		CommandConfigJson[] commandConfig;
 	}
-	public void setNewClientToken(String token) //TODO: Encrypt this
+	private class CommandConfigJson
 	{
-		token = token; //Encrypt here
+		String commandKey;
+		boolean enabled;
+	}
+	
+	public static void setNewClientToken(String token) //TODO: Encrypt this
+	{
+		Logger logger = LoggerFactory.getLogger(FileManager.class);
+		String encryptedToken = token; //Encrypt here
 		
-		SettingsJson settings = getCurrentSettings();
+		getCurrentSettings();
 		settings.token = token;
-		setSettings(settings);
-
-		
+		updateStoredSettings();
+		logger.info("Bot token has now been set to "+token+". This will be reflected after a restart.");
+	}
+	public static void getEnabledStatus(int commandNo, boolean newStatus)
+	{
+		getCurrentSettings();
+		settings.commandConfig[commandNo].enabled = newStatus;
+		updateStoredSettings();
+	}
+	public static void setEnabledStatus(int commandNo, boolean newStatus)
+	{
+		Logger logger = LoggerFactory.getLogger(FileManager.class);
+		getCurrentSettings();
+		settings.commandConfig[commandNo].enabled = newStatus;
+		updateStoredSettings();
+		logger.info("Command "+settings.commandConfig[commandNo].commandKey + "'s enabled status has been changed to "+newStatus+". This will be reflected after a restart.");
 	}
 }
