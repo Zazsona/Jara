@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import javax.swing.JOptionPane;
@@ -23,7 +24,7 @@ import com.google.gson.Gson;
  * 
  */
 
-public class FileManager
+public class GlobalSettingsManager
 {
 	private static File directory;
 	private static GlobalSettingsJson globalSettings;
@@ -32,7 +33,7 @@ public class FileManager
 	{
 		if (directory != null)
 		{
-			Logger logger = LoggerFactory.getLogger(FileManager.class);
+			Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
 			String operatingSystem = System.getProperty("os.name").toLowerCase();
 			if (operatingSystem.startsWith("windows"))
 			{
@@ -66,7 +67,7 @@ public class FileManager
 	//================================= Global Config Tools =====================================================
 	public static File getGlobalSettingsFile()
 	{
-		Logger logger = LoggerFactory.getLogger(FileManager.class);
+		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
 		File settingsFile = new File(getDirectory().getAbsolutePath()+"settings.json");
 		if (!settingsFile.exists())
 		{
@@ -91,7 +92,7 @@ public class FileManager
 	}
 	public static GlobalSettingsJson getGlobalSettings()
 	{
-		Logger logger = LoggerFactory.getLogger(FileManager.class);
+		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
 		if (globalSettings != null)
 		{
 			return globalSettings;
@@ -126,7 +127,7 @@ public class FileManager
 	}
 	public static void saveGlobalSettings()
 	{
-		Logger logger = LoggerFactory.getLogger(FileManager.class);
+		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
 		try
 		{
 			File settingsFile = getGlobalSettingsFile();
@@ -145,9 +146,14 @@ public class FileManager
 
 	}
 	
+	public static String getGlobalClientToken()
+	{
+		getGlobalSettings();
+		return globalSettings.token;
+	}
 	public static void setNewGlobalClientToken(String token) //TODO: Encrypt this
 	{
-		Logger logger = LoggerFactory.getLogger(FileManager.class);
+		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
 		String encryptedToken = token; //Encrypt here
 		
 		getGlobalSettings();
@@ -155,46 +161,39 @@ public class FileManager
 		saveGlobalSettings();
 		logger.info("Bot token has now been set to "+token+". This will be reflected after a restart.");
 	}
-	public static boolean getGlobalCommandEnabledStatus(int commandNo, boolean newStatus)
+	
+	public static boolean getGlobalCommandEnabledStatus(int commandNo)
 	{
 		getGlobalSettings();
-		return globalSettings.commandConfig[commandNo].enabled = newStatus;
+		return globalSettings.commandConfig[commandNo].enabled;
 	}
 	public static void setGlobalCommandEnabledStatus(int commandNo, boolean newStatus)
 	{
-		Logger logger = LoggerFactory.getLogger(FileManager.class);
+		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
 		getGlobalSettings();
 		globalSettings.commandConfig[commandNo].enabled = newStatus;
 		saveGlobalSettings();
 		logger.info("Command "+globalSettings.commandConfig[commandNo].commandKey + "'s enabled status has been changed to "+newStatus+". This will be reflected after a restart.");
 	}
-	public static void getGlobalCommandEnabledStatus(String commandKey, boolean newStatus)
+	public static boolean getGlobalCommandEnabledStatus(String commandKey)
 	{
 		getGlobalSettings();
-		boolean keyFound = false;
 		for (CommandConfigJson commandSettings : globalSettings.commandConfig)
 		{
 			if (commandSettings.commandKey.equalsIgnoreCase(commandKey))
 			{
-				commandSettings.enabled = newStatus;
-				keyFound = true;
+				return commandSettings.enabled;
 			}
 
 		}
-		if (keyFound == false)
-		{
-			Logger logger = LoggerFactory.getLogger(FileManager.class);
-			logger.debug("Tried to find key \""+ commandKey+"\", however, it does not appear to exist.");
-		}
-		else
-		{
-			saveGlobalSettings();
-		}
+		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
+		logger.debug("Tried to find key \""+ commandKey+"\", however, it does not appear to exist.");
+		return false; //Can't enable your command if it doesn't exist. *taps forehead*
 
 	}
 	public static void setGlobalCommandEnabledStatus(String commandKey, boolean newStatus)
 	{
-		Logger logger = LoggerFactory.getLogger(FileManager.class);
+		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
 		getGlobalSettings();
 		boolean keyFound = false;
 		for (CommandConfigJson commandSettings : globalSettings.commandConfig)
@@ -217,9 +216,42 @@ public class FileManager
 		}
 
 	}
+	
+	public static CommandConfigJson[] getGlobalCommandConfig()
+	{
+		ArrayList<CommandConfigJson> commandConfigList = new ArrayList<CommandConfigJson>();
+		for (CommandConfigJson commandConfig : getGlobalSettings().commandConfig)
+		{
+			commandConfigList.add(commandConfig);
+		}
+		return (CommandConfigJson[]) commandConfigList.toArray();
+	}
+	public static CommandConfigJson[] getGlobalEnabledCommands()
+	{
+		ArrayList<CommandConfigJson> commandConfigList = new ArrayList<CommandConfigJson>();
+		for (CommandConfigJson commandConfig : getGlobalSettings().commandConfig)
+		{
+			if (commandConfig.enabled == true)
+			{
+				commandConfigList.add(commandConfig);
+			}
+		}
+		return (CommandConfigJson[]) commandConfigList.toArray();
+	}
+	public static CommandConfigJson[] getGlobalDisabledCommands()
+	{
+		ArrayList<CommandConfigJson> commandConfigList = new ArrayList<CommandConfigJson>();
+		for (CommandConfigJson commandConfig : getGlobalSettings().commandConfig)
+		{
+			if (commandConfig.enabled == false)
+			{
+				commandConfigList.add(commandConfig);
+			}
+		}
+		return (CommandConfigJson[]) commandConfigList.toArray();
+	}
 	//============================================================================================================
 	
-
 	//===================================== JSON Classes =========================================================
 	private class GlobalSettingsJson
 	{
@@ -231,11 +263,6 @@ public class FileManager
 		String commandKey;
 		boolean enabled;
 	}
-	private class GuildSettingsJson
-	{
-		String guildID;
-		String categoryID;
-		CommandConfigJson[] commandConfig;
-	}
+
 	//============================================================================================================
 }
