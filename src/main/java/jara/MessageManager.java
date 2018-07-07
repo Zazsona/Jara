@@ -10,13 +10,19 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-public class MessageListener extends ListenerAdapter 
+public class MessageManager
 {
 	private Object lock = new Object();
-	private ArrayList<Message> messageLog = new ArrayList<Message>();
+	private ArrayList<Message> messageLog;
 	private int messagesToGet = 0;
 	private Guild guildToListen;
 	private TextChannel channelToListen;
+	MessageListener messageListener;
+	public MessageManager()
+	{
+		messageLog = new ArrayList<Message>();
+		messageListener = new MessageListener();
+	}
 	/**
 	 * This method returns the first message to be sent after its invocation<br>
 	 * within any channel of the guild that the bot has access to.<br>
@@ -34,7 +40,7 @@ public class MessageListener extends ListenerAdapter
 	{
 		guildToListen = guild;
 		messagesToGet = messageCount;
-		guild.getJDA().addEventListener(this);
+		guild.getJDA().addEventListener(messageListener);
 		try 
 		{
 			int messageLogSize = messageLog.size();
@@ -50,7 +56,7 @@ public class MessageListener extends ListenerAdapter
 						long timeSinceStart = runtimeBean.getUptime() - startTime - timeout; //This will be zero or less if timeout has expired
 						if (timeSinceStart <= 0)
 						{
-							guild.getJDA().removeEventListener(this);
+							guild.getJDA().removeEventListener(messageListener);
 							guildToListen = null;
 							return null; //Timeout expired, and we didn't get anything.
 						}
@@ -61,7 +67,7 @@ public class MessageListener extends ListenerAdapter
 					}
 				}
 			}
-			guild.getJDA().removeEventListener(this);
+			guild.getJDA().removeEventListener(messageListener);
 			Message[] messages = new Message[messageCount];
 			for (int i = 0; i<messageCount; i++)
 			{
@@ -73,7 +79,7 @@ public class MessageListener extends ListenerAdapter
 		catch (InterruptedException e) 
 		{
 			e.printStackTrace();
-			guild.getJDA().removeEventListener(this);
+			guild.getJDA().removeEventListener(messageListener);
 			guildToListen = null;
 			return null; //Let the calling method handle this.
 		}
@@ -95,7 +101,7 @@ public class MessageListener extends ListenerAdapter
 	{
 		channelToListen = channel;
 		messagesToGet = messageCount;
-		channel.getJDA().addEventListener(this);
+		channel.getJDA().addEventListener(messageListener);
 		try 
 		{
 			int messageLogSize = messageLog.size();
@@ -111,7 +117,7 @@ public class MessageListener extends ListenerAdapter
 						long timeSinceStart = runtimeBean.getUptime() - startTime - timeout; //This will be zero or less if timeout has expired
 						if (timeSinceStart <= 0)
 						{
-							channel.getJDA().removeEventListener(this);
+							channel.getJDA().removeEventListener(messageListener);
 							channelToListen = null;
 							return null; //Timeout expired, and we didn't get anything.
 						}
@@ -122,7 +128,7 @@ public class MessageListener extends ListenerAdapter
 					}
 				}
 			}
-			channel.getJDA().removeEventListener(this);
+			channel.getJDA().removeEventListener(messageListener);
 			Message[] messages = new Message[messageCount];
 			for (int i = 0; i<messageCount; i++)
 			{
@@ -134,7 +140,7 @@ public class MessageListener extends ListenerAdapter
 		catch (InterruptedException e) 
 		{
 			e.printStackTrace();
-			channel.getJDA().removeEventListener(this);
+			channel.getJDA().removeEventListener(messageListener);
 			channelToListen = null;
 			return null; //Let the calling method handle this.
 		}
@@ -340,31 +346,35 @@ public class MessageListener extends ListenerAdapter
 		}
 		return false;
 	}
-	@Override
-	public void onGuildMessageReceived(GuildMessageReceivedEvent msgEvent)
+	private class MessageListener extends ListenerAdapter
 	{
-		if (guildToListen != null)									//These checks set limits on where messages can be read from and are based on what parameters			
-		{															//where passed to the previous methods.
-			if (!guildToListen.equals(msgEvent.getGuild()))
-			{
-				return;
-			}
-		}
-		if (channelToListen != null)
+		@Override
+		public void onGuildMessageReceived(GuildMessageReceivedEvent msgEvent)
 		{
-			if (!channelToListen.equals(msgEvent.getChannel()))
-			{
-				return;
+			if (guildToListen != null)									//These checks set limits on where messages can be read from and are based on what parameters			
+			{															//where passed to the previous methods.
+				if (!guildToListen.equals(msgEvent.getGuild()))
+				{
+					return;
+				}
 			}
-		}
-		messageLog.add(msgEvent.getMessage());
-		messagesToGet--;
-		if (messagesToGet <= 0)
-		{
-			synchronized (lock)
+			if (channelToListen != null)
 			{
-				lock.notifyAll();
+				if (!channelToListen.equals(msgEvent.getChannel()))
+				{
+					return;
+				}
+			}
+			messageLog.add(msgEvent.getMessage());
+			messagesToGet--;
+			if (messagesToGet <= 0)
+			{
+				synchronized (lock)
+				{
+					lock.notifyAll();
+				}
 			}
 		}
 	}
+
 }
