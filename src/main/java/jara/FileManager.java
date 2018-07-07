@@ -14,18 +14,20 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
+/**
+ * 
+ * When adding new methods to this class ****ALWAYS**** call getDirectory(), or getXFile() as this 
+ * always ensures the directory has been set, and allows for OS specific organisation.
+ * 
+ * Also be sure to save any modifications via updateStoredSettings().
+ * 
+ */
+
 public class FileManager
 {
-	/**
-	 * 
-	 * When adding new methods to this class ****ALWAYS**** call getDirectory(), or getXFile() as this 
-	 * always ensures the directory has been set, and allows for OS specific organisation.
-	 * 
-	 * Also be sure to save any modifications via updateStoredSettings().
-	 * 
-	 */
 	private static File directory;
-	private static SettingsJson settings;
+	private static GlobalSettingsJson globalSettings;
+	
 	public static File getDirectory()
 	{
 		if (directory != null)
@@ -60,7 +62,9 @@ public class FileManager
 		}
 		return directory;				
 	}
-	public static File getSettingsFile()
+	
+	//================================= Global Config Tools =====================================================
+	public static File getGlobalSettingsFile()
 	{
 		Logger logger = LoggerFactory.getLogger(FileManager.class);
 		File settingsFile = new File(getDirectory().getAbsolutePath()+"settings.json");
@@ -85,18 +89,18 @@ public class FileManager
 			return settingsFile;
 		}
 	}
-	public static SettingsJson getCurrentSettings()
+	public static GlobalSettingsJson getGlobalSettings()
 	{
 		Logger logger = LoggerFactory.getLogger(FileManager.class);
-		if (settings != null)
+		if (globalSettings != null)
 		{
-			return settings;
+			return globalSettings;
 		}
 		else
 		{
 			try
 			{
-				File settingsFile = getSettingsFile();
+				File settingsFile = getGlobalSettingsFile();
 				FileReader fileReader = new FileReader(settingsFile);
 				Scanner scanner = new Scanner(fileReader);
 				StringBuilder settingsFileDataBuilder = new StringBuilder();
@@ -107,8 +111,8 @@ public class FileManager
 				scanner.close();
 				fileReader.close();
 				Gson gson = new Gson();
-				settings = gson.fromJson(settingsFileDataBuilder.toString(), SettingsJson.class);
-				return settings;
+				globalSettings = gson.fromJson(settingsFileDataBuilder.toString(), GlobalSettingsJson.class);
+				return globalSettings;
 			} 
 			catch (IOException e)
 			{
@@ -120,16 +124,16 @@ public class FileManager
 			}
 		}
 	}
-	public static void updateStoredSettings()
+	public static void saveGlobalSettings()
 	{
 		Logger logger = LoggerFactory.getLogger(FileManager.class);
 		try
 		{
-			File settingsFile = getSettingsFile();
+			File settingsFile = getGlobalSettingsFile();
 			FileWriter fileWriter = new FileWriter(settingsFile, false);
 			PrintWriter printWriter = new PrintWriter(fileWriter);
 			Gson gson = new Gson();
-			printWriter.print(gson.toJson(settings));
+			printWriter.print(gson.toJson(globalSettings));
 			printWriter.close();
 			fileWriter.close();
 		} 
@@ -140,7 +144,84 @@ public class FileManager
 		}
 
 	}
-	private class SettingsJson
+	
+	public static void setNewGlobalClientToken(String token) //TODO: Encrypt this
+	{
+		Logger logger = LoggerFactory.getLogger(FileManager.class);
+		String encryptedToken = token; //Encrypt here
+		
+		getGlobalSettings();
+		globalSettings.token = token;
+		saveGlobalSettings();
+		logger.info("Bot token has now been set to "+token+". This will be reflected after a restart.");
+	}
+	public static boolean getGlobalCommandEnabledStatus(int commandNo, boolean newStatus)
+	{
+		getGlobalSettings();
+		return globalSettings.commandConfig[commandNo].enabled = newStatus;
+	}
+	public static void setGlobalCommandEnabledStatus(int commandNo, boolean newStatus)
+	{
+		Logger logger = LoggerFactory.getLogger(FileManager.class);
+		getGlobalSettings();
+		globalSettings.commandConfig[commandNo].enabled = newStatus;
+		saveGlobalSettings();
+		logger.info("Command "+globalSettings.commandConfig[commandNo].commandKey + "'s enabled status has been changed to "+newStatus+". This will be reflected after a restart.");
+	}
+	public static void getGlobalCommandEnabledStatus(String commandKey, boolean newStatus)
+	{
+		getGlobalSettings();
+		boolean keyFound = false;
+		for (CommandConfigJson commandSettings : globalSettings.commandConfig)
+		{
+			if (commandSettings.commandKey.equalsIgnoreCase(commandKey))
+			{
+				commandSettings.enabled = newStatus;
+				keyFound = true;
+			}
+
+		}
+		if (keyFound == false)
+		{
+			Logger logger = LoggerFactory.getLogger(FileManager.class);
+			logger.debug("Tried to find key \""+ commandKey+"\", however, it does not appear to exist.");
+		}
+		else
+		{
+			saveGlobalSettings();
+		}
+
+	}
+	public static void setGlobalCommandEnabledStatus(String commandKey, boolean newStatus)
+	{
+		Logger logger = LoggerFactory.getLogger(FileManager.class);
+		getGlobalSettings();
+		boolean keyFound = false;
+		for (CommandConfigJson commandSettings : globalSettings.commandConfig)
+		{
+			if (commandSettings.commandKey.equalsIgnoreCase(commandKey))
+			{
+				commandSettings.enabled = newStatus;
+				keyFound = true;
+			}
+
+		}
+		if (keyFound == false)
+		{
+			logger.debug("Tried to find key \""+ commandKey+"\", however, it does not appear to exist.");
+		}
+		else
+		{
+			saveGlobalSettings();
+			logger.info("Command "+commandKey+ "'s enabled status has been changed to "+newStatus+". This will be reflected after a restart.");
+		}
+
+	}
+	//============================================================================================================
+	
+
+	//===================================== JSON Classes =========================================================
+	private class GlobalSettingsJson
 	{
 		String token;
 		CommandConfigJson[] commandConfig;
@@ -150,29 +231,11 @@ public class FileManager
 		String commandKey;
 		boolean enabled;
 	}
-	
-	public static void setNewClientToken(String token) //TODO: Encrypt this
+	private class GuildSettingsJson
 	{
-		Logger logger = LoggerFactory.getLogger(FileManager.class);
-		String encryptedToken = token; //Encrypt here
-		
-		getCurrentSettings();
-		settings.token = token;
-		updateStoredSettings();
-		logger.info("Bot token has now been set to "+token+". This will be reflected after a restart.");
+		String guildID;
+		String categoryID;
+		CommandConfigJson[] commandConfig;
 	}
-	public static void getEnabledStatus(int commandNo, boolean newStatus)
-	{
-		getCurrentSettings();
-		settings.commandConfig[commandNo].enabled = newStatus;
-		updateStoredSettings();
-	}
-	public static void setEnabledStatus(int commandNo, boolean newStatus)
-	{
-		Logger logger = LoggerFactory.getLogger(FileManager.class);
-		getCurrentSettings();
-		settings.commandConfig[commandNo].enabled = newStatus;
-		updateStoredSettings();
-		logger.info("Command "+settings.commandConfig[commandNo].commandKey + "'s enabled status has been changed to "+newStatus+". This will be reflected after a restart.");
-	}
+	//============================================================================================================
 }
