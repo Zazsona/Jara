@@ -44,27 +44,37 @@ public class CommandConfiguration
 	{
 		if (isEnabled())
 		{
-			Runnable commandRunnable = () -> {
-				try
-				{
-					getCommandClass().newInstance().run(msgEvent, parameters);
-				}
-				catch (InstantiationException | IllegalAccessException e)
-				{
-					msgEvent.getChannel().sendMessage("Sorry, I was unable to run the command.").queue();
-					Logger logger = LoggerFactory.getLogger(CommandConfiguration.class);
-					logger.error("A command request was sent but could not be fulfilled: "+parameters.toString()); //TODO: Provide more details (Guild, user, channel, etc.)
-					e.printStackTrace();
-				}
-			};
-			Thread commandThread = new Thread(commandRunnable);
-			commandThread.setName(aliases[0]+"-Thread"); //TODO: Reimplement failure feedback
-			commandThread.start();
+			GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
+			if (guildSettings.getGuildCommandEnabledStatus(aliases[0]) == true) //The first alias should always match the command key.
+			{
+				Runnable commandRunnable = () -> {
+					try
+					{
+						getCommandClass().newInstance().run(msgEvent, parameters);
+					}
+					catch (InstantiationException | IllegalAccessException e)
+					{
+						msgEvent.getChannel().sendMessage("Sorry, I was unable to run the command.").queue();
+						Logger logger = LoggerFactory.getLogger(CommandConfiguration.class);
+						logger.error("A command request was sent but could not be fulfilled: "+parameters.toString()); //TODO: Provide more details (Guild, user, channel, etc.)
+						e.printStackTrace();
+					}
+				};
+				Thread commandThread = new Thread(commandRunnable);
+				commandThread.setName(aliases[0]+"-Thread"); //TODO: Reimplement failure feedback
+				commandThread.start();
+				return;
+			}
+			else
+			{
+				msgEvent.getChannel().sendMessage("This command is disabled. Please talk to your guild owner if you wish to have it enabled.").queue();
+			}
+			
 		}
 		else
 		{
 			Logger logger = LoggerFactory.getLogger(CommandConfiguration.class);
-			logger.info("The command called with "+parameters[0]+" is disabled. Please enable it in the config.");
+			logger.info(msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+" attempted to use the command "+parameters[0]+", however it's disabled. Please enable it in the config.");
 		}
 
 	}
