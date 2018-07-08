@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 import javax.swing.JOptionPane;
@@ -71,19 +72,10 @@ public class GlobalSettingsManager
 		File settingsFile = new File(getDirectory().getAbsolutePath()+"settings.json");
 		if (!settingsFile.exists())
 		{
-			logger.info("Settings file does not exist. Creating now.");
-			try
-			{
-				settingsFile.createNewFile();
-				//TODO: Call first time setup
-				return settingsFile;
-			} 
-			catch (IOException e)
-			{
-				logger.error("An error occured when attempting to create the file.");
-				e.printStackTrace();
-				return null;
-			}
+			logger.error("Settings file does not exist.");
+			JOptionPane.showMessageDialog(null, "The global settings file has disappeared, and is required. Please restart the program to run first time setup again.");
+			System.exit(0);
+			return null;
 		}
 		else
 		{
@@ -144,6 +136,12 @@ public class GlobalSettingsManager
 			e.printStackTrace();
 		}
 
+	}
+	
+	public static File performFirstTimeSetup()
+	{
+		//TODO: Call some GUIs 'n' shit.
+		return new File("foobar.json");
 	}
 	
 	public static String getGlobalClientToken()
@@ -225,6 +223,15 @@ public class GlobalSettingsManager
 			commandConfigList.add(commandConfig);
 		}
 		return (CommandConfigJson[]) commandConfigList.toArray();
+	}
+	public static HashMap<String, Boolean> getGlobalCommandConfigMap()
+	{
+		HashMap<String, Boolean> commandMap = new HashMap<String, Boolean>();
+		for (CommandConfigJson commandConfig : getGlobalSettings().commandConfig)
+		{
+			commandMap.put(commandConfig.commandKey, commandConfig.enabled);
+		}
+		return commandMap;
 	}
 	public static CommandConfigJson[] getGlobalEnabledCommands()
 	{

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import commands.About;
 import commands.CoinFlip;
 import commands.EightBall;
+import commands.Jokes;
 import commands.Ping;
 import commands.Report;
 import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
@@ -39,18 +40,19 @@ public class Core //A class for covering the global manners of the bot.
 	    	e.printStackTrace();
 		}
 	}
-	public static void enableCommands(HashMap<String, Boolean> enabledCommandList)
+	public static void enableCommands()
 	{
 		/*
 		 * When adding command aliases, ensure that the first alias matches the command's command key.
 		 */
-		CommandConfiguration[] commandRegister = new CommandConfiguration[6];
-		commandRegister[0] = new CommandConfiguration(enabledCommandList.get("Ping"), new String[] {"Ping", "Pong"}, Ping.class);
-		commandRegister[1] = new CommandConfiguration(enabledCommandList.get("Report"), new String[] {"Report", "Info", "Status"}, Report.class);
-		commandRegister[2] = new CommandConfiguration(enabledCommandList.get("About"), new String[] {"About", "Author", "Source"}, About.class);
-		commandRegister[3] = new CommandConfiguration(enabledCommandList.get("CoinFlip"), new String[] {"CoinFlip", "FlipCoin", "Coin", "TossCoin", "CoinToss", "cf", "fc"}, CoinFlip.class);
-		commandRegister[4] = new CommandConfiguration(enabledCommandList.get("EightBall"), new String[] {"EightBall", "8Ball", "HelixFossil"}, EightBall.class);
-		commandRegister[4] = new CommandConfiguration(enabledCommandList.get("Joke"), new String[] {"Jokes", "Joke", "TellMeAJoke", "Comedy"}, EightBall.class);
-		shardManager.addEventListener(new CommandHandler(commandRegister));
+		HashMap<String, Boolean> commandConfigMap = GlobalSettingsManager.getGlobalCommandConfigMap();
+		CommandConfiguration[] commandConfigs = new CommandConfiguration[commandConfigMap.size()];
+		commandConfigs[0] = new CommandConfiguration(commandConfigMap.get("Ping"), new String[] {"Ping", "Pong"}, Ping.class);
+		commandConfigs[1] = new CommandConfiguration(commandConfigMap.get("Report"), new String[] {"Report", "Info", "Status"}, Report.class);
+		commandConfigs[2] = new CommandConfiguration(commandConfigMap.get("About"), new String[] {"About", "Author", "Source"}, About.class);
+		commandConfigs[3] = new CommandConfiguration(commandConfigMap.get("CoinFlip"), new String[] {"CoinFlip", "FlipCoin", "Coin", "TossCoin", "CoinToss", "cf", "fc"}, CoinFlip.class);
+		commandConfigs[4] = new CommandConfiguration(commandConfigMap.get("EightBall"), new String[] {"EightBall", "8Ball", "HelixFossil"}, EightBall.class);
+		commandConfigs[4] = new CommandConfiguration(commandConfigMap.get("Jokes"), new String[] {"Jokes", "Joke", "TellMeAJoke", "Comedy"}, Jokes.class);
+		shardManager.addEventListener(new CommandHandler(commandConfigs));
 	}
 }

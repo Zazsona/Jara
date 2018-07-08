@@ -5,10 +5,14 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class CommandHandler extends ListenerAdapter 
 {
-	CommandConfiguration[] commandRegister; //Contains details on all commands.
-	public CommandHandler(CommandConfiguration[] commandRegisterArg)
+	CommandConfiguration[] commandConfigs; //Contains details on all commands.
+	public CommandHandler(CommandConfiguration[] commandConfigsArg)
 	{
-		commandRegister = commandRegisterArg;
+		commandConfigs = new CommandConfiguration[commandConfigsArg.length];
+		for (int i = 0; i<commandConfigsArg.length; i++)
+		{
+			commandConfigs[i] = commandConfigsArg[i];
+		}
 	}
 	
 	@Override 
@@ -18,7 +22,7 @@ public class CommandHandler extends ListenerAdapter
 		if (commandString.startsWith("/"))									   //Prefix to signify that a command is being called.
 		{
 			String[] command = commandString.split(" ");							   //Separating parameters.
-			for (CommandConfiguration commandConfig : commandRegister)
+			for (CommandConfiguration commandConfig : commandConfigs)
 			{
 				if (commandConfig.isEnabled())
 				{
