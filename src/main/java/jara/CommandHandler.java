@@ -8,11 +8,7 @@ public class CommandHandler extends ListenerAdapter
 	CommandConfiguration[] commandConfigs; //Contains details on all commands.
 	public CommandHandler(CommandConfiguration[] commandConfigsArg)
 	{
-		commandConfigs = new CommandConfiguration[commandConfigsArg.length];
-		for (int i = 0; i<commandConfigsArg.length; i++)
-		{
-			commandConfigs[i] = commandConfigsArg[i];
-		}
+		commandConfigs = commandConfigsArg.clone();
 	}
 	
 	@Override 
@@ -24,7 +20,7 @@ public class CommandHandler extends ListenerAdapter
 			String[] command = commandString.split(" ");							   //Separating parameters.
 			for (CommandConfiguration commandConfig : commandConfigs)
 			{
-				if (commandConfig.isEnabled())
+				if (commandConfig.isEnabled())								//While execute() does an enabled check anyway, this saves us iterating through aliases.
 				{
 					for (String alias : commandConfig.getAliases())
 					{
