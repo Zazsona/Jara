@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 
 
+
 public class GuildSettingsManager
 {
 	private File directory;
@@ -28,60 +29,32 @@ public class GuildSettingsManager
 	
 	public File getDirectory()
 	{
-		if (directory != null)
-		{
-			Logger logger = LoggerFactory.getLogger(GuildSettingsManager.class);
-			String operatingSystem = System.getProperty("os.name").toLowerCase();
-			if (operatingSystem.startsWith("windows"))
-			{
-				directory = new File(System.getProperty("user.home")+"\\AppData\\Roaming\\Jara\\");
-			}
-			else if (operatingSystem.startsWith("linux"))
-			{
-				directory = new File(System.getProperty("user.home")+"/.Jara/");
-			}
-			else
-			{
-				logger.info("An unsupported operating system is being used. Be aware some issues may occur."); //TODO: Move this to somewhere more logical?
-			}
-			if (!directory.exists())
-			{
-				try
-				{
-					directory.mkdirs();
-				}
-				catch (SecurityException e)
-				{
-					logger.error("Jara has run into a file security error. Does it have permissions to read/write files & directories?");
-					e.printStackTrace();
-				}				
-			}
-		}
-		return directory;				
+		directory = GlobalSettingsManager.getDirectory();
+		return directory;
 	}
 	
 	//==================================== Guild Specific Tools ==================================================
 	public File getGuildSettingsFolder()
 	{
 		File guildSettingsFolder;
-		if (System.getProperty("os.name").startsWith("windows"))
+		if (System.getProperty("os.name").startsWith("Windows"))
 		{
-			guildSettingsFolder = new File(getDirectory().getAbsolutePath()+"guilds\\");
+			guildSettingsFolder = new File(getDirectory().getAbsolutePath()+"\\guilds\\");
 		}
 		else
 		{
-			guildSettingsFolder = new File(getDirectory().getAbsolutePath()+"guilds/");
+			guildSettingsFolder = new File(getDirectory().getAbsolutePath()+"/guilds/");
 		}
 		if (!guildSettingsFolder.exists())
 		{
-			guildSettingsFolder.mkdir();
+			guildSettingsFolder.mkdirs();
 		}
 		return guildSettingsFolder;
 	}
 	public File getGuildSettingsFile()
 	{
 		Logger logger = LoggerFactory.getLogger(GuildSettingsManager.class);
-		File guildSettingsFile = new File(getGuildSettingsFolder().getAbsolutePath()+guildID+".json");
+		File guildSettingsFile = new File(getGuildSettingsFolder().getAbsolutePath()+"/"+guildID+".json");
 		if (!guildSettingsFile.exists())
 		{
 			try
@@ -221,7 +194,7 @@ public class GuildSettingsManager
 		{
 			commandConfigList.add(commandConfig);
 		}
-		return (CommandConfigJson[]) commandConfigList.toArray();
+		return commandConfigList.toArray(new CommandConfigJson[commandConfigList.size()]);
 	}
 	public CommandConfigJson[] getGuildEnabledCommands()
 	{
@@ -233,7 +206,7 @@ public class GuildSettingsManager
 				commandConfigList.add(commandConfig);
 			}
 		}
-		return (CommandConfigJson[]) commandConfigList.toArray();
+		return commandConfigList.toArray(new CommandConfigJson[commandConfigList.size()]);
 	}
 	public CommandConfigJson[] getGuildDisabledCommands()
 	{
@@ -245,7 +218,7 @@ public class GuildSettingsManager
 				commandConfigList.add(commandConfig);
 			}
 		}
-		return (CommandConfigJson[]) commandConfigList.toArray();
+		return commandConfigList.toArray(new CommandConfigJson[commandConfigList.size()]);
 	}
 
 	//============================================================================================================

@@ -32,7 +32,7 @@ public class GlobalSettingsManager
 	
 	public static File getDirectory()
 	{
-		if (directory != null)
+		if (directory == null)
 		{
 			Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
 			String operatingSystem = System.getProperty("os.name").toLowerCase();
@@ -69,7 +69,7 @@ public class GlobalSettingsManager
 	public static File getGlobalSettingsFile()
 	{
 		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
-		File settingsFile = new File(getDirectory().getAbsolutePath()+"settings.json");
+		File settingsFile = new File(getDirectory().getAbsolutePath()+"/settings.json");
 		if (!settingsFile.exists())
 		{
 			logger.error("Settings file does not exist.");
@@ -138,10 +138,48 @@ public class GlobalSettingsManager
 
 	}
 	
-	public static File performFirstTimeSetup()
+	public static File performFirstTimeSetup(String token) //TODO: Remove
 	{
 		//TODO: Call some GUIs 'n' shit.
-		return new File("foobar.json");
+		File settingsFile = new File(getDirectory().getAbsolutePath()+"/settings.json");
+		if (!settingsFile.exists())
+		{
+			try
+			{
+				settingsFile.createNewFile();
+				FileWriter fileWriter = new FileWriter(settingsFile);
+				PrintWriter printWriter = new PrintWriter(fileWriter);
+				
+				CommandRegister commandRegister = new CommandRegister();
+				CommandConfigJson[] ccjs = new CommandConfigJson[commandRegister.getRegisterSize()];
+				String[] keys = commandRegister.getAllCommandKeys();
+				for (int i = 0; i<ccjs.length; i++)
+				{
+					ccjs[i] = new CommandConfigJson();
+					ccjs[i].commandKey = keys[i];
+					ccjs[i].enabled = true;
+				}
+				globalSettings = new GlobalSettingsManager.GlobalSettingsJson();
+				globalSettings.token = token;
+				globalSettings.commandConfig = ccjs.clone();
+
+				Gson gson = new Gson();
+				printWriter.print(gson.toJson(globalSettings));
+				
+				printWriter.close();
+				fileWriter.close();
+				return settingsFile;
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+				return null;
+			}
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	public static String getGlobalClientToken()
@@ -222,7 +260,7 @@ public class GlobalSettingsManager
 		{
 			commandConfigList.add(commandConfig);
 		}
-		return (CommandConfigJson[]) commandConfigList.toArray();
+		return commandConfigList.toArray(new CommandConfigJson[commandConfigList.size()]);
 	}
 	public static HashMap<String, Boolean> getGlobalCommandConfigMap()
 	{
@@ -243,7 +281,7 @@ public class GlobalSettingsManager
 				commandConfigList.add(commandConfig);
 			}
 		}
-		return (CommandConfigJson[]) commandConfigList.toArray();
+		return commandConfigList.toArray(new CommandConfigJson[commandConfigList.size()]);
 	}
 	public static CommandConfigJson[] getGlobalDisabledCommands()
 	{
@@ -255,17 +293,17 @@ public class GlobalSettingsManager
 				commandConfigList.add(commandConfig);
 			}
 		}
-		return (CommandConfigJson[]) commandConfigList.toArray();
+		return commandConfigList.toArray(new CommandConfigJson[commandConfigList.size()]);
 	}
 	//============================================================================================================
 	
 	//===================================== JSON Classes =========================================================
-	private class GlobalSettingsJson
+	private static class GlobalSettingsJson
 	{
 		String token;
 		CommandConfigJson[] commandConfig;
 	}
-	private class CommandConfigJson
+	private static class CommandConfigJson
 	{
 		String commandKey;
 		boolean enabled;
