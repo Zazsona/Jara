@@ -258,7 +258,7 @@ public class MessageManager
 	 */
 	public Message[] getMessageHistory()
 	{
-		return (Message[]) messageLog.toArray();
+		return messageLog.toArray(new Message[messageLog.size()]);
 	}
 	/**
 	 * 
