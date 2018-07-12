@@ -2,8 +2,13 @@ package jara;
 
 import java.util.ArrayList;
 
+import commands.About;
+import commands.CoinFlip;
 import commands.Command;
+import commands.EightBall;
+import commands.Jokes;
 import commands.Ping;
+import commands.Report;
 
 public class CommandRegister
 {
@@ -23,9 +28,12 @@ public class CommandRegister
 		 * ===========================================
 		 */
 		register.add(new CommandAttributes("Ping", Ping.class, new String[] {"Pong", "Test"}));
+		register.add(new CommandAttributes("Report", Report.class, new String[] {"Status", "Stats"}));
+		register.add(new CommandAttributes("About", About.class, new String[] {"Credits", "Authors"}));
+		register.add(new CommandAttributes("EightBall", EightBall.class, new String[] {"8ball", "helix", "fortune"}));
+		register.add(new CommandAttributes("Jokes", Jokes.class, new String[] {"Joke", "Comedy"}));
+		register.add(new CommandAttributes("CoinFlip", CoinFlip.class, new String[] {"FlipCoin", "Toss", "cf", "fc", "fiftyfifty", "flipacoin"}));
 	}
-	
-	
 	/**
 	 * This method returns the command list of all programmed commands, with their classes and alias arrays.<br>
 	 * @return
@@ -33,19 +41,52 @@ public class CommandRegister
 	 */
 	public CommandAttributes[] getRegister()
 	{
-		return (CommandAttributes[]) register.toArray();
+		return register.toArray(new CommandAttributes[register.size()]);
 	}
 	public String[] getAllCommandAliases()
 	{
-		
+		ArrayList<String> aliases = new ArrayList<String>();
+		for (CommandAttributes commandAttributes : register)
+		{
+			for (String alias : commandAttributes.getAliases())
+			{
+				aliases.add(alias);
+			}
+		}
+		return aliases.toArray(new String[aliases.size()]);
 	}
-	public Class<? extends Command> getAllCommandClasses()
+	public ArrayList<Class<? extends Command>> getAllCommandClasses()
 	{
-		
+		ArrayList<Class<? extends Command>> classes = new ArrayList<Class<? extends Command>>();
+		for (CommandAttributes commandAttributes : register)
+		{
+			classes.add(commandAttributes.getCommandClass());
+		}
+		return classes;
 	}
 	public String[] getAllCommandKeys()
 	{
-		
+		ArrayList<String> keys = new ArrayList<String>();
+		for (CommandAttributes commandAttributes : register)
+		{
+			keys.add(commandAttributes.getCommandKey());
+		}
+		return keys.toArray(new String[keys.size()]);
+	}
+	public CommandAttributes getCommand(String key)
+	{
+		for (CommandAttributes commandAttributes : register)
+		{
+			if (commandAttributes.getCommandKey().equalsIgnoreCase(key))
+			{
+				return commandAttributes;
+			}
+		}
+		return null; //Bad key
+	}
+	public int getRegisterSize()
+	{
+		return register.size();
 	}
 	
 }

@@ -12,7 +12,12 @@ public class CommandAttributes
 	{
 		commandKey = commandKeyArg;
 		commandClass = commandClassArg;
-		aliases = aliasesArg.clone();
+		aliases = new String[aliasesArg.length+1];
+		aliases[0] = commandKey;
+		for (int i = 1; i<aliasesArg.length; i++)
+		{
+			aliases[i] = aliasesArg[i-1];
+		}
 	}
 	public String getCommandKey()
 	{

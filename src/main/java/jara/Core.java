@@ -7,12 +7,6 @@ import javax.security.auth.login.LoginException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import commands.About;
-import commands.CoinFlip;
-import commands.EightBall;
-import commands.Jokes;
-import commands.Ping;
-import commands.Report;
 import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 
@@ -42,17 +36,13 @@ public class Core //A class for covering the global manners of the bot.
 	}
 	public static void enableCommands()
 	{
-		/*
-		 * When adding command aliases, ensure that the first alias matches the command's command key.
-		 */
 		HashMap<String, Boolean> commandConfigMap = GlobalSettingsManager.getGlobalCommandConfigMap();
-		CommandConfiguration[] commandConfigs = new CommandConfiguration[commandConfigMap.size()];
-		commandConfigs[0] = new CommandConfiguration(commandConfigMap.get("Ping"), new String[] {"Ping", "Pong"}, Ping.class);
-		commandConfigs[1] = new CommandConfiguration(commandConfigMap.get("Report"), new String[] {"Report", "Info", "Status"}, Report.class);
-		commandConfigs[2] = new CommandConfiguration(commandConfigMap.get("About"), new String[] {"About", "Author", "Source"}, About.class);
-		commandConfigs[3] = new CommandConfiguration(commandConfigMap.get("CoinFlip"), new String[] {"CoinFlip", "FlipCoin", "Coin", "TossCoin", "CoinToss", "cf", "fc"}, CoinFlip.class);
-		commandConfigs[4] = new CommandConfiguration(commandConfigMap.get("EightBall"), new String[] {"EightBall", "8Ball", "HelixFossil"}, EightBall.class);
-		commandConfigs[4] = new CommandConfiguration(commandConfigMap.get("Jokes"), new String[] {"Jokes", "Joke", "TellMeAJoke", "Comedy"}, Jokes.class);
+		CommandRegister commandRegister = new CommandRegister();
+		CommandConfiguration[] commandConfigs = new CommandConfiguration[commandRegister.getRegisterSize()];
+		for (int i = 0; i<commandConfigs.length; i++)
+		{
+			commandConfigs[i] = new CommandConfiguration(commandConfigMap.get(commandRegister.getRegister()[i].getCommandKey()), commandRegister.getRegister()[i].getAliases(), commandRegister.getRegister()[i].getCommandClass());
+		}
 		shardManager.addEventListener(new CommandHandler(commandConfigs));
 	}
 }
