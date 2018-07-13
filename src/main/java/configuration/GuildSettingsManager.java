@@ -1,4 +1,4 @@
-package jara;
+package configuration;
 
 import java.io.File;
 import java.io.FileReader;
@@ -13,7 +13,10 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
+import jara.CommandRegister;
+import jara.Core;
 
+//TODO: Add a onGuildJoinEvent to create a new settings file. Also, create a new settings file if it is found to be missing.
 
 public class GuildSettingsManager
 {
@@ -57,19 +60,16 @@ public class GuildSettingsManager
 		File guildSettingsFile = new File(getGuildSettingsFolder().getAbsolutePath()+"/"+guildID+".json");
 		if (!guildSettingsFile.exists())
 		{
-			try
-			{
-				guildSettingsFile.createNewFile();
-				//TODO: Set file data
-			} 
-			catch (IOException e)
-			{
-				logger.error("Unable to create guild settings file.");
-				e.printStackTrace();
-				return null;
-			}
+			logger.error("Guild "+guildID+"'s settings have gone missing, or never existed. Creating new config.");
+			Core.getShardManager().getGuildById(guildID).getOwner().getUser().openPrivateChannel().complete().sendMessage("Hmm, I can't seem to find a config for your guild :thinking:\nIf you added this bot while it was offline, that's fine! Use ```/config``` in your guild to get started.\nIf you had a config set up, please contact the host for this instance of the bot." ).queue();
+			performNewGuildSetup();
 		}
 		return guildSettingsFile;
+	}
+	public void deleteGuildSettingsFile()
+	{
+		File guildSettingsFile = getGuildSettingsFile();
+		guildSettingsFile.delete();
 	}
 	public GuildSettingsJson getGuildSettings()
 	{
@@ -121,7 +121,53 @@ public class GuildSettingsManager
 			e.printStackTrace();
 		}
 	}
-	
+	public File performNewGuildSetup()
+	{
+		//TODO: Call some GUIs 'n' shit.
+		File guildSettingsFile = new File(getGuildSettingsFolder().getAbsolutePath()+"/"+guildID+".json");
+		if (!guildSettingsFile.exists())
+		{
+			try
+			{
+				guildSettingsFile.createNewFile();
+				FileWriter fileWriter = new FileWriter(guildSettingsFile);
+				PrintWriter printWriter = new PrintWriter(fileWriter);
+				
+				CommandRegister commandRegister = new CommandRegister();
+				CommandConfigJson[] ccjs = new CommandConfigJson[commandRegister.getRegisterSize()];
+				String[] keys = commandRegister.getAllCommandKeys();
+				for (int i = 0; i<ccjs.length; i++)
+				{
+					ccjs[i] = new CommandConfigJson();
+					ccjs[i].commandKey = keys[i];
+					ccjs[i].enabled = false;
+					if (keys[i].equalsIgnoreCase("About") || keys[i].equalsIgnoreCase("Help"))
+					{
+						ccjs[i].enabled = true; //Have these enabled by default.
+					}
+				}
+				guildSettings = new GuildSettingsJson();
+				guildSettings.gameCategoryID = ""; //TODO: Pass category id as arg? Create one here? Ask?
+				guildSettings.commandConfig = ccjs.clone();
+
+				Gson gson = new Gson();
+				printWriter.print(gson.toJson(guildSettings));
+				
+				printWriter.close();
+				fileWriter.close();
+				return guildSettingsFile;
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+				return null;
+			}
+		}
+		else
+		{
+			return null;
+		}
+	}
 	public String getGuildGameCategoryID()
 	{
 		return getGuildSettings().gameCategoryID;

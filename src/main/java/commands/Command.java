@@ -3,7 +3,7 @@ package commands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jara.GuildSettingsManager;
+import configuration.GuildSettingsManager;
 import net.dv8tion.jda.core.entities.Category;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
