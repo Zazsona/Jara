@@ -1,5 +1,7 @@
 package configuration;
 
+import java.time.LocalDateTime;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,12 +58,12 @@ public class CommandConfiguration
 					{
 						msgEvent.getChannel().sendMessage("Sorry, I was unable to run the command.").queue();
 						Logger logger = LoggerFactory.getLogger(CommandConfiguration.class);
-						logger.error("A command request was sent but could not be fulfilled: "+parameters.toString()); //TODO: Provide more details (Guild, user, channel, etc.)
+						logger.error("A command request was sent but could not be fulfilled.\nCommand: "+parameters.toString()+"\nGuild: "+msgEvent.getGuild().getId()+" ("+msgEvent.getGuild().getName()+")\nUser: "+msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+"Channel: "+msgEvent.getChannel().getId()+" ("+msgEvent.getChannel().getName()+")\nDate/Time: "+LocalDateTime.now().toString());
 						e.printStackTrace();
 					}
 				};
 				Thread commandThread = new Thread(commandRunnable);
-				commandThread.setName(aliases[0]+"-Thread"); //TODO: Reimplement failure feedback
+				commandThread.setName(aliases[0]+"-Thread");
 				commandThread.start();
 				return;
 			}

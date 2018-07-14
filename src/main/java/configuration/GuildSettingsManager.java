@@ -16,7 +16,6 @@ import com.google.gson.Gson;
 import jara.CommandRegister;
 import jara.Core;
 
-//TODO: Add a onGuildJoinEvent to create a new settings file. Also, create a new settings file if it is found to be missing.
 
 public class GuildSettingsManager
 {
@@ -91,6 +90,7 @@ public class GuildSettingsManager
 			fileReader.close();
 			Gson gson = new Gson();
 			guildSettings = gson.fromJson(guildSettingsDataBuilder.toString(), GuildSettingsJson.class);
+			addNewCommands();
 			return guildSettings;
 		} 
 		catch (IOException e)
@@ -123,7 +123,6 @@ public class GuildSettingsManager
 	}
 	public File performNewGuildSetup()
 	{
-		//TODO: Call some GUIs 'n' shit.
 		File guildSettingsFile = new File(getGuildSettingsFolder().getAbsolutePath()+"/"+guildID+".json");
 		if (!guildSettingsFile.exists())
 		{
@@ -147,7 +146,7 @@ public class GuildSettingsManager
 					}
 				}
 				guildSettings = new GuildSettingsJson();
-				guildSettings.gameCategoryID = ""; //TODO: Pass category id as arg? Create one here? Ask?
+				guildSettings.gameCategoryID = ""; //This will be set separately when configured by guild owner.
 				guildSettings.commandConfig = ccjs.clone();
 
 				Gson gson = new Gson();
@@ -231,6 +230,27 @@ public class GuildSettingsManager
 			logger.info("Command "+commandKey+ "'s enabled status has been changed to "+newStatus+" for guild "+guildID);
 		}
 
+	}
+	public void addNewCommands()
+	{
+		CommandRegister commandRegister = new CommandRegister();
+		if (guildSettings.commandConfig.length < commandRegister.getRegisterSize()) 
+		{
+			CommandConfigJson[] updatedCommandConfig = new CommandConfigJson[commandRegister.getRegisterSize()]; 
+			for (int i = 0; i<guildSettings.commandConfig.length; i++)		//For every known command setting...
+			{
+				updatedCommandConfig[i] = guildSettings.commandConfig[i];		//Put that in the new config
+			}
+			String keys[] = commandRegister.getAllCommandKeys();
+			for (int j = guildSettings.commandConfig.length; j<commandRegister.getRegisterSize(); j++)	//For the missing entries (based on size discrepancy)...
+			{
+				updatedCommandConfig[j].commandKey = keys[j];																		//Create new entries
+				updatedCommandConfig[j].enabled = false; //We will show the GUI later, and false should make it clearer what is new.
+			}
+			guildSettings.commandConfig = updatedCommandConfig.clone();
+			Core.getShardManager().getGuildById(guildID).getOwner().getUser().openPrivateChannel().complete().sendMessage("Just a heads up, I've received an update and new commands have been added. You can enable these via ```/config```").queue();
+			saveGuildSettings();		
+		}
 	}
 	
 	public CommandConfigJson[] getGuildCommandConfig()

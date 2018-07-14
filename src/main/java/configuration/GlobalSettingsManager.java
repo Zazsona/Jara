@@ -42,14 +42,9 @@ public class GlobalSettingsManager
 			{
 				directory = new File(System.getProperty("user.home")+"\\AppData\\Roaming\\Jara\\");
 			}
-			else if (operatingSystem.startsWith("linux"))
-			{
-				directory = new File(System.getProperty("user.home")+"/.Jara/");
-			}
 			else
 			{
-
-				logger.info("An unsupported operating system is being used. Be aware some issues may occur."); //TODO: Move this to somewhere more logical?
+				directory = new File(System.getProperty("user.home")+"/.Jara/");
 			}
 			if (!directory.exists())
 			{
@@ -107,6 +102,7 @@ public class GlobalSettingsManager
 				fileReader.close();
 				Gson gson = new Gson();
 				globalSettings = gson.fromJson(settingsFileDataBuilder.toString(), GlobalSettingsJson.class);
+				addNewCommands();
 				return globalSettings;
 			} 
 			catch (IOException e)
@@ -143,9 +139,15 @@ public class GlobalSettingsManager
 	public static File performFirstTimeSetup(String token) //TODO: Remove
 	{
 		//TODO: Call some GUIs 'n' shit.
+		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
 		File settingsFile = new File(getDirectory().getAbsolutePath()+"/settings.json");
 		if (!settingsFile.exists())
 		{
+			String operatingSystem = System.getProperty("os.name");
+			if (!operatingSystem.startsWith("Windows") || !operatingSystem.startsWith("Linux"))
+			{
+				logger.info("An unsupported operating system is being used. Be aware some issues may occur.");
+			}
 			try
 			{
 				settingsFile.createNewFile();
@@ -252,7 +254,29 @@ public class GlobalSettingsManager
 			saveGlobalSettings();
 			logger.info("Command "+commandKey+ "'s enabled status has been changed to "+newStatus+". This will be reflected after a restart.");
 		}
-
+	}
+	
+	public static void addNewCommands()
+	{
+		CommandRegister commandRegister = new CommandRegister();
+		if (globalSettings.commandConfig.length < commandRegister.getRegisterSize()) 
+		{
+			CommandConfigJson[] updatedCommandConfig = new CommandConfigJson[commandRegister.getRegisterSize()]; 
+			for (int i = 0; i<globalSettings.commandConfig.length; i++)		//For every known command setting...
+			{
+				updatedCommandConfig[i] = globalSettings.commandConfig[i];		//Put that in the new config
+			}
+			String keys[] = commandRegister.getAllCommandKeys();
+			for (int j = globalSettings.commandConfig.length; j<commandRegister.getRegisterSize(); j++)	//For the missing entries (based on size discrepancy)...
+			{
+				updatedCommandConfig[j].commandKey = keys[j];																		//Create new entries
+				updatedCommandConfig[j].enabled = false; //We will show the GUI later, and false should make it clearer what is new.
+			}
+			globalSettings.commandConfig = updatedCommandConfig.clone();
+			//TODO: SHOW THE GUI TO SELECT ENABLED COMMANDS
+			saveGlobalSettings();
+			
+		}
 	}
 	
 	public static CommandConfigJson[] getGlobalCommandConfig()
