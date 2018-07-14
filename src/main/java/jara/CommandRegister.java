@@ -2,13 +2,13 @@ package jara;
 
 import java.util.ArrayList;
 
-import commands.About;
-import commands.CoinFlip;
 import commands.Command;
-import commands.EightBall;
-import commands.Jokes;
-import commands.Ping;
-import commands.Report;
+import commands.standard.About;
+import commands.standard.CoinFlip;
+import commands.standard.EightBall;
+import commands.standard.Jokes;
+import commands.standard.Ping;
+import commands.standard.Report;
 
 public class CommandRegister
 {
@@ -87,6 +87,17 @@ public class CommandRegister
 	public int getRegisterSize()
 	{
 		return register.size();
+	}
+	public String getCommandKey(Class<? extends Command> clazz)
+	{
+		for (CommandAttributes commandAttributes : register)
+		{
+			if (commandAttributes.getCommandClass().equals(clazz))
+			{
+				return commandAttributes.getCommandKey();
+			}
+		}
+		return null; //Invalid class
 	}
 	
 }
