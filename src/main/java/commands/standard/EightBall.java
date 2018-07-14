@@ -1,6 +1,7 @@
-package commands;
+package commands.standard;
 import java.util.Random;
 
+import commands.Command;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 public class EightBall extends Command
