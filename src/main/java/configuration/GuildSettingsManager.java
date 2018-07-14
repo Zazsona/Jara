@@ -60,7 +60,6 @@ public class GuildSettingsManager
 		if (!guildSettingsFile.exists())
 		{
 			logger.error("Guild "+guildID+"'s settings have gone missing, or never existed. Creating new config.");
-			Core.getShardManager().getGuildById(guildID).getOwner().getUser().openPrivateChannel().complete().sendMessage("Hmm, I can't seem to find a config for your guild :thinking:\nIf you added this bot while it was offline, that's fine! Use ```/config``` in your guild to get started.\nIf you had a config set up, please contact the host for this instance of the bot." ).queue();
 			performNewGuildSetup();
 		}
 		return guildSettingsFile;
@@ -140,6 +139,8 @@ public class GuildSettingsManager
 					ccjs[i] = new CommandConfigJson();
 					ccjs[i].commandKey = keys[i];
 					ccjs[i].enabled = false;
+					ccjs[i].roleIDs = new ArrayList<String>(); 
+					ccjs[i].roleIDs.add(guildID); //Weird, huh? Discord's @everyone role id matches the guild's id. So this enables the command for all.
 					if (keys[i].equalsIgnoreCase("About") || keys[i].equalsIgnoreCase("Help"))
 					{
 						ccjs[i].enabled = true; //Have these enabled by default.
@@ -246,11 +247,57 @@ public class GuildSettingsManager
 			{
 				updatedCommandConfig[j].commandKey = keys[j];																		//Create new entries
 				updatedCommandConfig[j].enabled = false; //We will show the GUI later, and false should make it clearer what is new.
+				updatedCommandConfig[j].roleIDs = new ArrayList<String>();
 			}
 			guildSettings.commandConfig = updatedCommandConfig.clone();
 			Core.getShardManager().getGuildById(guildID).getOwner().getUser().openPrivateChannel().complete().sendMessage("Just a heads up, I've received an update and new commands have been added. You can enable these via ```/config```").queue();
 			saveGuildSettings();		
 		}
+	}
+	public void addRoleCommandPermission(String commandKey, String roleID)
+	{
+		for (int i = 0; i<guildSettings.commandConfig.length; i++)
+		{
+			if (commandKey.equalsIgnoreCase(guildSettings.commandConfig[i].commandKey))
+			{
+				guildSettings.commandConfig[i].roleIDs.add(roleID);
+				saveGuildSettings();
+			}
+		}
+	}
+	public void removeRoleCommandPermission(String commandKey, String roleID)
+	{
+		for (int i = 0; i<guildSettings.commandConfig.length; i++)
+		{
+			if (commandKey.equalsIgnoreCase(guildSettings.commandConfig[i].commandKey))
+			{
+				guildSettings.commandConfig[i].roleIDs.remove(roleID);
+				saveGuildSettings();
+			}
+		}
+	}
+	public ArrayList<String> getCommandRolePermissions(String commandKey)
+	{
+		for (int i = 0; i<guildSettings.commandConfig.length; i++)
+		{
+			if (commandKey.equalsIgnoreCase(guildSettings.commandConfig[i].commandKey))
+			{
+				return guildSettings.commandConfig[i].roleIDs;
+			}
+		}
+		return null; //Invalid command key
+	}
+	public ArrayList<String> getRoleCommandPermissions(String roleID)
+	{
+		ArrayList<String> commandKeys = new ArrayList<String>();
+		for (int i = 0; i<guildSettings.commandConfig.length; i++)
+		{
+			if (guildSettings.commandConfig[i].roleIDs.contains(roleID))
+			{
+				commandKeys.add(guildSettings.commandConfig[i].commandKey);
+			}
+		}
+		return commandKeys;
 	}
 	
 	public CommandConfigJson[] getGuildCommandConfig()
@@ -294,6 +341,7 @@ public class GuildSettingsManager
 	{
 		String commandKey;
 		boolean enabled;
+		ArrayList<String> roleIDs;
 	}
 	private class GuildSettingsJson
 	{

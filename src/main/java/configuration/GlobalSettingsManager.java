@@ -274,8 +274,7 @@ public class GlobalSettingsManager
 			}
 			globalSettings.commandConfig = updatedCommandConfig.clone();
 			//TODO: SHOW THE GUI TO SELECT ENABLED COMMANDS
-			saveGlobalSettings();
-			
+			saveGlobalSettings();		
 		}
 	}
 	
