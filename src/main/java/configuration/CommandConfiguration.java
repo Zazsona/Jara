@@ -47,7 +47,7 @@ public class CommandConfiguration
 		if (isEnabled())
 		{
 			GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
-			if (guildSettings.getGuildCommandEnabledStatus(aliases[0]) == true) //The first alias should always match the command key.
+			if (guildSettings.getGuildCommandEnabledStatus(aliases[0]) && guildSettings.hasPermission(msgEvent, getCommandClass())) //The first alias should always match the command key.
 			{
 				Runnable commandRunnable = () -> {
 					try

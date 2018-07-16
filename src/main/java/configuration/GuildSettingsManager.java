@@ -5,7 +5,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Member;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import org.slf4j.Logger;
@@ -13,8 +15,12 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
+import commands.Command;
 import jara.CommandRegister;
 import jara.Core;
+import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 
 public class GuildSettingsManager
@@ -286,6 +292,20 @@ public class GuildSettingsManager
 			}
 		}
 		return null; //Invalid command key
+	}
+	public boolean hasPermission(GuildMessageReceivedEvent msgEvent, Class<? extends Command> command)
+	{
+		ArrayList<String> roleIDs = getCommandRolePermissions(new CommandRegister().getCommandKey(command));
+		List<Role> userRoles = msgEvent.getMember().getRoles(); //MsgEvent used as this gets Member in context of the guild.
+		boolean permissionGranted = false;
+		for (Role userRole : userRoles)
+		{
+			if (roleIDs.contains(userRole.getId()))
+			{
+				permissionGranted = true;
+			}
+		}
+		return permissionGranted;
 	}
 	public ArrayList<String> getRoleCommandPermissions(String roleID)
 	{
