@@ -3,6 +3,7 @@ package jara;
 import java.util.ArrayList;
 
 import commands.Command;
+import commands.config.Config;
 import commands.standard.About;
 import commands.standard.CoinFlip;
 import commands.standard.EightBall;
@@ -33,6 +34,7 @@ public class CommandRegister
 		register.add(new CommandAttributes("EightBall", EightBall.class, new String[] {"8ball", "helix", "fortune"}));
 		register.add(new CommandAttributes("Jokes", Jokes.class, new String[] {"Joke", "Comedy"}));
 		register.add(new CommandAttributes("CoinFlip", CoinFlip.class, new String[] {"FlipCoin", "Toss", "cf", "fc", "fiftyfifty", "flipacoin"}));
+		register.add(new CommandAttributes("Config", Config.class, new String[] {"Settings"}));
 	}
 	/**
 	 * This method returns the command list of all programmed commands, with their classes and alias arrays.<br>

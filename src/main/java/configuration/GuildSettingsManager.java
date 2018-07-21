@@ -151,6 +151,11 @@ public class GuildSettingsManager
 					{
 						ccjs[i].enabled = true; //Have these enabled by default.
 					}
+					else if (keys[i].equalsIgnoreCase("Config"))
+					{
+						ccjs[i].roleIDs.remove(guildID);
+						ccjs[i].enabled = true;
+					}
 				}
 				guildSettings = new GuildSettingsJson();
 				guildSettings.gameCategoryID = ""; //This will be set separately when configured by guild owner.
@@ -251,6 +256,7 @@ public class GuildSettingsManager
 			String keys[] = commandRegister.getAllCommandKeys();
 			for (int j = guildSettings.commandConfig.length; j<commandRegister.getRegisterSize(); j++)	//For the missing entries (based on size discrepancy)...
 			{
+				updatedCommandConfig[j] = new CommandConfigJson();
 				updatedCommandConfig[j].commandKey = keys[j];																		//Create new entries
 				updatedCommandConfig[j].enabled = false; //We will show the GUI later, and false should make it clearer what is new.
 				updatedCommandConfig[j].roleIDs = new ArrayList<String>();

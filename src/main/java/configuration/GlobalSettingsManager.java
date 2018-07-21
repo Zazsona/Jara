@@ -269,6 +269,7 @@ public class GlobalSettingsManager
 			String keys[] = commandRegister.getAllCommandKeys();
 			for (int j = globalSettings.commandConfig.length; j<commandRegister.getRegisterSize(); j++)	//For the missing entries (based on size discrepancy)...
 			{
+				updatedCommandConfig[j] = new CommandConfigJson();
 				updatedCommandConfig[j].commandKey = keys[j];																		//Create new entries
 				updatedCommandConfig[j].enabled = false; //We will show the GUI later, and false should make it clearer what is new.
 			}
@@ -308,6 +309,15 @@ public class GlobalSettingsManager
 		}
 		return commandConfigList.toArray(new CommandConfigJson[commandConfigList.size()]);
 	}
+	public static String[] getGlobalEnabledCommandKeys()
+	{
+		ArrayList<String> keys = new ArrayList<String>();
+		for (CommandConfigJson config : getGlobalEnabledCommands())
+		{
+			keys.add(config.commandKey);
+		}
+		return keys.toArray(new String[keys.size()]);
+	}
 	public static CommandConfigJson[] getGlobalDisabledCommands()
 	{
 		ArrayList<CommandConfigJson> commandConfigList = new ArrayList<CommandConfigJson>();
@@ -319,6 +329,15 @@ public class GlobalSettingsManager
 			}
 		}
 		return commandConfigList.toArray(new CommandConfigJson[commandConfigList.size()]);
+	}
+	public static String[] getGlobalDisabledCommandKeys()
+	{
+		ArrayList<String> keys = new ArrayList<String>();
+		for (CommandConfigJson config : getGlobalDisabledCommands())
+		{
+			keys.add(config.commandKey);
+		}
+		return keys.toArray(new String[keys.size()]);
 	}
 	//============================================================================================================
 	
