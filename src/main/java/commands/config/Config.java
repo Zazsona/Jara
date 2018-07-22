@@ -8,6 +8,7 @@ import commands.Command;
 import configuration.GlobalSettingsManager;
 import configuration.GuildSettingsManager;
 import jara.CommandRegister;
+import jara.Core;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -24,7 +25,7 @@ public class Config extends Command {
 				setGameCategory(parameters[2], msgEvent);
 			}
 		}
-		else if (parameters[i].equalsIgnoreCase("remgamecategory"))
+		else if (parameters[1].equalsIgnoreCase("remgamecategory"))
 		{
 			setGameCategory("", msgEvent);
 		}
@@ -56,7 +57,6 @@ public class Config extends Command {
 		{
 			displayConfig(msgEvent);
 		}
-		//TODO: Limit which commands can be disabled (Help, Config)
 	}
 	private void setPermissions(GuildMessageReceivedEvent msgEvent, String... parameters) 
 	{
@@ -165,14 +165,7 @@ public class Config extends Command {
 			}
 			roleList.append("\n");
 		}
-		try
-		{
-			embed.setColor(msgEvent.getGuild().getSelfMember().getRoles().get(0).getColor()); //Try to set it to the bot's primary role color
-		}
-		catch (IndexOutOfBoundsException e)	//If the bot has no role
-		{
-			embed.setColor(Color.decode("#5967cf"));	//Use a default theme. //TODO: Make this global in Core (get)
-		}
+		embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
 		embed.setTitle("============ Config =============");
 		embed.addField("Command", keyList.toString(), true);
 		embed.addField("Enabled", enabledList.toString(), true);

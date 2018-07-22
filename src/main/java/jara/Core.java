@@ -1,5 +1,6 @@
 package jara;
 
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.List;
 
@@ -15,6 +16,8 @@ import event.GuildLeaveHandler;
 import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.bot.sharding.ShardManager;
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Role;
 
 public class Core //A class for covering the global manners of the bot.
 {
@@ -59,5 +62,17 @@ public class Core //A class for covering the global manners of the bot.
 	public static ShardManager getShardManager()
 	{
 		return shardManager;
+	}
+	public static Color getHighlightColour(Member selfMember)
+	{
+		try
+		{
+			return selfMember.getRoles().get(0).getColor(); //Try to set it to the bot's primary role colour
+		}
+		catch (IndexOutOfBoundsException e)	//If the bot has no role
+		{
+			return Color.decode("#5967cf"); //Use a default theme.
+		}
+		
 	}
 }

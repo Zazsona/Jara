@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import commands.Command;
+import jara.Core;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
@@ -27,20 +28,12 @@ public class Report extends Command
 		{
 			reportSB.append(" (" + msgEvent.getMember().getNickname() + ")");   //Display guild specific nickname, too.
 		}
-		EmbedBuilder reportEmbed = new EmbedBuilder();
-		reportEmbed.setTitle(msgEvent.getJDA().getSelfUser().getName()+" Report:");
-		reportEmbed.setDescription(reportSB.toString());
+		EmbedBuilder embed = new EmbedBuilder();
+		embed.setTitle(msgEvent.getJDA().getSelfUser().getName()+" Report:");
+		embed.setDescription(reportSB.toString());
+		embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
 		
-		try
-		{
-			reportEmbed.setColor(msgEvent.getGuild().getSelfMember().getRoles().get(0).getColor()); //Try to set it to the bot's primary role color
-		}
-		catch (IndexOutOfBoundsException e)	//If the bot has no role
-		{
-			reportEmbed.setColor(Color.decode("#5967cf"));	//Use a default theme.
-		}
-		
-        msgEvent.getChannel().sendMessage(reportEmbed.build()).queue();
+        msgEvent.getChannel().sendMessage(embed.build()).queue();
 	}
 
 }
