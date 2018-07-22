@@ -272,8 +272,11 @@ public class GuildSettingsManager
 		{
 			if (commandKey.equalsIgnoreCase(guildSettings.commandConfig[i].commandKey))
 			{
-				guildSettings.commandConfig[i].roleIDs.add(roleID);
-				saveGuildSettings();
+				if (!guildSettings.commandConfig[i].roleIDs.contains(roleID))
+				{
+					guildSettings.commandConfig[i].roleIDs.add(roleID);
+					saveGuildSettings();
+				}
 			}
 		}
 	}
