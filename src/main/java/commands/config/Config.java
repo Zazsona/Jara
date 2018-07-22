@@ -17,8 +17,75 @@ public class Config extends Command {
 	@Override
 	public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
 	{
+		if (parameters.length == 3)
+		{
+			if (parameters[1].equalsIgnoreCase("enable") || parameters[1].equalsIgnoreCase("disable"))
+			{
+				for (String key : GlobalSettingsManager.getGlobalEnabledCommandKeys())
+				{
+					if (parameters[2].equalsIgnoreCase(key))
+					{
+						GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
+						if (parameters[1].equalsIgnoreCase("enable"))
+						{
+							guildSettings.setGuildCommandEnabledStatus(key, true);
+						}
+						else
+						{
+							guildSettings.setGuildCommandEnabledStatus(key, false);
+						}
+
+						msgEvent.getChannel().sendMessage(key+" status updated!").queue();	
+					}
+				}
+			}
+		}
+		else if (parameters.length == 4)
+		{
+			if (parameters[1].equalsIgnoreCase("addrole") || parameters[1].equalsIgnoreCase("remrole"))
+			{
+				List<Role> roles = msgEvent.getGuild().getRolesByName(parameters[3], true);
+				if (roles.isEmpty())
+				{
+					msgEvent.getChannel().sendMessage("Could not find a role by that name.").queue();
+					return;
+				}
+				String roleID = roles.get(0).getId();
+				for (String key : GlobalSettingsManager.getGlobalEnabledCommandKeys())
+				{
+					if (parameters[2].equalsIgnoreCase(key))
+					{
+						
+						GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
+						if (parameters[1].equalsIgnoreCase("addrole"))
+						{
+							guildSettings.addRoleCommandPermission(key, roleID);
+						}
+						else
+						{
+							guildSettings.removeRoleCommandPermission(key, roleID);
+						}
+						msgEvent.getChannel().sendMessage(key+" permissions updated!").queue();	
+					}
+				}
+			}
+		}
+		else
+		{
+			displayConfig(msgEvent);
+		}
+		//TODO: Limit which commands can be disabled (Help, Config)
+	}
+	public void displayConfig(GuildMessageReceivedEvent msgEvent)
+	{
 		GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
 		EmbedBuilder embed = new EmbedBuilder();
+		embed.setDescription("**Commands**\n"
+				+ "/config enable [Command]\n"
+				+ "/config disable [Command]\n"
+				+ "/config AddRole [Command] [Role Name]\n"
+				+ "/config RemRole [Command] [Role Name]\n");
+				
 		StringBuilder keyList = new StringBuilder();
 		StringBuilder enabledList = new StringBuilder();
 		StringBuilder roleList = new StringBuilder();
@@ -37,7 +104,10 @@ public class Config extends Command {
 			{
 				roleList.append(msgEvent.getGuild().getRoleById(roleID).getName().replace("@", "")+", "); //Replacing @ here as getName appends it for the everyone role, causing a ping.
 			}
-			roleList.setLength(roleList.length()-1); //Remove last ', '
+			if (roleList.lastIndexOf(", ") == roleList.length()-2)
+			{
+				roleList.setLength(roleList.length()-2); //Remove last ', '
+			}
 			roleList.append("\n");
 		}
 		try
@@ -53,7 +123,6 @@ public class Config extends Command {
 		embed.addField("Enabled", enabledList.toString(), true);
 		embed.addField("Permissions", roleList.toString(), true);
 		msgEvent.getChannel().sendMessage(embed.build()).queue();
-		//TODO: Limit which commands can be disabled (Help, Config)
 	}
 
 }
