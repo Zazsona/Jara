@@ -17,58 +17,40 @@ public class Config extends Command {
 	@Override
 	public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
 	{
-		if (parameters.length == 3)
+		if (parameters[1].equalsIgnoreCase("setgamecategory"))
 		{
-			if (parameters[1].equalsIgnoreCase("enable") || parameters[1].equalsIgnoreCase("disable"))
+			if (parameters.length == 3)
 			{
-				for (String key : GlobalSettingsManager.getGlobalEnabledCommandKeys())
-				{
-					if (parameters[2].equalsIgnoreCase(key))
-					{
-						GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
-						if (parameters[1].equalsIgnoreCase("enable"))
-						{
-							guildSettings.setGuildCommandEnabledStatus(key, true);
-						}
-						else
-						{
-							guildSettings.setGuildCommandEnabledStatus(key, false);
-						}
-
-						msgEvent.getChannel().sendMessage(key+" status updated!").queue();	
-					}
-				}
+				setGameCategory(parameters[2], msgEvent);
 			}
 		}
-		else if (parameters.length == 4)
+		else if (parameters[i].equalsIgnoreCase("remgamecategory"))
 		{
-			if (parameters[1].equalsIgnoreCase("addrole") || parameters[1].equalsIgnoreCase("remrole"))
+			setGameCategory("", msgEvent);
+		}
+		else if (parameters[1].equalsIgnoreCase("enable") || parameters[1].equalsIgnoreCase("disable"))
+		{
+			if (parameters.length == 3)
 			{
-				List<Role> roles = msgEvent.getGuild().getRolesByName(parameters[3], true);
-				if (roles.isEmpty())
-				{
-					msgEvent.getChannel().sendMessage("Could not find a role by that name.").queue();
-					return;
-				}
-				String roleID = roles.get(0).getId();
-				for (String key : GlobalSettingsManager.getGlobalEnabledCommandKeys())
-				{
-					if (parameters[2].equalsIgnoreCase(key))
-					{
-						
-						GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
-						if (parameters[1].equalsIgnoreCase("addrole"))
-						{
-							guildSettings.addRoleCommandPermission(key, roleID);
-						}
-						else
-						{
-							guildSettings.removeRoleCommandPermission(key, roleID);
-						}
-						msgEvent.getChannel().sendMessage(key+" permissions updated!").queue();	
-					}
-				}
+				setStatus(msgEvent, parameters);
 			}
+			else
+			{
+				msgEvent.getChannel().sendMessage("Insufficient parameters.").queue();
+			}
+
+		}
+		else if (parameters[1].equalsIgnoreCase("addrole") || parameters[1].equalsIgnoreCase("remrole"))
+		{
+			if (parameters.length == 4)
+			{
+				setPermissions(msgEvent, parameters);
+			}
+			else
+			{
+				msgEvent.getChannel().sendMessage("Insufficient parameters.").queue();
+			}
+
 		}
 		else
 		{
@@ -76,11 +58,84 @@ public class Config extends Command {
 		}
 		//TODO: Limit which commands can be disabled (Help, Config)
 	}
-	public void displayConfig(GuildMessageReceivedEvent msgEvent)
+	private void setPermissions(GuildMessageReceivedEvent msgEvent, String... parameters) 
+	{
+		List<Role> roles = msgEvent.getGuild().getRolesByName(parameters[3], true);
+		if (roles.isEmpty())
+		{
+			msgEvent.getChannel().sendMessage("Could not find a role by that name.").queue();
+			return;
+		}
+		String roleID = roles.get(0).getId();
+		for (String key : GlobalSettingsManager.getGlobalEnabledCommandKeys())
+		{
+			if (parameters[2].equalsIgnoreCase(key))
+			{
+				
+				GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
+				if (parameters[1].equalsIgnoreCase("addrole"))
+				{
+					guildSettings.addRoleCommandPermission(key, roleID);
+				}
+				else
+				{
+					guildSettings.removeRoleCommandPermission(key, roleID);
+				}
+				msgEvent.getChannel().sendMessage(key+" permissions updated!").queue();	
+			}
+		}
+	}
+	private void setStatus(GuildMessageReceivedEvent msgEvent, String... parameters) 
+	{
+		for (String key : GlobalSettingsManager.getGlobalEnabledCommandKeys())
+		{
+			if (parameters[2].equalsIgnoreCase(key))
+			{
+				GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
+				if (parameters[1].equalsIgnoreCase("enable"))
+				{
+					guildSettings.setGuildCommandEnabledStatus(key, true);
+				}
+				else
+				{
+					if (key.equalsIgnoreCase("config") || key.equalsIgnoreCase("about") || key.equalsIgnoreCase("help"))
+					{
+						msgEvent.getChannel().sendMessage(key + " cannot be disabled.").queue();
+					}
+					guildSettings.setGuildCommandEnabledStatus(key, false);
+				}
+
+				msgEvent.getChannel().sendMessage(key+" status updated!").queue();	
+			}
+		}
+	}
+	private void setGameCategory(String categoryName, GuildMessageReceivedEvent msgEvent)
+	{
+		String categoryID;
+		if (categoryName.equals(""))
+		{
+			categoryID = "";
+		}
+		else
+		{
+			categoryID = msgEvent.getGuild().getCategoriesByName(categoryName, true).get(0).getId();
+			if (categoryID.equals(""))
+			{
+				msgEvent.getChannel().sendMessage("Category not found.").queue();
+				return;
+			}
+			GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
+			guildSettings.setGuildGameCategoryID(categoryID);
+			msgEvent.getChannel().sendMessage("Game category set to "+msgEvent.getGuild().getCategoryById(categoryID).getName());
+		}
+	}
+	private void displayConfig(GuildMessageReceivedEvent msgEvent)
 	{
 		GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
 		EmbedBuilder embed = new EmbedBuilder();
 		embed.setDescription("**Commands**\n"
+				+ "/config SetGameCategory [Category Name]\n"
+				+ "/config RemGameCategory"
 				+ "/config enable [Command]\n"
 				+ "/config disable [Command]\n"
 				+ "/config AddRole [Command] [Role Name]\n"
