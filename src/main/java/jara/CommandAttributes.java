@@ -14,7 +14,7 @@ public class CommandAttributes
 		commandClass = commandClassArg;
 		aliases = new String[aliasesArg.length+1];
 		aliases[0] = commandKey;
-		for (int i = 1; i<aliasesArg.length; i++)
+		for (int i = 1; i<aliases.length; i++)
 		{
 			aliases[i] = aliasesArg[i-1];
 		}

@@ -27,6 +27,7 @@ public class CommandRegister
 		 * Simply create a new CommandAttributes class in the list, and pass the Command Key, Command Class, and then any aliases.
 		 * All other operations (Adding them to settings, indexing them at boot, etc.) will be done automatically.
 		 * 
+		 * NOTE: ALWAYS ADD YOUR NEW COMMAND AT THE END FOR PROPER UPDATING OF LEGACY CONFIGS
 		 * ===========================================
 		 */
 		register.add(new CommandAttributes("Ping", Ping.class, new String[] {"Pong", "Test"}));
@@ -35,8 +36,8 @@ public class CommandRegister
 		register.add(new CommandAttributes("EightBall", EightBall.class, new String[] {"8ball", "helix", "fortune"}));
 		register.add(new CommandAttributes("Jokes", Jokes.class, new String[] {"Joke", "Comedy"}));
 		register.add(new CommandAttributes("CoinFlip", CoinFlip.class, new String[] {"FlipCoin", "Toss", "cf", "fc", "fiftyfifty", "flipacoin"}));
-		register.add(new CommandAttributes("Countdown", Countdown.class, new String[] {"cd"}));
 		register.add(new CommandAttributes("Config", Config.class, new String[] {"Settings"}));
+		register.add(new CommandAttributes("Countdown", Countdown.class, new String[] {"cd"}));
 
 
 	}
