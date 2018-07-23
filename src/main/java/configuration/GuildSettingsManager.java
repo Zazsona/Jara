@@ -97,7 +97,6 @@ public class GuildSettingsManager
 			fileReader.close();
 			Gson gson = new Gson();
 			guildSettings = gson.fromJson(guildSettingsDataBuilder.toString(), GuildSettingsJson.class);
-			addNewCommands();
 			return guildSettings;
 		} 
 		catch (IOException e)
@@ -245,7 +244,7 @@ public class GuildSettingsManager
 		}
 
 	}
-	public void addNewCommands()
+	/*public void addNewCommands()
 	{
 		CommandRegister commandRegister = new CommandRegister();
 		if (guildSettings.commandConfig.length < commandRegister.getRegisterSize()) 
@@ -256,7 +255,7 @@ public class GuildSettingsManager
 				updatedCommandConfig[i] = guildSettings.commandConfig[i];		//Put that in the new config
 			}
 			String keys[] = commandRegister.getAllCommandKeys();
-			for (int j = guildSettings.commandConfig.length; j<commandRegister.getRegisterSize(); j++)	//For the missing entries (based on size discrepancy)...
+			for (int j = guildSettings.commandConfig.length; j<commandRegister.getRegisterSize(); j++)	//For the missing entries (based on size discrepancy)...		//Could be useful in future for adding commands on the fly, as no reboot is required.
 			{
 				updatedCommandConfig[j] = new JsonFormats().new GuildCommandConfigJson();
 				updatedCommandConfig[j].commandKey = keys[j];																		//Create new entries
@@ -267,7 +266,7 @@ public class GuildSettingsManager
 			Core.getShardManager().getGuildById(guildID).getOwner().getUser().openPrivateChannel().complete().sendMessage("Just a heads up, I've received an update and new commands have been added. You can enable these via ```/config```").queue();
 			saveGuildSettings();		
 		}
-	}
+	}*/
 	public void addRoleCommandPermission(String commandKey, String roleID)
 	{
 		for (int i = 0; i<guildSettings.commandConfig.length; i++)

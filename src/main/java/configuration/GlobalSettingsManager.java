@@ -18,6 +18,8 @@ import com.google.gson.Gson;
 
 import configuration.JsonFormats.GlobalCommandConfigJson;
 import configuration.JsonFormats.GlobalSettingsJson;
+import configuration.JsonFormats.GuildCommandConfigJson;
+import configuration.JsonFormats.GuildSettingsJson;
 import jara.CommandRegister;
 import jara.Core;
 import net.dv8tion.jda.core.entities.Guild;
@@ -279,6 +281,7 @@ public class GlobalSettingsManager
 	
 	public static void addNewCommands()
 	{
+		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
 		CommandRegister commandRegister = new CommandRegister();
 		if (globalSettings.commandConfig.length < commandRegister.getRegisterSize()) 
 		{
@@ -299,8 +302,45 @@ public class GlobalSettingsManager
 			saveGlobalSettings();		
 			for (File guildSettingsFile : getGuildSettingsFolder().listFiles())
 			{
-				
+				try
+				{
+					FileReader fileReader = new FileReader(guildSettingsFile);
+					Scanner scanner = new Scanner(fileReader);
+					StringBuilder guildSettingsDataBuilder = new StringBuilder();
+					while (scanner.hasNext())
+					{
+						guildSettingsDataBuilder.append(scanner.nextLine());
+					}
+					scanner.close();
+					fileReader.close();
+					Gson gson = new Gson();
+					GuildSettingsJson guildSettings = gson.fromJson(guildSettingsDataBuilder.toString(), GuildSettingsJson.class);
+					GuildCommandConfigJson[] updatedGuildCommandConfig = new GuildCommandConfigJson[commandRegister.getRegisterSize()]; 
+					for (int i = 0; i<guildSettings.commandConfig.length; i++)		//For every known command setting...
+					{
+						updatedGuildCommandConfig[i] = guildSettings.commandConfig[i];		//Put that in the new config
+					}
+					for (int j = guildSettings.commandConfig.length; j<commandRegister.getRegisterSize(); j++)	//For the missing entries (based on size discrepancy)...
+					{
+						updatedGuildCommandConfig[j] = new JsonFormats().new GuildCommandConfigJson();
+						updatedGuildCommandConfig[j].commandKey = keys[j];																		//Create new entries
+						updatedGuildCommandConfig[j].enabled = false; //We will show the GUI later, and false should make it clearer what is new.
+						updatedGuildCommandConfig[j].roleIDs = new ArrayList<String>();
+					}
+					guildSettings.commandConfig = updatedGuildCommandConfig.clone();
+					FileWriter fileWriter = new FileWriter(guildSettingsFile, false);
+					PrintWriter printWriter = new PrintWriter(fileWriter);
+					printWriter.print(gson.toJson(guildSettings));
+					printWriter.close();
+					fileWriter.close();
 
+				}
+				catch (IOException e)
+				{
+					logger.error("Unable to read/write guild "+guildSettingsFile.getName().replace(".json", "")+"'s settings file.");
+					e.printStackTrace();
+					continue;
+				}
 			}
 		}
 	}
