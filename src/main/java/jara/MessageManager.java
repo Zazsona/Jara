@@ -129,8 +129,13 @@ public class MessageManager
 				}
 			}
 			channel.getJDA().removeEventListener(messageListener);
-			Message[] messages = new Message[messageCount];
-			for (int i = 0; i<messageCount; i++)
+			int msgArraySize = messageCount;
+			if (messageLog.size() < messageCount)	//Sets how big to declare the array.
+			{
+				msgArraySize = messageLog.size();	//This allows us to set a message count of Integer.MAX_VALUE without concern of how much space the array will reserve.
+			}
+			Message[] messages = new Message[msgArraySize];
+			for (int i = 0; i<messages.length; i++)
 			{
 				messages[i] = messageLog.get(messageLog.size()-messageCount-i);
 			}
