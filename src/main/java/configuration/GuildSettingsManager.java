@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 
 import commands.Command;
+import configuration.JsonFormats.GuildCommandConfigJson;
+import configuration.JsonFormats.GuildSettingsJson;
 import jara.CommandRegister;
 import jara.Core;
 import net.dv8tion.jda.core.entities.Role;
@@ -138,11 +140,11 @@ public class GuildSettingsManager
 				PrintWriter printWriter = new PrintWriter(fileWriter);
 				
 				CommandRegister commandRegister = new CommandRegister();
-				CommandConfigJson[] ccjs = new CommandConfigJson[commandRegister.getRegisterSize()];
+				GuildCommandConfigJson[] ccjs = new JsonFormats.GuildCommandConfigJson[commandRegister.getRegisterSize()];
 				String[] keys = commandRegister.getAllCommandKeys();
 				for (int i = 0; i<ccjs.length; i++)
 				{
-					ccjs[i] = new CommandConfigJson();
+					ccjs[i] = new JsonFormats().new GuildCommandConfigJson();
 					ccjs[i].commandKey = keys[i];
 					ccjs[i].enabled = false;
 					ccjs[i].roleIDs = new ArrayList<String>(); 
@@ -157,7 +159,7 @@ public class GuildSettingsManager
 						ccjs[i].enabled = true;
 					}
 				}
-				guildSettings = new GuildSettingsJson();
+				guildSettings = new JsonFormats().new GuildSettingsJson();
 				guildSettings.gameCategoryID = ""; //This will be set separately when configured by guild owner.
 				guildSettings.commandConfig = ccjs.clone();
 
@@ -205,7 +207,7 @@ public class GuildSettingsManager
 	}
 	public boolean getGuildCommandEnabledStatus(String commandKey)
 	{
-		for (CommandConfigJson commandSettings : getGuildSettings().commandConfig)
+		for (GuildCommandConfigJson commandSettings : getGuildSettings().commandConfig)
 		{
 			if (commandSettings.commandKey.equalsIgnoreCase(commandKey))
 			{
@@ -223,7 +225,7 @@ public class GuildSettingsManager
 		Logger logger = LoggerFactory.getLogger(GuildSettingsManager.class);
 		boolean keyFound = false;
 		GuildSettingsJson guildSettings = getGuildSettings();
-		for (CommandConfigJson commandSettings : guildSettings.commandConfig)
+		for (GuildCommandConfigJson commandSettings : guildSettings.commandConfig)
 		{
 			if (commandSettings.commandKey.equalsIgnoreCase(commandKey))
 			{
@@ -248,7 +250,7 @@ public class GuildSettingsManager
 		CommandRegister commandRegister = new CommandRegister();
 		if (guildSettings.commandConfig.length < commandRegister.getRegisterSize()) 
 		{
-			CommandConfigJson[] updatedCommandConfig = new CommandConfigJson[commandRegister.getRegisterSize()]; 
+			GuildCommandConfigJson[] updatedCommandConfig = new GuildCommandConfigJson[commandRegister.getRegisterSize()]; 
 			for (int i = 0; i<guildSettings.commandConfig.length; i++)		//For every known command setting...
 			{
 				updatedCommandConfig[i] = guildSettings.commandConfig[i];		//Put that in the new config
@@ -256,7 +258,7 @@ public class GuildSettingsManager
 			String keys[] = commandRegister.getAllCommandKeys();
 			for (int j = guildSettings.commandConfig.length; j<commandRegister.getRegisterSize(); j++)	//For the missing entries (based on size discrepancy)...
 			{
-				updatedCommandConfig[j] = new CommandConfigJson();
+				updatedCommandConfig[j] = new JsonFormats().new GuildCommandConfigJson();
 				updatedCommandConfig[j].commandKey = keys[j];																		//Create new entries
 				updatedCommandConfig[j].enabled = false; //We will show the GUI later, and false should make it clearer what is new.
 				updatedCommandConfig[j].roleIDs = new ArrayList<String>();
@@ -329,53 +331,40 @@ public class GuildSettingsManager
 		return commandKeys;
 	}
 	
-	public CommandConfigJson[] getGuildCommandConfig()
+	public GuildCommandConfigJson[] getGuildCommandConfig()
 	{
-		ArrayList<CommandConfigJson> commandConfigList = new ArrayList<CommandConfigJson>();
-		for (CommandConfigJson commandConfig : getGuildSettings().commandConfig)
+		ArrayList<GuildCommandConfigJson> commandConfigList = new ArrayList<GuildCommandConfigJson>();
+		for (GuildCommandConfigJson commandConfig : getGuildSettings().commandConfig)
 		{
 			commandConfigList.add(commandConfig);
 		}
-		return commandConfigList.toArray(new CommandConfigJson[commandConfigList.size()]);
+		return commandConfigList.toArray(new GuildCommandConfigJson[commandConfigList.size()]);
 	}
-	public CommandConfigJson[] getGuildEnabledCommands()
+	public GuildCommandConfigJson[] getGuildEnabledCommands()
 	{
-		ArrayList<CommandConfigJson> commandConfigList = new ArrayList<CommandConfigJson>();
-		for (CommandConfigJson commandConfig : getGuildSettings().commandConfig)
+		ArrayList<GuildCommandConfigJson> commandConfigList = new ArrayList<GuildCommandConfigJson>();
+		for (GuildCommandConfigJson commandConfig : getGuildSettings().commandConfig)
 		{
 			if (commandConfig.enabled == true)
 			{
 				commandConfigList.add(commandConfig);
 			}
 		}
-		return commandConfigList.toArray(new CommandConfigJson[commandConfigList.size()]);
+		return commandConfigList.toArray(new GuildCommandConfigJson[commandConfigList.size()]);
 	}
-	public CommandConfigJson[] getGuildDisabledCommands()
+	public GuildCommandConfigJson[] getGuildDisabledCommands()
 	{
-		ArrayList<CommandConfigJson> commandConfigList = new ArrayList<CommandConfigJson>();
-		for (CommandConfigJson commandConfig : getGuildSettings().commandConfig)
+		ArrayList<GuildCommandConfigJson> commandConfigList = new ArrayList<GuildCommandConfigJson>();
+		for (GuildCommandConfigJson commandConfig : getGuildSettings().commandConfig)
 		{
 			if (commandConfig.enabled == false)
 			{
 				commandConfigList.add(commandConfig);
 			}
 		}
-		return commandConfigList.toArray(new CommandConfigJson[commandConfigList.size()]);
+		return commandConfigList.toArray(new GuildCommandConfigJson[commandConfigList.size()]);
 	}
 
 	//============================================================================================================
 	
-	//===================================== JSON Classes =========================================================
-	private class CommandConfigJson
-	{
-		String commandKey;
-		boolean enabled;
-		ArrayList<String> roleIDs;
-	}
-	private class GuildSettingsJson
-	{
-		String gameCategoryID;
-		CommandConfigJson[] commandConfig;
-	}
-	//============================================================================================================
 }

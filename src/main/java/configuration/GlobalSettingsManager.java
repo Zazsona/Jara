@@ -16,7 +16,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
+import configuration.JsonFormats.GlobalCommandConfigJson;
+import configuration.JsonFormats.GlobalSettingsJson;
 import jara.CommandRegister;
+import jara.Core;
+import net.dv8tion.jda.core.entities.Guild;
 
 /**
  * 
@@ -115,6 +119,23 @@ public class GlobalSettingsManager
 			}
 		}
 	}
+	public static File getGuildSettingsFolder()
+	{
+		File guildSettingsFolder;
+		if (System.getProperty("os.name").startsWith("Windows"))
+		{
+			guildSettingsFolder = new File(getDirectory().getAbsolutePath()+"\\guilds\\");
+		}
+		else
+		{
+			guildSettingsFolder = new File(getDirectory().getAbsolutePath()+"/guilds/");
+		}
+		if (!guildSettingsFolder.exists())
+		{
+			guildSettingsFolder.mkdirs();
+		}
+		return guildSettingsFolder;
+	}
 	public static void saveGlobalSettings()
 	{
 		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
@@ -144,7 +165,7 @@ public class GlobalSettingsManager
 		if (!settingsFile.exists())
 		{
 			String operatingSystem = System.getProperty("os.name");
-			if (!operatingSystem.startsWith("Windows") || !operatingSystem.startsWith("Linux"))
+			if (!(operatingSystem.startsWith("Windows") || operatingSystem.startsWith("Linux")))
 			{
 				logger.info("An unsupported operating system is being used. Be aware some issues may occur.");
 			}
@@ -155,15 +176,15 @@ public class GlobalSettingsManager
 				PrintWriter printWriter = new PrintWriter(fileWriter);
 				
 				CommandRegister commandRegister = new CommandRegister();
-				CommandConfigJson[] ccjs = new CommandConfigJson[commandRegister.getRegisterSize()];
+				GlobalCommandConfigJson[] ccjs = new GlobalCommandConfigJson[commandRegister.getRegisterSize()];
 				String[] keys = commandRegister.getAllCommandKeys();
 				for (int i = 0; i<ccjs.length; i++)
 				{
-					ccjs[i] = new CommandConfigJson();
+					ccjs[i] = new JsonFormats().new GlobalCommandConfigJson(); 
 					ccjs[i].commandKey = keys[i];
 					ccjs[i].enabled = true;
 				}
-				globalSettings = new GlobalSettingsManager.GlobalSettingsJson();
+				globalSettings = new JsonFormats().new GlobalSettingsJson();
 				globalSettings.token = token;
 				globalSettings.commandConfig = ccjs.clone();
 
@@ -218,7 +239,7 @@ public class GlobalSettingsManager
 	public static boolean getGlobalCommandEnabledStatus(String commandKey)
 	{
 		getGlobalSettings();
-		for (CommandConfigJson commandSettings : globalSettings.commandConfig)
+		for (GlobalCommandConfigJson commandSettings : globalSettings.commandConfig)
 		{
 			if (commandSettings.commandKey.equalsIgnoreCase(commandKey))
 			{
@@ -236,7 +257,7 @@ public class GlobalSettingsManager
 		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
 		getGlobalSettings();
 		boolean keyFound = false;
-		for (CommandConfigJson commandSettings : globalSettings.commandConfig)
+		for (GlobalCommandConfigJson commandSettings : globalSettings.commandConfig)
 		{
 			if (commandSettings.commandKey.equalsIgnoreCase(commandKey))
 			{
@@ -261,7 +282,7 @@ public class GlobalSettingsManager
 		CommandRegister commandRegister = new CommandRegister();
 		if (globalSettings.commandConfig.length < commandRegister.getRegisterSize()) 
 		{
-			CommandConfigJson[] updatedCommandConfig = new CommandConfigJson[commandRegister.getRegisterSize()]; 
+			GlobalCommandConfigJson[] updatedCommandConfig = new GlobalCommandConfigJson[commandRegister.getRegisterSize()]; 
 			for (int i = 0; i<globalSettings.commandConfig.length; i++)		//For every known command setting...
 			{
 				updatedCommandConfig[i] = globalSettings.commandConfig[i];		//Put that in the new config
@@ -269,89 +290,80 @@ public class GlobalSettingsManager
 			String keys[] = commandRegister.getAllCommandKeys();
 			for (int j = globalSettings.commandConfig.length; j<commandRegister.getRegisterSize(); j++)	//For the missing entries (based on size discrepancy)...
 			{
-				updatedCommandConfig[j] = new CommandConfigJson();
+				updatedCommandConfig[j] = new JsonFormats().new GlobalCommandConfigJson();
 				updatedCommandConfig[j].commandKey = keys[j];																		//Create new entries
 				updatedCommandConfig[j].enabled = false; //We will show the GUI later, and false should make it clearer what is new.
 			}
 			globalSettings.commandConfig = updatedCommandConfig.clone();
 			//TODO: SHOW THE GUI TO SELECT ENABLED COMMANDS
 			saveGlobalSettings();		
+			for (File guildSettingsFile : getGuildSettingsFolder().listFiles())
+			{
+				
+
+			}
 		}
 	}
 	
-	public static CommandConfigJson[] getGlobalCommandConfig()
+	public static GlobalCommandConfigJson[] getGlobalCommandConfig()
 	{
-		ArrayList<CommandConfigJson> commandConfigList = new ArrayList<CommandConfigJson>();
-		for (CommandConfigJson commandConfig : getGlobalSettings().commandConfig)
+		ArrayList<GlobalCommandConfigJson> commandConfigList = new ArrayList<GlobalCommandConfigJson>();
+		for (GlobalCommandConfigJson commandConfig : getGlobalSettings().commandConfig)
 		{
 			commandConfigList.add(commandConfig);
 		}
-		return commandConfigList.toArray(new CommandConfigJson[commandConfigList.size()]);
+		return commandConfigList.toArray(new GlobalCommandConfigJson[commandConfigList.size()]);
 	}
 	public static HashMap<String, Boolean> getGlobalCommandConfigMap()
 	{
 		HashMap<String, Boolean> commandMap = new HashMap<String, Boolean>();
-		for (CommandConfigJson commandConfig : getGlobalSettings().commandConfig)
+		for (GlobalCommandConfigJson commandConfig : getGlobalSettings().commandConfig)
 		{
 			commandMap.put(commandConfig.commandKey, commandConfig.enabled);
 		}
 		return commandMap;
 	}
-	public static CommandConfigJson[] getGlobalEnabledCommands()
+	public static GlobalCommandConfigJson[] getGlobalEnabledCommands()
 	{
-		ArrayList<CommandConfigJson> commandConfigList = new ArrayList<CommandConfigJson>();
-		for (CommandConfigJson commandConfig : getGlobalSettings().commandConfig)
+		ArrayList<GlobalCommandConfigJson> commandConfigList = new ArrayList<GlobalCommandConfigJson>();
+		for (GlobalCommandConfigJson commandConfig : getGlobalSettings().commandConfig)
 		{
 			if (commandConfig.enabled == true)
 			{
 				commandConfigList.add(commandConfig);
 			}
 		}
-		return commandConfigList.toArray(new CommandConfigJson[commandConfigList.size()]);
+		return commandConfigList.toArray(new GlobalCommandConfigJson[commandConfigList.size()]);
 	}
 	public static String[] getGlobalEnabledCommandKeys()
 	{
 		ArrayList<String> keys = new ArrayList<String>();
-		for (CommandConfigJson config : getGlobalEnabledCommands())
+		for (GlobalCommandConfigJson config : getGlobalEnabledCommands())
 		{
 			keys.add(config.commandKey);
 		}
 		return keys.toArray(new String[keys.size()]);
 	}
-	public static CommandConfigJson[] getGlobalDisabledCommands()
+	public static GlobalCommandConfigJson[] getGlobalDisabledCommands()
 	{
-		ArrayList<CommandConfigJson> commandConfigList = new ArrayList<CommandConfigJson>();
-		for (CommandConfigJson commandConfig : getGlobalSettings().commandConfig)
+		ArrayList<GlobalCommandConfigJson> commandConfigList = new ArrayList<GlobalCommandConfigJson>();
+		for (GlobalCommandConfigJson commandConfig : getGlobalSettings().commandConfig)
 		{
 			if (commandConfig.enabled == false)
 			{
 				commandConfigList.add(commandConfig);
 			}
 		}
-		return commandConfigList.toArray(new CommandConfigJson[commandConfigList.size()]);
+		return commandConfigList.toArray(new GlobalCommandConfigJson[commandConfigList.size()]);
 	}
 	public static String[] getGlobalDisabledCommandKeys()
 	{
 		ArrayList<String> keys = new ArrayList<String>();
-		for (CommandConfigJson config : getGlobalDisabledCommands())
+		for (GlobalCommandConfigJson config : getGlobalDisabledCommands())
 		{
 			keys.add(config.commandKey);
 		}
 		return keys.toArray(new String[keys.size()]);
 	}
-	//============================================================================================================
-	
-	//===================================== JSON Classes =========================================================
-	private static class GlobalSettingsJson
-	{
-		String token;
-		CommandConfigJson[] commandConfig;
-	}
-	private static class CommandConfigJson
-	{
-		String commandKey;
-		boolean enabled;
-	}
-
 	//============================================================================================================
 }
