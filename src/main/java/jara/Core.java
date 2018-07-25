@@ -46,11 +46,10 @@ public class Core //A class for covering the global manners of the bot.
 	public static void enableCommands()
 	{
 		HashMap<String, Boolean> commandConfigMap = GlobalSettingsManager.getGlobalCommandConfigMap();
-		CommandRegister commandRegister = new CommandRegister();
-		CommandConfiguration[] commandConfigs = new CommandConfiguration[commandRegister.getRegisterSize()];
+		CommandConfiguration[] commandConfigs = new CommandConfiguration[CommandRegister.getRegisterSize()];
 		for (int i = 0; i<commandConfigs.length; i++)
 		{
-			commandConfigs[i] = new CommandConfiguration(commandConfigMap.get(commandRegister.getRegister()[i].getCommandKey()), commandRegister.getRegister()[i].getAliases(), commandRegister.getRegister()[i].getCommandClass());
+			commandConfigs[i] = new CommandConfiguration(CommandRegister.getRegister()[i], commandConfigMap.get(CommandRegister.getRegister()[i].getCommandKey()));
 		}
 		shardManager.addEventListener(new CommandHandler(commandConfigs));
 	}

@@ -177,9 +177,8 @@ public class GlobalSettingsManager
 				FileWriter fileWriter = new FileWriter(settingsFile);
 				PrintWriter printWriter = new PrintWriter(fileWriter);
 				
-				CommandRegister commandRegister = new CommandRegister();
-				GlobalCommandConfigJson[] ccjs = new GlobalCommandConfigJson[commandRegister.getRegisterSize()];
-				String[] keys = commandRegister.getAllCommandKeys();
+				GlobalCommandConfigJson[] ccjs = new GlobalCommandConfigJson[CommandRegister.getRegisterSize()];
+				String[] keys = CommandRegister.getAllCommandKeys();
 				for (int i = 0; i<ccjs.length; i++)
 				{
 					ccjs[i] = new JsonFormats().new GlobalCommandConfigJson(); 
@@ -282,16 +281,15 @@ public class GlobalSettingsManager
 	public static void addNewCommands()
 	{
 		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
-		CommandRegister commandRegister = new CommandRegister();
-		if (globalSettings.commandConfig.length < commandRegister.getRegisterSize()) 
+		if (globalSettings.commandConfig.length < CommandRegister.getRegisterSize()) 
 		{
-			GlobalCommandConfigJson[] updatedCommandConfig = new GlobalCommandConfigJson[commandRegister.getRegisterSize()]; 
+			GlobalCommandConfigJson[] updatedCommandConfig = new GlobalCommandConfigJson[CommandRegister.getRegisterSize()]; 
 			for (int i = 0; i<globalSettings.commandConfig.length; i++)		//For every known command setting...
 			{
 				updatedCommandConfig[i] = globalSettings.commandConfig[i];		//Put that in the new config
 			}
-			String keys[] = commandRegister.getAllCommandKeys();
-			for (int j = globalSettings.commandConfig.length; j<commandRegister.getRegisterSize(); j++)	//For the missing entries (based on size discrepancy)...
+			String keys[] = CommandRegister.getAllCommandKeys();
+			for (int j = globalSettings.commandConfig.length; j<CommandRegister.getRegisterSize(); j++)	//For the missing entries (based on size discrepancy)...
 			{
 				updatedCommandConfig[j] = new JsonFormats().new GlobalCommandConfigJson();
 				updatedCommandConfig[j].commandKey = keys[j];																		//Create new entries
@@ -315,12 +313,12 @@ public class GlobalSettingsManager
 					fileReader.close();
 					Gson gson = new Gson();
 					GuildSettingsJson guildSettings = gson.fromJson(guildSettingsDataBuilder.toString(), GuildSettingsJson.class);
-					GuildCommandConfigJson[] updatedGuildCommandConfig = new GuildCommandConfigJson[commandRegister.getRegisterSize()]; 
+					GuildCommandConfigJson[] updatedGuildCommandConfig = new GuildCommandConfigJson[CommandRegister.getRegisterSize()]; 
 					for (int i = 0; i<guildSettings.commandConfig.length; i++)		//For every known command setting...
 					{
 						updatedGuildCommandConfig[i] = guildSettings.commandConfig[i];		//Put that in the new config
 					}
-					for (int j = guildSettings.commandConfig.length; j<commandRegister.getRegisterSize(); j++)	//For the missing entries (based on size discrepancy)...
+					for (int j = guildSettings.commandConfig.length; j<CommandRegister.getRegisterSize(); j++)	//For the missing entries (based on size discrepancy)...
 					{
 						updatedGuildCommandConfig[j] = new JsonFormats().new GuildCommandConfigJson();
 						updatedGuildCommandConfig[j].commandKey = keys[j];																		//Create new entries

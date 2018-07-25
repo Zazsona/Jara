@@ -95,7 +95,7 @@ public class Config extends Command {
 					guildSettings.removeRoleCommandPermission(key, roleID);
 				}
 			}
-			msgEvent.getChannel().sendMessage(roles.get(0).getName().substring(1)+" can now use all enabled commands!").queue();	
+			msgEvent.getChannel().sendMessage(roles.get(0).getName().replace("@", "")+" can now use all enabled commands!").queue();	
 		}
 		else
 		{
@@ -246,7 +246,7 @@ public class Config extends Command {
 			}
 			for (String roleID : guildSettings.getCommandRolePermissions(key))
 			{
-				roleList.append(msgEvent.getGuild().getRoleById(roleID).getName().substring(1)+", "); //Removing @ here as getName appends it for the everyone role, causing a ping.
+				roleList.append(msgEvent.getGuild().getRoleById(roleID).getName().replace("@", "")+", "); //Removing @ here as getName appends it for the everyone role, causing a ping.
 			}
 			if (roleList.lastIndexOf(", ") == roleList.length()-2)
 			{

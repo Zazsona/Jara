@@ -6,35 +6,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import commands.Command;
+import jara.CommandAttributes;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 public class CommandConfiguration
 {
 	private boolean enabledState; //Whether the config allows this command to be used
-	private String[] aliases; //Text strings that will call the command
-	private Class<? extends Command> commandClass;
+	private CommandAttributes attributes;
 	
-	public CommandConfiguration(boolean enabledStateArg, String[] aliasesArg, Class<? extends Command> commandClassArg)
+	public CommandConfiguration(CommandAttributes attributes, boolean enabledState)
 	{
-		enabledState = enabledStateArg;
-		aliases = aliasesArg;
-		commandClass = commandClassArg;
+		this.attributes = attributes;
+		this.enabledState = enabledState;
 	}
-	/**
-	 * 
-	 * Simple get method for the command's corresponding class.
-	 * Do not use this method for instantiating a command as it
-	 * does not perform an enabled check. 
-	 * 
-	 * Instead, use execute()
-	 * 
-	 * @return
-	 * Class<? extends Command> - The comand class.
-	 */
-	public Class<? extends Command> getCommandClass()
-	{
-		return commandClass;
-	}
+	
 	/**
 	 *Creates a new instance of the command and runs it on a separate thread.
 	 *
@@ -47,12 +32,12 @@ public class CommandConfiguration
 		if (isEnabled())
 		{
 			GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
-			if (guildSettings.getGuildCommandEnabledStatus(aliases[0]) && (msgEvent.getMember().isOwner() || guildSettings.hasPermission(msgEvent, getCommandClass()))) //The first alias should always match the command key.
+			if (guildSettings.getGuildCommandEnabledStatus(attributes.getCommandKey()) && (msgEvent.getMember().isOwner() || guildSettings.hasPermission(msgEvent, attributes.getCommandClass())))
 			{
 				Runnable commandRunnable = () -> {
 					try
 					{
-						getCommandClass().newInstance().run(msgEvent, parameters);
+						attributes.getCommandClass().newInstance().run(msgEvent, parameters);
 					}
 					catch (InstantiationException | IllegalAccessException e)
 					{
@@ -63,7 +48,7 @@ public class CommandConfiguration
 					}
 				};
 				Thread commandThread = new Thread(commandRunnable);
-				commandThread.setName(aliases[0]+"-Thread");
+				commandThread.setName(attributes.getCommandKey()+"-Thread");
 				commandThread.start();
 				return;
 			}
@@ -90,7 +75,7 @@ public class CommandConfiguration
 	 */
 	public String[] getAliases()
 	{
-		return aliases;
+		return attributes.getAliases();
 	}
 	/**
 	 * 

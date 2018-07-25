@@ -7,8 +7,9 @@ public class CommandAttributes
 	private String commandKey;
 	private Class<? extends Command> commandClass;
 	private String[] aliases; //Text strings that will call the command
+	private int category;
 
-	public CommandAttributes(String commandKeyArg, Class<? extends Command> commandClassArg, String[] aliasesArg)
+	public CommandAttributes(String commandKeyArg, Class<? extends Command> commandClassArg, String[] aliasesArg, int categoryArg)
 	{
 		commandKey = commandKeyArg;
 		commandClass = commandClassArg;
@@ -18,6 +19,8 @@ public class CommandAttributes
 		{
 			aliases[i] = aliasesArg[i-1];
 		}
+		category = categoryArg;
+		
 	}
 	public String getCommandKey()
 	{
@@ -49,5 +52,21 @@ public class CommandAttributes
 	public Class<? extends Command> getCommandClass()
 	{
 		return commandClass;
+	}
+	/**
+	 * Returns the class' category as its ID.<br>
+	 * 0 = NOGROUP<br>
+	 * 1 = GAMES<br>
+	 * 2 = STANDARD<br>
+	 * 3 = AUDIO<br>
+	 * 4 = CONFIG<br>
+	 */
+	public int getCategoryID()
+	{
+		return category;
+	}
+	public String getCategoryName()
+	{
+		return CommandRegister.getCategoryName(category);
 	}
 }

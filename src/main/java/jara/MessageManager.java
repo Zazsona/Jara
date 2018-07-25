@@ -115,15 +115,14 @@ public class MessageManager
 					if (timeout > 0)
 					{
 						long timeSinceStart = runtimeBean.getUptime() - startTime - timeout; //This will be zero or less if timeout has expired
-						if (timeSinceStart <= 0)
+						if (timeSinceStart <= 100)
 						{
-							channel.getJDA().removeEventListener(messageListener);
-							channelToListen = null;
-							return null; //Timeout expired, and we didn't get anything.
+							break; //Timeout expired.
 						}
 						else
 						{
 							timeout = (int) (timeout - timeSinceStart); //Maintain the timeout if a spurious unlock occurs. This ensures additional time isn't granted.
+							//TODO: Fix this, it returns the wrong value
 						}
 					}
 				}
@@ -137,7 +136,7 @@ public class MessageManager
 			Message[] messages = new Message[msgArraySize];
 			for (int i = 0; i<messages.length; i++)
 			{
-				messages[i] = messageLog.get(messageLog.size()-messageCount-i);
+				messages[i] = messageLog.get(messageLog.size()-msgArraySize+i);
 			}
 			channelToListen = null;
 			return messages;

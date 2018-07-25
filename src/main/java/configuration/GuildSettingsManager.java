@@ -138,9 +138,8 @@ public class GuildSettingsManager
 				FileWriter fileWriter = new FileWriter(guildSettingsFile);
 				PrintWriter printWriter = new PrintWriter(fileWriter);
 				
-				CommandRegister commandRegister = new CommandRegister();
-				GuildCommandConfigJson[] ccjs = new JsonFormats.GuildCommandConfigJson[commandRegister.getRegisterSize()];
-				String[] keys = commandRegister.getAllCommandKeys();
+				GuildCommandConfigJson[] ccjs = new JsonFormats.GuildCommandConfigJson[CommandRegister.getRegisterSize()];
+				String[] keys = CommandRegister.getAllCommandKeys();
 				for (int i = 0; i<ccjs.length; i++)
 				{
 					ccjs[i] = new JsonFormats().new GuildCommandConfigJson();
@@ -305,7 +304,7 @@ public class GuildSettingsManager
 	}
 	public boolean hasPermission(GuildMessageReceivedEvent msgEvent, Class<? extends Command> command)
 	{
-		ArrayList<String> roleIDs = getCommandRolePermissions(new CommandRegister().getCommandKey(command));
+		ArrayList<String> roleIDs = getCommandRolePermissions(CommandRegister.getCommand(command).getCommandKey());
 		List<Role> userRoles = msgEvent.getMember().getRoles(); //MsgEvent used as this gets Member in context of the guild.
 		boolean permissionGranted = false;
 		for (Role userRole : userRoles)
