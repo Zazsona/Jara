@@ -224,5 +224,17 @@ public class CommandRegister
 		}
 		return null; //Invalid id.
 	}
+	public static CommandAttributes[] getCommandsInCategory(int categoryID)
+	{
+		ArrayList<CommandAttributes> cmdsInCat = new ArrayList<CommandAttributes>();
+		for (CommandAttributes cmdAttributes : register)
+		{
+			if (cmdAttributes.getCategoryID() == categoryID)
+			{
+				cmdsInCat.add(cmdAttributes);
+			}
+		}
+		return cmdsInCat.toArray(new CommandAttributes[cmdsInCat.size()]);
+	}
 	
 }
