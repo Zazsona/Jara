@@ -221,7 +221,7 @@ public class Config extends Command {
 		}
 		EmbedBuilder embed = new EmbedBuilder();
 		embed.setDescription("**Commands**\n"
-				+ "/config SetGameCategory [Category Name]\n"
+				+ "/config SetGameCategory (Category Name)\n"
 				+ "/config RemGameCategory\n"
 				+ "/config enable [Command]\n"
 				+ "/config disable [Command]\n"

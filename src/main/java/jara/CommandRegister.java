@@ -19,7 +19,7 @@ public class CommandRegister
 	public static final int GAMES = 1;
 	public static final int STANDARD = 2;
 	public static final int AUDIO = 3;
-	public static final int CONFIG = 4;
+	public static final int ADMIN = 4;
 	private static ArrayList<CommandAttributes> register;
 	/**
 	 * When implementing a new command, is is essential to add it to the getRegister() method. Otherwise, it will be ignored at run time.
@@ -52,7 +52,7 @@ public class CommandRegister
 			register.add(new CommandAttributes("EightBall", EightBall.class, new String[] {"8ball", "helix", "fortune"}, STANDARD));
 			register.add(new CommandAttributes("Jokes", Jokes.class, new String[] {"Joke", "Comedy"}, STANDARD));
 			register.add(new CommandAttributes("CoinFlip", CoinFlip.class, new String[] {"FlipCoin", "Toss", "cf", "fc", "fiftyfifty", "flipacoin"}, STANDARD));
-			register.add(new CommandAttributes("Config", Config.class, new String[] {"Settings"}, CONFIG));
+			register.add(new CommandAttributes("Config", Config.class, new String[] {"Settings"}, ADMIN));
 			register.add(new CommandAttributes("Countdown", Countdown.class, new String[] {"cd"}, GAMES));
 			register.add(new CommandAttributes("Help", Help.class, new String[] {"?", "commands"}, NOGROUP)); //Does help REALLY need to be indexed in help?
 		}

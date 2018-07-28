@@ -25,7 +25,7 @@ public class Help extends Command {
 					"**Games** - SP/MP experiences to keep you busy!\n"
 					+ "**Standard** - Small commands for basic applications.\n"
 					+ "**Audio** - Commands for Voice Channels.\n"
-					+ "**Config** - Tools to modify the bot.";
+					+ "**Admin** - Tools to modify the bot.";
 			
 			embed.addField("Topics",topics, true);
 		}
@@ -43,7 +43,7 @@ public class Help extends Command {
 			{
 				embed.setDescription(buildCommandList(3));
 			}
-			else if (parameters[1].equalsIgnoreCase("config"))
+			else if (parameters[1].equalsIgnoreCase("admin"))
 			{
 				embed.setDescription(buildCommandList(4)); //TODO: Limit this to those who have access?
 			}
