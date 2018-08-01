@@ -1,4 +1,4 @@
-package commands.standard;
+package commands.utility;
 import java.util.Random;
 
 import commands.Command;

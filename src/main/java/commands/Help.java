@@ -23,7 +23,8 @@ public class Help extends Command {
 			embed.setDescription("To get a list of commands, use /help [Topic]. For more information, use /about\n");
 			String topics = 
 					"**Games** - SP/MP experiences to keep you busy!\n"
-					+ "**Standard** - Small commands for basic applications.\n"
+					+ "**Toys** - Quick fun commands.\n"
+					+ "**Utility** - Small commands for basic applications.\n"
 					+ "**Audio** - Commands for Voice Channels.\n"
 					+ "**Admin** - Tools to modify the bot.";
 			
@@ -33,19 +34,23 @@ public class Help extends Command {
 		{
 			if (parameters[1].equalsIgnoreCase("games"))
 			{
-				embed.setDescription(buildCommandList(1));
+				embed.setDescription(buildCommandList(CommandRegister.GAMES));
 			}
-			else if (parameters[1].equalsIgnoreCase("standard"))
+			else if (parameters[1].equalsIgnoreCase("toys"))
 			{
-				embed.setDescription(buildCommandList(2));
+				embed.setDescription(buildCommandList(CommandRegister.TOYS));
+			}
+			else if (parameters[1].equalsIgnoreCase("utility"))
+			{
+				embed.setDescription(buildCommandList(CommandRegister.UTILITY));
 			}
 			else if (parameters[1].equalsIgnoreCase("audio"))
 			{
-				embed.setDescription(buildCommandList(3));
+				embed.setDescription(buildCommandList(CommandRegister.AUDIO));
 			}
 			else if (parameters[1].equalsIgnoreCase("admin"))
 			{
-				embed.setDescription(buildCommandList(4)); //TODO: Limit this to those who have access?
+				embed.setDescription(buildCommandList(CommandRegister.ADMIN)); //TODO: Limit this to those who have access?
 			}
 			else
 			{

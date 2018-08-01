@@ -55,11 +55,6 @@ public class CommandAttributes
 	}
 	/**
 	 * Returns the class' category as its ID.<br>
-	 * 0 = NOGROUP<br>
-	 * 1 = GAMES<br>
-	 * 2 = STANDARD<br>
-	 * 3 = AUDIO<br>
-	 * 4 = CONFIG<br>
 	 */
 	public int getCategoryID()
 	{

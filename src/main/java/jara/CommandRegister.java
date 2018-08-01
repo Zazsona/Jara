@@ -6,20 +6,21 @@ import commands.Command;
 import commands.Help;
 import commands.config.Config;
 import commands.games.Countdown;
-import commands.standard.About;
-import commands.standard.CoinFlip;
-import commands.standard.EightBall;
-import commands.standard.Jokes;
-import commands.standard.Ping;
-import commands.standard.Report;
+import commands.utility.About;
+import commands.utility.CoinFlip;
+import commands.toys.EightBall;
+import commands.toys.Jokes;
+import commands.utility.Ping;
+import commands.utility.Report;
 
 public class CommandRegister
 {
 	public static final int NOGROUP = 0;
 	public static final int GAMES = 1;
-	public static final int STANDARD = 2;
-	public static final int AUDIO = 3;
-	public static final int ADMIN = 4;
+	public static final int UTILITY = 2;
+	public static final int TOYS = 3;
+	public static final int AUDIO = 4;
+	public static final int ADMIN = 5;
 	private static ArrayList<CommandAttributes> register;
 	/**
 	 * When implementing a new command, is is essential to add it to the getRegister() method. Otherwise, it will be ignored at run time.
@@ -46,12 +47,12 @@ public class CommandRegister
 			 * NOTE: ALWAYS ADD YOUR NEW COMMAND AT THE END FOR PROPER UPDATING OF LEGACY CONFIGS
 			 * ===========================================
 			 */
-			register.add(new CommandAttributes("Ping", Ping.class, new String[] {"Pong", "Test"}, STANDARD));
-			register.add(new CommandAttributes("Report", Report.class, new String[] {"Status", "Stats"}, STANDARD));
-			register.add(new CommandAttributes("About", About.class, new String[] {"Credits", "Authors"}, STANDARD));
-			register.add(new CommandAttributes("EightBall", EightBall.class, new String[] {"8ball", "helix", "fortune"}, STANDARD));
-			register.add(new CommandAttributes("Jokes", Jokes.class, new String[] {"Joke", "Comedy"}, STANDARD));
-			register.add(new CommandAttributes("CoinFlip", CoinFlip.class, new String[] {"FlipCoin", "Toss", "cf", "fc", "fiftyfifty", "flipacoin"}, STANDARD));
+			register.add(new CommandAttributes("Ping", Ping.class, new String[] {"Pong", "Test"}, UTILITY));
+			register.add(new CommandAttributes("Report", Report.class, new String[] {"Status", "Stats"}, UTILITY));
+			register.add(new CommandAttributes("About", About.class, new String[] {"Credits", "Authors"}, UTILITY));
+			register.add(new CommandAttributes("EightBall", EightBall.class, new String[] {"8ball", "helix", "fortune"}, TOYS));
+			register.add(new CommandAttributes("Jokes", Jokes.class, new String[] {"Joke", "Comedy"}, TOYS));
+			register.add(new CommandAttributes("CoinFlip", CoinFlip.class, new String[] {"FlipCoin", "Toss", "cf", "fc", "fiftyfifty", "flipacoin"}, UTILITY));
 			register.add(new CommandAttributes("Config", Config.class, new String[] {"Settings"}, ADMIN));
 			register.add(new CommandAttributes("Countdown", Countdown.class, new String[] {"cd"}, GAMES));
 			register.add(new CommandAttributes("Help", Help.class, new String[] {"?", "commands"}, NOGROUP)); //Does help REALLY need to be indexed in help?
@@ -178,11 +179,6 @@ public class CommandRegister
 	}
 	/**
 	 * Returns the command's category ID.<br>
-	 * 0 = NOGROUP<br>
-	 * 1 = GAMES<br>
-	 * 2 = STANDARD<br>
-	 * 3 = AUDIO<br>
-	 * 4 = CONFIG<br>
 	 * @param key
 	 * @return
 	 * 0-4 - The category ID.<br>
@@ -211,16 +207,18 @@ public class CommandRegister
 	{
 		switch (id) 
 		{
-		case 0:
+		case NOGROUP:
 			return "No Group";
-		case 1:
+		case GAMES:
 			return "Games";
-		case 2:
-			return "Standard";
-		case 3:
+		case UTILITY:
+			return "Utility";
+		case TOYS:
+			return "Toys";
+		case AUDIO:
 			return "Audio";
-		case 4:
-			return "Config";
+		case ADMIN:
+			return "Admin";
 		}
 		return null; //Invalid id.
 	}
