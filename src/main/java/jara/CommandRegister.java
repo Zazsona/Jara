@@ -6,12 +6,9 @@ import commands.Command;
 import commands.Help;
 import commands.config.Config;
 import commands.games.Countdown;
-import commands.utility.About;
-import commands.utility.CoinFlip;
+import commands.utility.*;
 import commands.toys.EightBall;
 import commands.toys.Jokes;
-import commands.utility.Ping;
-import commands.utility.Report;
 
 public class CommandRegister
 {
@@ -22,7 +19,7 @@ public class CommandRegister
 	public static final int AUDIO = 4;
 	public static final int ADMIN = 5;
 	private static ArrayList<CommandAttributes> register;
-	/**
+	/*
 	 * When implementing a new command, is is essential to add it to the getRegister() method. Otherwise, it will be ignored at run time.
 	 */
 	
@@ -56,6 +53,7 @@ public class CommandRegister
 			register.add(new CommandAttributes("Config", Config.class, new String[] {"Settings"}, ADMIN));
 			register.add(new CommandAttributes("Countdown", Countdown.class, new String[] {"cd"}, GAMES));
 			register.add(new CommandAttributes("Help", Help.class, new String[] {"?", "commands"}, NOGROUP)); //Does help REALLY need to be indexed in help?
+            register.add(new CommandAttributes("Randomiser", Randomiser.class, new String[] {"Randomise", "Randomize", "Randomizer", "Roulette", "Picker", "Selector"}, UTILITY));
 		}
 		return register.toArray(new CommandAttributes[register.size()]);
 	}
@@ -160,7 +158,7 @@ public class CommandRegister
 	/**
 	 * Returns the class' attributes. Note this does not include any configuration details, so is true for guild & global contexts.
 	 * 
-	 * @param class - A class that extends Command
+	 * @param clazz - A class that extends Command
 	 * @return
 	 * CommandAttributes - All details about the class.<br>
 	 * null - Class is not a registered command class.

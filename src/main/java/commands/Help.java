@@ -145,6 +145,11 @@ public class Help extends Command {
 			paramSetups.add("/Help (Category)");
 			infoBuilder.append(":thinking:");
 		}
+		else if (key.equalsIgnoreCase("Randomiser"))
+        {
+            paramSetups.add("/Randomiser [Option1] [Option2] ... [OptionN]");
+            infoBuilder.append("Randomly selects an item from the list.");
+        }
 		else
 		{
 			infoBuilder.append("No information is available for this command.");
