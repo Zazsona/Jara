@@ -6,6 +6,7 @@ import commands.Command;
 import commands.Help;
 import commands.config.Config;
 import commands.games.Countdown;
+import commands.toys.Say;
 import commands.utility.*;
 import commands.toys.EightBall;
 import commands.toys.Jokes;
@@ -54,6 +55,7 @@ public class CommandRegister
 			register.add(new CommandAttributes("Countdown", Countdown.class, new String[] {"cd"}, GAMES));
 			register.add(new CommandAttributes("Help", Help.class, new String[] {"?", "commands"}, NOGROUP)); //Does help REALLY need to be indexed in help?
             register.add(new CommandAttributes("Randomiser", Randomiser.class, new String[] {"Randomise", "Randomize", "Randomizer", "Roulette", "Picker", "Selector"}, UTILITY));
+			register.add(new CommandAttributes("Say", Say.class, new String[] {"Speak", "Talk"}, TOYS));
 		}
 		return register.toArray(new CommandAttributes[register.size()]);
 	}

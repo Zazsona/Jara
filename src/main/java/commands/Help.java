@@ -150,6 +150,11 @@ public class Help extends Command {
             paramSetups.add("/Randomiser [Option1] [Option2] ... [OptionN]");
             infoBuilder.append("Randomly selects an item from the list.");
         }
+        else if (key.equalsIgnoreCase("Say"))
+		{
+			paramSetups.add("/Say [Sentence]");
+			infoBuilder.append("Have the bot repeat a sentence.");
+		}
 		else
 		{
 			infoBuilder.append("No information is available for this command.");
