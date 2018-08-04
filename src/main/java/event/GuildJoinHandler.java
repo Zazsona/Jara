@@ -26,8 +26,13 @@ public class GuildJoinHandler extends ListenerAdapter
 		guildSettings.performNewGuildSetup();
 		EmbedBuilder embed = new EmbedBuilder();
 		embed.setColor(Core.getHighlightColour(joinEvent.getGuild().getSelfMember()));
-		embed.setDescription("Hey there, "+owner.getName()+"!\nI'm just sending you this to tell you I'm all ready to go in "+guild.getName()+".\n\nTo get started, use `/config` in your guild with a channel I have access to, there you will be able to enable commands and features!");
-		owner.openPrivateChannel().complete().sendMessage(embed.build()).queue(); //TODO: Make this prettier.
+		embed.setDescription("Hey there, "+owner.getName()+"!\nI'm just sending you this to tell you I'm all ready to go in "+guild.getName()+".\n" +
+									 "\nTo get started, use `/config` in your guild with a channel I have access to, there you will be able to enable commands and features!\n\n" +
+									 "**Quick Links to get you started:**\n" +
+									 "[Source Code](https://github.com/Zazsona/Jara)\n" +
+									 "[Command List](https://dothis.com)\n" +
+									 "[Tutorial](https://dothis.com)\n"); //TODO
+		owner.openPrivateChannel().complete().sendMessage(embed.build()).queue();
 		return;
 	}
 }
