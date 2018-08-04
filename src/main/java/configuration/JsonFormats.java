@@ -7,23 +7,23 @@ public class JsonFormats
 {
 	public class GlobalSettingsJson
 	{
-		String token;
-		GlobalCommandConfigJson[] commandConfig;
+		public String token;
+		public GlobalCommandConfigJson[] commandConfig;
 	}
 	public class GlobalCommandConfigJson
 	{
-		String commandKey;
-		boolean enabled;
+		public String commandKey;
+		public boolean enabled;
 	}
 	public class GuildSettingsJson
 	{
-		String gameCategoryID;
-		GuildCommandConfigJson[] commandConfig;
+		public String gameCategoryID;
+		public GuildCommandConfigJson[] commandConfig;
 	}
 	public class GuildCommandConfigJson
 	{
-		String commandKey;
-		boolean enabled;
-		ArrayList<String> roleIDs;
+		public String commandKey;
+		public boolean enabled;
+		public ArrayList<String> roleIDs;
 	}
 }

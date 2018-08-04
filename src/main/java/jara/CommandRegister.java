@@ -222,6 +222,23 @@ public class CommandRegister
 		}
 		return null; //Invalid id.
 	}
+
+	/**
+	 * Returns a list of all category names.
+	 * @return
+	 *ArrayList<String> - the names
+	 */
+	public static ArrayList<String> getCategoryNames()
+	{
+		ArrayList<String> names = new ArrayList<String>();
+		int i = 0;
+		while (getCategoryName(i) != null)
+		{
+			names.add(getCategoryName(i));
+			i++;
+		}
+		return names;
+	}
 	public static CommandAttributes[] getCommandsInCategory(int categoryID)
 	{
 		ArrayList<CommandAttributes> cmdsInCat = new ArrayList<CommandAttributes>();

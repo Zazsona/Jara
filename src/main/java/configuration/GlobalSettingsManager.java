@@ -11,6 +11,8 @@ import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 
+import gui.ConsoleGUI;
+import jara.CommandAttributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,9 +161,9 @@ public class GlobalSettingsManager
 
 	}
 	
-	public static File performFirstTimeSetup(String token) //TODO: Remove
+	public static File performFirstTimeSetup()
 	{
-		//TODO: Call some GUIs 'n' shit.
+		//TODO: Call some graphical GUIs 'n' shit.
 		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
 		File settingsFile = new File(getDirectory().getAbsolutePath()+"/settings.json");
 		if (!settingsFile.exists())
@@ -186,7 +188,7 @@ public class GlobalSettingsManager
 					ccjs[i].enabled = true;
 				}
 				globalSettings = new JsonFormats().new GlobalSettingsJson();
-				globalSettings.token = token;
+				globalSettings.token = "";
 				globalSettings.commandConfig = ccjs.clone();
 
 				Gson gson = new Gson();
@@ -194,6 +196,9 @@ public class GlobalSettingsManager
 				
 				printWriter.close();
 				fileWriter.close();
+				//TODO: Add Headless check
+				ConsoleGUI.firstTimeSetupWizard();
+
 				return settingsFile;
 			}
 			catch (IOException e)
@@ -221,7 +226,7 @@ public class GlobalSettingsManager
 		getGlobalSettings();
 		globalSettings.token = token;
 		saveGlobalSettings();
-		logger.info("Bot token has now been set to "+token+". This will be reflected after a restart.");
+		logger.info("Bot token has now been set to "+token+".");
 	}
 	
 	public static boolean getGlobalCommandEnabledStatus(int commandNo)
@@ -235,7 +240,7 @@ public class GlobalSettingsManager
 		getGlobalSettings();
 		globalSettings.commandConfig[commandNo].enabled = newStatus;
 		saveGlobalSettings();
-		logger.info("Command "+globalSettings.commandConfig[commandNo].commandKey + "'s enabled status has been changed to "+newStatus+". This will be reflected after a restart.");
+		logger.info("Command "+globalSettings.commandConfig[commandNo].commandKey + "'s enabled status has been changed to "+newStatus+".");
 	}
 	public static boolean getGlobalCommandEnabledStatus(String commandKey)
 	{
@@ -274,10 +279,32 @@ public class GlobalSettingsManager
 		else
 		{
 			saveGlobalSettings();
-			logger.info("Command "+commandKey+ "'s enabled status has been changed to "+newStatus+". This will be reflected after a restart.");
+			logger.info("Command "+commandKey+ "'s enabled status has been changed to "+newStatus+".");
 		}
 	}
-	
+	public static void setGlobalCategoryEnabledStatus(String categoryName, boolean newStatus)
+	{
+		setGlobalCategoryEnabledStatus(CommandRegister.getCommandCategory(categoryName), newStatus);
+	}
+	public static void setGlobalCategoryEnabledStatus(int categoryID, boolean newStatus)
+	{
+		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
+		if (CommandRegister.getCategoryName(categoryID) == null) //Simple verification check to ensure the id is valid.
+		{
+			logger.info("Could not alter category status as the specified category does not exist.");
+			return;
+		}
+		for (CommandAttributes commandAttributes : CommandRegister.getCommandsInCategory(categoryID))
+		{
+			for (int i = 0; i<globalSettings.commandConfig.length; i++)
+			{
+				if (globalSettings.commandConfig[i].commandKey.equalsIgnoreCase(commandAttributes.getCommandKey())) //TODO: Inefficient. Fix.
+				{
+					globalSettings.commandConfig[i].enabled = newStatus;
+				}
+			}
+		}
+	}
 	public static void addNewCommands()
 	{
 		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
