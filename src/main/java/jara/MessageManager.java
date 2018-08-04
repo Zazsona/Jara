@@ -12,26 +12,27 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class MessageManager
 {
-	private Object lock = new Object();
+	private final Object lock = new Object();
 	private ArrayList<Message> messageLog;
 	private int messagesToGet = 0;
 	private Guild guildToListen;
 	private TextChannel channelToListen;
-	MessageListener messageListener;
+	private final MessageListener messageListener;
 	public MessageManager()
 	{
 		messageLog = new ArrayList<Message>();
 		messageListener = new MessageListener();
 	}
 	/**
-	 * This method returns the first message to be sent after its invocation<br>
+	 * This method returns the first messages to be sent after its invocation<br>
 	 * within any channel of the guild that the bot has access to.<br>
+	 * This method will end when either the timeout expires, or the message count is hit. Whichever comes first.<br>
 	 * <br>
 	 * This function will block the thread until the message count has been received, or the timeout elapses.<br>
 	 * <br>
-	 * @param guild
-	 * @param timeout
-	 * @param messageCount
+	 * @param guild - The guild to listen to
+	 * @param timeout - The amount of time to record messages for
+	 * @param messageCount - The number of messages to record
 	 * @return
 	 * Message[] - The messages sent after the method was called, size matches messageCount
 	 * null - If the thread is interrupted before a message is received, or a timeout occurs.
@@ -90,14 +91,14 @@ public class MessageManager
 	 * <br>
 	 * This function will block the thread until the message count has been received, or the timeout elapses.<br>
 	 * <br>
-	 * @param channel
-	 * @param timeout
-	 * @param messageCount
+	 * @param channel - The channel to listen to
+	 * @param timeout - The amount of time to record messages for
+	 * @param messageCount - The number of messages to record
 	 * @return
 	 * Message[] - The messages sent after the method was called, size matches messageCount
 	 * null - If the thread is interrupted before a message is received, or a timeout occurs.
 	 */
-	private Message[] futureChannelMessageCollector(TextChannel channel, int timeout, int messageCount)
+	private Message[] futureChannelMessageCollector(TextChannel channel, long timeout, int messageCount)
 	{
 		channelToListen = channel;
 		messagesToGet = messageCount;
@@ -121,8 +122,7 @@ public class MessageManager
 						}
 						else
 						{
-							timeout = (int) (timeout - timeSinceStart); //Maintain the timeout if a spurious unlock occurs. This ensures additional time isn't granted.
-							//TODO: Fix this, it returns the wrong value
+							timeout = (timeout - timeSinceStart); //Maintain the timeout if a spurious unlock occurs. This ensures additional time isn't granted.
 						}
 					}
 				}
@@ -154,7 +154,7 @@ public class MessageManager
 	 * Waits and returns the first message to be sent in any channel of the guild after invocation.<br>
 	 * This method will block the thread while waiting for a message.
 	 * 
-	 * @param guild
+	 * @param guild - The guild to listen to
 	 * @return
 	 * Message - The message.
 	 */
@@ -166,7 +166,7 @@ public class MessageManager
 	 * Waits and returns the first message to be sent in the channel after invocation.<br>
 	 * This method will block the thread while waiting for a message.
 	 * 
-	 * @param channel
+	 * @param channel - The channel to listen to
 	 * @return
 	 * Message - The message.
 	 */
@@ -178,8 +178,8 @@ public class MessageManager
 	 * Waits and returns the first message to be sent in the guild after invocation and within a set time.<br>
 	 * This method will block the thread while waiting for a message, or for the time limit to elapse.
 	 * 
-	 * @param guild
-	 * @param timeout
+	 * @param guild - The guild to listen to
+	 * @param timeout - The amount of time to record for
 	 * @return
 	 * Message - The message.
 	 */
@@ -191,8 +191,8 @@ public class MessageManager
 	 * Waits and returns the first message to be sent in the channel after invocation and within a set time.<br>
 	 * This method will block the thread while waiting for a message, or for the time limit to elapse.
 	 * 
-	 * @param channel
-	 * @param timeout
+	 * @param channel - The channel to listen to
+	 * @param timeout - The amount of time to record for
 	 * @return
 	 * Message - The message.
 	 */
@@ -204,7 +204,7 @@ public class MessageManager
 	 * Waits and returns the first X messages to be sent in the guild after invocation.<br>
 	 * This method will block the thread while waiting for all messages.
 	 * 
-	 * @param guild
+	 * @param guild - The guild to listen to
 	 * @param count - Message count required
 	 * @return
 	 * Message[] - Array of messages received equal to count.
@@ -217,7 +217,7 @@ public class MessageManager
 	 * Waits and returns the first X messages to be sent in the channel after invocation.<br>
 	 * This method will block the thread while waiting for all messages.
 	 * 
-	 * @param channel
+	 * @param channel - The channel to listen to
 	 * @param count - Message count required
 	 * @return
 	 * Message[] - Array of messages received equal to count.
@@ -230,9 +230,9 @@ public class MessageManager
 	 * Waits and returns the first X messages to be sent in the guild after invocation and within the time limit.<br>
 	 * This method will block the thread while waiting for all messages or for the time limit to expire.
 	 * 
-	 * @param guild
+	 * @param guild - The guild to listen to
 	 * @param count - Message count required
-	 * @param timeout
+	 * @param timeout - The amount of time to record for
 	 * @return
 	 * Message[] - Array of messages received equal to count.
 	 */
@@ -244,9 +244,9 @@ public class MessageManager
 	 * Waits and returns the first X messages to be sent in the channel after invocation and within the time limit.<br>
 	 * This method will block the thread while waiting for all messages or for the time limit to expire.
 	 * 
-	 * @param channel
+	 * @param channel - The channel to listen to
 	 * @param count - Message count required
-	 * @param timeout
+	 * @param timeout - The amount of time to record for
 	 * @return
 	 * Message[] - Array of messages received equal to count.
 	 */
@@ -271,7 +271,7 @@ public class MessageManager
 	 * 
 	 * If the total amount of messages requested is less than the total available, as many as possible will be returned.
 	 * 
-	 * @param count
+	 * @param count - The number of messages to get
 	 * @return
 	 * Message[] - Array of messages requested
 	 */
@@ -294,7 +294,7 @@ public class MessageManager
 	 * 
 	 * If the total amount of messages requested is less than the total available, as many as possible will be returned.
 	 * 
-	 * @param count
+	 * @param count - The number of messages to get
 	 * @return
 	 * Message[] - Array of messages requested
 	 */
