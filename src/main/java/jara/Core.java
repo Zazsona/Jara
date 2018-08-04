@@ -2,10 +2,10 @@ package jara;
 
 import java.awt.Color;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
+import gui.ConsoleGUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,13 +15,11 @@ import event.GuildJoinHandler;
 import event.GuildLeaveHandler;
 import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.bot.sharding.ShardManager;
-import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Role;
 
 public class Core //A class for covering the global manners of the bot.
 {
-	static ShardManager shardManager;
+	private static ShardManager shardManager;
 	public static void initialiseDiscordConnection(String clientToken)
 	{
 		Logger logger = LoggerFactory.getLogger(Core.class);
@@ -34,7 +32,9 @@ public class Core //A class for covering the global manners of the bot.
 		}
 	    catch (LoginException e)
 		{
-	    	logger.error("Failed to log in. Is the token invalid?");
+	    	logger.error("Failed to log in.");
+			String newToken = ConsoleGUI.updateToken();
+			initialiseDiscordConnection(newToken); //TODO: Headless check
 	    	e.printStackTrace();
 		} 
 	    catch (IllegalArgumentException e)

@@ -1,6 +1,5 @@
 package gui;
 
-import com.google.gson.Gson;
 import configuration.GlobalSettingsManager;
 import configuration.JsonFormats;
 import jara.CommandRegister;
@@ -10,7 +9,7 @@ import java.util.Scanner;
 
 public class ConsoleGUI
 {
-    public static void printLogo()
+    private static void printLogo()
     {
         System.out.print("\n" +
                                "=============================================================================\n" +
@@ -33,18 +32,12 @@ public class ConsoleGUI
                                "   JJ:::::::::JJ      a::::::::::aa:::a r:::::r             a::::::::::aa:::a\n" +
                                "     JJJJJJJJJ         aaaaaaaaaa  aaaa rrrrrrr              aaaaaaaaaa  aaaa\n" +
                                "                                                                             \n" +
-                               "                                                                             \n" +
-                               "                                                                             \n" +
-                               "                                                                             \n" +
-                               "                                                                             \n" +
-                               "                                                                             \n" +
                                "                                                                             \n");
     }
     public static void firstTimeSetupWizard()
     {
         printLogo();
         String input;
-        Gson gson = new Gson();
         //JsonFormats.GlobalSettingsJson config = GlobalSettingsManager.getGlobalSettings();
         Scanner scanner = new Scanner(System.in);
         System.out.println("Hey there, and welcome to your new Discord bot.");
@@ -105,7 +98,6 @@ public class ConsoleGUI
                     {
                         GlobalSettingsManager.setGlobalCommandEnabledStatus(query[1], true);
                     }
-                    GlobalSettingsManager.saveGlobalSettings();
                     printGlobalConfig(GlobalSettingsManager.getGlobalCommandConfig());
 
                 }
@@ -119,7 +111,6 @@ public class ConsoleGUI
                     {
                         GlobalSettingsManager.setGlobalCommandEnabledStatus(query[1], false);
                     }
-                    GlobalSettingsManager.saveGlobalSettings();
                     printGlobalConfig(GlobalSettingsManager.getGlobalCommandConfig());
                 }
                 else
@@ -142,9 +133,9 @@ public class ConsoleGUI
         ArrayList<String> utility = new ArrayList<String>();
         ArrayList<String> audio = new ArrayList<String>();
         ArrayList<String> admin = new ArrayList<String>();
-        for (int i = 0; i<commandConfig.length; i++)
+        for (JsonFormats.GlobalCommandConfigJson aCommandConfig : commandConfig)
         {
-            int category = CommandRegister.getCommand(commandConfig[i].commandKey).getCategoryID();
+            int category = CommandRegister.getCommand(aCommandConfig.commandKey).getCategoryID();
             switch (category)
             {
                 case CommandRegister.NOGROUP:
@@ -154,27 +145,27 @@ public class ConsoleGUI
                 }
                 case CommandRegister.GAMES:
                 {
-                    games.add(commandConfig[i].commandKey + " :: " + commandConfig[i].enabled);
+                    games.add(aCommandConfig.commandKey + " :: " + aCommandConfig.enabled);
                     break;
                 }
                 case CommandRegister.TOYS:
                 {
-                    toys.add(commandConfig[i].commandKey + " :: " + commandConfig[i].enabled);
+                    toys.add(aCommandConfig.commandKey + " :: " + aCommandConfig.enabled);
                     break;
                 }
                 case CommandRegister.UTILITY:
                 {
-                    utility.add(commandConfig[i].commandKey + " :: " + commandConfig[i].enabled);
+                    utility.add(aCommandConfig.commandKey + " :: " + aCommandConfig.enabled);
                     break;
                 }
                 case CommandRegister.AUDIO:
                 {
-                    audio.add(commandConfig[i].commandKey + " :: " + commandConfig[i].enabled);
+                    audio.add(aCommandConfig.commandKey + " :: " + aCommandConfig.enabled);
                     break;
                 }
                 case CommandRegister.ADMIN:
                 {
-                    admin.add(commandConfig[i].commandKey + " :: " + commandConfig[i].enabled);
+                    admin.add(aCommandConfig.commandKey + " :: " + aCommandConfig.enabled);
                     break;
                 }
             }
@@ -206,5 +197,12 @@ public class ConsoleGUI
         }
 
     }
-
+    public static String updateToken()
+    {
+        System.out.println("Please enter a new token:");
+        Scanner scanner = new Scanner(System.in);
+        String token = scanner.nextLine();
+        GlobalSettingsManager.setNewGlobalClientToken(token);
+        return token;
+    }
 }
