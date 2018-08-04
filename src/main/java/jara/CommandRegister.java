@@ -1,6 +1,7 @@
 package jara;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import commands.Command;
 import commands.Help;
@@ -10,6 +11,7 @@ import commands.toys.Say;
 import commands.utility.*;
 import commands.toys.EightBall;
 import commands.toys.Jokes;
+import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 public class CommandRegister
 {
@@ -17,7 +19,7 @@ public class CommandRegister
 	public static final int GAMES = 1;
 	public static final int UTILITY = 2;
 	public static final int TOYS = 3;
-	public static final int AUDIO = 4;
+	public static final int AUDIO = 4; //TODO: Make it so that NOGROUP and ADMIN commands cannot be disabled OR add a disableable attribute.
 	public static final int ADMIN = 5;
 	private static ArrayList<CommandAttributes> register;
 	/*
@@ -70,10 +72,7 @@ public class CommandRegister
 		ArrayList<String> aliases = new ArrayList<String>();
 		for (CommandAttributes commandAttributes : register)
 		{
-			for (String alias : commandAttributes.getAliases())
-			{
-				aliases.add(alias);
-			}
+			Collections.addAll(aliases, commandAttributes.getAliases());
 		}
 		return aliases.toArray(new String[aliases.size()]); 
 	}
@@ -140,7 +139,7 @@ public class CommandRegister
 					break;														//Find out what a "It's coming home" is.
 				}																//Fix Northern Rail's train timetables
 			}																	//Play a flash game
-			if (match == true)													//Rent a dog
+			if (match)													        //Rent a dog
 			{																	//Mark everything as duplicate on SO
 				return commandAttributes;										//Come up with a faster algorithm.
 			}
@@ -179,7 +178,7 @@ public class CommandRegister
 	}
 	/**
 	 * Returns the command's category ID.<br>
-	 * @param key
+	 * @param key - Command key
 	 * @return
 	 * 0-4 - The category ID.<br>
 	 * -1 - Command key does not exist.
@@ -198,7 +197,7 @@ public class CommandRegister
 	}
 	/**
 	 * Converts a category ID into a category name.
-	 * @param id
+	 * @param id - The ID number for the category
 	 * @return
 	 * String - Category name
 	 * null = Invalid id.
@@ -250,6 +249,14 @@ public class CommandRegister
 			}
 		}
 		return cmdsInCat.toArray(new CommandAttributes[cmdsInCat.size()]);
+	}
+	public static void sendHelpInfo(GuildMessageReceivedEvent msgEvent, Class<? extends Command> clazz)
+	{
+		new Help().run(msgEvent, "/?", CommandRegister.getCommand(clazz).getCommandKey());
+		/*
+		 * So, technically this is fine, as help is *always* enabled and cannot be disabled. But generally calling commands like this is a bad idea, as they may be disabled.
+		 * This also saves us having to copy command usage info for each command, which could be a problem as commands change.
+		 */
 	}
 	
 }
