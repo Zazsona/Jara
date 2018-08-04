@@ -1,14 +1,17 @@
 package commands;
 
-import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 
+import configuration.GuildSettingsManager;
 import jara.CommandAttributes;
 import jara.CommandRegister;
 import jara.Core;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
+@SuppressWarnings("SpellCheckingInspection")
 public class Help extends Command {
 
 	@Override
@@ -20,7 +23,8 @@ public class Help extends Command {
 		if (parameters.length == 1)
 		{
 
-			embed.setDescription("To get a list of commands, use /help [Topic]. For more information, use /about\n");
+			embed.setDescription("To get a list of commands, use /help [Topic]. For more information, use /about\n" +
+										 "By default, only commands you have access to are shown. use \"/help [Topic] all\" to see every command.");
 			String topics = 
 					"**Games** - SP/MP experiences to keep you busy!\n"
 					+ "**Toys** - Quick fun commands.\n"
@@ -30,27 +34,46 @@ public class Help extends Command {
 			
 			embed.addField("Topics",topics, true);
 		}
-		else if (parameters.length == 2)
+		else if (parameters.length >= 2)
 		{
+			boolean limitToPerms = true;
+			ArrayList<String> roleIDs = new ArrayList<String>();
+
+			if (parameters.length == 3)
+			{
+				if (parameters[2].equalsIgnoreCase("all"))
+				{
+					limitToPerms = false;									//If the user sets "all" display every command, regardless of permissions
+				}
+			}
+			if (limitToPerms)
+			{
+				for (Role role : msgEvent.getMember().getRoles())			//Otherwise, collect their roles and base it off that.
+				{
+					roleIDs.add(role.getId());
+				}
+				roleIDs.add(msgEvent.getGuild().getId()); //This adds the everyone role
+			}
+
 			if (parameters[1].equalsIgnoreCase("games"))
 			{
-				embed.setDescription(buildCommandList(CommandRegister.GAMES));
+				embed.setDescription(buildCommandList(CommandRegister.GAMES, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
 			}
 			else if (parameters[1].equalsIgnoreCase("toys"))
 			{
-				embed.setDescription(buildCommandList(CommandRegister.TOYS));
+				embed.setDescription(buildCommandList(CommandRegister.TOYS, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
 			}
 			else if (parameters[1].equalsIgnoreCase("utility"))
 			{
-				embed.setDescription(buildCommandList(CommandRegister.UTILITY));
+				embed.setDescription(buildCommandList(CommandRegister.UTILITY, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
 			}
 			else if (parameters[1].equalsIgnoreCase("audio"))
 			{
-				embed.setDescription(buildCommandList(CommandRegister.AUDIO));
+				embed.setDescription(buildCommandList(CommandRegister.AUDIO, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
 			}
 			else if (parameters[1].equalsIgnoreCase("admin"))
 			{
-				embed.setDescription(buildCommandList(CommandRegister.ADMIN)); //TODO: Limit this to those who have access?
+				embed.setDescription(buildCommandList(CommandRegister.ADMIN, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
 			}
 			else
 			{
@@ -62,13 +85,13 @@ public class Help extends Command {
 	}
 	private ArrayList<String> getCommandExplanation(String key)
 	{
-		/**
+		/*
 		 * Yay! Help menus. exciting stuff, but someone's gotta do 'em.
 		 * 
 		 * Anyway, here's my recommended format for consistency:
 		 *
 		 * Displaying parameters:
-		 * Put these inside the paramSetups arraylist, and lay them out so that it looks like...
+		 * Put these inside the paramSetups array list, and lay them out so that it looks like...
 		 * 	
 		 * /CommandTrigger [Parameter1] (Parameter2)
 		 * 
@@ -159,12 +182,11 @@ public class Help extends Command {
 		{
 			infoBuilder.append("No information is available for this command.");
 		}
-		paramSetups.add(0, infoBuilder.toString()); //To save creating a new arraylist with duplicate data, we'll just 'borrow' this one. The first index is always the info.
+		paramSetups.add(0, infoBuilder.toString()); //To save creating a new array list with duplicate data, we'll just 'borrow' this one. The first index is always the info.
 		return paramSetups;
 	}
 	private String buildEmbedDesc(String alias)
 	{
-		
 		StringBuilder cmdDescBuilder = new StringBuilder();
 		CommandAttributes cmdAttributes = CommandRegister.getCommand(alias);
 		if (cmdAttributes == null)
@@ -174,38 +196,59 @@ public class Help extends Command {
 		else
 		{
 			cmdDescBuilder.append("~~------------------------------------------------------------~~\n");
-			cmdDescBuilder.append("**Command:** "+cmdAttributes.getCommandKey()+"\n");
+			cmdDescBuilder.append("**Command:** ").append(cmdAttributes.getCommandKey()).append("\n");
 			StringBuilder aliasBuilder = new StringBuilder();
 			for (String regAlias : cmdAttributes.getAliases())
 			{
-				aliasBuilder.append(regAlias+", ");
+				aliasBuilder.append(regAlias).append(", ");
 			}
 			aliasBuilder.setLength(aliasBuilder.length()-2);
-			cmdDescBuilder.append("**Aliases:** "+aliasBuilder.toString()+"\n");	
+			cmdDescBuilder.append("**Aliases:** ").append(aliasBuilder.toString()).append("\n");
 			ArrayList<String> explanationList = getCommandExplanation(cmdAttributes.getCommandKey());
 			if (explanationList.size() > 1)
 			{
 				cmdDescBuilder.append("**Parameters: **\n");
 				for (int i = 1; i<explanationList.size(); i++) //Start from 1, so we skip info.
 				{
-					cmdDescBuilder.append(explanationList.get(i)+"\n");
+					cmdDescBuilder.append(explanationList.get(i)).append("\n");
 				}
 			}
 			cmdDescBuilder.append("~~------------------------------------------------------------~~\n");
-			cmdDescBuilder.append("**Info:**\n"+explanationList.get(0)+"\n");
+			cmdDescBuilder.append("**Info:**\n").append(explanationList.get(0)).append("\n");
 			cmdDescBuilder.append("~~------------------------------------------------------------~~\n");
 		}
 		return cmdDescBuilder.toString();
 	}
-	private String buildCommandList(int categoryID)
+	private String buildCommandList(int categoryID, String guildID, ArrayList<String> roleIDs, boolean limitToPerms)
 	{
+		/*
+				limitToPerms is used here to bypass the permissions check.
+				The reason this check exists is not to hide the existence of the commands from the user, but rather so that
+				they do not have to trawl through a list of commands where they can only use some of them, which could be an issue as the command count grows.
+
+				TL;DR, the permission check is for an easier experience, not secrecy. Consider this when setting limitToPerms as true.
+		 */
+		GuildSettingsManager guildSettings = new GuildSettingsManager(guildID);
 		StringBuilder commands = new StringBuilder();
+		boolean commandsListed = false;
 		commands.append("~~------------------------------------------------------------~~\n");
 		for (CommandAttributes cmdAttributes : CommandRegister.getCommandsInCategory(categoryID))
 		{
-			commands.append(cmdAttributes.getCommandKey()+"\n");
+			if (guildSettings.getGuildCommandEnabledStatus(cmdAttributes.getCommandKey()))
+			{
+				if (!(Collections.disjoint(guildSettings.getCommandRolePermissions(cmdAttributes.getCommandKey()), roleIDs)) || !limitToPerms)
+				{
+					commands.append(cmdAttributes.getCommandKey()).append("\n");
+					commandsListed = true;
+				}
+			}
+		}
+		if (!commandsListed)
+		{
+			commands.append("You don't have permission to use any of these commands.\n");
 		}
 		commands.append("~~------------------------------------------------------------~~\n");
+
 		return commands.toString();
 	}
 
