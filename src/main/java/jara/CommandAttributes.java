@@ -8,8 +8,9 @@ public class CommandAttributes
 	private Class<? extends Command> commandClass;
 	private String[] aliases; //Text strings that will call the command
 	private int category;
+	private boolean disableable;
 
-	public CommandAttributes(String commandKeyArg, Class<? extends Command> commandClassArg, String[] aliasesArg, int categoryArg)
+	public CommandAttributes(String commandKeyArg, Class<? extends Command> commandClassArg, String[] aliasesArg, int categoryArg, boolean disableableArg)
 	{
 		commandKey = commandKeyArg;
 		commandClass = commandClassArg;
@@ -20,8 +21,15 @@ public class CommandAttributes
 			aliases[i] = aliasesArg[i-1];
 		}
 		category = categoryArg;
+		disableable = disableableArg;
 		
 	}
+
+	/**
+	 * Simple get for the command's key. This is unique to this command and can be used to identify it.
+	 * @return
+	 * String - The key
+	 */
 	public String getCommandKey()
 	{
 		return commandKey;
@@ -55,13 +63,31 @@ public class CommandAttributes
 	}
 	/**
 	 * Returns the class' category as its ID.<br>
+	 * @return
+	 * int - The id number
 	 */
 	public int getCategoryID()
 	{
 		return category;
 	}
+
+	/**
+	 * Simple get which returns the name of the command's category
+	 * @return
+	 * String - Category name
+	 */
 	public String getCategoryName()
 	{
 		return CommandRegister.getCategoryName(category);
+	}
+	/**
+	 * Simple state check which specifies if this command is able to be disabled
+	 * @return
+	 * true - Can be disabled/enabled freely
+	 * false - Locked. This command should not be disableable.
+	 */
+	public boolean isDisableable()
+	{
+		return disableable;
 	}
 }

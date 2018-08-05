@@ -19,7 +19,7 @@ public class CommandRegister
 	public static final int GAMES = 1;
 	public static final int UTILITY = 2;
 	public static final int TOYS = 3;
-	public static final int AUDIO = 4; //TODO: Make it so that NOGROUP and ADMIN commands cannot be disabled OR add a disableable attribute.
+	public static final int AUDIO = 4;
 	public static final int ADMIN = 5;
 	private static ArrayList<CommandAttributes> register;
 	/*
@@ -47,17 +47,17 @@ public class CommandRegister
 			 * NOTE: ALWAYS ADD YOUR NEW COMMAND AT THE END FOR PROPER UPDATING OF LEGACY CONFIGS
 			 * ===========================================
 			 */
-			register.add(new CommandAttributes("Ping", Ping.class, new String[] {"Pong", "Test"}, UTILITY));
-			register.add(new CommandAttributes("Report", Report.class, new String[] {"Status", "Stats"}, UTILITY));
-			register.add(new CommandAttributes("About", About.class, new String[] {"Credits", "Authors"}, UTILITY));
-			register.add(new CommandAttributes("EightBall", EightBall.class, new String[] {"8ball", "helix", "fortune"}, TOYS));
-			register.add(new CommandAttributes("Jokes", Jokes.class, new String[] {"Joke", "Comedy"}, TOYS));
-			register.add(new CommandAttributes("CoinFlip", CoinFlip.class, new String[] {"FlipCoin", "Toss", "cf", "fc", "fiftyfifty", "flipacoin"}, UTILITY));
-			register.add(new CommandAttributes("Config", Config.class, new String[] {"Settings"}, ADMIN));
-			register.add(new CommandAttributes("Countdown", Countdown.class, new String[] {"cd"}, GAMES));
-			register.add(new CommandAttributes("Help", Help.class, new String[] {"?", "commands"}, NOGROUP)); //Does help REALLY need to be indexed in help?
-            register.add(new CommandAttributes("Randomiser", Randomiser.class, new String[] {"Randomise", "Randomize", "Randomizer", "Roulette", "Picker", "Selector"}, UTILITY));
-			register.add(new CommandAttributes("Say", Say.class, new String[] {"Speak", "Talk"}, TOYS));
+			register.add(new CommandAttributes("Ping", Ping.class, new String[] {"Pong", "Test"}, UTILITY, true));
+			register.add(new CommandAttributes("Report", Report.class, new String[] {"Status", "Stats"}, UTILITY, true));
+			register.add(new CommandAttributes("About", About.class, new String[] {"Credits", "Authors"}, UTILITY, false));
+			register.add(new CommandAttributes("EightBall", EightBall.class, new String[] {"8ball", "helix", "fortune"}, TOYS, true));
+			register.add(new CommandAttributes("Jokes", Jokes.class, new String[] {"Joke", "Comedy"}, TOYS, true));
+			register.add(new CommandAttributes("CoinFlip", CoinFlip.class, new String[] {"FlipCoin", "Toss", "cf", "fc", "fiftyfifty", "flipacoin"}, UTILITY, true));
+			register.add(new CommandAttributes("Config", Config.class, new String[] {"Settings"}, ADMIN, false));
+			register.add(new CommandAttributes("Countdown", Countdown.class, new String[] {"cd"}, GAMES, true));
+			register.add(new CommandAttributes("Help", Help.class, new String[] {"?", "commands"}, NOGROUP, false)); //Does help REALLY need to be indexed in help?
+            register.add(new CommandAttributes("Randomiser", Randomiser.class, new String[] {"Randomise", "Randomize", "Randomizer", "Roulette", "Picker", "Selector"}, UTILITY, true));
+			register.add(new CommandAttributes("Say", Say.class, new String[] {"Speak", "Talk"}, TOYS, true));
 		}
 		return register.toArray(new CommandAttributes[register.size()]);
 	}
@@ -240,6 +240,7 @@ public class CommandRegister
 	}
 	public static CommandAttributes[] getCommandsInCategory(int categoryID)
 	{
+		getRegister();
 		ArrayList<CommandAttributes> cmdsInCat = new ArrayList<CommandAttributes>();
 		for (CommandAttributes cmdAttributes : register)
 		{
