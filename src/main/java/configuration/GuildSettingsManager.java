@@ -5,11 +5,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Member;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
+import net.dv8tion.jda.core.entities.Member;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,17 +20,14 @@ import commands.Command;
 import configuration.JsonFormats.GuildCommandConfigJson;
 import configuration.JsonFormats.GuildSettingsJson;
 import jara.CommandRegister;
-import jara.Core;
 import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 
 public class GuildSettingsManager
 {
-	private File directory;
 	private GuildSettingsJson guildSettings;
-	private String guildID;
+	private final String guildID;
 	
 	public GuildSettingsManager(String guildID)
 	{
@@ -39,22 +37,14 @@ public class GuildSettingsManager
 	
 	public File getDirectory()
 	{
-		directory = GlobalSettingsManager.getDirectory();
-		return directory;
+		return GlobalSettingsManager.getDirectory();
 	}
 	
 	//==================================== Guild Specific Tools ==================================================
-	public File getGuildSettingsFolder()
+	private File getGuildSettingsFolder()
 	{
 		File guildSettingsFolder;
-		if (System.getProperty("os.name").startsWith("Windows"))
-		{
-			guildSettingsFolder = new File(getDirectory().getAbsolutePath()+"\\guilds\\");
-		}
-		else
-		{
-			guildSettingsFolder = new File(getDirectory().getAbsolutePath()+"/guilds/");
-		}
+		guildSettingsFolder = new File(getDirectory().getAbsolutePath()+"/guilds/");
 		if (!guildSettingsFolder.exists())
 		{
 			guildSettingsFolder.mkdirs();
@@ -74,8 +64,7 @@ public class GuildSettingsManager
 	}
 	public void deleteGuildSettingsFile()
 	{
-		File guildSettingsFile = getGuildSettingsFile();
-		guildSettingsFile.delete();
+		getGuildSettingsFile().delete();
 	}
 	public GuildSettingsJson getGuildSettings()
 	{
@@ -138,28 +127,20 @@ public class GuildSettingsManager
 				FileWriter fileWriter = new FileWriter(guildSettingsFile);
 				PrintWriter printWriter = new PrintWriter(fileWriter);
 				
-				GuildCommandConfigJson[] ccjs = new JsonFormats.GuildCommandConfigJson[CommandRegister.getRegisterSize()];
+				GuildCommandConfigJson[] ccjs = new GuildCommandConfigJson[CommandRegister.getRegisterSize()];
 				String[] keys = CommandRegister.getAllCommandKeys();
 				for (int i = 0; i<ccjs.length; i++)
 				{
-					ccjs[i] = new JsonFormats().new GuildCommandConfigJson();
-					ccjs[i].commandKey = keys[i];
-					ccjs[i].enabled = false;
-					ccjs[i].roleIDs = new ArrayList<String>(); 
-					ccjs[i].roleIDs.add(guildID); //Weird, huh? Discord's @everyone role id matches the guild's id. So this enables the command for all.
-					if (keys[i].equalsIgnoreCase("About") || keys[i].equalsIgnoreCase("Help"))
+					ArrayList<String> roleIDs = new ArrayList<>();
+					if (CommandRegister.getCommandCategory(keys[i]) != CommandRegister.ADMIN)
 					{
-						ccjs[i].enabled = true; //Have these enabled by default.
+						roleIDs.add(guildID); //Weird, huh? Discord's @everyone role id matches the guild's id. So this enables the command for all.
 					}
-					else if (keys[i].equalsIgnoreCase("Config"))
-					{
-						ccjs[i].roleIDs.remove(guildID);
-						ccjs[i].enabled = true;
-					}
+					ccjs[i] = new JsonFormats().new GuildCommandConfigJson(keys[i], true, roleIDs);
 				}
 				guildSettings = new JsonFormats().new GuildSettingsJson();
-				guildSettings.gameCategoryID = ""; //This will be set separately when configured by guild owner.
-				guildSettings.commandConfig = ccjs.clone();
+				guildSettings.setGameCategoryID(""); //This will be set separately when configured by guild owner.
+				guildSettings.setCommandConfig(ccjs);
 
 				Gson gson = new Gson();
 				printWriter.print(gson.toJson(guildSettings));
@@ -181,35 +162,20 @@ public class GuildSettingsManager
 	}
 	public String getGuildGameCategoryID()
 	{
-		return getGuildSettings().gameCategoryID;
+		return getGuildSettings().getGameCategoryID();
 	}
 	public void setGuildGameCategoryID(String gameCategoryID)
 	{
-		GuildSettingsJson guildSettings = getGuildSettings();
-		guildSettings.gameCategoryID = gameCategoryID;
+		getGuildSettings().setGameCategoryID(gameCategoryID);
 		saveGuildSettings();
-	}
-
-	public boolean getGuildCommandEnabledStatus(int commandNo)
-	{
-		return getGuildSettings().commandConfig[commandNo].enabled;
-	}
-	public void setGuildCommandEnabledStatus(int commandNo, boolean newStatus)
-	{
-		Logger logger = LoggerFactory.getLogger(GuildSettingsManager.class);
-
-		GuildSettingsJson guildSettings = getGuildSettings();
-		guildSettings.commandConfig[commandNo].enabled = newStatus;
-		saveGuildSettings();
-		logger.info("Command "+guildSettings.commandConfig[commandNo].commandKey + "'s enabled status has been changed to "+newStatus+" for guild "+guildID);
 	}
 	public boolean getGuildCommandEnabledStatus(String commandKey)
 	{
-		for (GuildCommandConfigJson commandSettings : getGuildSettings().commandConfig)
+		for (GuildCommandConfigJson commandSettings : getGuildSettings().getCommandConfig())
 		{
-			if (commandSettings.commandKey.equalsIgnoreCase(commandKey))
+			if (commandSettings.getCommandKey().equalsIgnoreCase(commandKey))
 			{
-				return commandSettings.enabled;
+				return commandSettings.isEnabled();
 			}
 
 		}
@@ -222,17 +188,16 @@ public class GuildSettingsManager
 	{
 		Logger logger = LoggerFactory.getLogger(GuildSettingsManager.class);
 		boolean keyFound = false;
-		GuildSettingsJson guildSettings = getGuildSettings();
-		for (GuildCommandConfigJson commandSettings : guildSettings.commandConfig)
+		for (GuildCommandConfigJson commandSettings : getGuildSettings().getCommandConfig())
 		{
-			if (commandSettings.commandKey.equalsIgnoreCase(commandKey))
+			if (commandSettings.getCommandKey().equalsIgnoreCase(commandKey))
 			{
-				commandSettings.enabled = newStatus;
+				commandSettings.setEnabled(newStatus); //TODO: What if lockeded?
 				keyFound = true;
 			}
 
 		}
-		if (keyFound == false)
+		if (!keyFound)
 		{
 			logger.debug("Tried to find key \""+ commandKey+"\", however, it does not appear to exist.");
 		}
@@ -243,124 +208,111 @@ public class GuildSettingsManager
 		}
 
 	}
-	/*public void addNewCommands()
+	public void addPermittedRole(String commandKey, String roleID)
 	{
-		CommandRegister commandRegister = new CommandRegister();
-		if (guildSettings.commandConfig.length < commandRegister.getRegisterSize()) 
+		for (int i = 0; i< getGuildSettings().getCommandConfig().length; i++)
 		{
-			GuildCommandConfigJson[] updatedCommandConfig = new GuildCommandConfigJson[commandRegister.getRegisterSize()]; 
-			for (int i = 0; i<guildSettings.commandConfig.length; i++)		//For every known command setting...
+			if (commandKey.equalsIgnoreCase(getGuildSettings().getCommandConfig()[i].getCommandKey()))
 			{
-				updatedCommandConfig[i] = guildSettings.commandConfig[i];		//Put that in the new config
-			}
-			String keys[] = commandRegister.getAllCommandKeys();
-			for (int j = guildSettings.commandConfig.length; j<commandRegister.getRegisterSize(); j++)	//For the missing entries (based on size discrepancy)...		//Could be useful in future for adding commands on the fly, as no reboot is required.
-			{
-				updatedCommandConfig[j] = new JsonFormats().new GuildCommandConfigJson();
-				updatedCommandConfig[j].commandKey = keys[j];																		//Create new entries
-				updatedCommandConfig[j].enabled = false; //We will show the GUI later, and false should make it clearer what is new.
-				updatedCommandConfig[j].roleIDs = new ArrayList<String>();
-			}
-			guildSettings.commandConfig = updatedCommandConfig.clone();
-			Core.getShardManager().getGuildById(guildID).getOwner().getUser().openPrivateChannel().complete().sendMessage("Just a heads up, I've received an update and new commands have been added. You can enable these via ```/config```").queue();
-			saveGuildSettings();		
-		}
-	}*/
-	public void addRoleCommandPermission(String commandKey, String roleID)
-	{
-		for (int i = 0; i<guildSettings.commandConfig.length; i++)
-		{
-			if (commandKey.equalsIgnoreCase(guildSettings.commandConfig[i].commandKey))
-			{
-				if (!guildSettings.commandConfig[i].roleIDs.contains(roleID))
+				if (!getGuildSettings().getCommandConfig()[i].getPermittedRoles().contains(roleID))
 				{
-					guildSettings.commandConfig[i].roleIDs.add(roleID);
+					getGuildSettings().getCommandConfig()[i].getPermittedRoles().add(roleID);
 					saveGuildSettings();
 				}
 			}
 		}
 	}
-	public void removeRoleCommandPermission(String commandKey, String roleID)
+	public void removePermittedRole(String commandKey, String roleID)
 	{
-		for (int i = 0; i<guildSettings.commandConfig.length; i++)
+		for (int i = 0; i< getGuildSettings().getCommandConfig().length; i++)
 		{
-			if (commandKey.equalsIgnoreCase(guildSettings.commandConfig[i].commandKey))
+			if (commandKey.equalsIgnoreCase(getGuildSettings().getCommandConfig()[i].getCommandKey()))
 			{
-				guildSettings.commandConfig[i].roleIDs.remove(roleID);
+				getGuildSettings().getCommandConfig()[i].getPermittedRoles().remove(roleID);
 				saveGuildSettings();
 			}
 		}
 	}
-	public ArrayList<String> getCommandRolePermissions(String commandKey)
+	public ArrayList<String> getPermittedRoles(String commandKey)
 	{
-		for (int i = 0; i<guildSettings.commandConfig.length; i++)
+		for (int i = 0; i< getGuildSettings().getCommandConfig().length; i++)
 		{
-			if (commandKey.equalsIgnoreCase(guildSettings.commandConfig[i].commandKey))
+			if (commandKey.equalsIgnoreCase(getGuildSettings().getCommandConfig()[i].getCommandKey()))
 			{
-				return guildSettings.commandConfig[i].roleIDs;
+				return getGuildSettings().getCommandConfig()[i].getPermittedRoles();
 			}
 		}
 		return null; //Invalid command key
 	}
-	public boolean hasPermission(GuildMessageReceivedEvent msgEvent, Class<? extends Command> command)
+	public boolean isPermitted(Member member, String commandKey)
 	{
-		ArrayList<String> roleIDs = getCommandRolePermissions(CommandRegister.getCommand(command).getCommandKey());
-		List<Role> userRoles = msgEvent.getMember().getRoles(); //MsgEvent used as this gets Member in context of the guild.
 		boolean permissionGranted = false;
-		for (Role userRole : userRoles)
+		ArrayList<String> roleIDs = new ArrayList<>();
+		for (Role role : member.getRoles())
 		{
-			if (roleIDs.contains(userRole.getId()))
+			roleIDs.add(role.getId());
+		}
+		for (GuildCommandConfigJson commandConfig : getGuildSettings().getCommandConfig())
+		{
+			if (commandConfig.getCommandKey().equalsIgnoreCase(commandKey))
 			{
-				permissionGranted = true;
+				if (!Collections.disjoint(commandConfig.getPermittedRoles(), roleIDs)) //TODO Fix
+				{
+					permissionGranted = true;
+				}
 			}
 		}
 		return permissionGranted;
 	}
-	public ArrayList<String> getRoleCommandPermissions(String roleID)
+	public boolean isPermitted(Member member, Class<? extends Command> command)
 	{
-		ArrayList<String> commandKeys = new ArrayList<String>();
-		for (int i = 0; i<guildSettings.commandConfig.length; i++)
+		return isPermitted(member, CommandRegister.getCommand(command).getCommandKey());
+	}
+	public ArrayList<String> getPermittedCommands(String roleID)
+	{
+		ArrayList<String> permittedCommandKeys = new ArrayList<String>();
+		for (JsonFormats.GuildCommandConfigJson commandConfig : getGuildSettings().getCommandConfig())
 		{
-			if (guildSettings.commandConfig[i].roleIDs.contains(roleID))
+			if (commandConfig.getPermittedRoles().contains(roleID))
 			{
-				commandKeys.add(guildSettings.commandConfig[i].commandKey);
+				permittedCommandKeys.add(commandConfig.getCommandKey());
 			}
 		}
-		return commandKeys;
+		return permittedCommandKeys;
 	}
 	
-	public GuildCommandConfigJson[] getGuildCommandConfig()
+	/*public GuildCommandConfigJson[] getGuildCommandConfig()
 	{
 		ArrayList<GuildCommandConfigJson> commandConfigList = new ArrayList<GuildCommandConfigJson>();
-		for (GuildCommandConfigJson commandConfig : getGuildSettings().commandConfig)
+		for (GuildCommandConfigJson commandConfig : getGuildSettings().getCommandConfig())
 		{
 			commandConfigList.add(commandConfig);
 		}
 		return commandConfigList.toArray(new GuildCommandConfigJson[commandConfigList.size()]);
-	}
+	}*/
 	public GuildCommandConfigJson[] getGuildEnabledCommands()
 	{
 		ArrayList<GuildCommandConfigJson> commandConfigList = new ArrayList<GuildCommandConfigJson>();
-		for (GuildCommandConfigJson commandConfig : getGuildSettings().commandConfig)
+		for (GuildCommandConfigJson commandConfig : getGuildSettings().getCommandConfig())
 		{
-			if (commandConfig.enabled == true)
+			if (commandConfig.isEnabled())
 			{
 				commandConfigList.add(commandConfig);
 			}
 		}
-		return commandConfigList.toArray(new GuildCommandConfigJson[commandConfigList.size()]);
+		return commandConfigList.toArray(new GuildCommandConfigJson[0]);
 	}
 	public GuildCommandConfigJson[] getGuildDisabledCommands()
 	{
 		ArrayList<GuildCommandConfigJson> commandConfigList = new ArrayList<GuildCommandConfigJson>();
-		for (GuildCommandConfigJson commandConfig : getGuildSettings().commandConfig)
+		for (GuildCommandConfigJson commandConfig : getGuildSettings().getCommandConfig())
 		{
-			if (commandConfig.enabled == false)
+			if (!commandConfig.isEnabled())
 			{
 				commandConfigList.add(commandConfig);
 			}
 		}
-		return commandConfigList.toArray(new GuildCommandConfigJson[commandConfigList.size()]);
+		return commandConfigList.toArray(new GuildCommandConfigJson[0]);
 	}
 
 	//============================================================================================================

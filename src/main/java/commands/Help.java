@@ -71,7 +71,7 @@ public class Help extends Command {
 			{
 				embed.setDescription(buildCommandList(CommandRegister.AUDIO, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
 			}
-			else if (parameters[1].equalsIgnoreCase("admin"))
+			else if (parameters[1].equalsIgnoreCase("config"))
 			{
 				embed.setDescription(buildCommandList(CommandRegister.ADMIN, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
 			}
@@ -236,7 +236,7 @@ public class Help extends Command {
 		{
 			if (guildSettings.getGuildCommandEnabledStatus(cmdAttributes.getCommandKey()))
 			{
-				if (!(Collections.disjoint(guildSettings.getCommandRolePermissions(cmdAttributes.getCommandKey()), roleIDs)) || !limitToPerms)
+				if (!(Collections.disjoint(guildSettings.getPermittedRoles(cmdAttributes.getCommandKey()), roleIDs)) || !limitToPerms)
 				{
 					commands.append(cmdAttributes.getCommandKey()).append("\n");
 					commandsListed = true;

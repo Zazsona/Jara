@@ -135,38 +135,41 @@ public class ConsoleGUI
         ArrayList<String> admin = new ArrayList<String>();
         for (JsonFormats.GlobalCommandConfigJson aCommandConfig : commandConfig)
         {
-            int category = CommandRegister.getCommand(aCommandConfig.commandKey).getCategoryID();
-            switch (category)
+            if (CommandRegister.getCommand(aCommandConfig.getCommandKey()).isDisableable())
             {
-                case CommandRegister.NOGROUP:
+                int category = CommandRegister.getCommand(aCommandConfig.getCommandKey()).getCategoryID();
+                switch (category)
                 {
-                    //Ignore
-                    break;
-                }
-                case CommandRegister.GAMES:
-                {
-                    games.add(aCommandConfig.commandKey + " :: " + aCommandConfig.enabled);
-                    break;
-                }
-                case CommandRegister.TOYS:
-                {
-                    toys.add(aCommandConfig.commandKey + " :: " + aCommandConfig.enabled);
-                    break;
-                }
-                case CommandRegister.UTILITY:
-                {
-                    utility.add(aCommandConfig.commandKey + " :: " + aCommandConfig.enabled);
-                    break;
-                }
-                case CommandRegister.AUDIO:
-                {
-                    audio.add(aCommandConfig.commandKey + " :: " + aCommandConfig.enabled);
-                    break;
-                }
-                case CommandRegister.ADMIN:
-                {
-                    admin.add(aCommandConfig.commandKey + " :: " + aCommandConfig.enabled);
-                    break;
+                    case CommandRegister.NOGROUP:
+                    {
+                        //Ignore
+                        break;
+                    }
+                    case CommandRegister.GAMES:
+                    {
+                        games.add(aCommandConfig.getCommandKey() + " :: " + aCommandConfig.isEnabled());
+                        break;
+                    }
+                    case CommandRegister.TOYS:
+                    {
+                        toys.add(aCommandConfig.getCommandKey() + " :: " + aCommandConfig.isEnabled());
+                        break;
+                    }
+                    case CommandRegister.UTILITY:
+                    {
+                        utility.add(aCommandConfig.getCommandKey() + " :: " + aCommandConfig.isEnabled());
+                        break;
+                    }
+                    case CommandRegister.AUDIO:
+                    {
+                        audio.add(aCommandConfig.getCommandKey() + " :: " + aCommandConfig.isEnabled());
+                        break;
+                    }
+                    case CommandRegister.ADMIN:
+                    {
+                        admin.add(aCommandConfig.getCommandKey() + " :: " + aCommandConfig.isEnabled());
+                        break;
+                    }
                 }
             }
         }

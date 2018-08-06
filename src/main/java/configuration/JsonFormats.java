@@ -1,29 +1,127 @@
 package configuration;
 
+import jara.CommandRegister;
+import jara.Core;
+
 import java.util.ArrayList;
 
 
 public class JsonFormats 
 {
-	public class GlobalSettingsJson
+	public abstract class SettingsJson
 	{
-		public String token;
-		public GlobalCommandConfigJson[] commandConfig;
+		//Empty (for now...)
 	}
-	public class GlobalCommandConfigJson
+	public abstract class CommandConfigJson
 	{
-		public String commandKey;
-		public boolean enabled;
+		private String commandKey;
+		private boolean enabled;
+
+		protected CommandConfigJson(String commandKey, boolean enabled)
+		{
+			this.commandKey = commandKey;
+			setEnabled(enabled);
+		}
+		public String getCommandKey()
+		{
+			return commandKey;
+		}
+		public boolean isEnabled()
+		{
+			return enabled;
+		}
+		public void setEnabled(boolean newState)
+		{
+			if (!newState && CommandRegister.getCommand(getCommandKey()).isDisableable())
+			{
+				enabled = false;
+			}
+			else
+			{
+				enabled = true;
+			}
+		}
 	}
-	public class GuildSettingsJson
+
+
+	public class GlobalSettingsJson extends SettingsJson
 	{
-		public String gameCategoryID;
-		public GuildCommandConfigJson[] commandConfig;
+		private String token;
+		private GlobalCommandConfigJson[] commandConfig;
+		public String getToken()
+		{
+			return token;
+		}
+		public void setToken(String newToken)
+		{
+			Core.initialiseDiscordConnection(newToken); //Verify the new token works (If it does not, this method recursively calls for a new token)
+			Core.getShardManager().shutdown();
+			token = newToken;
+		}
+		public GlobalCommandConfigJson[] getCommandConfig()
+		{
+			return commandConfig;
+		}
+		public void setCommandConfig(GlobalCommandConfigJson[] commandConfig)
+		{
+			this.commandConfig = commandConfig;
+		}
 	}
-	public class GuildCommandConfigJson
+	public class GlobalCommandConfigJson extends CommandConfigJson
 	{
-		public String commandKey;
-		public boolean enabled;
-		public ArrayList<String> roleIDs;
+		public GlobalCommandConfigJson(String commandKey, boolean enabled)
+		{
+			super(commandKey, enabled);
+		}
+	}
+	public class GuildSettingsJson extends SettingsJson
+	{
+		private String gameCategoryID;
+		private GuildCommandConfigJson[] commandConfig;
+
+		public String getGameCategoryID()
+		{
+			return gameCategoryID;
+		}
+		public void setGameCategoryID(String newID)
+		{
+			gameCategoryID = newID;
+		}
+
+		public GuildCommandConfigJson[] getCommandConfig()
+		{
+			return commandConfig;
+		}
+		public void setCommandConfig(GuildCommandConfigJson[] commandConfig)
+		{
+			this.commandConfig = commandConfig;
+		}
+
+	}
+	public class GuildCommandConfigJson extends CommandConfigJson
+	{
+		private ArrayList<String> roleIDs;
+
+		public GuildCommandConfigJson(String commandKey, boolean enabled, ArrayList<String> roleIDs)
+		{
+			super(commandKey, enabled);
+			this.roleIDs = roleIDs;
+		}
+
+		public ArrayList<String> getPermittedRoles()
+		{
+			return roleIDs;
+		}
+		/*public void addPermittedRole(String roleID)
+		{
+			roleIDs.add(roleID);
+		}
+		public void removePermittedRole(String roleID)
+		{
+			roleIDs.remove(roleID);
+		}*/
+
+
+
 	}
 }

@@ -1,20 +1,16 @@
 package commands.config;
 
-import java.awt.Color;
-import java.util.ArrayList;
 import java.util.List;
 
 import commands.Command;
 import configuration.GlobalSettingsManager;
 import configuration.GuildSettingsManager;
-import jara.CommandRegister;
 import jara.Core;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 public class Config extends Command {
-	//TODO: Perhaps incorporate a unique superclass for each category. This could also be used with generics for easy mass selecton (All games, all config, etc.)
 	@Override
 	public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
 	{
@@ -88,11 +84,11 @@ public class Config extends Command {
 			{
 				if (parameters[1].equalsIgnoreCase("addrole"))
 				{
-					guildSettings.addRoleCommandPermission(key, roleID);
+					guildSettings.addPermittedRole(key, roleID);
 				}
 				else
 				{
-					guildSettings.removeRoleCommandPermission(key, roleID);
+					guildSettings.removePermittedRole(key, roleID);
 				}
 			}
 			msgEvent.getChannel().sendMessage(roles.get(0).getName().replace("@", "")+" can now use all enabled commands!").queue();	
@@ -103,15 +99,14 @@ public class Config extends Command {
 			{
 				if (parameters[2].equalsIgnoreCase(key))
 				{
-					
 					GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
 					if (parameters[1].equalsIgnoreCase("addrole"))
 					{
-						guildSettings.addRoleCommandPermission(key, roleID);
+						guildSettings.addPermittedRole(key, roleID);
 					}
 					else
 					{
-						guildSettings.removeRoleCommandPermission(key, roleID);
+						guildSettings.removePermittedRole(key, roleID);
 					}
 					msgEvent.getChannel().sendMessage(key+" permissions updated!").queue();	
 				}
@@ -244,7 +239,7 @@ public class Config extends Command {
 			{
 				enabledList.append("X\n");
 			}
-			for (String roleID : guildSettings.getCommandRolePermissions(key))
+			for (String roleID : guildSettings.getPermittedRoles(key))
 			{
 				roleList.append(msgEvent.getGuild().getRoleById(roleID).getName().replace("@", "")+", "); //Removing @ here as getName appends it for the everyone role, causing a ping.
 			}

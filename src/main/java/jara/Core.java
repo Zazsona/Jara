@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import javax.security.auth.login.LoginException;
 
+import configuration.JsonFormats;
 import gui.ConsoleGUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,26 +31,25 @@ public class Core //A class for covering the global manners of the bot.
 		    shardManager = shardManagerBuilder.build();
 		    logger.info("Logged in!");
 		}
-	    catch (LoginException e)
+	    catch (LoginException | IllegalArgumentException e)
 		{
 	    	logger.error("Failed to log in.");
 			String newToken = ConsoleGUI.updateToken();
 			initialiseDiscordConnection(newToken); //TODO: Headless check
 	    	e.printStackTrace();
 		} 
-	    catch (IllegalArgumentException e)
+	    /*catch (IllegalArgumentException e)
 		{
 	    	logger.error("No log in credentials provided. Make sure to set your client token.");
 	    	e.printStackTrace();
-		}
+		}*/
 	}
 	public static void enableCommands()
 	{
-		HashMap<String, Boolean> commandConfigMap = GlobalSettingsManager.getGlobalCommandConfigMap();
 		CommandConfiguration[] commandConfigs = new CommandConfiguration[CommandRegister.getRegisterSize()];
 		for (int i = 0; i<commandConfigs.length; i++)
 		{
-			commandConfigs[i] = new CommandConfiguration(CommandRegister.getRegister()[i], commandConfigMap.get(CommandRegister.getRegister()[i].getCommandKey()));
+			commandConfigs[i] = new CommandConfiguration(CommandRegister.getRegister()[i], GlobalSettingsManager.getGlobalCommandEnabledStatus(CommandRegister.getRegister()[i].getCommandKey()));
 		}
 		shardManager.addEventListener(new CommandHandler(commandConfigs));
 	}
