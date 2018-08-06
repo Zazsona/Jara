@@ -5,7 +5,7 @@ import java.util.Collections;
 
 import commands.Command;
 import commands.Help;
-import commands.config.Config;
+import commands.admin.Config;
 import commands.games.Countdown;
 import commands.toys.Say;
 import commands.utility.*;
@@ -42,9 +42,7 @@ public class CommandRegister
 			 * Simply create a new CommandAttributes class in the list, and pass the Command Key, Command Class, and then any aliases.
 			 * All other operations (Adding them to settings, indexing them at boot, etc.) will be done automatically.
 			 * 
-			 * I also highly recommend you include details about the command in Help.class, such as parameters and what it does. Aliases and category will be done automatically.
-			 * 
-			 * NOTE: ALWAYS ADD YOUR NEW COMMAND AT THE END FOR PROPER UPDATING OF LEGACY CONFIGS
+			 * I also highly recommend you include details about the command in Help, such as parameters and what it does. Aliases and category will be done automatically.
 			 * ===========================================
 			 */
 			register.add(new CommandAttributes("Ping", Ping.class, new String[] {"Pong", "Test"}, UTILITY, true));

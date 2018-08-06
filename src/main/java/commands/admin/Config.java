@@ -1,4 +1,4 @@
-package commands.config;
+package commands.admin;
 
 import java.util.List;
 
