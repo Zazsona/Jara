@@ -54,7 +54,7 @@ public class CommandRegister
 			register.add(new CommandAttributes("Config", Config.class, new String[] {"Settings"}, ADMIN, false));
 			register.add(new CommandAttributes("Countdown", Countdown.class, new String[] {"cd"}, GAMES, true));
 			register.add(new CommandAttributes("Help", Help.class, new String[] {"?", "commands"}, NOGROUP, false)); //Does help REALLY need to be indexed in help?
-            register.add(new CommandAttributes("Randomiser", Randomiser.class, new String[] {"Randomise", "Randomize", "Randomizer", "Roulette", "Picker", "Selector"}, UTILITY, true));
+            register.add(new CommandAttributes("Randomizer", Randomizer.class, new String[] {"Randomise", "Randomize", "Randomiser", "Roulette", "Picker", "Selector"}, UTILITY, true));
 			register.add(new CommandAttributes("Say", Say.class, new String[] {"Speak", "Talk"}, TOYS, true));
 		}
 		return register.toArray(new CommandAttributes[register.size()]);

@@ -3,6 +3,7 @@ package commands;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import configuration.GlobalSettingsManager;
 import configuration.GuildSettingsManager;
 import jara.CommandAttributes;
 import jara.CommandRegister;
@@ -36,9 +37,8 @@ public class Help extends Command {
 		}
 		else if (parameters.length >= 2)
 		{
-			boolean limitToPerms = true;
+			boolean limitToPerms = !msgEvent.getMember().isOwner();
 			ArrayList<String> roleIDs = new ArrayList<String>();
-
 			if (parameters.length == 3)
 			{
 				if (parameters[2].equalsIgnoreCase("all"))
@@ -71,7 +71,7 @@ public class Help extends Command {
 			{
 				embed.setDescription(buildCommandList(CommandRegister.AUDIO, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
 			}
-			else if (parameters[1].equalsIgnoreCase("config"))
+			else if (parameters[1].equalsIgnoreCase("admin"))
 			{
 				embed.setDescription(buildCommandList(CommandRegister.ADMIN, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
 			}
@@ -134,15 +134,17 @@ public class Help extends Command {
 		else if (key.equalsIgnoreCase("Config"))
 		{
 			paramSetups.add("/config");
-			paramSetups.add("/config SetGameCategory (Category Name)");
+			paramSetups.add("/config check [Command]/[Command Category]/GameCategory");
+			paramSetups.add("/config SetGameCategory (Channel Category Name)");
 			paramSetups.add("/config RemGameCategory");
 			paramSetups.add("/config enable [Command]");
 			paramSetups.add("/config disable [Command]");
 			paramSetups.add("/config AddRole [Command] [Role Name]");
 			paramSetups.add("/config RemRole [Command] [Role Name]");
-			infoBuilder.append("This is the primary command for customising the bot for your guild. Use /config to view the current configuration.\n"
+			infoBuilder.append("This is the primary command for customising the bot for your guild. Use /config check * to view the full current configuration.\n"
 					+ "\n"
 					+ "Options:\n"
+					+ "Check - Displays settings the specified item\n"
 					+ "Enable/Disable - This sets whether a command can be used at all. Using a disabled command will simply return a message.\n"
 					+ "AddRole/RemRole - Defines which Discord roles can use the command.\n"
 					+ "Set/RemGameCategory - Setting a game category means the bot will create a new channel in the category for each individual game. This helps reduce clutter in the channel the command was used in and allows users to easily see when and what games are currently on-going.\n"
@@ -168,9 +170,9 @@ public class Help extends Command {
 			paramSetups.add("/Help (Category)");
 			infoBuilder.append(":thinking:");
 		}
-		else if (key.equalsIgnoreCase("Randomiser"))
+		else if (key.equalsIgnoreCase("Randomizer"))
         {
-            paramSetups.add("/Randomiser [Option1] [Option2] ... [OptionN]");
+            paramSetups.add("/Randomizer [Option1] [Option2] ... [OptionN]");
             infoBuilder.append("Randomly selects an item from the list.");
         }
         else if (key.equalsIgnoreCase("Say"))
@@ -234,7 +236,7 @@ public class Help extends Command {
 		commands.append("~~------------------------------------------------------------~~\n");
 		for (CommandAttributes cmdAttributes : CommandRegister.getCommandsInCategory(categoryID))
 		{
-			if (guildSettings.isCommandEnabled(cmdAttributes.getCommandKey()))
+			if (guildSettings.isCommandEnabled(cmdAttributes.getCommandKey()) && GlobalSettingsManager.isCommandEnabledGlobally(cmdAttributes.getCommandKey()))
 			{
 				if (!(Collections.disjoint(guildSettings.getPermittedRoles(cmdAttributes.getCommandKey()), roleIDs)) || !limitToPerms)
 				{
@@ -245,7 +247,7 @@ public class Help extends Command {
 		}
 		if (!commandsListed)
 		{
-			commands.append("You don't have permission to use any of these commands.\n");
+			commands.append("You don't have permission to use any of these commands. Use `/help [Category] all` to see all enabled commands. \n");
 		}
 		commands.append("~~------------------------------------------------------------~~\n");
 

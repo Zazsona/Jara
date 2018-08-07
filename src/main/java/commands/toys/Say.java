@@ -13,9 +13,9 @@ public class Say extends Command
         if (parameters.length > 1)
         {
             StringBuilder message = new StringBuilder();
-            for (String part : parameters)
+            for (int i = 1; i<parameters.length; i++)
             {
-                message.append(part).append(" ");
+                message.append(parameters[i]).append(" ");
             }
             msgEvent.getChannel().sendMessage(message.toString()).queue();
         }

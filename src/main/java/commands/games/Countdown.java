@@ -145,14 +145,15 @@ public class Countdown extends Command
 				List<Character> answerLetters = content.toUpperCase().chars().mapToObj((letter) -> Character.valueOf((char) letter)).collect(Collectors.toList()); //Converting each Int returns from chars() into a Character, as char[] cannot be converted into Character[]
 				for (char letter : letters.toCharArray())
 				{
-					answerLetters.remove(Character.valueOf(letter));		//TODO: Make this more efficient, if possible.
+					answerLetters.remove(Character.valueOf(letter));
 				}
 				
 				if (answerLetters.size() == 0)
 				{
 					if (content.length() > winnerData[1].length()) //The result of all this, is that the first person with the longest word wins.
 					{
-						//TODO: Check if it's a word.
+						//Ideally here, we would conduct a dictionary check. However this would likely involve paying for an API.
+						//TODO: Implement some basic checks here to avoid obvious cheating.
 						winnerData[0] = answer.getMember().getEffectiveName();
 						winnerData[1] = content;
 					}

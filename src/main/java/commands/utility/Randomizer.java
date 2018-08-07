@@ -7,7 +7,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 import java.util.Random;
 
-public class Randomiser extends Command
+public class Randomizer extends Command
 {
     @Override
     public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
