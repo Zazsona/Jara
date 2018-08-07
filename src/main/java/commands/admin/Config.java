@@ -80,7 +80,7 @@ public class Config extends Command {
 		if (parameters[2].equals("*"))
 		{
 			GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
-			for (String key : GlobalSettingsManager.getGlobalEnabledCommandKeys())
+			for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
 			{
 				if (parameters[1].equalsIgnoreCase("addrole"))
 				{
@@ -95,7 +95,7 @@ public class Config extends Command {
 		}
 		else
 		{
-			for (String key : GlobalSettingsManager.getGlobalEnabledCommandKeys())
+			for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
 			{
 				if (parameters[2].equalsIgnoreCase(key))
 				{
@@ -119,18 +119,18 @@ public class Config extends Command {
 		if (parameters[2].equals("*"))
 		{
 			GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
-			for (String key : GlobalSettingsManager.getGlobalEnabledCommandKeys())
+			for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
 			{
 
 				if (parameters[1].equalsIgnoreCase("enable"))
 				{
-					guildSettings.setGuildCommandEnabledStatus(key, true);
+					guildSettings.setCommandEnabled(key, true);
 				}
 				else
 				{
 					if (!(key.equalsIgnoreCase("config") || key.equalsIgnoreCase("about") || key.equalsIgnoreCase("help"))) //If it is NOT any of these...
 					{
-						guildSettings.setGuildCommandEnabledStatus(key, false);
+						guildSettings.setCommandEnabled(key, false);
 					}
 				}
 			}
@@ -138,14 +138,14 @@ public class Config extends Command {
 		}
 		else
 		{
-			for (String key : GlobalSettingsManager.getGlobalEnabledCommandKeys())
+			for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
 			{
 				if (parameters[2].equalsIgnoreCase(key))
 				{
 					GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
 					if (parameters[1].equalsIgnoreCase("enable"))
 					{
-						guildSettings.setGuildCommandEnabledStatus(key, true);
+						guildSettings.setCommandEnabled(key, true);
 					}
 					else
 					{
@@ -154,7 +154,7 @@ public class Config extends Command {
 							msgEvent.getChannel().sendMessage(key + " cannot be disabled.").queue();
 							return;
 						}
-						guildSettings.setGuildCommandEnabledStatus(key, false);
+						guildSettings.setCommandEnabled(key, false);
 					}
 					msgEvent.getChannel().sendMessage(key+" status updated!").queue();	
 					return;
@@ -228,10 +228,10 @@ public class Config extends Command {
 		StringBuilder keyList = new StringBuilder();
 		StringBuilder enabledList = new StringBuilder();
 		StringBuilder roleList = new StringBuilder();
-		for (String key : GlobalSettingsManager.getGlobalEnabledCommandKeys()) 
+		for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
 		{
 			keyList.append(key+"\n");
-			if (guildSettings.getGuildCommandEnabledStatus(key))
+			if (guildSettings.isCommandEnabled(key))
 			{
 				enabledList.append("✓\n");
 			}

@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 
 import gui.ConsoleGUI;
 import jara.CommandAttributes;
+import jara.Core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,11 @@ public class GlobalSettingsManager
 {
 	private static File directory;
 	private static GlobalSettingsJson globalSettings;
-	
+	/**
+	 * Returns the base settings directory.
+	 * @return
+	 * File - The dir where Jara stores settings
+	 */
 	public static File getDirectory()
 	{
 		if (directory == null)
@@ -65,7 +70,12 @@ public class GlobalSettingsManager
 		}
 		return directory;				
 	}
-	private static File getGuildSettingsFolder()
+	/**
+	 * Returns the directory which stores guild settings files.
+	 * @return
+	 * File - Guild Settings directory
+	 */
+	private static File getGuildSettingsDirectory()
 	{
 		File guildSettingsFolder;
 		guildSettingsFolder = new File(getDirectory().getAbsolutePath()+"/guilds/");
@@ -76,6 +86,12 @@ public class GlobalSettingsManager
 		return guildSettingsFolder;
 	}
 	//================================= Global Config Tools =====================================================
+
+	/**
+	 * Returns the file where global settings are stored.
+	 * @return
+	 * File - Global settings file
+	 */
 	private static File getGlobalSettingsFile()
 	{
 		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
@@ -92,6 +108,11 @@ public class GlobalSettingsManager
 			return settingsFile;
 		}
 	}
+	/**
+	 * Returns the settings as they are stored in the file, or the current working settings if the file has already been read.
+	 * @return
+	 * GlobalSettingsJson - Settings as stored in file
+	 */
 	private static GlobalSettingsJson getGlobalSettings()
 	{
 		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
@@ -148,7 +169,9 @@ public class GlobalSettingsManager
 		}
 
 	}
-	
+	/**
+	 * Saves any modifications to globalSettings back to file.
+	 */
 	public static File performFirstTimeSetup()
 	{
 		//TODO: Call some graphical GUIs 'n' shit.
@@ -197,97 +220,22 @@ public class GlobalSettingsManager
 			return null;
 		}
 	}
-	
-	public static String getGlobalClientToken()
-	{
-		getGlobalSettings();
-		return globalSettings.getToken();
-	}
-	public static void setNewGlobalClientToken(String token) //TODO: Encrypt this
-	{
-		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
-		String encryptedToken = token; //Encrypt here
-		
-		getGlobalSettings();
-		globalSettings.setToken(token);
-		saveGlobalSettings();
-		logger.info("Bot token has now been set to "+token+".");
-	}
 
-	public static boolean getGlobalCommandEnabledStatus(String commandKey)
-	{
-		getGlobalSettings();
-		for (GlobalCommandConfigJson commandSettings : globalSettings.getCommandConfig())
-		{
-			if (commandSettings.getCommandKey().equalsIgnoreCase(commandKey))
-			{
-				return commandSettings.isEnabled();
-			}
-
-		}
-		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
-		logger.debug("Tried to find key \""+ commandKey+"\", however, it does not appear to exist.");
-		return false; //Can't enable your command if it doesn't exist. *taps forehead*
-
-	}
-	public static void setGlobalCommandEnabledStatus(String commandKey, boolean newStatus)
-	{
-		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
-		getGlobalSettings();
-		boolean keyFound = false;
-		for (GlobalCommandConfigJson commandSettings : globalSettings.getCommandConfig())
-		{
-			if (commandSettings.getCommandKey().equalsIgnoreCase(commandKey))
-			{
-				commandSettings.setEnabled(newStatus);
-				keyFound = true;
-			}
-
-		}
-		if (!keyFound)
-		{
-			logger.debug("Tried to find key \""+ commandKey+"\", however, it does not appear to exist.");
-		}
-		else
-		{
-			saveGlobalSettings();
-			logger.info("Command "+commandKey+ "'s enabled status has been changed to "+newStatus+"."); //TODO: Nope
-		}
-	}
-	public static void setGlobalCategoryEnabledStatus(String categoryName, boolean newStatus)
-	{
-		setGlobalCategoryEnabledStatus(CommandRegister.getCommandCategory(categoryName), newStatus);
-	}
-	public static void setGlobalCategoryEnabledStatus(int categoryID, boolean newStatus)
-	{
-		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
-		if (CommandRegister.getCategoryName(categoryID) == null) //Simple verification check to ensure the id is valid.
-		{
-			logger.info("Could not alter category status as the specified category does not exist.");
-			return;
-		}
-		for (CommandAttributes commandAttributes : CommandRegister.getCommandsInCategory(categoryID))
-		{
-			for (int i = 0; i<globalSettings.getCommandConfig().length; i++)
-			{
-				if (globalSettings.getCommandConfig()[i].getCommandKey().equalsIgnoreCase(commandAttributes.getCommandKey())) //TODO: Inefficient. Fix.
-				{
-					globalSettings.getCommandConfig()[i].setEnabled(newStatus);
-				}
-			}
-		}
-	}
+	/**
+	 * This method will compare the configuration files for global settings as well as each individual guild against the Command register<br>
+	 *     Any missing entries in the config files are then added with a default state.
+	 */
 	private static void addNewCommands()
 	{
 		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
-		if (globalSettings.getCommandConfig().length < CommandRegister.getRegisterSize())  //If our config has fewer commands than the total we know of...
+		if (getGlobalSettings().getCommandConfig().length < CommandRegister.getRegisterSize())  //If our config has fewer commands than the total we know of...
 		{
 			ArrayList<String> keys = new ArrayList<>();																		//This is used to keep track of which keys still need to be added
 			Collections.addAll(keys, CommandRegister.getAllCommandKeys());
 			GlobalCommandConfigJson[] updatedCommandConfig = new GlobalCommandConfigJson[CommandRegister.getRegisterSize()];
-			for (int i = 0; i<globalSettings.getCommandConfig().length; i++)
+			for (int i = 0; i<getGlobalSettings().getCommandConfig().length; i++)
 			{
-				updatedCommandConfig[i] = globalSettings.getCommandConfig()[i];											//Import existing settings and note their keys have been recorded
+				updatedCommandConfig[i] = getGlobalSettings().getCommandConfig()[i];											//Import existing settings and note their keys have been recorded
 				keys.remove(updatedCommandConfig[i].getCommandKey());
 			}
 			for (int i = 0; i<keys.size(); i++)																							//For the keys that remain (i.e, those that were not in the existing config...)
@@ -295,10 +243,10 @@ public class GlobalSettingsManager
 				updatedCommandConfig[(updatedCommandConfig.length-1)-i] = new JsonFormats().new GlobalCommandConfigJson(keys.get(i), false);	//Add them, as disabled by default. (Better safe than sorry)
 				keys.remove(keys.get(i));
 			}
-			globalSettings.setCommandConfig(updatedCommandConfig);
+			getGlobalSettings().setCommandConfig(updatedCommandConfig);
 			//TODO: SHOW THE GUI TO SELECT ENABLED COMMANDS
-			saveGlobalSettings();		
-			for (File guildSettingsFile : getGuildSettingsFolder().listFiles())
+			saveGlobalSettings();
+			for (File guildSettingsFile : getGuildSettingsDirectory().listFiles())
 			{
 				try
 				{
@@ -346,52 +294,179 @@ public class GlobalSettingsManager
 			}
 		}
 	}
-	
+	//==============================================================================================================
+	//==================================Getters & Setters===========================================================
+
+	/**
+	 * Returns the client token the bot is either currently using.<br>
+	 * If the bot is not currently connected, it returns the token saved to config
+	 * @return
+	 * String - the token.
+	 */
+	public static String getClientToken()
+	{
+		if (Core.getShardManager() != null)
+		{
+			return Core.getShardManager().getApplicationInfo().getJDA().getToken();
+		}
+		else
+		{
+			return getGlobalSettings().getToken();
+		}
+	}
+
+	/**
+	 * Sets a new token for the bot.<br>
+	 * It is highly recommended to restart the bot after running this, otherwise it will still use the old token.<br>
+	 * <br>
+	 * NOTE: This method will test the new token to ensure it is valid. If it is not valid it will launch a GUI prompt to correct it, holding the current thread.
+	 *
+	 * @param token - The new token
+	 */
+	public static void setClientToken(String token) //TODO: Encrypt this
+	{
+		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
+		String encryptedToken = token; //Encrypt here
+
+		getGlobalSettings().setToken(token);
+		saveGlobalSettings();
+		logger.info("Bot token has now been set to "+token+".");
+	}
+
+	/**
+	 * Checks if the command is enabled in the global settings
+	 * @param commandKey - The command to check
+	 * @return
+	 * true - Command is enabled
+	 * false - Command is disabled
+	 */
+	public static boolean isCommandEnabledGlobally(String commandKey)
+	{
+		for (GlobalCommandConfigJson commandSettings : getGlobalSettings().getCommandConfig())
+		{
+			if (commandSettings.getCommandKey().equalsIgnoreCase(commandKey))
+			{
+				return commandSettings.isEnabled();
+			}
+
+		}
+		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
+		logger.debug("Tried to find key \""+ commandKey+"\", however, it does not appear to exist.");
+		return false; //Can't enable your command if it doesn't exist. *taps forehead*
+
+	}
+
+	/**
+	 * This method will attempt to set the command's status to newStatus.<br>
+	 * Some commands cannot be disabled, however, as these would cause issues, such as /Help or /Config
+	 * @param commandKey - The command to update
+	 * @param newStatus - The new state for the command
+	 */
+	public static void setCommandEnabledGlobally(String commandKey, boolean newStatus)
+	{
+		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
+		boolean keyFound = false;
+		boolean updatedState = !newStatus;
+		for (GlobalCommandConfigJson commandSettings : getGlobalSettings().getCommandConfig())
+		{
+			if (commandSettings.getCommandKey().equalsIgnoreCase(commandKey))
+			{
+				commandSettings.setEnabled(newStatus);
+				keyFound = true;
+			}
+
+		}
+		if (!keyFound)
+		{
+			logger.debug("Tried to find key \""+ commandKey+"\", however, it does not appear to exist.");
+		}
+		else
+		{
+			saveGlobalSettings();
+			if (updatedState == newStatus)
+			{
+				logger.info("Command "+commandKey+ "'s enabled state is now "+newStatus+".");
+			}
+			else
+			{
+				logger.info("Sorry, the status of "+commandKey+" cannot be changed.");
+			}
+
+		}
+	}
+
+	/**
+	 * Sets all commands (where possible) in the category to the new status
+	 * @param categoryName - The category name of commands to update
+	 * @param newStatus - The new state
+	 */
+	public static void setCategoryEnabledGlobally(String categoryName, boolean newStatus)
+	{
+		setCategoryEnabledGlobally(CommandRegister.getCommandCategory(categoryName), newStatus);
+	}
+	/**
+	 * Sets all commands (where possible) in the category to the new status
+	 * @param categoryID - The category ID of commands to update
+	 * @param newStatus - The new state
+	 */
+	public static void setCategoryEnabledGlobally(int categoryID, boolean newStatus)
+	{
+		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
+		if (CommandRegister.getCategoryName(categoryID) == null) //Simple verification check to ensure the id is valid.
+		{
+			logger.info("Could not alter category status as the specified category does not exist.");
+			return;
+		}
+		for (CommandAttributes commandAttributes : CommandRegister.getCommandsInCategory(categoryID))
+		{
+			for (int i = 0; i<getGlobalSettings().getCommandConfig().length; i++)
+			{
+				if (getGlobalSettings().getCommandConfig()[i].getCommandKey().equalsIgnoreCase(commandAttributes.getCommandKey())) //TODO: Inefficient. Fix.
+				{
+					getGlobalSettings().getCommandConfig()[i].setEnabled(newStatus);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Returns the command keys for all commands enabled globally
+	 * @return
+	 * String[] - Array of enabled command keys
+	 */
+	public static String[] getGloballyEnabledCommandKeys()
+	{
+		ArrayList<String> keys = new ArrayList<String>();
+		for (GlobalCommandConfigJson config : getGlobalSettings().getCommandConfig())
+		{
+			if (config.isEnabled())
+			{
+				keys.add(config.getCommandKey());
+			}
+		}
+		return keys.toArray(new String[0]);
+	}
+	/**
+	 * Returns the command keys for all commands disabled globally
+	 * @return
+	 * String[] - Array of disabled command keys
+	 */
+	public static String[] getGloballyDisabledCommandKeys()
+	{
+		ArrayList<String> keys = new ArrayList<String>();
+		for (GlobalCommandConfigJson config : getGlobalSettings().getCommandConfig())
+		{
+			if (!config.isEnabled())
+			{
+				keys.add(config.getCommandKey());
+			}
+		}
+		return keys.toArray(new String[0]);
+	}
+
 	public static GlobalCommandConfigJson[] getGlobalCommandConfig()
 	{
-		return globalSettings.getCommandConfig();
-	}
-	public static GlobalCommandConfigJson[] getGlobalEnabledCommands()
-	{
-		ArrayList<GlobalCommandConfigJson> commandConfigList = new ArrayList<GlobalCommandConfigJson>();
-		for (GlobalCommandConfigJson commandConfig : getGlobalSettings().getCommandConfig())
-		{
-			if (commandConfig.isEnabled())
-			{
-				commandConfigList.add(commandConfig);
-			}
-		}
-		return commandConfigList.toArray(new GlobalCommandConfigJson[0]);
-	}
-	public static String[] getGlobalEnabledCommandKeys()
-	{
-		ArrayList<String> keys = new ArrayList<String>();
-		for (GlobalCommandConfigJson config : getGlobalEnabledCommands())
-		{
-			keys.add(config.getCommandKey());
-		}
-		return keys.toArray(new String[0]);
-	}
-	public static GlobalCommandConfigJson[] getGlobalDisabledCommands()
-	{
-		ArrayList<GlobalCommandConfigJson> commandConfigList = new ArrayList<GlobalCommandConfigJson>();
-		for (GlobalCommandConfigJson commandConfig : getGlobalSettings().getCommandConfig())
-		{
-			if (!commandConfig.isEnabled())
-			{
-				commandConfigList.add(commandConfig);
-			}
-		}
-		return commandConfigList.toArray(new GlobalCommandConfigJson[0]);
-	}
-	public static String[] getGlobalDisabledCommandKeys()
-	{
-		ArrayList<String> keys = new ArrayList<String>();
-		for (GlobalCommandConfigJson config : getGlobalDisabledCommands())
-		{
-			keys.add(config.getCommandKey());
-		}
-		return keys.toArray(new String[0]);
+		return getGlobalSettings().getCommandConfig();
 	}
 	//============================================================================================================
 }

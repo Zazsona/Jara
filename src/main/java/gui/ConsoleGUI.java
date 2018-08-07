@@ -56,7 +56,7 @@ public class ConsoleGUI
         {
             System.out.println("Dandy! Enter the client token below:");
         }
-        GlobalSettingsManager.setNewGlobalClientToken(scanner.nextLine());
+        GlobalSettingsManager.setClientToken(scanner.nextLine());
         printGlobalConfig(GlobalSettingsManager.getGlobalCommandConfig()); //The command list is printed beforehand so that instructions are always at the end, ensuring they are seen
         System.out.println("\nNext up is command configuration.\n" +
                                    "Each guild can enable and disable commands as they wish, however any commands disabled here cannot be seen at all.\n\n" +
@@ -92,11 +92,11 @@ public class ConsoleGUI
                 {
                     if (CommandRegister.getCategoryNames().contains(query[1]))
                     {
-                        GlobalSettingsManager.setGlobalCategoryEnabledStatus(query[1], true);
+                        GlobalSettingsManager.setCategoryEnabledGlobally(query[1], true);
                     }
                     else
                     {
-                        GlobalSettingsManager.setGlobalCommandEnabledStatus(query[1], true);
+                        GlobalSettingsManager.setCommandEnabledGlobally(query[1], true);
                     }
                     printGlobalConfig(GlobalSettingsManager.getGlobalCommandConfig());
 
@@ -105,11 +105,11 @@ public class ConsoleGUI
                 {
                     if (CommandRegister.getCategoryNames().contains(query[1]))
                     {
-                        GlobalSettingsManager.setGlobalCategoryEnabledStatus(query[1], false);
+                        GlobalSettingsManager.setCategoryEnabledGlobally(query[1], false);
                     }
                     else
                     {
-                        GlobalSettingsManager.setGlobalCommandEnabledStatus(query[1], false);
+                        GlobalSettingsManager.setCommandEnabledGlobally(query[1], false);
                     }
                     printGlobalConfig(GlobalSettingsManager.getGlobalCommandConfig());
                 }
@@ -205,7 +205,7 @@ public class ConsoleGUI
         System.out.println("Please enter a new token:");
         Scanner scanner = new Scanner(System.in);
         String token = scanner.nextLine();
-        GlobalSettingsManager.setNewGlobalClientToken(token);
+        GlobalSettingsManager.setClientToken(token);
         return token;
     }
 }

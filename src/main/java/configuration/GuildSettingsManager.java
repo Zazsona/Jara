@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
+import jara.CommandAttributes;
 import net.dv8tion.jda.core.entities.Member;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,14 +35,25 @@ public class GuildSettingsManager
 		this.guildID = guildID;
 		getGuildSettings();
 	}
-	
+
+	/**
+	 * Returns the base settings directory.
+	 * @return
+	 * File - The dir where Jara stores settings
+	 */
 	public File getDirectory()
 	{
 		return GlobalSettingsManager.getDirectory();
 	}
 	
 	//==================================== Guild Specific Tools ==================================================
-	private File getGuildSettingsFolder()
+
+	/**
+	 * Returns the directory which stores guild settings files.
+	 * @return
+	 * File - Guild Settings directory
+	 */
+	private File getGuildSettingsDirectory()
 	{
 		File guildSettingsFolder;
 		guildSettingsFolder = new File(getDirectory().getAbsolutePath()+"/guilds/");
@@ -51,10 +63,16 @@ public class GuildSettingsManager
 		}
 		return guildSettingsFolder;
 	}
+
+	/**
+	 * Returns the file for this guild's settings data
+	 * @return
+	 * File - Guild settings file
+	 */
 	public File getGuildSettingsFile()
 	{
 		Logger logger = LoggerFactory.getLogger(GuildSettingsManager.class);
-		File guildSettingsFile = new File(getGuildSettingsFolder().getAbsolutePath()+"/"+guildID+".json");
+		File guildSettingsFile = new File(getGuildSettingsDirectory().getAbsolutePath()+"/"+guildID+".json");
 		if (!guildSettingsFile.exists())
 		{
 			logger.error("Guild "+guildID+"'s settings have gone missing, or never existed. Creating new config.");
@@ -62,10 +80,23 @@ public class GuildSettingsManager
 		}
 		return guildSettingsFile;
 	}
-	public void deleteGuildSettingsFile()
+
+	/**
+	 * Guess.
+	 * @return
+	 * true - File deleted
+	 * false - File not deleted
+	 */
+	public boolean deleteGuildSettingsFile()
 	{
-		getGuildSettingsFile().delete();
+		return getGuildSettingsFile().delete();
 	}
+
+	/**
+	 * Returns the settings as they are stored in the file, or the current working settings if the file has already been read.
+	 * @return
+	 * GuildSettingsJson - Settings as stored in file
+	 */
 	public GuildSettingsJson getGuildSettings()
 	{
 		if (guildSettings != null)
@@ -97,6 +128,10 @@ public class GuildSettingsManager
 		}
 
 	}
+
+	/**
+	 * Saves any modifications to guildSettings back to file.
+	 */
 	public void saveGuildSettings()
 	{
 		Logger logger = LoggerFactory.getLogger(GuildSettingsManager.class);
@@ -116,9 +151,15 @@ public class GuildSettingsManager
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	 * Creates a new file with default settings with which to store guild configuration with.
+	 * @return
+	 * File - the new guild data file
+	 */
 	public File performNewGuildSetup()
 	{
-		File guildSettingsFile = new File(getGuildSettingsFolder().getAbsolutePath()+"/"+guildID+".json");
+		File guildSettingsFile = new File(getGuildSettingsDirectory().getAbsolutePath()+"/"+guildID+".json");
 		if (!guildSettingsFile.exists())
 		{
 			try
@@ -160,16 +201,36 @@ public class GuildSettingsManager
 			return null;
 		}
 	}
+
+	/**
+	 * The ID for the category in which new games are created in.
+	 * @return
+	 * String - ID of the game channel category
+	 * "" - No category set.
+	 */
 	public String getGuildGameCategoryID()
 	{
 		return getGuildSettings().getGameCategoryID();
 	}
+
+	/**
+	 * Sets the ID of the game category, where game channels are placed.
+	 * @param gameCategoryID - the category ID
+	 */
 	public void setGuildGameCategoryID(String gameCategoryID)
 	{
 		getGuildSettings().setGameCategoryID(gameCategoryID);
 		saveGuildSettings();
 	}
-	public boolean getGuildCommandEnabledStatus(String commandKey)
+
+	/**
+	 * Returns whether the specified command is enabled for this guild.
+	 * @param commandKey - The command to check
+	 * @return
+	 * true - Command is enabled
+	 * false - Command is disabled
+	 */
+	public boolean isCommandEnabled(String commandKey)
 	{
 		for (GuildCommandConfigJson commandSettings : getGuildSettings().getCommandConfig())
 		{
@@ -184,15 +245,23 @@ public class GuildSettingsManager
 		return false; //Can't enable your command if it doesn't exist. *taps forehead*
 
 	}
-	public void setGuildCommandEnabledStatus(String commandKey, boolean newStatus)
+
+	/**
+	 * This method will attempt to set the command's status to newStatus.<br>
+	 * Some commands cannot be disabled, however, as these would cause issues, such as /Help or /Config
+	 * @param commandKey - The command to update
+	 * @param newStatus - The new state for the command
+	 */
+	public void setCommandEnabled(String commandKey, boolean newStatus)
 	{
 		Logger logger = LoggerFactory.getLogger(GuildSettingsManager.class);
 		boolean keyFound = false;
+		boolean updatedState = !newStatus;
 		for (GuildCommandConfigJson commandSettings : getGuildSettings().getCommandConfig())
 		{
 			if (commandSettings.getCommandKey().equalsIgnoreCase(commandKey))
 			{
-				commandSettings.setEnabled(newStatus); //TODO: What if lockeded?
+				updatedState = commandSettings.setEnabled(newStatus);
 				keyFound = true;
 			}
 
@@ -204,10 +273,24 @@ public class GuildSettingsManager
 		else
 		{
 			saveGuildSettings();
-			logger.info("Command "+commandKey+ "'s enabled status has been changed to "+newStatus+" for guild "+guildID);
+			if (updatedState == newStatus)
+			{
+				logger.info("Command "+commandKey+ "'s enabled status has been changed to "+newStatus+" for guild "+guildID);
+			}
+			else
+			{
+				logger.info("Could not change the status of "+commandKey+" in "+guildID+", it is a locked command.");
+			}
 		}
 
 	}
+
+	/**
+	 * Adds permission for a role to use a command.<br>
+	 *     For @everyone, use the guild's ID.
+	 * @param commandKey - The command to update
+	 * @param roleID - The role to add
+	 */
 	public void addPermittedRole(String commandKey, String roleID)
 	{
 		for (int i = 0; i< getGuildSettings().getCommandConfig().length; i++)
@@ -222,6 +305,12 @@ public class GuildSettingsManager
 			}
 		}
 	}
+	/**
+	 * Removes permission for a role to use a command.<br>
+	 *     For @everyone, use the guild's ID.
+	 * @param commandKey - The command to update
+	 * @param roleID - The role to remove
+	 */
 	public void removePermittedRole(String commandKey, String roleID)
 	{
 		for (int i = 0; i< getGuildSettings().getCommandConfig().length; i++)
@@ -233,6 +322,13 @@ public class GuildSettingsManager
 			}
 		}
 	}
+
+	/**
+	 * Returns a list of roles that have permission to use this command (including the everyone role)
+	 * @param commandKey - THe command to check
+	 * @return
+	 * ArrayList<String> - the role list
+	 */
 	public ArrayList<String> getPermittedRoles(String commandKey)
 	{
 		for (int i = 0; i< getGuildSettings().getCommandConfig().length; i++)
@@ -244,6 +340,15 @@ public class GuildSettingsManager
 		}
 		return null; //Invalid command key
 	}
+
+	/**
+	 * Checks to see if the specified member has any roles which allow them to use the command
+	 * @param member - The user to check
+	 * @param commandKey - The command to check
+	 * @return
+	 * true - Member can use this command
+	 * false - Member cannot use this command, or it does not exist
+	 */
 	public boolean isPermitted(Member member, String commandKey)
 	{
 		boolean permissionGranted = false;
@@ -256,7 +361,7 @@ public class GuildSettingsManager
 		{
 			if (commandConfig.getCommandKey().equalsIgnoreCase(commandKey))
 			{
-				if (!Collections.disjoint(commandConfig.getPermittedRoles(), roleIDs)) //TODO Fix
+				if (!Collections.disjoint(commandConfig.getPermittedRoles(), roleIDs))
 				{
 					permissionGranted = true;
 				}
@@ -264,10 +369,25 @@ public class GuildSettingsManager
 		}
 		return permissionGranted;
 	}
+	/**
+	 * Checks to see if the specified member has any roles which allow them to use the command
+	 * @param member - The user to check
+	 * @param command - The command to check
+	 * @return
+	 * true - Member can use this command
+	 * false - Member cannot use this command, or it does not exist
+	 */
 	public boolean isPermitted(Member member, Class<? extends Command> command)
 	{
 		return isPermitted(member, CommandRegister.getCommand(command).getCommandKey());
 	}
+
+	/**
+	 * Checks to see all commands a role can use.
+	 * @param roleID - The role to check
+	 * @return
+	 * ArrayList<String> - A list of the command keys
+	 */
 	public ArrayList<String> getPermittedCommands(String roleID)
 	{
 		ArrayList<String> permittedCommandKeys = new ArrayList<String>();
@@ -280,39 +400,74 @@ public class GuildSettingsManager
 		}
 		return permittedCommandKeys;
 	}
-	
-	/*public GuildCommandConfigJson[] getGuildCommandConfig()
+
+	/**
+	 * Returns the command keys for all commands enabled in this guild
+	 * @return
+	 * String[] - Array of enabled command keys
+	 */
+	public String[] getGuildEnabledCommandKeys()
 	{
-		ArrayList<GuildCommandConfigJson> commandConfigList = new ArrayList<GuildCommandConfigJson>();
-		for (GuildCommandConfigJson commandConfig : getGuildSettings().getCommandConfig())
+		ArrayList<String> keys = new ArrayList<String>();
+		for (JsonFormats.GuildCommandConfigJson config : getGuildSettings().getCommandConfig())
 		{
-			commandConfigList.add(commandConfig);
-		}
-		return commandConfigList.toArray(new GuildCommandConfigJson[commandConfigList.size()]);
-	}*/
-	public GuildCommandConfigJson[] getGuildEnabledCommands()
-	{
-		ArrayList<GuildCommandConfigJson> commandConfigList = new ArrayList<GuildCommandConfigJson>();
-		for (GuildCommandConfigJson commandConfig : getGuildSettings().getCommandConfig())
-		{
-			if (commandConfig.isEnabled())
+			if (config.isEnabled())
 			{
-				commandConfigList.add(commandConfig);
+				keys.add(config.getCommandKey());
 			}
 		}
-		return commandConfigList.toArray(new GuildCommandConfigJson[0]);
+		return keys.toArray(new String[0]);
 	}
-	public GuildCommandConfigJson[] getGuildDisabledCommands()
+	/**
+	 * Returns the command keys for all commands disabled in this guild
+	 * @return
+	 * String[] - Array of disabled command keys
+	 */
+	public String[] getGuildDisabledCommandKeys()
 	{
-		ArrayList<GuildCommandConfigJson> commandConfigList = new ArrayList<GuildCommandConfigJson>();
-		for (GuildCommandConfigJson commandConfig : getGuildSettings().getCommandConfig())
+		ArrayList<String> keys = new ArrayList<String>();
+		for (JsonFormats.GuildCommandConfigJson config : getGuildSettings().getCommandConfig())
 		{
-			if (!commandConfig.isEnabled())
+			if (!config.isEnabled())
 			{
-				commandConfigList.add(commandConfig);
+				keys.add(config.getCommandKey());
 			}
 		}
-		return commandConfigList.toArray(new GuildCommandConfigJson[0]);
+		return keys.toArray(new String[0]);
+	}
+
+	/**
+	 * Sets all commands (where possible) in the category to the new status
+	 * @param categoryName - The category name of commands to update
+	 * @param newStatus - The new state
+	 */
+	public void setCategoryEnabled(String categoryName, boolean newStatus)
+	{
+		setCategoryEnabled(CommandRegister.getCommandCategory(categoryName), newStatus);
+	}
+	/**
+	 * Sets all commands (where possible) in the category to the new status
+	 * @param categoryID - The category ID of commands to update
+	 * @param newStatus - The new state
+	 */
+	public void setCategoryEnabled(int categoryID, boolean newStatus)
+	{
+		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
+		if (CommandRegister.getCategoryName(categoryID) == null) //Simple verification check to ensure the id is valid.
+		{
+			logger.info("Could not alter category status as the specified category does not exist.");
+			return;
+		}
+		for (CommandAttributes commandAttributes : CommandRegister.getCommandsInCategory(categoryID))
+		{
+			for (int i = 0; i<getGuildSettings().getCommandConfig().length; i++)
+			{
+				if (getGuildSettings().getCommandConfig()[i].getCommandKey().equalsIgnoreCase(commandAttributes.getCommandKey())) //TODO: Inefficient. Fix.
+				{
+					getGuildSettings().getCommandConfig()[i].setEnabled(newStatus);
+				}
+			}
+		}
 	}
 
 	//============================================================================================================

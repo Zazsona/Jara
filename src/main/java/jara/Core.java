@@ -49,7 +49,7 @@ public class Core //A class for covering the global manners of the bot.
 		CommandConfiguration[] commandConfigs = new CommandConfiguration[CommandRegister.getRegisterSize()];
 		for (int i = 0; i<commandConfigs.length; i++)
 		{
-			commandConfigs[i] = new CommandConfiguration(CommandRegister.getRegister()[i], GlobalSettingsManager.getGlobalCommandEnabledStatus(CommandRegister.getRegister()[i].getCommandKey()));
+			commandConfigs[i] = new CommandConfiguration(CommandRegister.getRegister()[i], GlobalSettingsManager.isCommandEnabledGlobally(CommandRegister.getRegister()[i].getCommandKey()));
 		}
 		shardManager.addEventListener(new CommandHandler(commandConfigs));
 	}

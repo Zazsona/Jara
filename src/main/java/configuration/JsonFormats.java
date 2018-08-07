@@ -30,7 +30,7 @@ public class JsonFormats
 		{
 			return enabled;
 		}
-		public void setEnabled(boolean newState)
+		public boolean setEnabled(boolean newState)
 		{
 			if (!newState && CommandRegister.getCommand(getCommandKey()).isDisableable())
 			{
@@ -40,6 +40,7 @@ public class JsonFormats
 			{
 				enabled = true;
 			}
+			return isEnabled();
 		}
 	}
 
@@ -112,14 +113,6 @@ public class JsonFormats
 		{
 			return roleIDs;
 		}
-		/*public void addPermittedRole(String roleID)
-		{
-			roleIDs.add(roleID);
-		}
-		public void removePermittedRole(String roleID)
-		{
-			roleIDs.remove(roleID);
-		}*/
 
 
 

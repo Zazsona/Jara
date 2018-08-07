@@ -234,7 +234,7 @@ public class Help extends Command {
 		commands.append("~~------------------------------------------------------------~~\n");
 		for (CommandAttributes cmdAttributes : CommandRegister.getCommandsInCategory(categoryID))
 		{
-			if (guildSettings.getGuildCommandEnabledStatus(cmdAttributes.getCommandKey()))
+			if (guildSettings.isCommandEnabled(cmdAttributes.getCommandKey()))
 			{
 				if (!(Collections.disjoint(guildSettings.getPermittedRoles(cmdAttributes.getCommandKey()), roleIDs)) || !limitToPerms)
 				{
