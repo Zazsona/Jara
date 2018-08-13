@@ -4,11 +4,11 @@ import commands.Command;
 
 public class CommandAttributes 
 {
-	private String commandKey;
-	private Class<? extends Command> commandClass;
-	private String[] aliases; //Text strings that will call the command
-	private int category;
-	private boolean disableable;
+	private final String commandKey;
+	private final Class<? extends Command> commandClass;
+	private final String[] aliases; //Text strings that will call the command
+	private final int category;
+	private final boolean disableable;
 
 	public CommandAttributes(String commandKeyArg, Class<? extends Command> commandClassArg, String[] aliasesArg, int categoryArg, boolean disableableArg)
 	{
