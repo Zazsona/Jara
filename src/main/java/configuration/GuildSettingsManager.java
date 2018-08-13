@@ -157,7 +157,7 @@ public class GuildSettingsManager
 	 * @return
 	 * File - the new guild data file
 	 */
-	public File performNewGuildSetup()
+	public File performNewGuildSetup() //TODO: Make setup reflect global? (So globally disabled commands are... disabled.)
 	{
 		File guildSettingsFile = new File(getGuildSettingsDirectory().getAbsolutePath()+"/"+guildID+".json");
 		if (!guildSettingsFile.exists())

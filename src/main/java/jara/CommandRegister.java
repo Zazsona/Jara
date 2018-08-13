@@ -221,6 +221,33 @@ public class CommandRegister
 		}
 		return null; //Invalid id.
 	}
+	/**
+	 * Converts a category ID into a category name.
+	 * @param String name - The name of the category
+	 * @return
+	 * int - Category ID
+	 * -1 = Invalid name.
+	 */
+	public static int getCategoryID(String name)
+	{
+		name = name.toLowerCase();
+		switch (name)
+		{
+			case "no group":
+				return NOGROUP;
+			case "games":
+				return GAMES;
+			case "utility":
+				return UTILITY;
+			case "toys":
+				return TOYS;
+			case "audio":
+				return AUDIO;
+			case "admin":
+				return ADMIN;
+		}
+		return -1; //Invalid nsme.
+	}
 
 	/**
 	 * Returns a list of all category names.

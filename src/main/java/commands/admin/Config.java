@@ -5,18 +5,30 @@ import java.util.List;
 import commands.Command;
 import configuration.GlobalSettingsManager;
 import configuration.GuildSettingsManager;
+import jara.CommandAttributes;
+import jara.CommandRegister;
 import jara.Core;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
-public class Config extends Command {
+public class Config extends Command { //TODO: Add category based enable/disable/permissions
+
+	GuildSettingsManager guildSettings;
 	@Override
 	public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
 	{
+		guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
 		if (parameters.length > 1)
 		{
-			if (parameters[1].equalsIgnoreCase("setgamecategory"))
+			if (parameters[1].equalsIgnoreCase("check"))
+			{
+				if (parameters.length > 2)
+				{
+					checkSetting(msgEvent, parameters[2]);
+				}
+			}
+			else if (parameters[1].equalsIgnoreCase("setgamecategory"))
 			{
 				if (parameters.length >= 3)
 				{
@@ -35,7 +47,7 @@ public class Config extends Command {
 				}
 				else
 				{
-					msgEvent.getChannel().sendMessage("Insufficient parameters.").queue();
+					CommandRegister.sendHelpInfo(msgEvent, getClass());
 				}
 
 			}
@@ -47,22 +59,47 @@ public class Config extends Command {
 				}
 				else
 				{
-					msgEvent.getChannel().sendMessage("Insufficient parameters.").queue();
+					CommandRegister.sendHelpInfo(msgEvent, getClass());
 				}
 
 			}
 			else
 			{
-				msgEvent.getChannel().sendMessage("Config option not recognised.").queue();
+				CommandRegister.sendHelpInfo(msgEvent, getClass());
 			}
 		}
 		else
 		{
-			displayConfig(msgEvent);
+			EmbedBuilder embed = new EmbedBuilder();
+			embed.setTitle("============== Config ===============");
+			embed.setThumbnail("https://i.imgur.com/Hb8ET7G.png");
+			embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+			StringBuilder descBuilder = new StringBuilder();
+			descBuilder.append("**=========== Instructions ============**\n");
+			descBuilder.append("/config\n");
+			descBuilder.append("/config check [Command]/[Command Category]/GameCategory\n");
+			descBuilder.append("/config SetGameCategory (Channel Category Name)\n");
+			descBuilder.append("/config RemGameCategory\n");
+			descBuilder.append("/config enable [Command]\n");
+			descBuilder.append("/config disable [Command]\n");
+			descBuilder.append("/config AddRole [Command] [Role Name]\n");
+			descBuilder.append("/config RemRole [Command] [Role Name]\n\n");
+			descBuilder.append(getGameCategory(msgEvent));
+			descBuilder.append("**============= Commands ==============**\n");
+			for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
+			{
+				renderCommandData(msgEvent, key, embed);
+			}
+			embed.setDescription(descBuilder.toString());
+			msgEvent.getChannel().sendMessage(embed.build()).queue();
 		}
 	}
 	private void setPermissions(GuildMessageReceivedEvent msgEvent, String... parameters) 
 	{
+		EmbedBuilder embed = new EmbedBuilder();
+		embed.setTitle("============== Config ===============");
+		embed.setThumbnail("https://i.imgur.com/Hb8ET7G.png");
+		embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
 		List<Role> roles = msgEvent.getGuild().getRolesByName(parameters[3], true);
 		if (roles.isEmpty())
 		{
@@ -72,14 +109,14 @@ public class Config extends Command {
 			}
 			else
 			{
-				msgEvent.getChannel().sendMessage("Could not find a role by that name.").queue();
+				embed.setDescription("Could not find a role by that name.");
+				msgEvent.getChannel().sendMessage(embed.build()).queue();
 				return;
 			}
 		}
 		String roleID = roles.get(0).getId();
 		if (parameters[2].equals("*"))
 		{
-			GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
 			for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
 			{
 				if (parameters[1].equalsIgnoreCase("addrole"))
@@ -91,7 +128,8 @@ public class Config extends Command {
 					guildSettings.removePermittedRole(key, roleID);
 				}
 			}
-			msgEvent.getChannel().sendMessage(roles.get(0).getName().replace("@", "")+" can now use all enabled commands!").queue();	
+			embed.setDescription(roles.get(0).getName().replace("@", "")+" can now use all enabled commands!");
+			msgEvent.getChannel().sendMessage(embed.build()).queue();
 		}
 		else
 		{
@@ -99,7 +137,6 @@ public class Config extends Command {
 			{
 				if (parameters[2].equalsIgnoreCase(key))
 				{
-					GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
 					if (parameters[1].equalsIgnoreCase("addrole"))
 					{
 						guildSettings.addPermittedRole(key, roleID);
@@ -108,7 +145,9 @@ public class Config extends Command {
 					{
 						guildSettings.removePermittedRole(key, roleID);
 					}
-					msgEvent.getChannel().sendMessage(key+" permissions updated!").queue();	
+					embed.setDescription(key+" permissions updated!");
+					msgEvent.getChannel().sendMessage(embed.build()).queue();
+
 				}
 			}
 		}
@@ -116,9 +155,12 @@ public class Config extends Command {
 	}
 	private void setStatus(GuildMessageReceivedEvent msgEvent, String... parameters) 
 	{
+		EmbedBuilder embed = new EmbedBuilder();
+		embed.setTitle("============== Config ===============");
+		embed.setThumbnail("https://i.imgur.com/Hb8ET7G.png");
+		embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
 		if (parameters[2].equals("*"))
 		{
-			GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
 			for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
 			{
 
@@ -128,13 +170,12 @@ public class Config extends Command {
 				}
 				else
 				{
-					if (!(key.equalsIgnoreCase("config") || key.equalsIgnoreCase("about") || key.equalsIgnoreCase("help"))) //If it is NOT any of these...
-					{
-						guildSettings.setCommandEnabled(key, false);
-					}
+
+					guildSettings.setCommandEnabled(key, false);
 				}
 			}
-			msgEvent.getChannel().sendMessage("All commands have been "+parameters[1].toLowerCase()+"d").queue(); //Felt like being lazy here. para[1] is always either "enable"/"disable", this makes it "enabled" or "disabled" in text.
+			embed.setDescription("All basic commands have been "+parameters[1].toLowerCase()+"d"); //Felt like being lazy here. para[1] is always either "enable"/"disable", this makes it "enabled" or "disabled" in text.
+			msgEvent.getChannel().sendMessage(embed.build()).queue();
 		}
 		else
 		{
@@ -142,31 +183,36 @@ public class Config extends Command {
 			{
 				if (parameters[2].equalsIgnoreCase(key))
 				{
-					GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
 					if (parameters[1].equalsIgnoreCase("enable"))
 					{
 						guildSettings.setCommandEnabled(key, true);
 					}
 					else
 					{
-						if (key.equalsIgnoreCase("config") || key.equalsIgnoreCase("about") || key.equalsIgnoreCase("help"))
+						if (!CommandRegister.getCommand(key).isDisableable())
 						{
-							msgEvent.getChannel().sendMessage(key + " cannot be disabled.").queue();
+							embed.setDescription(key + " cannot be disabled.");
+							msgEvent.getChannel().sendMessage(embed.build()).queue();
 							return;
 						}
 						guildSettings.setCommandEnabled(key, false);
 					}
-					msgEvent.getChannel().sendMessage(key+" status updated!").queue();	
+					embed.setDescription(key+" status updated!");
+					msgEvent.getChannel().sendMessage(embed.build()).queue();
 					return;
 				}
 			}
-			msgEvent.getChannel().sendMessage("Command not found.").queue();
+			embed.setDescription("Command not found.");
+			msgEvent.getChannel().sendMessage(embed.build()).queue();
 		}
 
 	}
 	private void setGameCategory(GuildMessageReceivedEvent msgEvent, String...parameters)
 	{
-
+		EmbedBuilder embed = new EmbedBuilder();
+		embed.setTitle("============== Config ===============");
+		embed.setThumbnail("https://i.imgur.com/Hb8ET7G.png");
+		embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
 		String categoryID;
 		if (parameters.length > 2)
 		{
@@ -181,7 +227,8 @@ public class Config extends Command {
 			categoryID = msgEvent.getGuild().getCategoriesByName(categoryName, true).get(0).getId();
 			if (categoryID.equals(""))
 			{
-				msgEvent.getChannel().sendMessage("Category not found.").queue();
+				embed.setDescription("Category not found.");
+				msgEvent.getChannel().sendMessage(embed.build()).queue();
 				return;
 			}
 		}
@@ -190,71 +237,116 @@ public class Config extends Command {
 			categoryID = "";
 		}
 
-		GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
 		guildSettings.setGuildGameCategoryID(categoryID);
 		if (categoryID.equals(""))
 		{
-			msgEvent.getChannel().sendMessage("Game category removed.").queue();
+			embed.setDescription("Category removed.");
+			msgEvent.getChannel().sendMessage(embed.build()).queue();
 		}
 		else
 		{
-			msgEvent.getChannel().sendMessage("Game category set to "+msgEvent.getGuild().getCategoryById(categoryID).getName()).queue();
+			embed.setDescription("Game category set to "+msgEvent.getGuild().getCategoryById(categoryID).getName());
+			msgEvent.getChannel().sendMessage(embed.build()).queue();
 		}
 
 	}
-	private void displayConfig(GuildMessageReceivedEvent msgEvent)
+	private void checkSetting(GuildMessageReceivedEvent msgEvent, String query)
 	{
-		GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
-		String gameCategory;
-		try
-		{
-			gameCategory = msgEvent.getGuild().getCategoryById(guildSettings.getGuildGameCategoryID()).getName();
-		}
-		catch (IllegalArgumentException e)
-		{
-			gameCategory = "Not set";
-		}
 		EmbedBuilder embed = new EmbedBuilder();
-		embed.setDescription("**Commands**\n"
-				+ "/config SetGameCategory (Category Name)\n"
-				+ "/config RemGameCategory\n"
-				+ "/config enable [Command]\n"
-				+ "/config disable [Command]\n"
-				+ "/config AddRole [Command] [Role Name]\n"
-				+ "/config RemRole [Command] [Role Name]\n"
-				+ "\n"
-				+ "**Game Category**: "+gameCategory);
-				
-		StringBuilder keyList = new StringBuilder();
-		StringBuilder enabledList = new StringBuilder();
-		StringBuilder roleList = new StringBuilder();
-		for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
+		StringBuilder descBuilder = new StringBuilder();
+		if (query.equalsIgnoreCase("games") || query.equalsIgnoreCase("toys") || query.equalsIgnoreCase("utility") || query.equalsIgnoreCase("audio") || query.equalsIgnoreCase("admin"))
 		{
-			keyList.append(key+"\n");
-			if (guildSettings.isCommandEnabled(key))
+			for (CommandAttributes cmdAttributes : CommandRegister.getCommandsInCategory(CommandRegister.getCategoryID(query)))
 			{
-				enabledList.append("✓\n");
+				if (GlobalSettingsManager.isCommandEnabledGlobally(cmdAttributes.getCommandKey()))
+				{
+					renderCommandData(msgEvent, cmdAttributes.getCommandKey(), embed);
+				}
 			}
-			else
+
+		}
+		else if (query.equalsIgnoreCase("gamecategory"))
+		{
+			descBuilder.append(getGameCategory(msgEvent));
+		}
+		else if (query.equals("*"))
+		{
+			descBuilder.append(getGameCategory(msgEvent));
+			descBuilder.append("**============= Commands ==============**\n");
+			for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
 			{
-				enabledList.append("X\n");
+				renderCommandData(msgEvent, key, embed);
 			}
-			for (String roleID : guildSettings.getPermittedRoles(key))
+		}
+		else
+		{
+			boolean commandFound = false;
+			for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
 			{
-				roleList.append(msgEvent.getGuild().getRoleById(roleID).getName().replace("@", "")+", "); //Removing @ here as getName appends it for the everyone role, causing a ping.
+				if (key.equalsIgnoreCase(query))
+				{
+					renderCommandData(msgEvent, key, embed); //TODO
+					commandFound = true;
+					break;
+				}
 			}
-			if (roleList.lastIndexOf(", ") == roleList.length()-2)
+			if (!commandFound)
 			{
-				roleList.setLength(roleList.length()-2); //Remove last ', '
+				CommandRegister.sendHelpInfo(msgEvent, getClass());
+				return;
 			}
-			roleList.append("\n");
 		}
 		embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
-		embed.setTitle("===================== Config ======================");
-		embed.addField("Command", keyList.toString(), true);
-		embed.addField("Enabled", enabledList.toString(), true);
-		embed.addField("Permissions", roleList.toString(), true);
+		embed.setTitle("============== Config ===============");
+		embed.setDescription(descBuilder.toString());
+		embed.setThumbnail("https://i.imgur.com/Hb8ET7G.png");
 		msgEvent.getChannel().sendMessage(embed.build()).queue();
+	}
+
+	private String getGameCategory(GuildMessageReceivedEvent msgEvent)
+	{
+		StringBuilder descBuilder = new StringBuilder();
+		descBuilder.append("**============ Game Category ============**\n");
+		if (guildSettings.getGuildGameCategoryID().equals(""))
+		{
+			descBuilder.append("None Set.");
+		}
+		else
+		{
+			descBuilder.append(msgEvent.getGuild().getCategoryById(guildSettings.getGuildGameCategoryID()).getName()).append("\n");
+			descBuilder.append(guildSettings.getGuildGameCategoryID());
+		}
+		descBuilder.append("\n\n");
+		return descBuilder.toString();
+	}
+
+	private String renderCommandData(GuildMessageReceivedEvent msgEvent, String key, EmbedBuilder embed)
+	{
+		StringBuilder headerBuilder = new StringBuilder();
+		StringBuilder dataBuilder = new StringBuilder();
+		//dataBuilder.append("**").append(key).append("**");
+		if (guildSettings.isCommandEnabled(key))
+		{
+			dataBuilder.append("*Enabled*\n");
+			//headerBuilder.append(key).append(" - Enabled");
+		}
+		else
+		{
+			dataBuilder.append("*Disabled*\n");
+			//headerBuilder.append(key).append(" - Disabled");
+		}
+		dataBuilder.append("Roles: ");
+		for (String roleID : guildSettings.getPermittedRoles(key))
+		{
+			dataBuilder.append(msgEvent.getGuild().getRoleById(roleID).getName().replace("@", "")+", "); //Removing @ here as getName appends it for the everyone role, causing a ping.
+		}
+		if (dataBuilder.lastIndexOf(", ") == dataBuilder.length()-2)
+		{
+			dataBuilder.setLength(dataBuilder.length()-2); //Remove last ', '
+		}
+		dataBuilder.append("\n\n");
+		embed.addField("== "+key+" ==", dataBuilder.toString(), true);
+		return dataBuilder.toString();
 	}
 
 }
