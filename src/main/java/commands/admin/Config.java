@@ -177,6 +177,26 @@ public class Config extends Command { //TODO: Add category based enable/disable/
 			embed.setDescription("All basic commands have been "+parameters[1].toLowerCase()+"d"); //Felt like being lazy here. para[1] is always either "enable"/"disable", this makes it "enabled" or "disabled" in text.
 			msgEvent.getChannel().sendMessage(embed.build()).queue();
 		}
+		else if (parameters[2].equalsIgnoreCase("games") || parameters[2].equalsIgnoreCase("toys") || parameters[2].equalsIgnoreCase("utility") || parameters[2].equalsIgnoreCase("audio") || parameters[2].equalsIgnoreCase("admin"))
+		{
+			for (CommandAttributes cmdAttributes : CommandRegister.getCommandsInCategory(CommandRegister.getCategoryID(parameters[2])))
+			{
+				if (GlobalSettingsManager.isCommandEnabledGlobally(cmdAttributes.getCommandKey()))
+				{
+					if (parameters[1].equalsIgnoreCase("enable"))
+					{
+						guildSettings.setCommandEnabled(cmdAttributes.getCommandKey(), true);
+					}
+					else
+					{
+
+						guildSettings.setCommandEnabled(cmdAttributes.getCommandKey(), false);
+					}
+				}
+			}
+			embed.setDescription("Commands in "+parameters[2]+" have been "+parameters[1]+"d");
+			msgEvent.getChannel().sendMessage(embed.build()).queue();
+		}
 		else
 		{
 			for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
@@ -263,7 +283,6 @@ public class Config extends Command { //TODO: Add category based enable/disable/
 					renderCommandData(msgEvent, cmdAttributes.getCommandKey(), embed);
 				}
 			}
-
 		}
 		else if (query.equalsIgnoreCase("gamecategory"))
 		{
@@ -324,16 +343,13 @@ public class Config extends Command { //TODO: Add category based enable/disable/
 	{
 		StringBuilder headerBuilder = new StringBuilder();
 		StringBuilder dataBuilder = new StringBuilder();
-		//dataBuilder.append("**").append(key).append("**");
 		if (guildSettings.isCommandEnabled(key))
 		{
 			dataBuilder.append("*Enabled*\n");
-			//headerBuilder.append(key).append(" - Enabled");
 		}
 		else
 		{
 			dataBuilder.append("*Disabled*\n");
-			//headerBuilder.append(key).append(" - Disabled");
 		}
 		dataBuilder.append("Roles: ");
 		for (String roleID : guildSettings.getPermittedRoles(key))
