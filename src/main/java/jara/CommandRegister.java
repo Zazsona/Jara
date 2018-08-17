@@ -7,6 +7,7 @@ import commands.Command;
 import commands.Help;
 import commands.admin.Config;
 import commands.games.Countdown;
+import commands.games.CountdownConundrum;
 import commands.toys.Say;
 import commands.toys.Timecard;
 import commands.utility.*;
@@ -58,6 +59,7 @@ public class CommandRegister
             register.add(new CommandAttributes("Randomizer", Randomizer.class, new String[] {"Randomise", "Randomize", "Randomiser", "Roulette", "Picker", "Selector"}, UTILITY, true));
 			register.add(new CommandAttributes("Say", Say.class, new String[] {"Speak", "Talk"}, TOYS, true));
 			register.add(new CommandAttributes("Timecard", Timecard.class, new String[] {"SpongebobCard", "Timescreen"}, TOYS, true));
+			register.add(new CommandAttributes("CountdownConundrum", CountdownConundrum.class, new String[] {"CC", "Anagram"}, GAMES, true));
 		}
 		return register.toArray(new CommandAttributes[register.size()]);
 	}
@@ -223,7 +225,7 @@ public class CommandRegister
 	}
 	/**
 	 * Converts a category ID into a category name.
-	 * @param String name - The name of the category
+	 * @param name - The name of the category
 	 * @return
 	 * int - Category ID
 	 * -1 = Invalid name.
