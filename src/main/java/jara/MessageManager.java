@@ -2,6 +2,7 @@ package jara;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import net.dv8tion.jda.core.entities.Guild;
@@ -160,7 +161,15 @@ public class MessageManager
 	 */
 	public Message getNextMessage(Guild guild)
 	{
-		return futureGuildMessageCollector(guild, 0, 1)[0];
+		try
+		{
+			Message message = futureGuildMessageCollector(guild, 0, 1)[0];
+			return message;
+		}
+		catch (ArrayIndexOutOfBoundsException e)
+		{
+			return null;
+		}
 	}
 	/**
 	 * Waits and returns the first message to be sent in the channel after invocation.<br>
@@ -172,7 +181,15 @@ public class MessageManager
 	 */
 	public Message getNextMessage(TextChannel channel)
 	{
-		return futureChannelMessageCollector(channel, 0, 1)[0];
+		try
+		{
+			Message message = futureChannelMessageCollector(channel, 0, 1)[0];
+			return message;
+		}
+		catch (ArrayIndexOutOfBoundsException e)
+		{
+			return null;
+		}
 	}
 	/**
 	 * Waits and returns the first message to be sent in the guild after invocation and within a set time.<br>
@@ -185,7 +202,15 @@ public class MessageManager
 	 */
 	public Message getNextMessage(Guild guild, int timeout)
 	{
-		return futureGuildMessageCollector(guild, timeout, 1)[0];
+		try
+		{
+			Message message = futureGuildMessageCollector(guild, timeout, 1)[0];
+			return message;
+		}
+		catch (ArrayIndexOutOfBoundsException e)
+		{
+			return null;
+		}
 	}
 	/**
 	 * Waits and returns the first message to be sent in the channel after invocation and within a set time.<br>
@@ -198,7 +223,16 @@ public class MessageManager
 	 */
 	public Message getNextMessage(TextChannel channel, int timeout)
 	{
-		return futureChannelMessageCollector(channel, timeout, 1)[0];
+		try
+		{
+			Message message = futureChannelMessageCollector(channel, timeout, 1)[0];
+			return message;
+		}
+		catch (ArrayIndexOutOfBoundsException e)
+		{
+			return null; //No messages
+		}
+
 	}
 	/**
 	 * Waits and returns the first X messages to be sent in the guild after invocation.<br>
