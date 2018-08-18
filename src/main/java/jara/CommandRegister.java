@@ -8,11 +8,8 @@ import commands.Help;
 import commands.admin.Config;
 import commands.games.Countdown;
 import commands.games.CountdownConundrum;
-import commands.toys.Say;
-import commands.toys.Timecard;
+import commands.toys.*;
 import commands.utility.*;
-import commands.toys.EightBall;
-import commands.toys.Jokes;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 public class CommandRegister
@@ -60,6 +57,8 @@ public class CommandRegister
 			register.add(new CommandAttributes("Say", Say.class, new String[] {"Speak", "Talk"}, TOYS, true));
 			register.add(new CommandAttributes("Timecard", Timecard.class, new String[] {"SpongebobCard", "Timescreen"}, TOYS, true));
 			register.add(new CommandAttributes("CountdownConundrum", CountdownConundrum.class, new String[] {"CC", "Anagram"}, GAMES, true));
+			register.add(new CommandAttributes("IsItWednesdayMyDudes", IsItWednesdayMyDudes.class, new String[] {"ItIsWednesdayMyDudes", "ItIsNotWednesdayMyDudes", "Wednesday", "IIWMD", "IINWMD", "WednesdayFrog", "IsItWednesdayMyDudes", "ItIsWeds", "ItIsNotWeds"}, TOYS, true));
+
 		}
 		return register.toArray(new CommandAttributes[register.size()]);
 	}
