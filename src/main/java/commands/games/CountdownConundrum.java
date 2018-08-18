@@ -35,18 +35,18 @@ public class CountdownConundrum extends Command
 
         Runnable timer = () ->
         {
-            seconds = 30;
-            while (seconds >= 0)
+            seconds = 0;
+            while (seconds <= 30)
             {
                 try
                 {
                     switch (seconds)
                     {
-                        case 0:
+                        case 30:
                             embed.setThumbnail("https://i.imgur.com/eMrORg8.png");
                             embedMsg.editMessage(embed.build()).queue();
                             break;
-                        case 8:
+                        case 23:
                             embed.setThumbnail("https://i.imgur.com/F2deeEY.png");
                             embedMsg.editMessage(embed.build()).queue();
                             break;
@@ -54,14 +54,14 @@ public class CountdownConundrum extends Command
                             embed.setThumbnail("https://i.imgur.com/JpwwNrY.png");
                             embedMsg.editMessage(embed.build()).queue();
                             break;
-                        case 23:
+                        case 8:
                             embed.setThumbnail("https://i.imgur.com/llmbGHa.png");
                             embedMsg.editMessage(embed.build()).queue();
                             break;
 
                     }
                     Thread.sleep(1000);
-                    seconds--;
+                    seconds++;
                 }
                 catch (InterruptedException e)
                 {
@@ -74,7 +74,7 @@ public class CountdownConundrum extends Command
         Thread timerThread = new Thread(timer);
         timerThread.start();
         MessageManager msgManager = new MessageManager();
-        while (seconds >= 0)
+        while (seconds <= 30)
         {
             Message message = msgManager.getNextMessage(channel, 1000);
             if (message != null)
@@ -96,7 +96,7 @@ public class CountdownConundrum extends Command
         if (!winner.equals(""))
         {
             embed.setThumbnail("https://i.imgur.com/scKHMRb.png");
-            embed.setDescription("Congratulations! The word was "+conundrums[index][1]+".\n"+winner+" got it in just "+(30-seconds)+" seconds!");
+            embed.setDescription("Congratulations! The word was "+conundrums[index][1]+".\n"+winner+" got it in just "+seconds+" seconds!");
             channel.sendMessage(embed.build()).queue();
         }
         else
@@ -106,25 +106,13 @@ public class CountdownConundrum extends Command
             channel.sendMessage(embed.build()).queue();
         }
 
-        if (!channel.equals(msgEvent.getChannel())) //Basically, if this is a game channel...
-        {
-            channel.sendMessage("Well played! This channel will be deleted in 30 seconds.").queue();
-            try
-            {
-                Thread.sleep(30*1000);
-            }
-            catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-            channel.delete().queue();
-        }
+        super.deleteGameChannel(msgEvent, channel);
         return;
 
     }
     public String[][] getConundrums()
     {
-        String[][] conundrums = new String[31][2];
+        String[][] conundrums = new String[40][2];
         conundrums[0][0] = "Soartrip";
         conundrums[0][1] = "Airports";
         conundrums[1][0] = "Toooften";
@@ -147,7 +135,7 @@ public class CountdownConundrum extends Command
         conundrums[9][1] = "Conundrum";
         conundrums[10][0] = "Crewonset";
         conundrums[10][1] = "Sweetcorn";
-        conundrums[11][0] = "Manningit";
+        conundrums[11][0] = "Minigramt";
         conundrums[11][1] = "Immigrant";
         conundrums[12][0] = "Hashpipes";
         conundrums[12][1] = "Shipshape";
@@ -171,8 +159,8 @@ public class CountdownConundrum extends Command
         conundrums[21][1] = "Jukeboxes";
         conundrums[22][0] = "Pizzaarpa";
         conundrums[22][1] = "Paparazzi";
-        conundrums[23][0] = "Rezzybarr";
-        conundrums[23][1] = "Razzberry";
+        conundrums[23][0] = "Repsybarr";
+        conundrums[23][1] = "Raspberry";
         conundrums[24][0] = "Coppypock";
         conundrums[24][1] = "Poppycock";
         conundrums[25][0] = "Jifyectob";
@@ -187,6 +175,24 @@ public class CountdownConundrum extends Command
         conundrums[29][1] = "Schmoozer";
         conundrums[30][0] = "Dizeminim";
         conundrums[30][1] = "Minimized";
+        conundrums[31][0] = "Druowbszz";
+        conundrums[31][1] = "Buzzwords";
+        conundrums[32][0] = "Bornmaity";
+        conundrums[32][1] = "Abnormity";
+        conundrums[33][0] = "Badtedack";
+        conundrums[33][1] = "Backdated";
+        conundrums[34][0] = "Bitialies";
+        conundrums[34][1] = "Abilities";
+        conundrums[35][0] = "Repledmas";
+        conundrums[35][1] = "Resampled";
+        conundrums[36][0] = "Rarhingbor";
+        conundrums[36][1] = "Harboring";
+        conundrums[37][0] = "Finlentus";
+        conundrums[37][1] = "Influents";
+        conundrums[38][0] = "Furyllest";
+        conundrums[38][1] = "Restfully";
+        conundrums[39][0] = "Vocelkits";
+        conundrums[39][1] = "Livestock";
         return conundrums;
     }
 
