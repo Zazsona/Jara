@@ -31,6 +31,7 @@ public abstract class Command //A base class to build commands from.
 				try
 				{
 					TextChannel channel = (TextChannel) gameCategory.createTextChannel(channelName).complete();
+					msgEvent.getChannel().sendMessage("Game started in "+channel.getAsMention()).queue();
 					return channel;
 				}
 				catch (InsufficientPermissionException e)
@@ -61,5 +62,22 @@ public abstract class Command //A base class to build commands from.
 				return createGameChannel(msgEvent, channelName);
 			}
 		}
+	}
+	protected void deleteGameChannel(GuildMessageReceivedEvent msgEvent, TextChannel channel)
+	{
+		if (!channel.equals(msgEvent.getChannel())) //Basically, if this is a game channel...
+		{
+			channel.sendMessage("Well played! This channel will be deleted in 30 seconds.").queue();
+			try
+			{
+				Thread.sleep(30*1000);
+			}
+			catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+			channel.delete().queue();
+		}
+		return;
 	}
 }

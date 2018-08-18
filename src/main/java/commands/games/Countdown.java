@@ -33,19 +33,8 @@ public class Countdown extends Command
 		generateLetters(parameters);
 		Message[] answers = getAnswers(msgEvent); 
 		generateResults(answers);
-		if (!channel.equals(msgEvent.getChannel())) //Basically, if this is a game channel...
-		{
-			channel.sendMessage("Well played! This channel will be deleted in 30 seconds.").queue();
-			try 
-			{
-				Thread.sleep(30*1000);
-			} 
-			catch (InterruptedException e) 
-			{
-				e.printStackTrace(); 
-			}
-			channel.delete().queue();
-		}
+
+		super.deleteGameChannel(msgEvent, channel);
 		return;
 	}
 	private String generateLetters(String...parameters)
