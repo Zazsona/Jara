@@ -57,8 +57,23 @@ public class ConsoleGUI
             System.out.println("Dandy! Enter the client token below:");
         }
         GlobalSettingsManager.setClientToken(scanner.nextLine());
+        scanner.close();
+        configureCommands();
+        return;
+
+    }
+    public static void manageNewCommands()
+    {
+        printLogo();
+        System.out.println("Update complete! Some new commands have been added. Opening configuration...");
+        configureCommands();
+    }
+    private static void configureCommands()
+    {
+        Scanner scanner = new Scanner(System.in);
+        String input;
         printGlobalConfig(GlobalSettingsManager.getGlobalCommandConfig()); //The command list is printed beforehand so that instructions are always at the end, ensuring they are seen
-        System.out.println("\nNext up is command configuration.\n" +
+        System.out.println("\nCommand configuration.\n" +
                                    "Each guild can enable and disable commands as they wish, however any commands disabled here cannot be seen at all.\n\n" +
                                    "Instructions:\n" +
                                    "enable [Command]\n" +
@@ -124,8 +139,8 @@ public class ConsoleGUI
             }
 
         }
-
     }
+
     private static void printGlobalConfig(JsonFormats.GlobalCommandConfigJson[] commandConfig)
     {
         ArrayList<String> games = new ArrayList<String>();

@@ -244,8 +244,11 @@ public class GlobalSettingsManager
 				keys.remove(keys.get(i));
 			}
 			getGlobalSettings().setCommandConfig(updatedCommandConfig);
-			//TODO: SHOW THE GUI TO SELECT ENABLED COMMANDS
 			saveGlobalSettings();
+
+            //TODO: Headless check
+            ConsoleGUI.manageNewCommands();
+
 			for (File guildSettingsFile : getGuildSettingsDirectory().listFiles())
 			{
 				try
@@ -371,7 +374,7 @@ public class GlobalSettingsManager
 		{
 			if (commandSettings.getCommandKey().equalsIgnoreCase(commandKey))
 			{
-				commandSettings.setEnabled(newStatus);
+				updatedState = commandSettings.setEnabled(newStatus);
 				keyFound = true;
 			}
 
