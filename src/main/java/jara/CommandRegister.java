@@ -58,7 +58,7 @@ public class CommandRegister
 			register.add(new CommandAttributes("Timecard", Timecard.class, new String[] {"SpongebobCard", "Timescreen"}, TOYS, true));
 			register.add(new CommandAttributes("CountdownConundrum", CountdownConundrum.class, new String[] {"CC", "Anagram"}, GAMES, true));
 			register.add(new CommandAttributes("IsItWednesdayMyDudes", IsItWednesdayMyDudes.class, new String[] {"ItIsWednesdayMyDudes", "ItIsNotWednesdayMyDudes", "Wednesday", "IIWMD", "IINWMD", "WednesdayFrog", "IsItWednesdayMyDudes", "ItIsWeds", "ItIsNotWeds"}, TOYS, true));
-
+			register.add(new CommandAttributes("WouldYouRather", WouldYouRather.class, new String[] {"WouldYouRather?", "WYR", "WYR?"}, TOYS, true));
 		}
 		return register.toArray(new CommandAttributes[register.size()]);
 	}
