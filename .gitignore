@@ -7,3 +7,4 @@ gradle/
 .classpath
 .project
 .gradle
+*.iml
