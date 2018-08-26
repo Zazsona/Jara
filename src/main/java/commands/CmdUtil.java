@@ -1,6 +1,7 @@
 package commands;
 
 
+import configuration.GlobalSettingsManager;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -10,8 +11,19 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class CmdUtil
 {
@@ -80,5 +92,37 @@ public class CmdUtil
             e.printStackTrace();
             return "";
         }
+    }
+    public static ArrayList<String> getWordList() throws IOException
+    {
+        File localWordsFile = new File(GlobalSettingsManager.getDirectory()+"/wordList.txt");
+        ArrayList<String> wordsList = new ArrayList<>();
+        if (!localWordsFile.exists())
+        {
+            URLConnection cloudWordsFile = new URL("https://raw.githubusercontent.com/Zazsona/Jara/master/assets/wordsList.txt").openConnection();
+            cloudWordsFile.connect();
+            Scanner scanner = new Scanner(cloudWordsFile.getInputStream()); 
+
+            PrintWriter printWriter = new PrintWriter(localWordsFile);
+            while (scanner.hasNext())
+            {
+                String word = scanner.nextLine();
+                wordsList.add(word);
+                printWriter.println(word);
+            }
+            scanner.close();
+            printWriter.close();
+        }
+        else
+        {
+            Scanner scanner = new Scanner(localWordsFile);
+            while (scanner.hasNext())
+            {
+                String word = scanner.nextLine();
+                wordsList.add(word);
+            }
+            scanner.close();
+        }
+        return wordsList;
     }
 }
