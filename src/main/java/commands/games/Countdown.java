@@ -1,13 +1,12 @@
 package commands.games;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.xml.stream.events.Characters;
 
+import commands.CmdUtil;
 import commands.Command;
 import jara.Core;
 import jara.MessageManager;
@@ -141,10 +140,22 @@ public class Countdown extends Command
 				{
 					if (content.length() > winnerData[1].length()) //The result of all this, is that the first person with the longest word wins.
 					{
-						//Ideally here, we would conduct a dictionary check. However this would likely involve paying for an API.
-						//TODO: Implement some basic checks here to avoid obvious cheating.
-						winnerData[0] = answer.getMember().getEffectiveName();
-						winnerData[1] = content;
+						try
+						{
+							if (CmdUtil.getWordList().contains(content.toLowerCase()))
+							{
+								winnerData[0] = answer.getMember().getEffectiveName();
+								winnerData[1] = content;
+							}
+						}
+						catch (IOException e) //If the file is unavailable, we can't perform checks.
+						{
+							e.printStackTrace();
+							winnerData[0] = answer.getMember().getEffectiveName();
+							winnerData[1] = content;
+						}
+
+
 					}
 				}
 			}
