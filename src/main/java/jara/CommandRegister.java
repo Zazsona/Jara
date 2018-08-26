@@ -8,6 +8,7 @@ import commands.Help;
 import commands.admin.Config;
 import commands.games.Countdown;
 import commands.games.CountdownConundrum;
+import commands.games.Hangman;
 import commands.toys.*;
 import commands.utility.*;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -59,6 +60,7 @@ public class CommandRegister
 			register.add(new CommandAttributes("CountdownConundrum", CountdownConundrum.class, new String[] {"CC", "Anagram"}, GAMES, true));
 			register.add(new CommandAttributes("IsItWednesdayMyDudes", IsItWednesdayMyDudes.class, new String[] {"ItIsWednesdayMyDudes", "ItIsNotWednesdayMyDudes", "Wednesday", "IIWMD", "IINWMD", "WednesdayFrog", "IsItWednesdayMyDudes", "ItIsWeds", "ItIsNotWeds"}, TOYS, true));
 			register.add(new CommandAttributes("WouldYouRather", WouldYouRather.class, new String[] {"WouldYouRather?", "WYR", "WYR?"}, TOYS, true));
+			register.add(new CommandAttributes("Hangman", Hangman.class, new String[] {"hang"}, GAMES, true));
 		}
 		return register.toArray(new CommandAttributes[register.size()]);
 	}
