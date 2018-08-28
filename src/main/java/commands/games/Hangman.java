@@ -16,12 +16,12 @@ public class Hangman extends Command
     {
         TextChannel channel = super.createGameChannel(msgEvent, msgEvent.getMember().getEffectiveName()+"s-hangman");
         String word = CmdUtil.getRandomWord(); //Select a random word from "WordList"
-        while (word.length() > 15 && word.length() < 5) //We don't want a giant word, that'd be unfair. But we also don't want a tiny one.
+        while (word.length() > 15 || word.length() < 5) //We don't want a giant word, that'd be unfair. But we also don't want a tiny one.
         {
             word = CmdUtil.getRandomWord();
         }
         String progress = word.replaceAll("[a-zA-Z]", "#");
-        byte attempts = 9;
+        byte attempts = 8;
         StringBuilder guessHistory = new StringBuilder();
 
         MessageManager msgManager = new MessageManager();
@@ -32,7 +32,7 @@ public class Hangman extends Command
         embed.setDescription(":game_die:  Welcome to Hangman! The word's **" + progress + "**. :game_die: ");
         channel.sendMessage(embed.build()).queue();
 
-        while (attempts>1 && !word.equals(progress))
+        while (attempts>0 && !word.equals(progress))
         {
             EmbedBuilder gameEmbed = new EmbedBuilder();
             Message msg = msgManager.getNextMessage(channel);
@@ -40,6 +40,14 @@ public class Hangman extends Command
 
             if (msg.getContentDisplay().length() == 1)
             {
+                if (guessHistory.toString().contains(msg.getContentDisplay().toUpperCase())) //TODO: This should be tidied.
+                {
+                    gameEmbed.setTitle("Hangman");
+                    gameEmbed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+                    gameEmbed.setDescription("You've already used that letter. Try another.");
+                    channel.sendMessage(gameEmbed.build()).queue();
+                    continue;
+                }
                 char guess = msg.getContentDisplay().toLowerCase().charAt(0);
                 guessHistory.append(", ").append(Character.toUpperCase(guess));
 
@@ -65,30 +73,28 @@ public class Hangman extends Command
                     attempts--;
                     switch (attempts)
                     {
-                        case 8:
+                        case 7:
                             gameEmbed.setThumbnail("https://i.imgur.com/NynGFvk.png");
                             break;
-                        case 7:
+                        case 6:
                             gameEmbed.setThumbnail("https://i.imgur.com/jF1MxtR.png");
                             break;
-                        case 6:
+                        case 5:
                             gameEmbed.setThumbnail("https://i.imgur.com/a1d7xvA.png");
                             break;
-                        case 5:
+                        case 4:
                             gameEmbed.setThumbnail("https://i.imgur.com/wKm9Uyn.png");
                             break;
-                        case 4:
+                        case 3:
                             gameEmbed.setThumbnail("https://i.imgur.com/ZwxnCKS.png");
                             break;
-                        case 3:
+                        case 2:
                             gameEmbed.setThumbnail("https://i.imgur.com/nv7UCAy.png");
                             break;
-                        case 2:
+                        case 1:
                             gameEmbed.setThumbnail("https://i.imgur.com/zYfry8y.png");
                             break;
-                        case 1:
-                            gameEmbed.setThumbnail("https://i.imgur.com/8ragw82.png");
-                            break;
+                        //If 0, that's game over.
                     }  //Generate Hangman image
                 }
 
@@ -96,19 +102,18 @@ public class Hangman extends Command
                 gameEmbed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
                 gameEmbed.addField("Progress", progress, true);
                 gameEmbed.addField("Guesses", guessHistory.toString().substring(2), true);
+                if (attempts<=0)                    //Basically, we don't want to send a standard 'progress' embed, and then follow it up with a win/lose one. With this, we're replacing the progress one.
+                {
+                    gameEmbed.setDescription("**Oh no! I'm afraid you didn't quite get it. The word was "+word+"**");
+                    gameEmbed.setThumbnail("https://i.imgur.com/8ragw82.png");
+                }
+                else if (progress.equals(word))
+                {
+                    gameEmbed.setDescription("**Congratulations! You win. The word was "+word+"**");
+                    gameEmbed.setThumbnail("https://i.imgur.com/aRkU3aD.png");
+                }
                 channel.sendMessage(gameEmbed.build()).queue();
             }
-        }
-
-        if (attempts<=1)
-        {
-            embed.setDescription("Oh no! I'm afraid you didn't quite get it. The word was "+word);
-            channel.sendMessage(embed.build()).queue();
-        }
-        else
-        {
-            embed.setDescription("Congratulations! You win. The word was "+word);
-            channel.sendMessage(embed.build()).queue();
         }
         super.deleteGameChannel(msgEvent, channel);
     }
