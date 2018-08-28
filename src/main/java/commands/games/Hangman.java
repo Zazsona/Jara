@@ -1,5 +1,6 @@
 package commands.games;
 
+import commands.CmdUtil;
 import commands.Command;
 import jara.Core;
 import jara.MessageManager;
@@ -8,22 +9,17 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
-import java.util.Arrays;
-import java.util.Random;
-
 public class Hangman extends Command
 {
-    private static String[] wordList; //Despite being static, we won't set this yet to save on memory.
     @Override
     public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
     {
         TextChannel channel = super.createGameChannel(msgEvent, msgEvent.getMember().getEffectiveName()+"s-hangman");
-        if (wordList == null)
+        String word = CmdUtil.getRandomWord(); //Select a random word from "WordList"
+        while (word.length() > 15 && word.length() < 5) //We don't want a giant word, that'd be unfair. But we also don't want a tiny one.
         {
-            wordList = new String[] { "mind", "joint", "count", "bird", "roll", "strikebreaker", "explosion", "negotiation", "halt", "know", "sodium", "ample", "fever", "manufacture", "obligation", "literacy", "carve", "player", "spectrum", "dump", "crook", "java", "pamphlet", "playstation", "switch", "brush", "header", "footer", "grill", "burning", "destruction", "string", "face", "crook", "jazz", "portal", "gang", "machine", "deadly", "shameful", "bloodstain", "beacon", "civilisation", "number", "rocket", "flaming", "ceremony", "comet", "gushing", "debit", "credit", "mythical", "rock", "guitar", "final", "fantasy", "kingdom", "heart", "wrist", "band", "engine", "blade", "key", "coaster", "wing", "nocturnal", "titan", "leviathan", "man", "keyboard", "poo", "bear", "dog", "cat", "dragon", "den", "denizen", "technology", "mouse", "laptop", "kid", "wolf", "cradle", "camera", "cable", "urine", "expansionism", "ruse", "dishwasher", "walnut", "idiot", "plonker", "fool", "human", "libra", "element", "scissors", "word", "game", "bike", "pelt", "producer", "rainbow", "ripple", "twine", "variety", "procrastination", "bed", "headphones", "phone", "hyena", "patience", "general", "discord", "cloud", "middle", "street", "speaker", "array", "button", "england", "afghanistan", "typo", "window", "sprite", "mobile", "broker", "tipster", "bar", "pub", "cactus", "dime", "pound", "coin", "penny", "cartridge", "disc", "solid", "state", "drive", "hard", "nexus", "sonic", "sky", "volume", "attitude", "beanstalk", "frazzle", "court", "crush", "willy", "orchestra", "studio", "stage", "toast", "bread", "biscuit", "ring", "microphone", "boom", "central", "unit", "motherboard", "sword", "weapon", "bow", "video", "space", "jupiter", "earth", "mars", "star", "vacuum", "hamster", "fuel", "car", "muffin", "scone", "ghost", "learn", "college", "school", "stack", "slippers", "pen", "pencil", "rubber", "cup", "case", "tiara", "tractor", "gauntlet", "bikini", "beast", "cheek", "shirt", "fedora", "sock", "lego", "brick", "wednesday", "tuxedo", "suit", "mail", "space", "square", "design", "device", "website", "commerce", "apple", "news", "logo", "week", "free", "trial", "offer", "code", "figure", "funny", "hilarious", "year", "meme", "dank", "comic", "nerd", "geek", "outcast", "intelligence", "bum" };
+            word = CmdUtil.getRandomWord();
         }
-        Random r = new Random();
-        String word = wordList[r.nextInt(wordList.length)]; //Select a random word from "WordList"
         String progress = word.replaceAll("[a-zA-Z]", "#");
         byte attempts = 9;
         StringBuilder guessHistory = new StringBuilder();
@@ -104,7 +100,7 @@ public class Hangman extends Command
             }
         }
 
-        if (attempts<=0)
+        if (attempts<=1)
         {
             embed.setDescription("Oh no! I'm afraid you didn't quite get it. The word was "+word);
             channel.sendMessage(embed.build()).queue();
