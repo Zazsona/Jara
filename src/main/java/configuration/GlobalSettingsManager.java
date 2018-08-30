@@ -326,10 +326,9 @@ public class GlobalSettingsManager
 	 *
 	 * @param token - The new token
 	 */
-	public static void setClientToken(String token) //TODO: Encrypt this
+	public static void setClientToken(String token)
 	{
 		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
-		String encryptedToken = token; //Encrypt here
 
 		getGlobalSettings().setToken(token);
 		saveGlobalSettings();

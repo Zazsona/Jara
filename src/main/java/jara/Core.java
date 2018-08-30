@@ -1,11 +1,9 @@
 package jara;
 
 import java.awt.Color;
-import java.util.HashMap;
 
 import javax.security.auth.login.LoginException;
 
-import configuration.JsonFormats;
 import gui.ConsoleGUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,12 +35,7 @@ public class Core //A class for covering the global manners of the bot.
 			String newToken = ConsoleGUI.updateToken();
 			initialiseDiscordConnection(newToken); //TODO: Headless check
 	    	e.printStackTrace();
-		} 
-	    /*catch (IllegalArgumentException e)
-		{
-	    	logger.error("No log in credentials provided. Make sure to set your client token.");
-	    	e.printStackTrace();
-		}*/
+		}
 	}
 	public static void enableCommands()
 	{
@@ -72,6 +65,6 @@ public class Core //A class for covering the global manners of the bot.
 		{
 			return Color.decode("#5967cf"); //Use a default theme.
 		}
-		
+
 	}
 }

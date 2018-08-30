@@ -13,7 +13,9 @@ import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
 public abstract class Command //A base class to build commands from.
 {
 	public abstract void run(GuildMessageReceivedEvent msgEvent, String... parameters);
-	
+	//TODO: Add a configurable timer for how long after inactivity games should be ended / channels deleted.
+	//TODO: Option to limit channel access (Private games)
+		//- Perhaps give users the ability to define a list(s) of 'friends'?
 	protected TextChannel createGameChannel(GuildMessageReceivedEvent msgEvent, String channelName)
 	{
 		Logger logger = LoggerFactory.getLogger(Command.class);

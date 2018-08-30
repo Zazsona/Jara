@@ -13,7 +13,7 @@ public class About extends Command
 	{
 		EmbedBuilder embed = new EmbedBuilder();
 		embed.setTitle("======About======");
-		embed.setDescription("Jara - A general purpose Discord bot built with smaller guilds in mind.\n"
+		embed.setDescription("Jara - A Discord bot for you.\n"
 				+ "\n**Contributors**\n"							//Feel free to add your details here
 				+ "Zazsona\n"										//If forking, I ask that you retain the contributor list here in some capacity.
 				+ "\nSource code available here:\n"				

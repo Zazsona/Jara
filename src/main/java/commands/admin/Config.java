@@ -12,7 +12,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
-public class Config extends Command { //TODO: Add category based enable/disable/permissions
+public class Config extends Command {
 
 	GuildSettingsManager guildSettings;
 	@Override
@@ -304,7 +304,7 @@ public class Config extends Command { //TODO: Add category based enable/disable/
 			{
 				if (key.equalsIgnoreCase(query))
 				{
-					renderCommandData(msgEvent, key, embed); //TODO
+					renderCommandData(msgEvent, key, embed);
 					commandFound = true;
 					break;
 				}
