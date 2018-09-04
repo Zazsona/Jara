@@ -22,6 +22,13 @@ public class Audio
 	private AudioManager audioManager;
 	private Guild guild;
 
+	public final byte REQUEST_PENDING = 0;
+	public final byte REQUEST_NOW_PLAYING = 1;
+	public final byte REQUEST_ADDED_TO_QUEUE = 2;
+	public final byte REQUEST_RESULTED_IN_ERROR = 3;
+	public final byte REQUEST_USER_NOT_IN_VOICE = 4;
+	public final byte REQUEST_IS_BAD = 5;
+
 	public Audio(Guild guild)
 	{
 		this.guild = guild;
@@ -38,7 +45,7 @@ public class Audio
 		player.addListener(scheduleHandler);
 	}
 
-	public void play(Member member, String query)
+	public byte play(Member member, String query)
 	{
 		try
 		{
@@ -49,14 +56,21 @@ public class Audio
 				{
 					audioManager.openAudioConnection(channel);
 				}
-				playerManager.loadItem(query, new AudioLoadHandler(this)); //If audio is already playing, it will be added to the queue instead.
-				//TODO: Inform user it has been added to queue when relevant
+				AudioLoadHandler audioLoadHandler = new AudioLoadHandler(this);
+				playerManager.loadItem(query, audioLoadHandler); //If audio is already playing, it will be added to the queue instead.
+				while (audioLoadHandler.getResult() == REQUEST_PENDING)
+				{
+					Thread.sleep(3); //TODO: This, more elegantly.
+				}
+				return audioLoadHandler.getResult();
 			}
+			return REQUEST_USER_NOT_IN_VOICE;
 		}
 		catch (Exception e)
 		{
 			//Error setting up audio
 			e.printStackTrace();
+			return REQUEST_RESULTED_IN_ERROR;
 		}
 	}
 
