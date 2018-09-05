@@ -163,6 +163,16 @@ public class Help extends Command {
 					+ "\n"
 					+ "To generate the letters, you can enter 'c' for a consonant, or 'v' for a vowel 9 times.");
 		}
+		else if (key.equalsIgnoreCase("CountdownConundrum"))
+		{
+			paramSetups.add("/CountdownConundrum");
+			infoBuilder.append("Fancy yourself a wordsmith? Try to figure out the nine letter word from the anagram.");
+		}
+		else if (key.equalsIgnoreCase("Hangman"))
+		{
+			paramSetups.add("/Hangman");
+			infoBuilder.append("Guess the word by entering each letter at a time to save Mr.Unfortunate.\nBe careful, though. Guess wrong eight times and it's game over.");
+		}
 		else if (key.equalsIgnoreCase("Help"))
 		{
 			paramSetups.add("/Help");
@@ -179,6 +189,23 @@ public class Help extends Command {
 		{
 			paramSetups.add("/Say [Sentence]");
 			infoBuilder.append("Have the bot repeat a sentence.");
+		}
+		else if (key.equalsIgnoreCase("Timecard"))
+		{
+			infoBuilder.append("Displays a Timecard from Spongebob Squarepants. In some cases may result in comedic scenarios.");
+		}
+		else if (key.equalsIgnoreCase("WouldYouRather"))
+		{
+			infoBuilder.append("Simple \"Would you rather?\" question.\nNote: NSFW questions will only appear in NSFW channels.");
+		}
+		else if (key.equalsIgnoreCase("IsItWednesdayMyDudes")) //C'mon. This one should be pretty bloody obvious.
+		{
+			infoBuilder.append("This either tells you if it is Wednesday, or deploys a team of super spies. I'll leave it up to you to figure out which.");
+		}
+		else if (key.equalsIgnoreCase("Play"))
+		{
+			paramSetups.add("/Play [Link]");
+			infoBuilder.append("Plays the track at the link. Supports:\nYouTube\nSoundCloud\nBandcamp\nVimeo\nTwitch\nHTTP URLs");
 		}
 		else
 		{
