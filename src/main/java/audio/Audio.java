@@ -22,12 +22,12 @@ public class Audio
 	private AudioManager audioManager;
 	private Guild guild;
 
-	public final byte REQUEST_PENDING = 0;
-	public final byte REQUEST_NOW_PLAYING = 1;
-	public final byte REQUEST_ADDED_TO_QUEUE = 2;
-	public final byte REQUEST_RESULTED_IN_ERROR = 3;
-	public final byte REQUEST_USER_NOT_IN_VOICE = 4;
-	public final byte REQUEST_IS_BAD = 5;
+	public static final byte REQUEST_PENDING = 0;
+	public static final byte REQUEST_NOW_PLAYING = 1;
+	public static final byte REQUEST_ADDED_TO_QUEUE = 2;
+	public static final byte REQUEST_RESULTED_IN_ERROR = 3;
+	public static final byte REQUEST_USER_NOT_IN_VOICE = 4;
+	public static final byte REQUEST_IS_BAD = 5;
 
 	public Audio(Guild guild)
 	{
@@ -111,6 +111,15 @@ public class Audio
 	public AudioManager getAudioManager()
 	{
 		return audioManager;
+	}
+	public long getTotalQueuePlayTime()
+	{
+		long time = 0;
+		for (AudioTrack audioTrack : getTrackQueue())
+		{
+			time += audioTrack.getInfo().length;
+		}
+		return time;
 	}
 
 

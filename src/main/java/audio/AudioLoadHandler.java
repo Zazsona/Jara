@@ -28,7 +28,11 @@ public class AudioLoadHandler implements AudioLoadResultHandler
             audio.getPlayer().playTrack(audio.getTrackQueue().get(0));
             result = audio.REQUEST_NOW_PLAYING;
         }
-        result = audio.REQUEST_ADDED_TO_QUEUE;
+        else
+        {
+            result = audio.REQUEST_ADDED_TO_QUEUE;
+        }
+
     }
 
     @Override
@@ -43,7 +47,11 @@ public class AudioLoadHandler implements AudioLoadResultHandler
             audio.getPlayer().playTrack(audio.getTrackQueue().get(0));
             result = audio.REQUEST_NOW_PLAYING;
         }
-        result = audio.REQUEST_ADDED_TO_QUEUE;
+        else
+        {
+            result = audio.REQUEST_ADDED_TO_QUEUE;
+        }
+
     }
 
     @Override
