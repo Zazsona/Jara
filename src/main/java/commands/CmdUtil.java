@@ -1,7 +1,9 @@
 package commands;
 
 
+import audio.Audio;
 import configuration.GlobalSettingsManager;
+import jara.Core;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -23,6 +25,7 @@ import java.util.Scanner;
 
 public class CmdUtil
 {
+    private static HashMap<String, Audio> guildAudios = new HashMap<>();
     /**
      * This method sends a HTTP request to the specified URL.
      * @param URL
@@ -139,4 +142,18 @@ public class CmdUtil
         }
 
     }
+    public static Audio getGuildAudio(String guildID)
+    {
+
+        if (guildAudios.containsKey(guildID))
+        {
+            return guildAudios.get(guildID);
+        }
+        else
+        {
+            guildAudios.put(guildID, new Audio(Core.getShardManager().getGuildById(guildID)));
+            return guildAudios.get(guildID);
+        }
+    }
+
 }
