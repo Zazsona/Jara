@@ -211,6 +211,10 @@ public class Help extends Command {
 		{
 			infoBuilder.append("Votes to skip the current playing track.");
 		}
+		else if (key.equalsIgnoreCase("NowPlaying"))
+		{
+			infoBuilder.append("Gives some information about the currently playing track.");
+		}
 		else
 		{
 			infoBuilder.append("No information is available for this command.");
