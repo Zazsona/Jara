@@ -207,6 +207,10 @@ public class Help extends Command {
 			paramSetups.add("/Play [Link]");
 			infoBuilder.append("Plays the track at the link. Supports:\nYouTube\nSoundCloud\nBandcamp\nVimeo\nTwitch\nHTTP URLs");
 		}
+		else if (key.equalsIgnoreCase("Skip"))
+		{
+			infoBuilder.append("Votes to skip the current playing track.");
+		}
 		else
 		{
 			infoBuilder.append("No information is available for this command.");

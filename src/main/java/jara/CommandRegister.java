@@ -7,6 +7,7 @@ import commands.Command;
 import commands.Help;
 import commands.admin.Config;
 import commands.audio.Play;
+import commands.audio.Skip;
 import commands.games.Countdown;
 import commands.games.CountdownConundrum;
 import commands.games.Hangman;
@@ -62,7 +63,8 @@ public class CommandRegister
 			register.add(new CommandAttributes("IsItWednesdayMyDudes", IsItWednesdayMyDudes.class, new String[] {"ItIsWednesdayMyDudes", "ItIsNotWednesdayMyDudes", "Wednesday", "IIWMD", "IINWMD", "WednesdayFrog", "IsItWednesdayMyDudes", "ItIsWeds", "ItIsNotWeds"}, TOYS, true));
 			register.add(new CommandAttributes("WouldYouRather", WouldYouRather.class, new String[] {"WouldYouRather?", "WYR", "WYR?"}, TOYS, true));
 			register.add(new CommandAttributes("Hangman", Hangman.class, new String[] {"hang"}, GAMES, true));
-			register.add(new CommandAttributes("Play", Play.class, new String[] {"PlayAudio, Music"}, AUDIO, true));
+			register.add(new CommandAttributes("Play", Play.class, new String[] {"PlayAudio", "Music", "Track", "Radio", "Stream"}, AUDIO, true));
+			register.add(new CommandAttributes("Skip", Skip.class, new String[] {"Stop", "Pass", "Next"}, AUDIO, true));
 		}
 		return register.toArray(new CommandAttributes[register.size()]);
 	}

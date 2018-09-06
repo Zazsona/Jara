@@ -112,6 +112,44 @@ public class Audio
 		return time;
 	}
 
+	/**
+	 * Gets the current number of users who have voted to skip the current track.
+	 * @return
+	 * int - The # of skip votes
+	 */
+	public int getSkipVotes()
+	{
+		return skipVotes.size();
+	}
+
+	/**
+	 * Inverts the user's current vote state.
+	 * @param userID
+	 * @return
+	 * true - Vote added
+	 * false - Vote removed
+	 */
+	public boolean registerSkipVote(String userID)
+	{
+		if (skipVotes.contains(userID))
+		{
+			skipVotes.remove(userID);
+			return false;
+		}
+		else
+		{
+			skipVotes.add(userID);
+			return true;
+		}
+	}
+
+	/**
+	 * Creates a new ArrayList to count skip votes, de-referencing the old one.
+	 */
+	public void resetSkipVote()
+	{
+		skipVotes = new ArrayList<>();
+	}
 
 
 
