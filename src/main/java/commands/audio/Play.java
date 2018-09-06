@@ -29,11 +29,7 @@ public class Play extends Command
         switch (result)
         {
             case Audio.REQUEST_NOW_PLAYING:
-                descBuilder.append("**"+requestedTrackInfo.title+"**\n");
-                descBuilder.append(requestedTrackInfo.author+"\n");
-                descBuilder.append((int) ((requestedTrackInfo.length/1000)/60)+" Minutes");
-                embed.setDescription(descBuilder.toString());
-                embed.setDescription(descBuilder.toString());
+                embed.setDescription(CmdUtil.formatAudioTrackDetails(audio.getTrackQueue().get(0)));
                 channel.sendMessage(embed.build()).queue();
                 break;
 
@@ -42,9 +38,7 @@ public class Play extends Command
                 descBuilder.append("Position: "+audio.getTrackQueue().size()+"\n"); //So, index 1 is position 2, 2 is 3, etc. Should be more readable for non-programmers.
                 descBuilder.append("ETA: "+(((audio.getTotalQueuePlayTime()-requestedTrackInfo.length)/1000)/60)+" Minutes\n"); //This ETA is really rough. It abstracts to minutes and ignores the progress of the current track.
                 descBuilder.append("=====\n");
-                descBuilder.append("**"+requestedTrackInfo.title+"**\n");
-                descBuilder.append(requestedTrackInfo.author+"\n");
-                descBuilder.append((int) ((requestedTrackInfo.length/1000)/60)+" Minutes");
+                descBuilder.append(CmdUtil.formatAudioTrackDetails(audio.getTrackQueue().get(audio.getTrackQueue().size())));
                 embed.setDescription(descBuilder.toString());
                 channel.sendMessage(embed.build()).queue();
                 break;

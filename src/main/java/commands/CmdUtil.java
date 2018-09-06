@@ -2,6 +2,8 @@ package commands;
 
 
 import audio.Audio;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import configuration.GlobalSettingsManager;
 import jara.Core;
 import org.apache.commons.text.StringEscapeUtils;
@@ -153,6 +155,44 @@ public class CmdUtil
         {
             guildAudios.put(guildID, new Audio(Core.getShardManager().getGuildById(guildID)));
             return guildAudios.get(guildID);
+        }
+    }
+    public static String formatAudioTrackDetails(AudioTrack track)
+    {
+        AudioTrackInfo requestedTrackInfo = track.getInfo();
+        StringBuilder infoBuilder = new StringBuilder();
+        infoBuilder.append("**"+requestedTrackInfo.title+"**\n");
+        infoBuilder.append(requestedTrackInfo.author+"\n");
+        infoBuilder.append(formatMillisecondsToHhMmSs(requestedTrackInfo.length));
+        return infoBuilder.toString();
+    }
+
+    /**
+     * Converts milliseconds to HH:mm:ss. If there are no hours, it becomes mm:ss.
+     * @param ms
+     * @return
+     * String - the time format.
+     */
+    public static String formatMillisecondsToHhMmSs(long ms)
+    {
+        long remainingTime = ms;
+        long hours = remainingTime / (1000*60*60);
+        remainingTime -= hours*(1000*60*60);
+        long minutes = remainingTime / (1000*60);
+        remainingTime -= minutes*(1000*60);
+        long seconds = remainingTime / (1000);
+
+        if (hours > 0)
+        {
+            return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        }
+        else if (minutes > 0)
+        {
+            return String.format("%02d:%02d", minutes, seconds);
+        }
+        else
+        {
+            return String.format("00:%02d", seconds); //It'd look weird if it was just seconds.
         }
     }
 
