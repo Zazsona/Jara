@@ -4,6 +4,8 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ScheduleHandler extends AudioEventAdapter
 {
@@ -16,7 +18,7 @@ public class ScheduleHandler extends AudioEventAdapter
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track)
     {
-        audio.setIsAudioPlayingInGuild(true);
+
     }
     @Override
     public void onPlayerPause(AudioPlayer player)
@@ -38,7 +40,6 @@ public class ScheduleHandler extends AudioEventAdapter
         }
         else
         {
-            audio.setIsAudioPlayingInGuild(false);
             //TODO: Leave channel
         }
 
@@ -46,7 +47,8 @@ public class ScheduleHandler extends AudioEventAdapter
     @Override
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs)
     {
-        //TODO: Inform the user an error occured.
+        Logger logger = LoggerFactory.getLogger(getClass());
+        logger.info("AudioTrack "+track.getInfo().uri + "("+track.getInfo().title+") has become stuck. Starting next track.");
         audio.getTrackQueue().remove(0); //Remove the track we just tried to play
         if (audio.getTrackQueue().size() > 0)
         {
@@ -54,7 +56,6 @@ public class ScheduleHandler extends AudioEventAdapter
         }
         else
         {
-            audio.setIsAudioPlayingInGuild(false);
             //TODO: Leave channel
         }
     }

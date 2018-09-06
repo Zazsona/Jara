@@ -15,12 +15,10 @@ import java.util.ArrayList;
 
 public class Audio
 {
-	private static ArrayList<String> guildsPlayingAudio = new ArrayList<>();
 	private ArrayList<AudioTrack> trackQueue = new ArrayList<>();
 	private AudioPlayerManager playerManager;
 	private AudioPlayer player;
 	private AudioManager audioManager;
-	private Guild guild;
 
 	public static final byte REQUEST_PENDING = 0;
 	public static final byte REQUEST_NOW_PLAYING = 1;
@@ -29,10 +27,10 @@ public class Audio
 	public static final byte REQUEST_USER_NOT_IN_VOICE = 4;
 	public static final byte REQUEST_IS_BAD = 5;
 
+	private ArrayList<String> skipVotes = new ArrayList<>(); //This stores the user IDs of those who have voted to skip (Prevents the same user voting multiple times)
+
 	public Audio(Guild guild)
 	{
-		this.guild = guild;
-
 		playerManager = new DefaultAudioPlayerManager();
 		AudioSourceManagers.registerRemoteSources(playerManager);
 		AudioSourceManagers.registerLocalSource(playerManager);
@@ -74,44 +72,36 @@ public class Audio
 		}
 	}
 
-	public static Boolean isAudioPlayingInGuild(String guildID)
-	{
-		return guildsPlayingAudio.contains(guildID);
-	}
 	public Boolean isAudioPlayingInGuild()
 	{
-		return guildsPlayingAudio.contains(guild.getId());
+		return (getPlayer().getPlayingTrack() != null);
 	}
-	public void setIsAudioPlayingInGuild(Boolean state)
-	{
-		setIsAudioPlayingInGuild(guild.getId(), state);
-	}
-	public static void setIsAudioPlayingInGuild(String guildID, Boolean state)
-	{
-		if (state)
-		{
-			if (!guildsPlayingAudio.contains(guildID))
-			{
-				guildsPlayingAudio.add(guildID);
-			}
-		}
-		else
-		{
-			guildsPlayingAudio.remove(guildID);
-		}
-	}
+
+	/**
+	 * Returns the currently queued tracks. The currently playing track is at index 0.
+	 * @return
+	 * ArrayList<AudioTrack> - The tracks.
+	 */
 	public ArrayList<AudioTrack> getTrackQueue()
 	{
 		return trackQueue;
 	}
+
+	/**
+	 * Returns this guild's audio player.
+	 * @return
+	 * AudioPlayer - the player
+	 */
 	public AudioPlayer getPlayer()
 	{
 		return player;
 	}
-	public AudioManager getAudioManager()
-	{
-		return audioManager;
-	}
+
+	/**
+	 * Calculates the total run time of all songs in the queue.
+	 * @return
+	 * long - The total run time in ms.
+	 */
 	public long getTotalQueuePlayTime()
 	{
 		long time = 0;
@@ -121,6 +111,8 @@ public class Audio
 		}
 		return time;
 	}
+
+
 
 
 
