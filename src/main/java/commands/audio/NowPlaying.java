@@ -19,17 +19,22 @@ public class NowPlaying extends Command
         embed.setTitle("Now Playing...");
         Audio audio = CmdUtil.getGuildAudio(msgEvent.getGuild().getId());
 
-        StringBuilder descBuilder = new StringBuilder();
         AudioTrack currentTrack = audio.getPlayer().getPlayingTrack();
-        descBuilder.append("Progress: ").append(CmdUtil.formatMillisecondsToHhMmSs(currentTrack.getPosition())).append("/").append(CmdUtil.formatMillisecondsToHhMmSs(currentTrack.getDuration()));
-        descBuilder.append("\n");
-        descBuilder.append("URL: ").append(currentTrack.getInfo().uri).append("\n");
-        descBuilder.append("Livestream: ").append(currentTrack.getInfo().isStream).append("\n");
-        descBuilder.append("=====\n");
-        descBuilder.append(CmdUtil.formatAudioTrackDetails(currentTrack));
-
-
-        embed.setDescription(descBuilder.toString());
+        if (currentTrack == null)
+        {
+            embed.setDescription("No track is currently playing.");
+        }
+        else
+        {
+            StringBuilder descBuilder = new StringBuilder();
+            descBuilder.append("Progress: ").append(CmdUtil.formatMillisecondsToHhMmSs(currentTrack.getPosition())).append("/").append(CmdUtil.formatMillisecondsToHhMmSs(currentTrack.getDuration()));
+            descBuilder.append("\n");
+            descBuilder.append("URL: ").append(currentTrack.getInfo().uri).append("\n");
+            descBuilder.append("Livestream: ").append(currentTrack.getInfo().isStream).append("\n");
+            descBuilder.append("=====\n");
+            descBuilder.append(CmdUtil.formatAudioTrackDetails(currentTrack));
+            embed.setDescription(descBuilder.toString());
+        }
         msgEvent.getChannel().sendMessage(embed.build()).queue();
     }
 }
