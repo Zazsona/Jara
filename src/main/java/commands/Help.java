@@ -215,6 +215,10 @@ public class Help extends Command {
 		{
 			infoBuilder.append("Gives some information about the currently playing track.");
 		}
+		else if (key.equalsIgnoreCase("ForceSkip"))
+		{
+			infoBuilder.append("Skips the current track immediately without a vote.");
+		}
 		else
 		{
 			infoBuilder.append("No information is available for this command.");

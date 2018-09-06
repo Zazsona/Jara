@@ -6,6 +6,7 @@ import java.util.Collections;
 import commands.Command;
 import commands.Help;
 import commands.admin.Config;
+import commands.audio.ForceSkip;
 import commands.audio.NowPlaying;
 import commands.audio.Play;
 import commands.audio.Skip;
@@ -64,8 +65,9 @@ public class CommandRegister
 			register.add(new CommandAttributes("IsItWednesdayMyDudes", IsItWednesdayMyDudes.class, new String[] {"ItIsWednesdayMyDudes", "ItIsNotWednesdayMyDudes", "Wednesday", "IIWMD", "IINWMD", "WednesdayFrog", "IsItWednesdayMyDudes", "ItIsWeds", "ItIsNotWeds"}, TOYS, true));
 			register.add(new CommandAttributes("WouldYouRather", WouldYouRather.class, new String[] {"WouldYouRather?", "WYR", "WYR?"}, TOYS, true));
 			register.add(new CommandAttributes("Hangman", Hangman.class, new String[] {"hang"}, GAMES, true));
-			register.add(new CommandAttributes("Play", Play.class, new String[] {"PlayAudio", "Music", "Track", "Radio", "Stream"}, AUDIO, true));
+			register.add(new CommandAttributes("Play", Play.class, new String[] {"PlayAudio", "Music", "Track", "Radio", "Stream", "DJ"}, AUDIO, true));
 			register.add(new CommandAttributes("Skip", Skip.class, new String[] {"Stop", "Pass", "Next"}, AUDIO, true));
+			register.add(new CommandAttributes("ForceSkip", ForceSkip.class, new String[] {"AdminSkip", "InstaSkip", "FireTheDJ", "ForceNext"}, AUDIO, true));
 			register.add(new CommandAttributes("NowPlaying", NowPlaying.class, new String[] {"NP", "CP", "CurrentlyPlaying", "TrackInfo", "SongInfo", "MusicInfo", "AudioInfo"}, AUDIO, true));
 		}
 		return register.toArray(new CommandAttributes[register.size()]);
