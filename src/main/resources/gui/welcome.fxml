@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <BorderPane fx:id="titleBar" maxHeight="80.0" minHeight="80.0" prefHeight="80.0" prefWidth="1280.0" style="-fx-background-color: #23272A;">
+         <center>
+            <ImageView fx:id="titleBar_logo" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
+               <image>
+                  <Image url="@../jara_txt_logo.png" />
+               </image>
+            </ImageView>
+         </center>
+      </BorderPane>
+      <HBox fx:id="navBar" alignment="CENTER" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" prefWidth="1280.0" style="-fx-background-color: #2F3136;">
+         <children>
+            <HBox fx:id="navBar_welcome" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <VBox maxWidth="2.0" minWidth="2.0" prefHeight="2.0" prefWidth="163.0">
+                     <children>
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                        <Pane prefHeight="222.0" prefWidth="97.0" style="-fx-background-color: #484B51;" />
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                     </children>
+                  </VBox>
+                  <Pane prefHeight="200.0" prefWidth="200.0" />
+                  <Text fx:id="navBar_welcome_text" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="WELCOME" textAlignment="CENTER" wrappingWidth="118.21728515625">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Text>
+                  <Pane prefHeight="200.0" prefWidth="200.0" />
+                  <VBox maxWidth="2.0" minWidth="2.0" prefHeight="2.0" prefWidth="163.0">
+                     <children>
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                        <Pane prefHeight="222.0" prefWidth="97.0" style="-fx-background-color: #484B51;" />
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox fx:id="navBar_discord" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Pane prefHeight="200.0" prefWidth="200.0" />
+                  <Text fx:id="navBar_discord_text" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="DISCORD SETUP" textAlignment="CENTER" wrappingWidth="118.21728515625">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Text>
+                  <Pane prefHeight="200.0" prefWidth="200.0" />
+                  <VBox maxWidth="2.0" minWidth="2.0" prefHeight="45.0" prefWidth="2.0">
+                     <children>
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                        <Pane prefHeight="222.0" prefWidth="97.0" style="-fx-background-color: #484B51;" />
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox fx:id="navBar_configuration" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Pane prefHeight="200.0" prefWidth="200.0" />
+                  <Text fx:id="navBar_configuration_text" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="CONFIG" textAlignment="CENTER" wrappingWidth="118.21728515625">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Text>
+                  <Pane prefHeight="200.0" prefWidth="200.0" />
+                  <VBox maxWidth="2.0" minWidth="2.0" prefHeight="45.0" prefWidth="2.0">
+                     <children>
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                        <Pane prefHeight="222.0" prefWidth="97.0" style="-fx-background-color: #484B51;" />
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox fx:id="navBar_review" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Pane prefHeight="200.0" prefWidth="200.0" />
+                  <Text fx:id="navBar_review_text" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="REVIEW" textAlignment="CENTER" wrappingWidth="118.21728515625">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Text>
+                  <Pane prefHeight="200.0" prefWidth="200.0" />
+                  <VBox maxWidth="2.0" minWidth="2.0" prefHeight="45.0" prefWidth="2.0">
+                     <children>
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                        <Pane prefHeight="222.0" prefWidth="97.0" style="-fx-background-color: #484B51;" />
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+         </children>
+      </HBox>
+      <VBox prefHeight="9000.0" prefWidth="1280.0" style="-fx-background-color: #36393F;">
+         <children>
+            <Pane maxHeight="16.0" minHeight="10.0" prefHeight="16.0" prefWidth="1280.0" />
+            <HBox alignment="CENTER" prefHeight="288.0" prefWidth="1280.0">
+               <children>
+                  <VBox alignment="TOP_CENTER" prefHeight="284.0" prefWidth="200.0" style="-fx-background-color: #23272A;">
+                     <children>
+                        <Pane prefHeight="8.0" prefWidth="100.0" />
+                        <ImageView fitHeight="126.0" fitWidth="116.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../categories/admin_circle.png" />
+                           </image></ImageView>
+                        <Pane prefHeight="18.0" prefWidth="143.0" />
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Admin">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Text>
+                        <Pane prefHeight="11.0" prefWidth="100.0" />
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Direct your server" />
+                     </children>
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                  </VBox>
+                  <Pane minWidth="10.0" prefHeight="284.0" prefWidth="50.0" />
+                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #23272A;">
+                     <children>
+                        <Pane prefHeight="8.0" prefWidth="100.0" />
+                        <ImageView fitHeight="126.0" fitWidth="116.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../categories/audio_circle.png" />
+                           </image>
+                        </ImageView>
+                        <Pane prefHeight="18.0" prefWidth="143.0" />
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Audio">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Text>
+                        <Pane prefHeight="11.0" prefWidth="100.0" />
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Upgrade your VCs" />
+                     </children>
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                  </VBox>
+                  <Pane minWidth="10.0" prefHeight="284.0" prefWidth="50.0" />
+                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #23272A;">
+                     <children>
+                        <Pane prefHeight="8.0" prefWidth="100.0" />
+                        <ImageView fitHeight="126.0" fitWidth="116.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../categories/game_circle.png" />
+                           </image>
+                        </ImageView>
+                        <Pane prefHeight="18.0" prefWidth="143.0" />
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Games">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Text>
+                        <Pane prefHeight="11.0" prefWidth="100.0" />
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Never leave Discord" />
+                     </children>
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                  </VBox>
+                  <Pane minWidth="10.0" prefHeight="284.0" prefWidth="50.0" />
+                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #23272A;">
+                     <children>
+                        <Pane prefHeight="8.0" prefWidth="100.0" />
+                        <ImageView fitHeight="126.0" fitWidth="116.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../categories/toys_circle.png" />
+                           </image>
+                        </ImageView>
+                        <Pane prefHeight="18.0" prefWidth="143.0" />
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Toys">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Text>
+                        <Pane prefHeight="11.0" prefWidth="100.0" />
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Bust boredom" />
+                     </children>
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                  </VBox>
+                  <Pane minWidth="10.0" prefHeight="284.0" prefWidth="50.0" />
+                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #23272A;">
+                     <children>
+                        <Pane prefHeight="8.0" prefWidth="100.0" />
+                        <ImageView fitHeight="126.0" fitWidth="116.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../categories/utility_circle.png" />
+                           </image>
+                        </ImageView>
+                        <Pane prefHeight="18.0" prefWidth="143.0" />
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Utilities">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Text>
+                        <Pane prefHeight="11.0" prefWidth="100.0" />
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Day-to-day helps" />
+                     </children>
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                  </VBox>
+               </children>
+            </HBox>
+            <Pane minHeight="20.0" prefHeight="51.0" prefWidth="1280.0" />
+            <HBox alignment="CENTER" prefHeight="197.0" prefWidth="1280.0">
+               <children>
+                  <VBox alignment="TOP_CENTER" prefHeight="151.0" prefWidth="131.0" style="-fx-background-color: #23272A;">
+                     <children>
+                        <Pane prefHeight="8.0" prefWidth="100.0" />
+                        <ImageView fitHeight="93.0" fitWidth="103.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../categories/github_circle.png" />
+                           </image>
+                        </ImageView>
+                        <Pane prefHeight="18.0" prefWidth="143.0" />
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="GitHub">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Text>
+                        <Pane prefHeight="11.0" prefWidth="100.0" />
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="View the source" />
+                     </children>
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                  </VBox>
+                  <Pane minWidth="10.0" prefHeight="200.0" prefWidth="25.0" />
+                  <VBox alignment="TOP_CENTER" prefHeight="151.0" prefWidth="131.0" style="-fx-background-color: #23272A;">
+                     <children>
+                        <Pane prefHeight="8.0" prefWidth="100.0" />
+                        <ImageView fitHeight="93.0" fitWidth="103.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../categories/bolt_circle.png" />
+                           </image>
+                        </ImageView>
+                        <Pane prefHeight="18.0" prefWidth="143.0" />
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Issues">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Text>
+                        <Pane prefHeight="11.0" prefWidth="100.0" />
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Report a Bug" />
+                     </children>
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                  </VBox>
+                  <Pane minWidth="10.0" prefHeight="200.0" prefWidth="25.0" />
+                  <VBox alignment="TOP_CENTER" prefHeight="151.0" prefWidth="131.0" style="-fx-background-color: #23272A;">
+                     <children>
+                        <Pane prefHeight="8.0" prefWidth="100.0" />
+                        <ImageView fitHeight="93.0" fitWidth="103.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../categories/email_circle.png" />
+                           </image>
+                        </ImageView>
+                        <Pane prefHeight="18.0" prefWidth="143.0" />
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Contact">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Text>
+                        <Pane prefHeight="11.0" prefWidth="100.0" />
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Message the Dev" />
+                     </children>
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                  </VBox>
+               </children></HBox>
+         </children>
+      </VBox>
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #2F3136;">
+         <children>
+            <StackPane prefHeight="41.0" prefWidth="220.0">
+               <children>
+                  <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#99aab5" height="66.0" stroke="TRANSPARENT" strokeType="INSIDE" style="-fx-arc-height: 50; -fx-arc-width: 50;" width="222.0" />
+                  <Text fx:id="navBar_discord_text1" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Hold on..." textAlignment="CENTER" wrappingWidth="118.21728515625">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Text>
+               </children>
+            </StackPane>
+            <Pane minHeight="100.0" prefHeight="318.0" prefWidth="200.0" />
+            <StackPane prefHeight="150.0" prefWidth="200.0">
+               <children>
+                  <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#7289da" height="71.0" stroke="TRANSPARENT" strokeType="INSIDE" style="-fx-arc-height: 50; -fx-arc-width: 50;" width="222.0" />
+                  <Text fx:id="navBar_discord_text11" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Let's go!" textAlignment="CENTER" wrappingWidth="118.21728515625">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Text>
+               </children>
+            </StackPane>
+         </children>
+      </HBox>
+   </children>
+</VBox>
