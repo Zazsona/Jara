@@ -105,7 +105,7 @@
             </HBox>
          </children>
       </HBox>
-      <VBox prefHeight="613.0" prefWidth="1280.0" style="-fx-background-color: #36393F;" />
+      <VBox alignment="CENTER" prefHeight="613.0" prefWidth="1280.0" style="-fx-background-color: #36393F;" />
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #2F3136;">
          <children>
             <StackPane prefHeight="41.0" prefWidth="220.0">
