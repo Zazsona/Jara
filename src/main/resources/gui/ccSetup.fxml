@@ -1,0 +1,812 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <BorderPane fx:id="titleBar" maxHeight="80.0" minHeight="80.0" prefHeight="80.0" prefWidth="1280.0" style="-fx-background-color: #23272A;">
+         <center>
+            <ImageView fx:id="titleBar_logo" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
+               <image>
+                  <Image url="@../jara_txt_logo.png" />
+               </image>
+            </ImageView>
+         </center>
+      </BorderPane>
+      <HBox fx:id="navBar" alignment="CENTER" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" prefWidth="1280.0" style="-fx-background-color: #2F3136;">
+         <children>
+            <HBox fx:id="navBar_welcome" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <VBox maxWidth="2.0" minWidth="2.0" prefHeight="2.0" prefWidth="163.0">
+                     <children>
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                        <Pane prefHeight="222.0" prefWidth="97.0" style="-fx-background-color: #484B51;" />
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                     </children>
+                  </VBox>
+                  <Pane prefHeight="200.0" prefWidth="200.0" />
+                  <Text fx:id="navBar_welcome_text" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="WELCOME" textAlignment="CENTER" wrappingWidth="118.21728515625">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Text>
+                  <Pane prefHeight="200.0" prefWidth="200.0" />
+                  <VBox maxWidth="2.0" minWidth="2.0" prefHeight="2.0" prefWidth="163.0">
+                     <children>
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                        <Pane prefHeight="222.0" prefWidth="97.0" style="-fx-background-color: #484B51;" />
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox fx:id="navBar_discord" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Pane prefHeight="200.0" prefWidth="200.0" />
+                  <Text fx:id="navBar_discord_text" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="DISCORD SETUP" textAlignment="CENTER" wrappingWidth="118.21728515625">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Text>
+                  <Pane prefHeight="200.0" prefWidth="200.0" />
+                  <VBox maxWidth="2.0" minWidth="2.0" prefHeight="45.0" prefWidth="2.0">
+                     <children>
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                        <Pane prefHeight="222.0" prefWidth="97.0" style="-fx-background-color: #484B51;" />
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox fx:id="navBar_configuration" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Pane prefHeight="200.0" prefWidth="200.0" />
+                  <Text fx:id="navBar_configuration_text" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="CONFIG" textAlignment="CENTER" wrappingWidth="118.21728515625">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Text>
+                  <Pane prefHeight="200.0" prefWidth="200.0" />
+                  <VBox maxWidth="2.0" minWidth="2.0" prefHeight="45.0" prefWidth="2.0">
+                     <children>
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                        <Pane prefHeight="222.0" prefWidth="97.0" style="-fx-background-color: #484B51;" />
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox fx:id="navBar_review" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Pane prefHeight="200.0" prefWidth="200.0" />
+                  <Text fx:id="navBar_review_text" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="REVIEW" textAlignment="CENTER" wrappingWidth="118.21728515625">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Text>
+                  <Pane prefHeight="200.0" prefWidth="200.0" />
+                  <VBox maxWidth="2.0" minWidth="2.0" prefHeight="45.0" prefWidth="2.0">
+                     <children>
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                        <Pane prefHeight="222.0" prefWidth="97.0" style="-fx-background-color: #484B51;" />
+                        <Pane prefHeight="200.0" prefWidth="200.0" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+         </children>
+      </HBox>
+      <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" prefHeight="9000.0" prefWidth="1280.0" style="-fx-background-color: #36393F;">
+         <children>
+            <Pane maxHeight="16.0" minHeight="10.0" prefHeight="16.0" prefWidth="1280.0" />
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Select which commands you would like to be enabled below.">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Text>
+            <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="541.0" prefWidth="1280.0" style="-fx-background: #36393F; -fx-border-color: #36393F;">
+               <content>
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Pane prefHeight="80.0" prefWidth="1276.0" />
+                        <HBox alignment="CENTER" fillHeight="false" maxHeight="1.7976931348623157E308" prefHeight="555.0" prefWidth="1280.0" style="-fx-background: #36393F; -fx-border-color: #36393F;">
+                           <children>
+                              <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" prefHeight="555.0" prefWidth="225.0" style="-fx-background-color: #23272A;">
+                                 <children>
+                                    <Pane prefHeight="8.0" prefWidth="100.0" />
+                                    <ImageView fitHeight="126.0" fitWidth="116.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../categories/admin_circle.png" />
+                                       </image>
+                                    </ImageView>
+                                    <Pane prefHeight="18.0" prefWidth="143.0" />
+                                    <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Admin">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Text>
+                                    <Pane prefHeight="11.0" prefWidth="100.0" />
+                                    <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Direct your server" wrappingWidth="93.486328125" />
+                                    <Pane prefHeight="84.0" prefWidth="225.0" />
+                                    <BorderPane prefHeight="36.0" prefWidth="285.0">
+                                       <center>
+                                          <BorderPane style="-fx-background-color: #191c1e;" BorderPane.alignment="CENTER">
+                                             <bottom>
+                                                <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                             </bottom>
+                                             <center>
+                                                <VBox prefHeight="32.0" prefWidth="181.0" BorderPane.alignment="CENTER">
+                                                   <children>
+                                                      <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggle All">
+                                                         <font>
+                                                            <Font name="System Bold" size="12.0" />
+                                                         </font>
+                                                      </Text>
+                                                      <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggles all modifiable commands" />
+                                                   </children>
+                                                </VBox>
+                                             </center>
+                                             <right>
+                                                <CheckBox mnemonicParsing="false" selected="true" BorderPane.alignment="CENTER" />
+                                             </right>
+                                             <top>
+                                                <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                             </top>
+                                             <effect>
+                                                <DropShadow />
+                                             </effect>
+                                          </BorderPane>
+                                       </center>
+                                       <left>
+                                          <Pane prefHeight="184.0" prefWidth="6.0" BorderPane.alignment="CENTER" />
+                                       </left>
+                                       <right>
+                                          <Pane prefHeight="184.0" prefWidth="6.0" BorderPane.alignment="CENTER" />
+                                       </right>
+                                    </BorderPane>
+                                    <BorderPane prefHeight="369.0" prefWidth="285.0">
+                                       <center>
+                                          <ScrollPane fitToWidth="true" maxHeight="1.7976931348623157E308" prefHeight="331.0" prefWidth="114.0" style="-fx-background: #191c1e; -fx-border-color: #191c1e;" BorderPane.alignment="CENTER">
+                                             <content>
+                                                <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" prefHeight="139.0" prefWidth="190.0">
+                                                   <children>
+                                                      <BorderPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" prefWidth="216.0">
+                                                         <top>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </top>
+                                                         <center>
+                                                            <VBox prefHeight="32.0" prefWidth="128.0" BorderPane.alignment="CENTER">
+                                                               <children>
+                                                                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder">
+                                                                     <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                     </font>
+                                                                  </Text>
+                                                                  <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder Description" />
+                                                               </children>
+                                                            </VBox>
+                                                         </center>
+                                                         <bottom>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </bottom>
+                                                         <right>
+                                                            <CheckBox mnemonicParsing="false" selected="true" BorderPane.alignment="CENTER" />
+                                                         </right>
+                                                      </BorderPane>
+                                                      <Pane maxHeight="10.0" minHeight="5.0" prefHeight="10.0" prefWidth="200.0" />
+                                                      <BorderPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" prefWidth="270.0">
+                                                         <bottom>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </bottom>
+                                                         <center>
+                                                            <VBox prefHeight="19.0" prefWidth="270.0" BorderPane.alignment="CENTER">
+                                                               <children>
+                                                                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder2">
+                                                                     <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                     </font>
+                                                                  </Text>
+                                                                  <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder Description 2" />
+                                                               </children>
+                                                            </VBox>
+                                                         </center>
+                                                         <right>
+                                                            <CheckBox disable="true" mnemonicParsing="false" prefHeight="51.0" prefWidth="0.0" selected="true" BorderPane.alignment="CENTER" />
+                                                         </right>
+                                                         <top>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </top>
+                                                      </BorderPane>
+                                                   </children>
+                                                </VBox>
+                                             </content>
+                                             <effect>
+                                                <DropShadow />
+                                             </effect>
+                                          </ScrollPane>
+                                       </center>
+                                       <top>
+                                          <Pane prefHeight="11.0" prefWidth="285.0" BorderPane.alignment="CENTER" />
+                                       </top>
+                                       <left>
+                                          <Pane prefHeight="184.0" prefWidth="6.0" BorderPane.alignment="CENTER" />
+                                       </left>
+                                       <right>
+                                          <Pane prefHeight="184.0" prefWidth="4.0" BorderPane.alignment="CENTER" />
+                                       </right>
+                                    </BorderPane>
+                                    <Pane minHeight="10.0" prefHeight="41.0" prefWidth="225.0" />
+                                 </children>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </VBox>
+                              <Pane prefHeight="200.0" prefWidth="36.0" />
+                              <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" prefHeight="555.0" prefWidth="225.0" style="-fx-background-color: #23272A;">
+                                 <children>
+                                    <Pane prefHeight="8.0" prefWidth="100.0" />
+                                    <ImageView fitHeight="126.0" fitWidth="116.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../categories/audio_circle.png" />
+                                       </image>
+                                    </ImageView>
+                                    <Pane prefHeight="18.0" prefWidth="143.0" />
+                                    <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Audio">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Text>
+                                    <Pane prefHeight="11.0" prefWidth="100.0" />
+                                    <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Upgrade your VCs" />
+                                    <Pane prefHeight="84.0" prefWidth="225.0" />
+                                    <BorderPane prefHeight="36.0" prefWidth="285.0">
+                                       <center>
+                                          <BorderPane style="-fx-background-color: #191c1e;" BorderPane.alignment="CENTER">
+                                             <bottom>
+                                                <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                             </bottom>
+                                             <center>
+                                                <VBox prefHeight="32.0" prefWidth="181.0" BorderPane.alignment="CENTER">
+                                                   <children>
+                                                      <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggle All">
+                                                         <font>
+                                                            <Font name="System Bold" size="12.0" />
+                                                         </font>
+                                                      </Text>
+                                                      <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggles all modifiable commands" />
+                                                   </children>
+                                                </VBox>
+                                             </center>
+                                             <effect>
+                                                <DropShadow />
+                                             </effect>
+                                             <right>
+                                                <CheckBox mnemonicParsing="false" selected="true" BorderPane.alignment="CENTER" />
+                                             </right>
+                                             <top>
+                                                <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                             </top>
+                                          </BorderPane>
+                                       </center>
+                                       <left>
+                                          <Pane prefHeight="184.0" prefWidth="6.0" BorderPane.alignment="CENTER" />
+                                       </left>
+                                       <right>
+                                          <Pane prefHeight="184.0" prefWidth="6.0" BorderPane.alignment="CENTER" />
+                                       </right>
+                                    </BorderPane>
+                                    <BorderPane prefHeight="369.0" prefWidth="285.0">
+                                       <center>
+                                          <ScrollPane fitToWidth="true" maxHeight="1.7976931348623157E308" prefHeight="331.0" prefWidth="114.0" style="-fx-background: #191c1e; -fx-border-color: #191c1e;" BorderPane.alignment="CENTER">
+                                             <content>
+                                                <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" prefHeight="139.0" prefWidth="190.0">
+                                                   <children>
+                                                      <BorderPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" prefWidth="216.0">
+                                                         <bottom>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </bottom>
+                                                         <center>
+                                                            <VBox prefHeight="32.0" prefWidth="128.0" BorderPane.alignment="CENTER">
+                                                               <children>
+                                                                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder">
+                                                                     <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                     </font>
+                                                                  </Text>
+                                                                  <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder Description" />
+                                                               </children>
+                                                            </VBox>
+                                                         </center>
+                                                         <right>
+                                                            <CheckBox mnemonicParsing="false" selected="true" BorderPane.alignment="CENTER" />
+                                                         </right>
+                                                         <top>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </top>
+                                                      </BorderPane>
+                                                      <Pane maxHeight="10.0" minHeight="5.0" prefHeight="10.0" prefWidth="200.0" />
+                                                      <BorderPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" prefWidth="270.0">
+                                                         <bottom>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </bottom>
+                                                         <center>
+                                                            <VBox prefHeight="19.0" prefWidth="270.0" BorderPane.alignment="CENTER">
+                                                               <children>
+                                                                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder2">
+                                                                     <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                     </font>
+                                                                  </Text>
+                                                                  <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder Description 2" />
+                                                               </children>
+                                                            </VBox>
+                                                         </center>
+                                                         <right>
+                                                            <CheckBox disable="true" mnemonicParsing="false" prefHeight="51.0" prefWidth="0.0" selected="true" BorderPane.alignment="CENTER" />
+                                                         </right>
+                                                         <top>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </top>
+                                                      </BorderPane>
+                                                   </children>
+                                                </VBox>
+                                             </content>
+                                             <effect>
+                                                <DropShadow />
+                                             </effect>
+                                          </ScrollPane>
+                                       </center>
+                                       <left>
+                                          <Pane prefHeight="184.0" prefWidth="6.0" BorderPane.alignment="CENTER" />
+                                       </left>
+                                       <right>
+                                          <Pane prefHeight="184.0" prefWidth="4.0" BorderPane.alignment="CENTER" />
+                                       </right>
+                                       <top>
+                                          <Pane prefHeight="11.0" prefWidth="285.0" BorderPane.alignment="CENTER" />
+                                       </top>
+                                    </BorderPane>
+                                    <Pane minHeight="10.0" prefHeight="41.0" prefWidth="225.0" />
+                                 </children>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </VBox>
+                              <Pane prefHeight="200.0" prefWidth="36.0" />
+                              <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" prefHeight="555.0" prefWidth="225.0" style="-fx-background-color: #23272A;">
+                                 <children>
+                                    <Pane prefHeight="8.0" prefWidth="100.0" />
+                                    <ImageView fitHeight="126.0" fitWidth="116.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../categories/game_circle.png" />
+                                       </image>
+                                    </ImageView>
+                                    <Pane prefHeight="18.0" prefWidth="143.0" />
+                                    <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Games">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Text>
+                                    <Pane prefHeight="11.0" prefWidth="100.0" />
+                                    <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Never leave Discord" />
+                                    <Pane prefHeight="84.0" prefWidth="225.0" />
+                                    <BorderPane prefHeight="36.0" prefWidth="285.0">
+                                       <center>
+                                          <BorderPane style="-fx-background-color: #191c1e;" BorderPane.alignment="CENTER">
+                                             <bottom>
+                                                <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                             </bottom>
+                                             <center>
+                                                <VBox prefHeight="32.0" prefWidth="181.0" BorderPane.alignment="CENTER">
+                                                   <children>
+                                                      <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggle All">
+                                                         <font>
+                                                            <Font name="System Bold" size="12.0" />
+                                                         </font>
+                                                      </Text>
+                                                      <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggles all modifiable commands" />
+                                                   </children>
+                                                </VBox>
+                                             </center>
+                                             <effect>
+                                                <DropShadow />
+                                             </effect>
+                                             <right>
+                                                <CheckBox mnemonicParsing="false" selected="true" BorderPane.alignment="CENTER" />
+                                             </right>
+                                             <top>
+                                                <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                             </top>
+                                          </BorderPane>
+                                       </center>
+                                       <left>
+                                          <Pane prefHeight="184.0" prefWidth="6.0" BorderPane.alignment="CENTER" />
+                                       </left>
+                                       <right>
+                                          <Pane prefHeight="184.0" prefWidth="6.0" BorderPane.alignment="CENTER" />
+                                       </right>
+                                    </BorderPane>
+                                    <BorderPane prefHeight="369.0" prefWidth="285.0">
+                                       <center>
+                                          <ScrollPane fitToWidth="true" maxHeight="1.7976931348623157E308" prefHeight="331.0" prefWidth="114.0" style="-fx-background: #191c1e; -fx-border-color: #191c1e;" BorderPane.alignment="CENTER">
+                                             <content>
+                                                <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" prefHeight="139.0" prefWidth="190.0">
+                                                   <children>
+                                                      <BorderPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" prefWidth="216.0">
+                                                         <bottom>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </bottom>
+                                                         <center>
+                                                            <VBox prefHeight="32.0" prefWidth="128.0" BorderPane.alignment="CENTER">
+                                                               <children>
+                                                                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder">
+                                                                     <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                     </font>
+                                                                  </Text>
+                                                                  <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder Description" />
+                                                               </children>
+                                                            </VBox>
+                                                         </center>
+                                                         <right>
+                                                            <CheckBox mnemonicParsing="false" selected="true" BorderPane.alignment="CENTER" />
+                                                         </right>
+                                                         <top>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </top>
+                                                      </BorderPane>
+                                                      <Pane maxHeight="10.0" minHeight="5.0" prefHeight="10.0" prefWidth="200.0" />
+                                                      <BorderPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" prefWidth="270.0">
+                                                         <bottom>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </bottom>
+                                                         <center>
+                                                            <VBox prefHeight="19.0" prefWidth="270.0" BorderPane.alignment="CENTER">
+                                                               <children>
+                                                                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder2">
+                                                                     <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                     </font>
+                                                                  </Text>
+                                                                  <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder Description 2" />
+                                                               </children>
+                                                            </VBox>
+                                                         </center>
+                                                         <right>
+                                                            <CheckBox disable="true" mnemonicParsing="false" prefHeight="51.0" prefWidth="0.0" selected="true" BorderPane.alignment="CENTER" />
+                                                         </right>
+                                                         <top>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </top>
+                                                      </BorderPane>
+                                                   </children>
+                                                </VBox>
+                                             </content>
+                                             <effect>
+                                                <DropShadow />
+                                             </effect>
+                                          </ScrollPane>
+                                       </center>
+                                       <left>
+                                          <Pane prefHeight="184.0" prefWidth="6.0" BorderPane.alignment="CENTER" />
+                                       </left>
+                                       <right>
+                                          <Pane prefHeight="184.0" prefWidth="4.0" BorderPane.alignment="CENTER" />
+                                       </right>
+                                       <top>
+                                          <Pane prefHeight="11.0" prefWidth="285.0" BorderPane.alignment="CENTER" />
+                                       </top>
+                                    </BorderPane>
+                                    <Pane minHeight="10.0" prefHeight="41.0" prefWidth="225.0" />
+                                 </children>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </VBox>
+                              <Pane prefHeight="200.0" prefWidth="36.0" />
+                              <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" prefHeight="555.0" prefWidth="225.0" style="-fx-background-color: #23272A;">
+                                 <children>
+                                    <Pane prefHeight="8.0" prefWidth="100.0" />
+                                    <ImageView fitHeight="126.0" fitWidth="116.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../categories/toys_circle.png" />
+                                       </image>
+                                    </ImageView>
+                                    <Pane prefHeight="18.0" prefWidth="143.0" />
+                                    <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Toys">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Text>
+                                    <Pane prefHeight="11.0" prefWidth="100.0" />
+                                    <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Bust boredom" />
+                                    <Pane prefHeight="84.0" prefWidth="225.0" />
+                                    <BorderPane prefHeight="36.0" prefWidth="285.0">
+                                       <center>
+                                          <BorderPane style="-fx-background-color: #191c1e;" BorderPane.alignment="CENTER">
+                                             <bottom>
+                                                <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                             </bottom>
+                                             <center>
+                                                <VBox prefHeight="32.0" prefWidth="181.0" BorderPane.alignment="CENTER">
+                                                   <children>
+                                                      <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggle All">
+                                                         <font>
+                                                            <Font name="System Bold" size="12.0" />
+                                                         </font>
+                                                      </Text>
+                                                      <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggles all modifiable commands" />
+                                                   </children>
+                                                </VBox>
+                                             </center>
+                                             <effect>
+                                                <DropShadow />
+                                             </effect>
+                                             <right>
+                                                <CheckBox mnemonicParsing="false" selected="true" BorderPane.alignment="CENTER" />
+                                             </right>
+                                             <top>
+                                                <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                             </top>
+                                          </BorderPane>
+                                       </center>
+                                       <left>
+                                          <Pane prefHeight="184.0" prefWidth="6.0" BorderPane.alignment="CENTER" />
+                                       </left>
+                                       <right>
+                                          <Pane prefHeight="184.0" prefWidth="6.0" BorderPane.alignment="CENTER" />
+                                       </right>
+                                    </BorderPane>
+                                    <BorderPane prefHeight="369.0" prefWidth="285.0">
+                                       <center>
+                                          <ScrollPane fitToWidth="true" maxHeight="1.7976931348623157E308" prefHeight="331.0" prefWidth="114.0" style="-fx-background: #191c1e; -fx-border-color: #191c1e;" BorderPane.alignment="CENTER">
+                                             <content>
+                                                <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" prefHeight="139.0" prefWidth="190.0">
+                                                   <children>
+                                                      <BorderPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" prefWidth="216.0">
+                                                         <bottom>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </bottom>
+                                                         <center>
+                                                            <VBox prefHeight="32.0" prefWidth="128.0" BorderPane.alignment="CENTER">
+                                                               <children>
+                                                                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder">
+                                                                     <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                     </font>
+                                                                  </Text>
+                                                                  <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder Description" />
+                                                               </children>
+                                                            </VBox>
+                                                         </center>
+                                                         <right>
+                                                            <CheckBox mnemonicParsing="false" selected="true" BorderPane.alignment="CENTER" />
+                                                         </right>
+                                                         <top>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </top>
+                                                      </BorderPane>
+                                                      <Pane maxHeight="10.0" minHeight="5.0" prefHeight="10.0" prefWidth="200.0" />
+                                                      <BorderPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" prefWidth="270.0">
+                                                         <bottom>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </bottom>
+                                                         <center>
+                                                            <VBox prefHeight="19.0" prefWidth="270.0" BorderPane.alignment="CENTER">
+                                                               <children>
+                                                                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder2">
+                                                                     <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                     </font>
+                                                                  </Text>
+                                                                  <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder Description 2" />
+                                                               </children>
+                                                            </VBox>
+                                                         </center>
+                                                         <right>
+                                                            <CheckBox disable="true" mnemonicParsing="false" prefHeight="51.0" prefWidth="0.0" selected="true" BorderPane.alignment="CENTER" />
+                                                         </right>
+                                                         <top>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </top>
+                                                      </BorderPane>
+                                                   </children>
+                                                </VBox>
+                                             </content>
+                                             <effect>
+                                                <DropShadow />
+                                             </effect>
+                                          </ScrollPane>
+                                       </center>
+                                       <left>
+                                          <Pane prefHeight="184.0" prefWidth="6.0" BorderPane.alignment="CENTER" />
+                                       </left>
+                                       <right>
+                                          <Pane prefHeight="184.0" prefWidth="4.0" BorderPane.alignment="CENTER" />
+                                       </right>
+                                       <top>
+                                          <Pane prefHeight="11.0" prefWidth="285.0" BorderPane.alignment="CENTER" />
+                                       </top>
+                                    </BorderPane>
+                                    <Pane minHeight="10.0" prefHeight="41.0" prefWidth="225.0" />
+                                 </children>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </VBox>
+                              <Pane prefHeight="200.0" prefWidth="36.0" />
+                              <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" prefHeight="555.0" prefWidth="225.0" style="-fx-background-color: #23272A;">
+                                 <children>
+                                    <Pane prefHeight="8.0" prefWidth="100.0" />
+                                    <ImageView fitHeight="126.0" fitWidth="116.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../categories/utility_circle.png" />
+                                       </image>
+                                    </ImageView>
+                                    <Pane prefHeight="18.0" prefWidth="143.0" />
+                                    <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Utilities">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Text>
+                                    <Pane prefHeight="11.0" prefWidth="100.0" />
+                                    <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Day-to-day helps" />
+                                    <Pane prefHeight="84.0" prefWidth="225.0" />
+                                    <BorderPane prefHeight="36.0" prefWidth="285.0">
+                                       <center>
+                                          <BorderPane style="-fx-background-color: #191c1e;" BorderPane.alignment="CENTER">
+                                             <bottom>
+                                                <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                             </bottom>
+                                             <center>
+                                                <VBox prefHeight="32.0" prefWidth="181.0" BorderPane.alignment="CENTER">
+                                                   <children>
+                                                      <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggle All">
+                                                         <font>
+                                                            <Font name="System Bold" size="12.0" />
+                                                         </font>
+                                                      </Text>
+                                                      <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggles all modifiable commands" />
+                                                   </children>
+                                                </VBox>
+                                             </center>
+                                             <effect>
+                                                <DropShadow />
+                                             </effect>
+                                             <right>
+                                                <CheckBox mnemonicParsing="false" selected="true" BorderPane.alignment="CENTER" />
+                                             </right>
+                                             <top>
+                                                <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                             </top>
+                                          </BorderPane>
+                                       </center>
+                                       <left>
+                                          <Pane prefHeight="184.0" prefWidth="6.0" BorderPane.alignment="CENTER" />
+                                       </left>
+                                       <right>
+                                          <Pane prefHeight="184.0" prefWidth="6.0" BorderPane.alignment="CENTER" />
+                                       </right>
+                                    </BorderPane>
+                                    <BorderPane prefHeight="369.0" prefWidth="285.0">
+                                       <center>
+                                          <ScrollPane fitToWidth="true" maxHeight="1.7976931348623157E308" prefHeight="331.0" prefWidth="114.0" style="-fx-background: #191c1e; -fx-border-color: #191c1e;" BorderPane.alignment="CENTER">
+                                             <content>
+                                                <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" prefHeight="139.0" prefWidth="190.0">
+                                                   <children>
+                                                      <BorderPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" prefWidth="216.0">
+                                                         <bottom>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </bottom>
+                                                         <center>
+                                                            <VBox prefHeight="32.0" prefWidth="128.0" BorderPane.alignment="CENTER">
+                                                               <children>
+                                                                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder">
+                                                                     <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                     </font>
+                                                                  </Text>
+                                                                  <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder Description" />
+                                                               </children>
+                                                            </VBox>
+                                                         </center>
+                                                         <right>
+                                                            <CheckBox mnemonicParsing="false" selected="true" BorderPane.alignment="CENTER" />
+                                                         </right>
+                                                         <top>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </top>
+                                                      </BorderPane>
+                                                      <Pane maxHeight="10.0" minHeight="5.0" prefHeight="10.0" prefWidth="200.0" />
+                                                      <BorderPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" prefWidth="270.0">
+                                                         <bottom>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </bottom>
+                                                         <center>
+                                                            <VBox prefHeight="19.0" prefWidth="270.0" BorderPane.alignment="CENTER">
+                                                               <children>
+                                                                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder2">
+                                                                     <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                     </font>
+                                                                  </Text>
+                                                                  <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Placeholder Description 2" />
+                                                               </children>
+                                                            </VBox>
+                                                         </center>
+                                                         <right>
+                                                            <CheckBox disable="true" mnemonicParsing="false" prefHeight="51.0" prefWidth="0.0" selected="true" BorderPane.alignment="CENTER" />
+                                                         </right>
+                                                         <top>
+                                                            <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                                         </top>
+                                                      </BorderPane>
+                                                   </children>
+                                                </VBox>
+                                             </content>
+                                             <effect>
+                                                <DropShadow />
+                                             </effect>
+                                          </ScrollPane>
+                                       </center>
+                                       <left>
+                                          <Pane prefHeight="184.0" prefWidth="6.0" BorderPane.alignment="CENTER" />
+                                       </left>
+                                       <right>
+                                          <Pane prefHeight="184.0" prefWidth="4.0" BorderPane.alignment="CENTER" />
+                                       </right>
+                                       <top>
+                                          <Pane prefHeight="11.0" prefWidth="285.0" BorderPane.alignment="CENTER" />
+                                       </top>
+                                    </BorderPane>
+                                    <Pane minHeight="10.0" prefHeight="41.0" prefWidth="225.0" />
+                                 </children>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </VBox>
+                           </children>
+                        </HBox>
+                        <Pane prefHeight="64.0" prefWidth="1276.0" />
+                     </children>
+                  </VBox>
+               </content>
+            </ScrollPane>
+         </children>
+      </VBox>
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #2F3136;">
+         <children>
+            <StackPane prefHeight="41.0" prefWidth="220.0">
+               <children>
+                  <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#99aab5" height="66.0" stroke="TRANSPARENT" strokeType="INSIDE" style="-fx-arc-height: 50; -fx-arc-width: 50;" width="222.0" />
+                  <Text fx:id="navBar_discord_text1" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Back" textAlignment="CENTER" wrappingWidth="118.21728515625">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Text>
+               </children>
+            </StackPane>
+            <Pane minHeight="100.0" prefHeight="318.0" prefWidth="200.0" />
+            <StackPane prefHeight="150.0" prefWidth="200.0">
+               <children>
+                  <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#7289da" height="71.0" stroke="TRANSPARENT" strokeType="INSIDE" style="-fx-arc-height: 50; -fx-arc-width: 50;" width="222.0" />
+                  <Text fx:id="navBar_discord_text11" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Next" textAlignment="CENTER" wrappingWidth="118.21728515625">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Text>
+               </children>
+            </StackPane>
+         </children>
+      </HBox>
+   </children>
+</VBox>
