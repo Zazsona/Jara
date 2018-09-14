@@ -33,9 +33,17 @@ public class Welcome extends Application
 
             Text navBarReview = (Text) root.lookup("#navBar_review_text");
             navBarReview.setOnMouseClicked((event -> HeadedUtil.manageTitleSelection(navBarReview, primaryStage)));
-            
-            primaryStage.setTitle("Jara Setup");
-            primaryStage.setScene(new Scene(root, 1280, 800));
+
+            if (primaryStage.getScene() != null)
+            {
+                primaryStage.getScene().setRoot(root);
+            }
+            else
+            {
+                primaryStage.setTitle("Jara Setup");
+                primaryStage.setScene(new Scene(root, 1280, 800));
+            }
+
             primaryStage.show();
 
         }
