@@ -21,8 +21,19 @@ public class Welcome extends Application
             primaryStage.setTitle("Jara Setup");
             primaryStage.setScene(new Scene(root, 800, 600));
             primaryStage.show();
+
+            Thread.sleep(10000);
+
+            root = FXMLLoader.load(getClass().getClassLoader().getResource("gui/discordSetup.fxml"));
+            primaryStage.setScene(new Scene(root, 800, 600));
+            primaryStage.show();
+
         }
         catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        catch (InterruptedException e)
         {
             e.printStackTrace();
         }
