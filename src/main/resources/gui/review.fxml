@@ -11,7 +11,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="welcomeScreen" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="reviewScreen" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <BorderPane fx:id="titleBar" maxHeight="80.0" minHeight="80.0" prefHeight="80.0" prefWidth="1280.0" style="-fx-background-color: #23272A;">
          <center>
@@ -160,9 +160,9 @@
                         <DropShadow />
                      </effect>
                      <children>
-                        <StackPane fx:id="nextButton1" prefHeight="150.0" prefWidth="480.0">
+                        <StackPane fx:id="inviteButton" prefHeight="150.0" prefWidth="480.0">
                            <children>
-                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#7289da" height="71.0" stroke="TRANSPARENT" strokeType="INSIDE" style="-fx-arc-height: 50; -fx-arc-width: 50;" width="222.0" />
+                              <Rectangle fx:id="inviteRect" arcHeight="5.0" arcWidth="5.0" fill="#7289da" height="71.0" stroke="TRANSPARENT" strokeType="INSIDE" style="-fx-arc-height: 50; -fx-arc-width: 50;" width="222.0" />
                               <Text fx:id="navBar_discord_text111" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Invite Bot" textAlignment="CENTER" wrappingWidth="118.21728515625">
                                  <font>
                                     <Font name="System Bold" size="18.0" />
@@ -208,7 +208,7 @@
          <children>
             <StackPane fx:id="backButton" prefHeight="41.0" prefWidth="220.0">
                <children>
-                  <Rectangle fx:id="backButto" arcHeight="5.0" arcWidth="5.0" fill="#99aab5" height="66.0" stroke="TRANSPARENT" strokeType="INSIDE" style="-fx-arc-height: 50; -fx-arc-width: 50;" width="222.0" />
+                  <Rectangle fx:id="backRect" arcHeight="5.0" arcWidth="5.0" fill="#99aab5" height="66.0" stroke="TRANSPARENT" strokeType="INSIDE" style="-fx-arc-height: 50; -fx-arc-width: 50;" width="222.0" />
                   <Text fx:id="navBar_discord_text1" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Back" textAlignment="CENTER" wrappingWidth="118.21728515625">
                      <font>
                         <Font name="System Bold" size="18.0" />
@@ -219,7 +219,7 @@
             <Pane minHeight="100.0" prefHeight="318.0" prefWidth="200.0" />
             <StackPane fx:id="nextButton" prefHeight="150.0" prefWidth="200.0">
                <children>
-                  <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#7289da" height="71.0" stroke="TRANSPARENT" strokeType="INSIDE" style="-fx-arc-height: 50; -fx-arc-width: 50;" width="222.0" />
+                  <Rectangle fx:id="nextRect" arcHeight="5.0" arcWidth="5.0" fill="#7289da" height="71.0" stroke="TRANSPARENT" strokeType="INSIDE" style="-fx-arc-height: 50; -fx-arc-width: 50;" width="222.0" />
                   <Text fx:id="navBar_discord_text11" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="It's showtime" textAlignment="CENTER" wrappingWidth="118.21728515625">
                      <font>
                         <Font name="System Bold" size="18.0" />

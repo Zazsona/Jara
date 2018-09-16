@@ -1,5 +1,7 @@
 package gui.headed;
 import javafx.application.Platform;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -92,6 +94,29 @@ public class HeadedUtil
         else
         {
             logger.error("Unknown setup window. Cannot go to next.");
+        }
+    }
+
+    public static void nextButtonHover(Rectangle rectangle)
+    {
+        if (rectangle.getFill().equals(Paint.valueOf("#7289da")))
+        {
+            rectangle.setFill(Paint.valueOf("#5c71b5"));
+        }
+        else
+        {
+            rectangle.setFill(Paint.valueOf("#7289da"));
+        }
+    }
+    public static void backButtonHover(Rectangle rectangle)
+    {
+        if (rectangle.getFill().equals(Paint.valueOf("#99aab5")))
+        {
+            rectangle.setFill(Paint.valueOf("#808e96"));
+        }
+        else
+        {
+            rectangle.setFill(Paint.valueOf("#99aab5"));
         }
     }
 }
