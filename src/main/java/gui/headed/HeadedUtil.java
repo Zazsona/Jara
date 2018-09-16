@@ -7,6 +7,11 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class HeadedUtil
@@ -118,5 +123,50 @@ public class HeadedUtil
         {
             rectangle.setFill(Paint.valueOf("#99aab5"));
         }
+    }
+    public static String generateInviteLink()
+    {
+        if (discordSetup.getClientID().equals(""))
+        {
+            JOptionPane.showMessageDialog(null, "You'll need to complete setup before you can invite the bot.");
+            return "";
+        }
+        return "https://discordapp.com/oauth2/authorize?client_id="+discordSetup.getClientID()+"&scope=bot&permissions=8";
+    }
+    public static void openWebpage(String url)
+    {
+        if (url.equals(""))
+        {
+            return;
+        }
+        try
+        {
+            if (Desktop.isDesktopSupported())
+            {
+                try
+                {
+                    Desktop.getDesktop().browse(new URI(url));
+                }
+                catch (URISyntaxException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            else
+            {
+                Runtime runtime = Runtime.getRuntime();
+                Process process = runtime.exec("xdg-open " + url);
+                if (process.exitValue() != 0)
+                {
+                    throw new IOException();
+                }
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "ERROR: Unable to locate default browser. Please go to https://discordapp.com/developers/applications/ to set up your bot account.");
+        }
+
     }
 }

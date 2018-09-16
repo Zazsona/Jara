@@ -42,7 +42,7 @@ public class Review extends Application
 
             StackPane inviteButton = (StackPane) root.lookup("#inviteButton");
             Rectangle inviteRect = (Rectangle) root.lookup("#inviteRect");
-            inviteButton.setOnMouseClicked(null); //TODO
+            inviteButton.setOnMouseClicked((event) -> HeadedUtil.openWebpage(HeadedUtil.generateInviteLink())); //TODO
             inviteButton.setOnMouseEntered((event) -> HeadedUtil.nextButtonHover(inviteRect));
             inviteButton.setOnMouseExited((event) -> HeadedUtil.nextButtonHover(inviteRect));
 

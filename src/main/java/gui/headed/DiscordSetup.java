@@ -8,7 +8,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import org.w3c.dom.css.Rect;
 
 import java.io.IOException;
 
@@ -67,7 +66,7 @@ public class DiscordSetup extends Application
 
             StackPane portalButton = (StackPane) root.lookup("#portalButton");
             Rectangle portalRect = (Rectangle) root.lookup("#portalRect");
-            portalButton.setOnMouseClicked(null); //TODO
+            portalButton.setOnMouseClicked((event) -> HeadedUtil.openWebpage("https://discordapp.com/developers/applications/"));
             portalButton.setOnMouseEntered((event) -> HeadedUtil.nextButtonHover(portalRect));
             portalButton.setOnMouseExited((event) -> HeadedUtil.nextButtonHover(portalRect));
 
@@ -104,5 +103,21 @@ public class DiscordSetup extends Application
 
         token = txtFieldToken.getText();
         clientID = txtFieldClientID.getText();
+    }
+    public String getClientID()
+    {
+        if (clientID == null)
+        {
+            return "";
+        }
+        return clientID;
+    }
+    public String getToken()
+    {
+        if (token == null)
+        {
+            return "";
+        }
+        return token;
     }
 }
