@@ -34,7 +34,7 @@
                      </children>
                   </VBox>
                   <Pane prefHeight="200.0" prefWidth="200.0" />
-                  <Text fx:id="navBar_welcome_text" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="WELCOME" textAlignment="CENTER" wrappingWidth="118.21728515625">
+                  <Text fx:id="navBar_welcome_text" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="WELCOME" textAlignment="CENTER" wrappingWidth="181.21728515625">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
@@ -52,7 +52,7 @@
             <HBox fx:id="navBar_discord" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
                   <Pane prefHeight="200.0" prefWidth="200.0" />
-                  <Text fx:id="navBar_discord_text" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="DISCORD SETUP" textAlignment="CENTER" wrappingWidth="118.21728515625">
+                  <Text fx:id="navBar_discord_text" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="DISCORD SETUP" textAlignment="CENTER" wrappingWidth="190.21728515625">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
@@ -70,7 +70,7 @@
             <HBox fx:id="navBar_configuration" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
                   <Pane prefHeight="200.0" prefWidth="200.0" />
-                  <Text fx:id="navBar_configuration_text" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="CONFIG" textAlignment="CENTER" wrappingWidth="118.21728515625">
+                  <Text fx:id="navBar_configuration_text" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="CONFIG" textAlignment="CENTER" wrappingWidth="179.21728515625">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
@@ -88,7 +88,7 @@
             <HBox fx:id="navBar_review" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
                   <Pane prefHeight="200.0" prefWidth="200.0" />
-                  <Text fx:id="navBar_review_text" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="REVIEW" textAlignment="CENTER" wrappingWidth="118.21728515625">
+                  <Text fx:id="navBar_review_text" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="REVIEW" textAlignment="CENTER" wrappingWidth="172.21728515625">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
