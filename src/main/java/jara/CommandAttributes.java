@@ -9,10 +9,12 @@ public class CommandAttributes
 	private final String[] aliases; //Text strings that will call the command
 	private final int category;
 	private final boolean disableable;
+	private final String description;
 
-	public CommandAttributes(String commandKeyArg, Class<? extends Command> commandClassArg, String[] aliasesArg, int categoryArg, boolean disableableArg)
+	public CommandAttributes(String commandKeyArg, String descriptionArg, Class<? extends Command> commandClassArg, String[] aliasesArg, int categoryArg, boolean disableableArg)
 	{
 		commandKey = commandKeyArg;
+		description = descriptionArg;
 		commandClass = commandClassArg;
 		aliases = new String[aliasesArg.length+1];
 		aliases[0] = commandKey;
@@ -22,7 +24,6 @@ public class CommandAttributes
 		}
 		category = categoryArg;
 		disableable = disableableArg;
-		
 	}
 
 	/**
@@ -89,5 +90,15 @@ public class CommandAttributes
 	public boolean isDisableable()
 	{
 		return disableable;
+	}
+
+	/**
+	 * Returns a small description of the command, suitable for lists. Use /help for full instructions.
+	 * @return
+	 * String - the description.
+	 */
+	public String getDescription()
+	{
+		return description;
 	}
 }

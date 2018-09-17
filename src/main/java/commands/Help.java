@@ -279,7 +279,7 @@ public class Help extends Command {
 			{
 				if (!(Collections.disjoint(guildSettings.getPermittedRoles(cmdAttributes.getCommandKey()), roleIDs)) || !limitToPerms)
 				{
-					commands.append(cmdAttributes.getCommandKey()).append("\n");
+					commands.append("**").append(cmdAttributes.getCommandKey()).append("** - ").append(cmdAttributes.getDescription()).append("\n");
 					commandsListed = true;
 				}
 			}

@@ -49,26 +49,26 @@ public class CommandRegister
 			 * I also highly recommend you include details about the command in Help, such as parameters and what it does. Aliases and category will be done automatically.
 			 * ===========================================
 			 */
-			register.add(new CommandAttributes("Ping", Ping.class, new String[] {"Pong", "Test"}, UTILITY, true));
-			register.add(new CommandAttributes("Report", Report.class, new String[] {"Status", "Stats"}, UTILITY, true));
-			register.add(new CommandAttributes("About", About.class, new String[] {"Credits", "Authors"}, UTILITY, false));
-			register.add(new CommandAttributes("EightBall", EightBall.class, new String[] {"8ball", "helix", "fortune"}, TOYS, true));
-			register.add(new CommandAttributes("Jokes", Jokes.class, new String[] {"Joke", "Comedy"}, TOYS, true));
-			register.add(new CommandAttributes("CoinFlip", CoinFlip.class, new String[] {"FlipCoin", "Toss", "cf", "fc", "fiftyfifty", "flipacoin"}, UTILITY, true));
-			register.add(new CommandAttributes("Config", Config.class, new String[] {"Settings"}, ADMIN, false));
-			register.add(new CommandAttributes("Countdown", Countdown.class, new String[] {"cd"}, GAMES, true));
-			register.add(new CommandAttributes("Help", Help.class, new String[] {"?", "commands"}, NOGROUP, false)); //Does help REALLY need to be indexed in help?
-            register.add(new CommandAttributes("Randomizer", Randomizer.class, new String[] {"Randomise", "Randomize", "Randomiser", "Roulette", "Picker", "Selector"}, UTILITY, true));
-			register.add(new CommandAttributes("Say", Say.class, new String[] {"Speak", "Talk"}, TOYS, true));
-			register.add(new CommandAttributes("Timecard", Timecard.class, new String[] {"SpongebobCard", "Timescreen"}, TOYS, true));
-			register.add(new CommandAttributes("CountdownConundrum", CountdownConundrum.class, new String[] {"CC", "Anagram"}, GAMES, true));
-			register.add(new CommandAttributes("IsItWednesdayMyDudes", IsItWednesdayMyDudes.class, new String[] {"ItIsWednesdayMyDudes", "ItIsNotWednesdayMyDudes", "Wednesday", "IIWMD", "IINWMD", "WednesdayFrog", "IsItWednesdayMyDudes", "ItIsWeds", "ItIsNotWeds"}, TOYS, true));
-			register.add(new CommandAttributes("WouldYouRather", WouldYouRather.class, new String[] {"WouldYouRather?", "WYR", "WYR?"}, TOYS, true));
-			register.add(new CommandAttributes("Hangman", Hangman.class, new String[] {"hang"}, GAMES, true));
-			register.add(new CommandAttributes("Play", Play.class, new String[] {"PlayAudio", "Music", "Track", "Radio", "Stream", "DJ"}, AUDIO, true));
-			register.add(new CommandAttributes("Skip", Skip.class, new String[] {"Stop", "Pass", "Next"}, AUDIO, true));
-			register.add(new CommandAttributes("ForceSkip", ForceSkip.class, new String[] {"AdminSkip", "InstaSkip", "FireTheDJ", "ForceNext"}, AUDIO, true));
-			register.add(new CommandAttributes("NowPlaying", NowPlaying.class, new String[] {"NP", "CP", "CurrentlyPlaying", "TrackInfo", "SongInfo", "MusicInfo", "AudioInfo"}, AUDIO, true));
+			register.add(new CommandAttributes("Ping", "Tests the connection.", Ping.class, new String[] {"Pong", "Test"}, UTILITY, true));
+			register.add(new CommandAttributes("Report", "Displays Bot stats.", Report.class, new String[] {"Status", "Stats"}, UTILITY, true));
+			register.add(new CommandAttributes("About", "Shows Bot credits.", About.class, new String[] {"Credits", "Authors"}, UTILITY, false));
+			register.add(new CommandAttributes("EightBall", "Tells your fortune.", EightBall.class, new String[] {"8ball", "helix", "fortune"}, TOYS, true));
+			register.add(new CommandAttributes("Jokes", "This command is a joke.", Jokes.class, new String[] {"Joke", "Comedy"}, TOYS, true));
+			register.add(new CommandAttributes("CoinFlip", "Flips a coin.", CoinFlip.class, new String[] {"FlipCoin", "Toss", "cf", "fc", "fiftyfifty", "flipacoin"}, UTILITY, true));
+			register.add(new CommandAttributes("Config", "Modify Bot settings.", Config.class, new String[] {"Settings"}, ADMIN, false));
+			register.add(new CommandAttributes("Countdown", "The classic word making game.", Countdown.class, new String[] {"cd"}, GAMES, true));
+			register.add(new CommandAttributes("Help", "Shows command details.", Help.class, new String[] {"?", "commands"}, NOGROUP, false)); //Does help REALLY need to be indexed in help?
+            register.add(new CommandAttributes("Randomizer", "Randomises numbers.", Randomizer.class, new String[] {"Randomise", "Randomize", "Randomiser", "Roulette", "Picker", "Selector"}, UTILITY, true));
+			register.add(new CommandAttributes("Say", "Make the bot echo.", Say.class, new String[] {"Speak", "Talk"}, TOYS, true));
+			register.add(new CommandAttributes("Timecard", "Spongebob Timecards.", Timecard.class, new String[] {"SpongebobCard", "Timescreen"}, TOYS, true));
+			register.add(new CommandAttributes("CountdownConundrum", "Solve the anagram.", CountdownConundrum.class, new String[] {"CC", "Anagram"}, GAMES, true));
+			register.add(new CommandAttributes("IsItWednesdayMyDudes", "Well? Is it?", IsItWednesdayMyDudes.class, new String[] {"ItIsWednesdayMyDudes", "ItIsNotWednesdayMyDudes", "Wednesday", "IIWMD", "IINWMD", "WednesdayFrog", "IsItWednesdayMyDudes", "ItIsWeds", "ItIsNotWeds"}, TOYS, true));
+			register.add(new CommandAttributes("WouldYouRather", "Find out who your mates really are.", WouldYouRather.class, new String[] {"WouldYouRather?", "WYR", "WYR?"}, TOYS, true));
+			register.add(new CommandAttributes("Hangman", "Guess the word.", Hangman.class, new String[] {"hang"}, GAMES, true));
+			register.add(new CommandAttributes("Play", "Plays music.", Play.class, new String[] {"PlayAudio", "Music", "Track", "Radio", "Stream", "DJ"}, AUDIO, true));
+			register.add(new CommandAttributes("Skip", "Votes to skip the track", Skip.class, new String[] {"Stop", "Pass", "Next"}, AUDIO, true));
+			register.add(new CommandAttributes("ForceSkip", "Forces the track to skip.", ForceSkip.class, new String[] {"AdminSkip", "InstaSkip", "FireTheDJ", "ForceNext"}, AUDIO, true));
+			register.add(new CommandAttributes("NowPlaying", "Current track details.", NowPlaying.class, new String[] {"NP", "CP", "CurrentlyPlaying", "TrackInfo", "SongInfo", "MusicInfo", "AudioInfo"}, AUDIO, true));
 		}
 		return register.toArray(new CommandAttributes[register.size()]);
 	}
