@@ -1,6 +1,7 @@
 package gui.headed;
 
 import javafx.application.Application;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -13,37 +14,46 @@ import java.io.IOException;
 
 public class Welcome extends Application
 {
+    private static Stage stage;
+
+    @FXML
+    private StackPane backButton;
+    @FXML
+    private Rectangle backRect;
+    @FXML
+    private StackPane nextButton;
+    @FXML
+    private Rectangle nextRect;
+    @FXML
+    private Text navBar_discord_text;
+    @FXML
+    private Text navBar_configuration_text;
+    @FXML
+    private Text navBar_review_text;
+
+    public void initialize()
+    {
+        backButton.setOnMouseClicked((event) -> HeadedUtil.goBack());
+        backButton.setOnMouseEntered((event) -> HeadedUtil.backButtonHover(backRect));
+        backButton.setOnMouseExited((event) -> HeadedUtil.backButtonHover(backRect));
+
+        nextButton.setOnMouseClicked((event) -> HeadedUtil.goNext());
+        nextButton.setOnMouseEntered((event) -> HeadedUtil.nextButtonHover(nextRect));
+        nextButton.setOnMouseExited((event) -> HeadedUtil.nextButtonHover(nextRect));
+
+        navBar_discord_text.setOnMouseClicked((event) -> HeadedUtil.manageTitleSelection(navBar_discord_text));
+
+        navBar_configuration_text.setOnMouseClicked((event -> HeadedUtil.manageTitleSelection(navBar_configuration_text)));
+
+        navBar_review_text.setOnMouseClicked((event -> HeadedUtil.manageTitleSelection(navBar_review_text)));
+    }
+
     @Override
     public void start(Stage primaryStage)
     {
         try
         {
             Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("gui/welcome.fxml"));
-
-            StackPane backButton = (StackPane) root.lookup("#backButton");
-            Rectangle backRect = (Rectangle) root.lookup("#backRect");
-            backButton.setOnMouseClicked((event) -> HeadedUtil.goBack(primaryStage));
-            backButton.setOnMouseEntered((event) -> HeadedUtil.backButtonHover(backRect));
-            backButton.setOnMouseExited((event) -> HeadedUtil.backButtonHover(backRect));
-
-            StackPane nextButton = (StackPane) root.lookup("#nextButton");
-            Rectangle nextRect = (Rectangle) root.lookup("#nextRect");
-            nextButton.setOnMouseClicked((event) -> HeadedUtil.goNext(primaryStage));
-            nextButton.setOnMouseEntered((event) -> HeadedUtil.nextButtonHover(nextRect));
-            nextButton.setOnMouseExited((event) -> HeadedUtil.nextButtonHover(nextRect));
-
-
-            Text navBarDiscordSetup = (Text) root.lookup("#navBar_discord_text");
-            navBarDiscordSetup.setOnMouseClicked((event) -> HeadedUtil.manageTitleSelection(navBarDiscordSetup, primaryStage));
-
-            Text navBarCCSetup = (Text) root.lookup("#navBar_configuration_text");
-            navBarCCSetup.setOnMouseClicked((event -> HeadedUtil.manageTitleSelection(navBarCCSetup, primaryStage)));
-
-            Text navBarReview = (Text) root.lookup("#navBar_review_text");
-            navBarReview.setOnMouseClicked((event -> HeadedUtil.manageTitleSelection(navBarReview, primaryStage)));
-
-
-
 
             if (primaryStage.getScene() != null)
             {
@@ -53,6 +63,7 @@ public class Welcome extends Application
             {
                 primaryStage.setTitle("Jara Setup");
                 primaryStage.setScene(new Scene(root, 1280, 800));
+                stage = primaryStage;
             }
 
             primaryStage.show();
@@ -62,5 +73,10 @@ public class Welcome extends Application
         {
             e.printStackTrace();
         }
+    }
+
+    public Stage getStage()
+    {
+        return stage;
     }
 }

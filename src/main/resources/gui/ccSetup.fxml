@@ -11,7 +11,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="ccSetupScreen" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="ccSetupScreen" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.headed.CommandConfigSetup">
    <children>
       <BorderPane fx:id="titleBar" maxHeight="80.0" minHeight="80.0" prefHeight="80.0" prefWidth="1280.0" style="-fx-background-color: #23272A;">
          <center>
@@ -177,7 +177,7 @@
                                        <center>
                                           <ScrollPane fitToWidth="true" maxHeight="1.7976931348623157E308" prefHeight="331.0" prefWidth="114.0" style="-fx-background: #191c1e; -fx-border-color: #191c1e;" BorderPane.alignment="CENTER">
                                              <content>
-                                                <VBox alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" prefHeight="139.0" prefWidth="190.0">
+                                                <VBox fx:id="adminList" alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" prefHeight="139.0" prefWidth="190.0">
                                                    <children>
                                                       <BorderPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" prefWidth="216.0">
                                                          <top>

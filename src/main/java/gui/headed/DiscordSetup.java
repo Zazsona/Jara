@@ -1,6 +1,7 @@
 package gui.headed;
 
 import javafx.application.Application;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.TextField;
@@ -16,6 +17,71 @@ public class DiscordSetup extends Application
     private String clientID;
     private String token;
 
+    @FXML
+    private StackPane backButton;
+    @FXML
+    private Rectangle backRect;
+    @FXML
+    private StackPane nextButton;
+    @FXML
+    private Rectangle nextRect;
+    @FXML
+    private Text navBar_configuration_text;
+    @FXML
+    private Text navBar_welcome_text;
+    @FXML
+    private Text navBar_review_text;
+    @FXML
+    private StackPane portalButton;
+    @FXML
+    private Rectangle portalRect;
+    @FXML
+    private TextField txtFieldToken;
+    @FXML
+    private TextField txtFieldClientID;
+
+    public void initialize()
+    {
+        backButton.setOnMouseClicked((event) ->
+                                     {
+                                         saveState();
+                                         HeadedUtil.goBack();
+                                     });
+        backButton.setOnMouseEntered((event) -> HeadedUtil.backButtonHover(backRect));
+        backButton.setOnMouseExited((event) -> HeadedUtil.backButtonHover(backRect));
+
+        nextButton.setOnMouseClicked((event) ->
+                                     {
+                                         saveState();
+                                         HeadedUtil.goNext();
+                                     });
+        nextButton.setOnMouseEntered((event) -> HeadedUtil.nextButtonHover(nextRect));
+        nextButton.setOnMouseExited((event) -> HeadedUtil.nextButtonHover(nextRect));
+
+        navBar_welcome_text.setOnMouseClicked((event) ->
+                                             {
+                                                 saveState();
+                                                 HeadedUtil.manageTitleSelection(navBar_welcome_text);
+                                             });
+
+        navBar_configuration_text.setOnMouseClicked((event) ->
+                                        {
+                                            saveState();
+                                            HeadedUtil.manageTitleSelection(navBar_configuration_text);
+                                        });
+
+        navBar_review_text.setOnMouseClicked((event) ->
+                                       {
+                                           saveState();
+                                           HeadedUtil.manageTitleSelection(navBar_review_text);
+                                       });
+
+        portalButton.setOnMouseClicked((event) -> HeadedUtil.openWebpage("https://discordapp.com/developers/applications/"));
+        portalButton.setOnMouseEntered((event) -> HeadedUtil.nextButtonHover(portalRect));
+        portalButton.setOnMouseExited((event) -> HeadedUtil.nextButtonHover(portalRect));
+
+
+    }
     @Override
     public void start(Stage primaryStage)
     {
@@ -23,55 +89,8 @@ public class DiscordSetup extends Application
         {
             Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("gui/discordSetup.fxml"));
 
-            StackPane backButton = (StackPane) root.lookup("#backButton");
-            Rectangle backRect = (Rectangle) root.lookup("#backRect");
-            backButton.setOnMouseClicked((event) ->
-                                         {
-                                             saveState(root);
-                                             HeadedUtil.goBack(primaryStage);
-                                         });
-            backButton.setOnMouseEntered((event) -> HeadedUtil.backButtonHover(backRect));
-            backButton.setOnMouseExited((event) -> HeadedUtil.backButtonHover(backRect));
 
-            StackPane nextButton = (StackPane) root.lookup("#nextButton");
-            Rectangle nextRect = (Rectangle) root.lookup("#nextRect");
-            nextButton.setOnMouseClicked((event) ->
-                                         {
-                                             saveState(root);
-                                             HeadedUtil.goNext(primaryStage);
-                                         });
-            nextButton.setOnMouseEntered((event) -> HeadedUtil.nextButtonHover(nextRect));
-            nextButton.setOnMouseExited((event) -> HeadedUtil.nextButtonHover(nextRect));
-
-            Text navBarWelcomeSetup = (Text) root.lookup("#navBar_welcome_text");
-            navBarWelcomeSetup.setOnMouseClicked((event) ->
-                                                 {
-                                                     saveState(root);
-                                                     HeadedUtil.manageTitleSelection(navBarWelcomeSetup, primaryStage);
-                                                 });
-
-            Text navBarCCSetup = (Text) root.lookup("#navBar_configuration_text");
-            navBarCCSetup.setOnMouseClicked((event) ->
-                                                {
-                                                    saveState(root);
-                                                    HeadedUtil.manageTitleSelection(navBarCCSetup, primaryStage);
-                                                });
-
-            Text navBarReview = (Text) root.lookup("#navBar_review_text");
-            navBarReview.setOnMouseClicked((event) ->
-                                                {
-                                                    saveState(root);
-                                                    HeadedUtil.manageTitleSelection(navBarReview, primaryStage);
-                                                });
-
-            StackPane portalButton = (StackPane) root.lookup("#portalButton");
-            Rectangle portalRect = (Rectangle) root.lookup("#portalRect");
-            portalButton.setOnMouseClicked((event) -> HeadedUtil.openWebpage("https://discordapp.com/developers/applications/"));
-            portalButton.setOnMouseEntered((event) -> HeadedUtil.nextButtonHover(portalRect));
-            portalButton.setOnMouseExited((event) -> HeadedUtil.nextButtonHover(portalRect));
-
-
-            restoreState(root);
+            restoreState();
 
             primaryStage.getScene().setRoot(root);
             primaryStage.show();
@@ -82,11 +101,8 @@ public class DiscordSetup extends Application
             e.printStackTrace();
         }
     }
-    private void restoreState(Parent root)
+    private void restoreState()
     {
-        TextField txtFieldToken = (TextField) root.lookup("#txtFieldToken");
-        TextField txtFieldClientID = (TextField) root.lookup("#txtFieldClientID");
-
         if (token != null)
         {
             txtFieldToken.setText(token);
@@ -96,11 +112,8 @@ public class DiscordSetup extends Application
             txtFieldClientID.setText(clientID);
         }
     }
-    private void saveState(Parent root)
+    private void saveState()
     {
-        TextField txtFieldToken = (TextField) root.lookup("#txtFieldToken");
-        TextField txtFieldClientID = (TextField) root.lookup("#txtFieldClientID");
-
         token = txtFieldToken.getText();
         clientID = txtFieldClientID.getText();
     }

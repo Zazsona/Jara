@@ -1,9 +1,11 @@
 package gui.headed;
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.apache.commons.lang3.builder.ToStringExclude;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +24,9 @@ public class HeadedUtil
     private static DiscordSetup discordSetup = new DiscordSetup();
     private static CommandConfigSetup ccSetup = new CommandConfigSetup();
     private static Review review = new Review();
+    private static Stage stage = welcome.getStage();
 
-    public static void manageTitleSelection(Text selection, Stage stage)
+    public static void manageTitleSelection(Text selection)
     {
         String selectionID = selection.getId();
         if (selectionID.equals("navBar_welcome_text"))
@@ -48,7 +51,7 @@ public class HeadedUtil
         }
     }
 
-    public static void goBack(Stage stage)
+    public static void goBack()
     {
         String screenID = stage.getScene().getRoot().getId();
 
@@ -75,7 +78,7 @@ public class HeadedUtil
             logger.error("Unknown setup window. Cannot go back.");
         }
     }
-    public static void goNext(Stage stage)
+    public static void goNext()
     {
         String screenID = stage.getScene().getRoot().getId();
 
