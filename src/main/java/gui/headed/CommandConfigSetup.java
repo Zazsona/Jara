@@ -1,5 +1,6 @@
 package gui.headed;
 
+import configuration.JsonFormats;
 import jara.CommandAttributes;
 import jara.CommandRegister;
 import javafx.fxml.FXML;
@@ -11,6 +12,9 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
 import javafx.scene.control.CheckBox;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class CommandConfigSetup
 {
@@ -50,6 +54,8 @@ public class CommandConfigSetup
     private CheckBox toysCategoryCheckBox;
     @FXML
     private CheckBox utilityCategoryCheckBox;
+
+    private ArrayList<Integer> supportedCategories;
 
     public void initialize()
     {
@@ -154,6 +160,34 @@ public class CommandConfigSetup
             }
         }
     }
+
+    public ArrayList<Integer> getSupportedCategories()
+    {
+        supportedCategories = new ArrayList<>();
+        for (CommandAttributes ca : CommandRegister.getRegister())
+        {
+            if (!supportedCategories.contains(ca.getCategoryID()) && ca.getCategoryID() != CommandRegister.NOGROUP)
+            {
+                if (((CheckBox) ccSetupScreen.lookup("#"+ca.getCommandKey()+"CheckBox")).isSelected())
+                {
+                    supportedCategories.add(ca.getCategoryID());
+                }
+            }
+        }
+        return supportedCategories;
+    }
+
+    public ArrayList<JsonFormats.GlobalCommandConfigJson> getCommandConfig()
+    {
+        ArrayList<JsonFormats.GlobalCommandConfigJson> commandConfig = new ArrayList<>();
+
+        for (CommandAttributes ca : CommandRegister.getRegister())
+        {
+            commandConfig.add(new JsonFormats().new GlobalCommandConfigJson(ca.getCommandKey(), ((CheckBox) ccSetupScreen.lookup("#"+ca.getCommandKey()+"CheckBox")).isSelected()));
+        }
+        return commandConfig;
+    }
+
     public void setRoot(Parent root)
     {
         this.ccSetupScreen = (VBox) root;
