@@ -6,7 +6,6 @@ import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
@@ -17,10 +16,12 @@ import javafx.scene.text.Font;
 import javafx.scene.control.CheckBox;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class CommandConfigSetup extends Application
 {
-
+    @FXML
+    private VBox ccSetupScreen;
     @FXML
     private StackPane backButton;
     @FXML
@@ -56,21 +57,49 @@ public class CommandConfigSetup extends Application
     @FXML
     private CheckBox utilityCategoryCheckBox;
 
+    private ArrayList<String> enabledCommands;
+    private boolean adminToggle;
+    private boolean audioToggle;
+    private boolean gamesToggle;
+    private boolean toysToggle;
+    private boolean utilityToggle;
+
     public void initialize()
     {
-        backButton.setOnMouseClicked((event) -> HeadedUtil.goBack());
-        backButton.setOnMouseEntered((event) -> HeadedUtil.backButtonHover(backRect));
-        backButton.setOnMouseExited((event) -> HeadedUtil.backButtonHover(backRect));
+        backButton.setOnMouseClicked((event) ->
+                                     {
+                                         saveState();
+                                         HeadedGUIManager.goBack();
 
-        nextButton.setOnMouseClicked((event) -> HeadedUtil.goNext());
-        nextButton.setOnMouseEntered((event) -> HeadedUtil.nextButtonHover(nextRect));
-        nextButton.setOnMouseExited((event) -> HeadedUtil.nextButtonHover(nextRect));
+                                     });
+        backButton.setOnMouseEntered((event) -> HeadedGUIManager.backButtonHover(backRect));
+        backButton.setOnMouseExited((event) -> HeadedGUIManager.backButtonHover(backRect));
 
-        navBar_discord_text.setOnMouseClicked((event) -> HeadedUtil.manageTitleSelection(navBar_discord_text));
+        nextButton.setOnMouseClicked((event) ->
+                                     {
+                                         saveState();
+                                         HeadedGUIManager.goNext();
+                                     });
+        nextButton.setOnMouseEntered((event) -> HeadedGUIManager.nextButtonHover(nextRect));
+        nextButton.setOnMouseExited((event) -> HeadedGUIManager.nextButtonHover(nextRect));
 
-        navBar_welcome_text.setOnMouseClicked((event) -> HeadedUtil.manageTitleSelection(navBar_welcome_text));
+        navBar_discord_text.setOnMouseClicked((event) ->
+                                              {
+                                                  saveState();
+                                                  HeadedGUIManager.manageTitleSelection(navBar_discord_text);
+                                              });
 
-        navBar_review_text.setOnMouseClicked((event) -> HeadedUtil.manageTitleSelection(navBar_review_text));
+        navBar_welcome_text.setOnMouseClicked((event) ->
+                                              {
+                                                  saveState();
+                                                  HeadedGUIManager.manageTitleSelection(navBar_welcome_text);
+                                              });
+
+        navBar_review_text.setOnMouseClicked((event) ->
+                                             {
+                                                 saveState();
+                                                 HeadedGUIManager.manageTitleSelection(navBar_review_text);
+                                             });
 
         adminCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(adminCategoryCheckBox, CommandRegister.ADMIN));
         audioCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(audioCategoryCheckBox, CommandRegister.AUDIO));
@@ -107,14 +136,7 @@ public class CommandConfigSetup extends Application
                     adminList.getChildren().addAll(topSpacePane, generateCommandListElement(ca), bottomSpacePane);
                     break;
             }
-            if (ca.getCategoryID() == CommandRegister.ADMIN)
-            {
-
-
-
-            }
         }
-
     }
     @Override
     public void start(Stage primaryStage)
@@ -122,6 +144,9 @@ public class CommandConfigSetup extends Application
         try
         {
             Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("gui/ccSetup.fxml"));
+
+            restoreState();
+
             primaryStage.getScene().setRoot(root);
             primaryStage.show();
 
@@ -152,14 +177,16 @@ public class CommandConfigSetup extends Application
         {
             checkBox.setDisable(true);
         }
+        checkBox.setId(commandAttributes.getCommandKey()+"CheckBox");
         bp.setRight(checkBox);
         bp.setAlignment(checkBox, Pos.CENTER);
         VBox vbox = new VBox();
         Text nameText = new Text(commandAttributes.getCommandKey());
-        Text descText = new Text("Placeholder Desc");
+        Text descText = new Text(commandAttributes.getDescription());
         nameText.setFont(new Font("System", 12));
         nameText.setStyle("-fx-font-weight: bold;");
         nameText.setFill(Paint.valueOf("#FFFFFF"));
+        nameText.setId(commandAttributes.getCommandKey()+"Title");
         descText.setFont(new Font("System", 12));
         descText.setFill(Paint.valueOf("#FFFFFF"));
         vbox.getChildren().addAll(nameText, descText);
@@ -167,7 +194,7 @@ public class CommandConfigSetup extends Application
         return bp;
 
     }
-    private void toggleCategory(CheckBox categoryCheckBox, int categoryID)
+    /*private void toggleCategory(CheckBox categoryCheckBox, int categoryID)
     {
         VBox list;
         switch (categoryID)
@@ -184,7 +211,7 @@ public class CommandConfigSetup extends Application
             case CommandRegister.AUDIO:
                 list = audioList;
                 break;
-            case CommandRegister.ADMIN:
+            case CommandRegister.ADMIN:                                                         //Alternate method.
                 list = adminList;
                 break;
             default:
@@ -201,9 +228,51 @@ public class CommandConfigSetup extends Application
                 }
             }
         }
+    }*/
+    private void toggleCategory(CheckBox categoryCheckBox, int categoryID)
+    {
+        CommandAttributes[] ca = CommandRegister.getCommandsInCategory(categoryID);
+        for (int i = 0; i<ca.length; i++)
+        {
+            CheckBox checkBox = (CheckBox) ccSetupScreen.lookup("#"+ca[i].getCommandKey()+"CheckBox");
+            if (!checkBox.isDisabled())
+            {
+                checkBox.setSelected(categoryCheckBox.isSelected());
+            }
+        }
     }
-    //TODO: Save state (CommandConfiguration instance?)
-    //TODO: Restore state
+    private void saveState()
+    {
+        System.out.println("Saving state");
+        for (CommandAttributes ca : CommandRegister.getRegister())
+        {
+            enabledCommands.add(ca.getCommandKey());
+        }
+        adminToggle = adminCategoryCheckBox.isSelected();
+        audioToggle = audioCategoryCheckBox.isSelected();
+        gamesToggle = gamesCategoryCheckBox.isSelected();
+        toysToggle = toysCategoryCheckBox.isSelected();
+        utilityToggle = utilityCategoryCheckBox.isSelected();
+    }
+    private void restoreState()
+    {
+        System.out.println("Restoring state");
+        if (enabledCommands != null)
+        {
+            for (CommandAttributes ca : CommandRegister.getRegister())
+            {
+                ((CheckBox) ccSetupScreen.lookup("#"+ca.getCommandKey()+"CheckBox")).setSelected(enabledCommands.contains(ca.getCommandKey())); //If the commandKey is in enabledCommands, it returns true. We just plug this directly as the state of the CheckBox, as if the commandKey is in the list, it is enabled..
+            }
+            adminCategoryCheckBox.setSelected(adminToggle);
+            audioCategoryCheckBox.setSelected(audioToggle);
+            gamesCategoryCheckBox.setSelected(gamesToggle);
+            toysCategoryCheckBox.setSelected(toysToggle);
+            utilityCategoryCheckBox.setSelected(utilityToggle);
+        }
+        enabledCommands = new ArrayList<String>();
+
+    }
+
 
 
 }
