@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -57,6 +58,7 @@ public class HeadedGUIManager extends Application
             stage = new Stage();
             stage.setTitle("Jara Setup");
             stage.setScene(new Scene(welcomeRoot, 1280, 800));
+            stage.getIcons().add(new Image(HeadedGUIManager.class.getClassLoader().getResourceAsStream("jara.png")));
             stage.show();
         }
         catch (IOException e)
