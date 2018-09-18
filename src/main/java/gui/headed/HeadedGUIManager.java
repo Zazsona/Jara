@@ -80,6 +80,7 @@ public class HeadedGUIManager extends Application
                 stage.getScene().setRoot(ccSetup.getRoot());
                 break;
             case "navBar_review_text":
+                review.refresh();
                 stage.getScene().setRoot(review.getRoot());
                 break;
             default:
@@ -127,6 +128,7 @@ public class HeadedGUIManager extends Application
                 //TODO for all: Save progress, Load new window and its state
                 break;
             case "ccSetupScreen":
+                review.refresh();
                 stage.getScene().setRoot(review.getRoot());
                 break;
             case "reviewScreen":
@@ -203,6 +205,22 @@ public class HeadedGUIManager extends Application
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "ERROR: Unable to locate default browser. Please go to https://discordapp.com/developers/applications/ to set up your bot account.");
         }
-
     }
+    public static DiscordSetup getDiscordSetupController()
+    {
+        return discordSetup;
+    }
+    public static CommandConfigSetup getCcSetupController()
+    {
+        return ccSetup;
+    }
+    public static Welcome getWelcomeController()
+    {
+        return welcome;
+    }
+    public static Review getReviewController()
+    {
+        return review;
+    }
+
 }

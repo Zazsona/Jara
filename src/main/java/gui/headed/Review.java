@@ -1,9 +1,11 @@
 package gui.headed;
 
+import jara.CommandRegister;
 import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
@@ -34,6 +36,8 @@ public class Review
     private StackPane inviteButton;
     @FXML
     private Rectangle inviteRect;
+    @FXML
+    private Label supportListLbl;
 
     public void initialize()
     {
@@ -55,6 +59,20 @@ public class Review
         inviteButton.setOnMouseEntered((event) -> HeadedGUIManager.nextButtonHover(inviteRect));
         inviteButton.setOnMouseExited((event) -> HeadedGUIManager.nextButtonHover(inviteRect));
 
+
+
+    }
+    public void refresh()
+    {
+
+        CommandConfigSetup ccSetup = HeadedGUIManager.getCcSetupController();
+
+        StringBuilder supportListBuilder = new StringBuilder();
+        for (Integer id : ccSetup.getSupportedCategories())
+        {
+            supportListBuilder.append(CommandRegister.getCategoryName(id)).append("\n");
+        }
+        supportListLbl.setText(supportListBuilder.toString());
     }
     public void setRoot(Parent root)
     {
