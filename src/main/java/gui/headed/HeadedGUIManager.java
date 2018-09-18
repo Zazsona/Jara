@@ -1,8 +1,6 @@
 package gui.headed;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -19,12 +17,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import static com.sun.javafx.scene.control.skin.Utils.getResource;
 
-
-public class HeadedUtil extends Application
+public class HeadedGUIManager extends Application
 {
-    private static final Logger logger = LoggerFactory.getLogger(HeadedUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(HeadedGUIManager.class);
 
     private static Welcome welcome;
     private static DiscordSetup discordSetup;
@@ -38,15 +34,25 @@ public class HeadedUtil extends Application
     {
         try
         {
-            FXMLLoader fxmlLoader = new FXMLLoader(HeadedUtil.class.getClassLoader().getResource("gui/welcome.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(HeadedGUIManager.class.getClassLoader().getResource("gui/welcome.fxml"));
             Parent welcomeRoot = fxmlLoader.load();
             welcome = fxmlLoader.getController();
             welcome.setRoot(welcomeRoot);
 
-            fxmlLoader = new FXMLLoader(HeadedUtil.class.getClassLoader().getResource("gui/discordSetup.fxml"));
+            fxmlLoader = new FXMLLoader(HeadedGUIManager.class.getClassLoader().getResource("gui/discordSetup.fxml"));
             Parent discordRoot = fxmlLoader.load();
             discordSetup = fxmlLoader.getController();
             discordSetup.setRoot(discordRoot);
+
+            fxmlLoader = new FXMLLoader(HeadedGUIManager.class.getClassLoader().getResource("gui/ccSetup.fxml"));
+            Parent ccRoot = fxmlLoader.load();
+            ccSetup = fxmlLoader.getController();
+            ccSetup.setRoot(ccRoot);
+
+            fxmlLoader = new FXMLLoader(HeadedGUIManager.class.getClassLoader().getResource("gui/review.fxml"));
+            Parent reviewRoot = fxmlLoader.load();
+            review = fxmlLoader.getController();
+            review.setRoot(reviewRoot);
 
             stage = new Stage();
             stage.setTitle("Jara Setup");
@@ -71,10 +77,10 @@ public class HeadedUtil extends Application
                 stage.getScene().setRoot(discordSetup.getRoot());
                 break;
             case "navBar_configuration_text":
-                //stage.getScene().setRoot(ccSetup.getRoot());
+                stage.getScene().setRoot(ccSetup.getRoot());
                 break;
             case "navBar_review_text":
-                //stage.getScene().setRoot(review.getRoot());
+                stage.getScene().setRoot(review.getRoot());
                 break;
             default:
                 logger.info("Cannot load page. It does not exist.");
@@ -100,7 +106,7 @@ public class HeadedUtil extends Application
                 stage.getScene().setRoot(discordSetup.getRoot());
                 break;
             case "reviewScreen":
-                //stage.getScene().setRoot(ccSetup.getRoot());
+                stage.getScene().setRoot(ccSetup.getRoot());
                 break;
             default:
                 logger.error("Unknown setup window. Cannot go back.");
@@ -117,11 +123,11 @@ public class HeadedUtil extends Application
                 stage.getScene().setRoot(discordSetup.getRoot());
                 break;
             case "discordSetupScreen":
-                //stage.getScene().setRoot(ccSetup.getRoot());
+                stage.getScene().setRoot(ccSetup.getRoot());
                 //TODO for all: Save progress, Load new window and its state
                 break;
             case "ccSetupScreen":
-                //stage.getScene().setRoot(review.getRoot());
+                stage.getScene().setRoot(review.getRoot());
                 break;
             case "reviewScreen":
                 //TODO: Create config, launch bot

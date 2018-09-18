@@ -2,23 +2,17 @@ package gui.headed;
 
 import jara.CommandAttributes;
 import jara.CommandRegister;
-import javafx.application.Application;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
 import javafx.scene.text.Font;
 import javafx.scene.control.CheckBox;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
-public class CommandConfigSetup extends Application
+public class CommandConfigSetup
 {
     @FXML
     private VBox ccSetupScreen;
@@ -57,49 +51,21 @@ public class CommandConfigSetup extends Application
     @FXML
     private CheckBox utilityCategoryCheckBox;
 
-    private ArrayList<String> enabledCommands;
-    private boolean adminToggle;
-    private boolean audioToggle;
-    private boolean gamesToggle;
-    private boolean toysToggle;
-    private boolean utilityToggle;
-
     public void initialize()
     {
-        backButton.setOnMouseClicked((event) ->
-                                     {
-                                         saveState();
-                                         HeadedGUIManager.goBack();
-
-                                     });
+        backButton.setOnMouseClicked((event) -> HeadedGUIManager.goBack());
         backButton.setOnMouseEntered((event) -> HeadedGUIManager.backButtonHover(backRect));
         backButton.setOnMouseExited((event) -> HeadedGUIManager.backButtonHover(backRect));
 
-        nextButton.setOnMouseClicked((event) ->
-                                     {
-                                         saveState();
-                                         HeadedGUIManager.goNext();
-                                     });
+        nextButton.setOnMouseClicked((event) -> HeadedGUIManager.goNext());
         nextButton.setOnMouseEntered((event) -> HeadedGUIManager.nextButtonHover(nextRect));
         nextButton.setOnMouseExited((event) -> HeadedGUIManager.nextButtonHover(nextRect));
 
-        navBar_discord_text.setOnMouseClicked((event) ->
-                                              {
-                                                  saveState();
-                                                  HeadedGUIManager.manageTitleSelection(navBar_discord_text);
-                                              });
+        navBar_discord_text.setOnMouseClicked((event) -> HeadedGUIManager.manageTitleSelection(navBar_discord_text));
 
-        navBar_welcome_text.setOnMouseClicked((event) ->
-                                              {
-                                                  saveState();
-                                                  HeadedGUIManager.manageTitleSelection(navBar_welcome_text);
-                                              });
+        navBar_welcome_text.setOnMouseClicked((event) -> HeadedGUIManager.manageTitleSelection(navBar_welcome_text));
 
-        navBar_review_text.setOnMouseClicked((event) ->
-                                             {
-                                                 saveState();
-                                                 HeadedGUIManager.manageTitleSelection(navBar_review_text);
-                                             });
+        navBar_review_text.setOnMouseClicked((event) -> HeadedGUIManager.manageTitleSelection(navBar_review_text));
 
         adminCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(adminCategoryCheckBox, CommandRegister.ADMIN));
         audioCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(audioCategoryCheckBox, CommandRegister.AUDIO));
@@ -136,24 +102,6 @@ public class CommandConfigSetup extends Application
                     adminList.getChildren().addAll(topSpacePane, generateCommandListElement(ca), bottomSpacePane);
                     break;
             }
-        }
-    }
-    @Override
-    public void start(Stage primaryStage)
-    {
-        try
-        {
-            Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("gui/ccSetup.fxml"));
-
-            restoreState();
-
-            primaryStage.getScene().setRoot(root);
-            primaryStage.show();
-
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
         }
     }
     private BorderPane generateCommandListElement(CommandAttributes commandAttributes)
@@ -194,41 +142,6 @@ public class CommandConfigSetup extends Application
         return bp;
 
     }
-    /*private void toggleCategory(CheckBox categoryCheckBox, int categoryID)
-    {
-        VBox list;
-        switch (categoryID)
-        {
-            case CommandRegister.GAMES:
-                list = gamesList;
-                break;
-            case CommandRegister.UTILITY:
-                list = utilityList;
-                break;
-            case CommandRegister.TOYS:
-                list = toysList;
-                break;
-            case CommandRegister.AUDIO:
-                list = audioList;
-                break;
-            case CommandRegister.ADMIN:                                                         //Alternate method.
-                list = adminList;
-                break;
-            default:
-                list = new VBox();
-        }
-        for (Node node : list.getChildren())
-        {
-            if (node instanceof BorderPane)
-            {
-                CheckBox checkBox = ((CheckBox) ((BorderPane) node).getRight());
-                if (!checkBox.isDisabled())
-                {
-                    checkBox.setSelected(categoryCheckBox.isSelected());
-                }
-            }
-        }
-    }*/
     private void toggleCategory(CheckBox categoryCheckBox, int categoryID)
     {
         CommandAttributes[] ca = CommandRegister.getCommandsInCategory(categoryID);
@@ -241,36 +154,13 @@ public class CommandConfigSetup extends Application
             }
         }
     }
-    private void saveState()
+    public void setRoot(Parent root)
     {
-        System.out.println("Saving state");
-        for (CommandAttributes ca : CommandRegister.getRegister())
-        {
-            enabledCommands.add(ca.getCommandKey());
-        }
-        adminToggle = adminCategoryCheckBox.isSelected();
-        audioToggle = audioCategoryCheckBox.isSelected();
-        gamesToggle = gamesCategoryCheckBox.isSelected();
-        toysToggle = toysCategoryCheckBox.isSelected();
-        utilityToggle = utilityCategoryCheckBox.isSelected();
+        this.ccSetupScreen = (VBox) root;
     }
-    private void restoreState()
+    public Parent getRoot()
     {
-        System.out.println("Restoring state");
-        if (enabledCommands != null)
-        {
-            for (CommandAttributes ca : CommandRegister.getRegister())
-            {
-                ((CheckBox) ccSetupScreen.lookup("#"+ca.getCommandKey()+"CheckBox")).setSelected(enabledCommands.contains(ca.getCommandKey())); //If the commandKey is in enabledCommands, it returns true. We just plug this directly as the state of the CheckBox, as if the commandKey is in the list, it is enabled..
-            }
-            adminCategoryCheckBox.setSelected(adminToggle);
-            audioCategoryCheckBox.setSelected(audioToggle);
-            gamesCategoryCheckBox.setSelected(gamesToggle);
-            toysCategoryCheckBox.setSelected(toysToggle);
-            utilityCategoryCheckBox.setSelected(utilityToggle);
-        }
-        enabledCommands = new ArrayList<String>();
-
+        return ccSetupScreen;
     }
 
 
