@@ -12,6 +12,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
 import javafx.scene.control.CheckBox;
+import javafx.stage.Stage;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -109,6 +110,10 @@ public class CommandConfigSetup
                     break;
             }
         }
+    }
+    public void show(Stage stage)
+    {
+        stage.getScene().setRoot(ccSetupScreen);
     }
     private BorderPane generateCommandListElement(CommandAttributes commandAttributes)
     {

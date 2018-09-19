@@ -73,17 +73,16 @@ public class HeadedGUIManager extends Application
         switch (selectionID)
         {
             case "navBar_welcome_text":
-                stage.getScene().setRoot(welcome.getRoot());
+                welcome.show(stage);
                 break;
             case "navBar_discord_text":
-                stage.getScene().setRoot(discordSetup.getRoot());
+                discordSetup.show(stage);
                 break;
             case "navBar_configuration_text":
-                stage.getScene().setRoot(ccSetup.getRoot());
+                ccSetup.show(stage);
                 break;
             case "navBar_review_text":
-                review.refresh();
-                stage.getScene().setRoot(review.getRoot());
+                review.show(stage);
                 break;
             default:
                 logger.info("Cannot load page. It does not exist.");
@@ -102,14 +101,14 @@ public class HeadedGUIManager extends Application
                 Platform.exit();
                 break;
             case "discordSetupScreen":
-                stage.getScene().setRoot(welcome.getRoot());
+                welcome.show(stage);
                 //TODO for all: Save progress, Load new window and its state
                 break;
             case "ccSetupScreen":
-                stage.getScene().setRoot(discordSetup.getRoot());
+                discordSetup.show(stage);
                 break;
             case "reviewScreen":
-                stage.getScene().setRoot(ccSetup.getRoot());
+                ccSetup.show(stage);
                 break;
             default:
                 logger.error("Unknown setup window. Cannot go back.");
@@ -123,15 +122,14 @@ public class HeadedGUIManager extends Application
         switch (screenID)
         {
             case "welcomeScreen":
-                stage.getScene().setRoot(discordSetup.getRoot());
+                discordSetup.show(stage);
                 break;
             case "discordSetupScreen":
-                stage.getScene().setRoot(ccSetup.getRoot());
+                ccSetup.show(stage);
                 //TODO for all: Save progress, Load new window and its state
                 break;
             case "ccSetupScreen":
-                review.refresh();
-                stage.getScene().setRoot(review.getRoot());
+                review.show(stage);
                 break;
             case "reviewScreen":
                 //TODO: Create config, launch bot
@@ -163,15 +161,6 @@ public class HeadedGUIManager extends Application
         {
             rectangle.setFill(Paint.valueOf("#99aab5"));
         }
-    }
-    public static String generateInviteLink()
-    {
-        if (discordSetup.getClientID().equals(""))
-        {
-            JOptionPane.showMessageDialog(null, "You'll need to complete setup before you can invite the bot.");
-            return "";
-        }
-        return "https://discordapp.com/oauth2/authorize?client_id="+discordSetup.getClientID()+"&scope=bot&permissions=8";
     }
     public static void openWebpage(String url)
     {

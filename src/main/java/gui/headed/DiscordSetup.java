@@ -7,6 +7,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 public class DiscordSetup
 {
@@ -55,6 +56,10 @@ public class DiscordSetup
         portalButton.setOnMouseEntered((event) -> HeadedGUIManager.nextButtonHover(portalRect));
         portalButton.setOnMouseExited((event) -> HeadedGUIManager.nextButtonHover(portalRect));
 
+    }
+    public void show(Stage stage)
+    {
+        stage.getScene().setRoot(discordSetupScreen);
     }
 
     public String getClientID()

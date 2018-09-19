@@ -12,6 +12,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import javax.swing.*;
 import java.io.IOException;
 
 public class Review
@@ -55,16 +56,14 @@ public class Review
 
         navBar_configuration_text.setOnMouseClicked((event -> HeadedGUIManager.manageTitleSelection(navBar_configuration_text)));
 
-        inviteButton.setOnMouseClicked((event) -> HeadedGUIManager.openWebpage(HeadedGUIManager.generateInviteLink()));
         inviteButton.setOnMouseEntered((event) -> HeadedGUIManager.nextButtonHover(inviteRect));
         inviteButton.setOnMouseExited((event) -> HeadedGUIManager.nextButtonHover(inviteRect));
 
 
 
     }
-    public void refresh()
+    public void show(Stage stage)
     {
-
         CommandConfigSetup ccSetup = HeadedGUIManager.getCcSetupController();
 
         StringBuilder supportListBuilder = new StringBuilder();
@@ -73,6 +72,20 @@ public class Review
             supportListBuilder.append(CommandRegister.getCategoryName(id)).append("\n");
         }
         supportListLbl.setText(supportListBuilder.toString());
+
+        inviteButton.setOnMouseClicked((event) -> HeadedGUIManager.openWebpage(generateInviteLink()));
+
+        stage.getScene().setRoot(reviewScreen);
+    }
+    public static String generateInviteLink()
+    {
+        DiscordSetup discordSetup = HeadedGUIManager.getDiscordSetupController();
+        if (discordSetup.getClientID().equals(""))
+        {
+            JOptionPane.showMessageDialog(null, "You'll need to complete setup before you can invite the bot.");
+            return "";
+        }
+        return "https://discordapp.com/oauth2/authorize?client_id="+discordSetup.getClientID()+"&scope=bot&permissions=8";
     }
     public void setRoot(Parent root)
     {

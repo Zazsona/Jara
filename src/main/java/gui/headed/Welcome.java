@@ -49,6 +49,10 @@ public class Welcome extends Application
         navBar_review_text.setOnMouseClicked((event -> HeadedGUIManager.manageTitleSelection(navBar_review_text)));
 
     }
+    public void show(Stage stage)
+    {
+        stage.getScene().setRoot(welcomeScreen);
+    }
 
     @Override
     public void start(Stage primaryStage)
