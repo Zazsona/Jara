@@ -26,6 +26,13 @@ public class CommandRegister
 	public static final int AUDIO = 4;
 	public static final int ADMIN = 5;
 	private static ArrayList<CommandAttributes> register;
+
+	private static ArrayList<CommandAttributes> adminCommands;
+	private static ArrayList<CommandAttributes> audioCommands;
+	private static ArrayList<CommandAttributes> gamesCommands;
+	private static ArrayList<CommandAttributes> toysCommands;
+	private static ArrayList<CommandAttributes> utilityCommands;
+	private static ArrayList<CommandAttributes> noGroupCommands;
 	/*
 	 * When implementing a new command, is is essential to add it to the getRegister() method. Otherwise, it will be ignored at run time.
 	 */
@@ -244,6 +251,8 @@ public class CommandRegister
 		name = name.toLowerCase();
 		switch (name)
 		{
+			case "nogroup":
+				return NOGROUP;
 			case "no group":
 				return NOGROUP;
 			case "games":
@@ -278,16 +287,76 @@ public class CommandRegister
 	}
 	public static CommandAttributes[] getCommandsInCategory(int categoryID)
 	{
+		ArrayList<CommandAttributes> categoryCommands;
+		switch (categoryID)
+		{
+			default:
+				return null;
+			case NOGROUP:
+				categoryCommands = noGroupCommands;
+				break;
+			case GAMES:
+				categoryCommands = gamesCommands;
+				break;
+			case UTILITY:
+				categoryCommands = utilityCommands;
+				break;
+			case TOYS:
+				categoryCommands = toysCommands;
+				break;
+			case AUDIO:
+				categoryCommands = audioCommands;
+				break;
+			case ADMIN:
+				categoryCommands = adminCommands;
+				break;
+		}
+		if (categoryCommands != null)
+		{
+			System.out.println("Commands already generated.");
+			return adminCommands.toArray(new CommandAttributes[register.size()]);
+		}
+		else
+		{
+			return generateCommandsInCategory(categoryID);
+		}
+	}
+	private static CommandAttributes[] generateCommandsInCategory(int categoryID)
+	{
+		System.out.println("Generating commands");
 		getRegister();
-		ArrayList<CommandAttributes> cmdsInCat = new ArrayList<CommandAttributes>();
+		ArrayList<CommandAttributes> categoryCommands = new ArrayList<>();
 		for (CommandAttributes cmdAttributes : register)
 		{
 			if (cmdAttributes.getCategoryID() == categoryID)
 			{
-				cmdsInCat.add(cmdAttributes);
+				categoryCommands.add(cmdAttributes);
 			}
 		}
-		return cmdsInCat.toArray(new CommandAttributes[cmdsInCat.size()]);
+		switch (categoryID)
+		{
+			default:
+				return null;
+			case NOGROUP:
+				 noGroupCommands = categoryCommands;
+				break;
+			case GAMES:
+				gamesCommands = categoryCommands;
+				break;
+			case UTILITY:
+				utilityCommands = categoryCommands;
+				break;
+			case TOYS:
+				toysCommands = categoryCommands;
+				break;
+			case AUDIO:
+				audioCommands = categoryCommands;
+				break;
+			case ADMIN:
+				adminCommands = categoryCommands;
+				break;
+		}
+		return categoryCommands.toArray(new CommandAttributes[categoryCommands.size()]);
 	}
 	public static void sendHelpInfo(GuildMessageReceivedEvent msgEvent, Class<? extends Command> clazz)
 	{
