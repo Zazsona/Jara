@@ -114,25 +114,23 @@ public class GlobalSettings
     }
     public void updateCommandConfiguration(boolean newState, String... commandKeys)
     {
+        saved = false;
         for (String key : commandKeys)
         {
             if (CommandRegister.getCommand(key).isDisableable())
             {
-                commandConfig.remove(key);
-                commandConfig.put(key, newState);
+                commandConfig.replace(key, newState);
             }
         }
     }
     public void updateCategoryConfiguration(boolean newState, int categoryID)
     {
+        ArrayList<String> keys = new ArrayList<>();
         for (CommandAttributes ca : CommandRegister.getCommandsInCategory(categoryID))
         {
-            if (ca.isDisableable())
-            {
-                commandConfig.remove(ca.getCommandKey());
-                commandConfig.put(ca.getCommandKey(), newState);
-            }
+            keys.add(ca.getCommandKey());
         }
+        updateCommandConfiguration(newState, keys.toArray(new String[keys.size()]));
     }
     public boolean isCommandEnabled(String commandKey)
     {
