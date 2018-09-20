@@ -1,9 +1,10 @@
 package commands.admin;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import commands.Command;
-import configuration.GuildSettingsManager;
+import configuration.GuildSettings;
 import configuration.SettingsUtil;
 import jara.CommandAttributes;
 import jara.CommandRegister;
@@ -12,13 +13,13 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
-public class Config extends Command {
+public class Config extends Command { //TODO: Redo this. It's outdated and messy. //TODO: Save guildSettings
 
-	GuildSettingsManager guildSettings;
+	GuildSettings guildSettings;
 	@Override
 	public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
 	{
-		guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
+		guildSettings = new GuildSettings(msgEvent.getGuild().getId());
 		if (parameters.length > 1)
 		{
 			if (parameters[1].equalsIgnoreCase("check"))
@@ -114,18 +115,19 @@ public class Config extends Command {
 				return;
 			}
 		}
-		String roleID = roles.get(0).getId();
+		ArrayList<String> roleID = new ArrayList<>();
+		roleID.add(roles.get(0).getId());
 		if (parameters[2].equals("*"))
 		{
 			for (String key : SettingsUtil.getGlobalSettings().getEnabledCommands())
 			{
 				if (parameters[1].equalsIgnoreCase("addrole"))
 				{
-					guildSettings.addPermittedRole(key, roleID);
+					guildSettings.addPermissions(roleID, key);
 				}
 				else
 				{
-					guildSettings.removePermittedRole(key, roleID);
+					guildSettings.removePermissions(roleID, key);
 				}
 			}
 			embed.setDescription(roles.get(0).getName().replace("@", "")+" can now use all enabled commands!");
@@ -139,11 +141,11 @@ public class Config extends Command {
 				{
 					if (parameters[1].equalsIgnoreCase("addrole"))
 					{
-						guildSettings.addPermittedRole(key, roleID);
+						guildSettings.addPermissions(roleID, key);
 					}
 					else
 					{
-						guildSettings.removePermittedRole(key, roleID);
+						guildSettings.removePermissions(roleID, key);
 					}
 					embed.setDescription(key+" permissions updated!");
 					msgEvent.getChannel().sendMessage(embed.build()).queue();
@@ -166,12 +168,11 @@ public class Config extends Command {
 
 				if (parameters[1].equalsIgnoreCase("enable"))
 				{
-					guildSettings.setCommandEnabled(key, true);
+					guildSettings.updateCommandConfiguration(true, null, key);
 				}
 				else
 				{
-
-					guildSettings.setCommandEnabled(key, false);
+					guildSettings.updateCommandConfiguration(false, null, key);
 				}
 			}
 			embed.setDescription("All basic commands have been "+parameters[1].toLowerCase()+"d"); //Felt like being lazy here. para[1] is always either "enable"/"disable", this makes it "enabled" or "disabled" in text.
@@ -185,12 +186,11 @@ public class Config extends Command {
 				{
 					if (parameters[1].equalsIgnoreCase("enable"))
 					{
-						guildSettings.setCommandEnabled(cmdAttributes.getCommandKey(), true);
+						guildSettings.updateCommandConfiguration(true, null, cmdAttributes.getCommandKey());
 					}
 					else
 					{
-
-						guildSettings.setCommandEnabled(cmdAttributes.getCommandKey(), false);
+						guildSettings.updateCommandConfiguration(false, null, cmdAttributes.getCommandKey());
 					}
 				}
 			}
@@ -205,7 +205,7 @@ public class Config extends Command {
 				{
 					if (parameters[1].equalsIgnoreCase("enable"))
 					{
-						guildSettings.setCommandEnabled(key, true);
+						guildSettings.updateCommandConfiguration(true, null, key);
 					}
 					else
 					{
@@ -215,7 +215,7 @@ public class Config extends Command {
 							msgEvent.getChannel().sendMessage(embed.build()).queue();
 							return;
 						}
-						guildSettings.setCommandEnabled(key, false);
+						guildSettings.updateCommandConfiguration(false, null, key);
 					}
 					embed.setDescription(key+" status updated!");
 					msgEvent.getChannel().sendMessage(embed.build()).queue();
@@ -257,7 +257,7 @@ public class Config extends Command {
 			categoryID = "";
 		}
 
-		guildSettings.setGuildGameCategoryID(categoryID);
+		guildSettings.setGameCategoryId(categoryID);
 		if (categoryID.equals(""))
 		{
 			embed.setDescription("Category removed.");
@@ -326,14 +326,14 @@ public class Config extends Command {
 	{
 		StringBuilder descBuilder = new StringBuilder();
 		descBuilder.append("**============ Game Category ============**\n");
-		if (guildSettings.getGuildGameCategoryID().equals(""))
+		if (guildSettings.getGameCategoryId().equals(""))
 		{
 			descBuilder.append("None Set.");
 		}
 		else
 		{
-			descBuilder.append(msgEvent.getGuild().getCategoryById(guildSettings.getGuildGameCategoryID()).getName()).append("\n");
-			descBuilder.append(guildSettings.getGuildGameCategoryID());
+			descBuilder.append(msgEvent.getGuild().getCategoryById(guildSettings.getGameCategoryId()).getName()).append("\n");
+			descBuilder.append(guildSettings.getGameCategoryId());
 		}
 		descBuilder.append("\n\n");
 		return descBuilder.toString();
@@ -352,7 +352,7 @@ public class Config extends Command {
 			dataBuilder.append("*Disabled*\n");
 		}
 		dataBuilder.append("Roles: ");
-		for (String roleID : guildSettings.getPermittedRoles(key))
+		for (String roleID : guildSettings.getPermissions(key))
 		{
 			dataBuilder.append(msgEvent.getGuild().getRoleById(roleID).getName().replace("@", "")+", "); //Removing @ here as getName appends it for the everyone role, causing a ping.
 		}

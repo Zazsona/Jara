@@ -1,9 +1,9 @@
 package event;
 
+import configuration.SettingsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import configuration.GuildSettingsManager;
 import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
@@ -14,8 +14,7 @@ public class GuildLeaveHandler extends ListenerAdapter
 	{
 		Logger logger = LoggerFactory.getLogger(getClass());
 		logger.info("Oh dear! I've been kicked out of guild "+leaveEvent.getGuild().getId()+". Deleting guild config.");
-		GuildSettingsManager guildSettings = new GuildSettingsManager(leaveEvent.getGuild().getId());
-		guildSettings.deleteGuildSettingsFile();
+		SettingsUtil.getGuildSettingsFile(leaveEvent.getGuild().getId()).delete();
 		return;
 	}
 }

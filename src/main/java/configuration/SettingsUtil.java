@@ -4,6 +4,7 @@ import gui.headed.HeadedGUIManager;
 import jara.CommandAttributes;
 import jara.CommandRegister;
 import javafx.application.Application;
+import net.dv8tion.jda.core.entities.Guild;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +61,6 @@ public class SettingsUtil
             }
         }
         //We don't care if the config has commands not in the register, these will simply be ignored. This allows for backwards compatibility and (in some cases) transfers of settings from forked/modded versions of Jara.
-
     }
     public static GlobalSettings getGlobalSettings()
     {
@@ -105,7 +105,7 @@ public class SettingsUtil
      * @return
      * File - Guild Settings directory
      */
-    private static File getGuildSettingsDirectory()
+    public static File getGuildSettingsDirectory()
     {
         File guildSettingsFolder;
         guildSettingsFolder = new File(getDirectory().getAbsolutePath()+"/guilds/");
@@ -115,8 +115,6 @@ public class SettingsUtil
         }
         return guildSettingsFolder;
     }
-    //================================= Global Config Tools =====================================================
-
     /**
      * Returns the file where global settings are stored.
      * @return
@@ -134,5 +132,30 @@ public class SettingsUtil
         {
             return settingsFile;
         }
+    }
+    public static File getGuildSettingsFile(String guildID)
+    {
+        return new File(getGuildSettingsDirectory().getPath()+"/"+guildID+".json");
+    }
+    public static void addNewGuild(String guildId)
+    {
+        try
+        {
+            File guildFile = getGuildSettingsFile(guildId);
+            if (guildFile.exists())
+            {
+                guildFile.delete();
+            }
+            guildFile.createNewFile();
+            GuildSettings guildSettings = new GuildSettings(guildId);
+            guildSettings.setGameCategoryId("");
+            guildSettings.generateDefaultCommandConfig();
+            guildSettings.save();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
     }
 }

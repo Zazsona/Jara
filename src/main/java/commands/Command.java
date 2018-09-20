@@ -1,14 +1,16 @@
 package commands;
 
+import configuration.GuildSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import configuration.GuildSettingsManager;
 import net.dv8tion.jda.core.entities.Category;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.exceptions.GuildUnavailableException;
 import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
+
+import java.io.IOException;
 
 public abstract class Command //A base class to build commands from.
 {
@@ -19,8 +21,8 @@ public abstract class Command //A base class to build commands from.
 	protected TextChannel createGameChannel(GuildMessageReceivedEvent msgEvent, String channelName)
 	{
 		Logger logger = LoggerFactory.getLogger(Command.class);
-		GuildSettingsManager guildSettings = new GuildSettingsManager(msgEvent.getGuild().getId());
-		String gameCategoryID = guildSettings.getGuildGameCategoryID();
+		GuildSettings guildSettings = new GuildSettings(msgEvent.getGuild().getId());
+		String gameCategoryID = guildSettings.getGameCategoryId();
 		if (gameCategoryID.equals(""))
 		{
 			return msgEvent.getChannel();
@@ -60,7 +62,17 @@ public abstract class Command //A base class to build commands from.
 			{
 				logger.info("Guild "+msgEvent.getGuild().getId()+"'s game category for the saved id doesn't exist. Creating new category and updating id.");
 				msgEvent.getGuild().getController().createCategory("Bot Games").complete();
-				guildSettings.setGuildGameCategoryID(gameCategoryID);
+				guildSettings.setGameCategoryId(gameCategoryID);
+
+				try
+				{
+					guildSettings.save();
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
+
 				return createGameChannel(msgEvent, channelName);
 			}
 		}

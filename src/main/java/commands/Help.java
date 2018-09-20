@@ -3,7 +3,7 @@ package commands;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import configuration.GuildSettingsManager;
+import configuration.GuildSettings;
 import configuration.SettingsUtil;
 import jara.CommandAttributes;
 import jara.CommandRegister;
@@ -269,7 +269,7 @@ public class Help extends Command {
 
 				TL;DR, the permission check is for an easier experience, not secrecy. Consider this when setting limitToPerms as true.
 		 */
-		GuildSettingsManager guildSettings = new GuildSettingsManager(guildID);
+		GuildSettings guildSettings = new GuildSettings(guildID);
 		StringBuilder commands = new StringBuilder();
 		boolean commandsListed = false;
 		commands.append("~~------------------------------------------------------------~~\n");
@@ -277,7 +277,7 @@ public class Help extends Command {
 		{
 			if (guildSettings.isCommandEnabled(cmdAttributes.getCommandKey()) && SettingsUtil.getGlobalSettings().isCommandEnabled(cmdAttributes.getCommandKey()))
 			{
-				if (!(Collections.disjoint(guildSettings.getPermittedRoles(cmdAttributes.getCommandKey()), roleIDs)) || !limitToPerms)
+				if (!(Collections.disjoint(guildSettings.getPermissions(cmdAttributes.getCommandKey()), roleIDs)) || !limitToPerms)
 				{
 					commands.append("**").append(cmdAttributes.getCommandKey()).append("** - ").append(cmdAttributes.getDescription()).append("\n");
 					commandsListed = true;

@@ -1,6 +1,5 @@
 package gui.headed;
 
-import configuration.JsonFormats;
 import jara.CommandAttributes;
 import jara.CommandRegister;
 import javafx.fxml.FXML;
@@ -14,8 +13,8 @@ import javafx.scene.text.Font;
 import javafx.scene.control.CheckBox;
 import javafx.stage.Stage;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class CommandConfigSetup
 {
@@ -182,13 +181,13 @@ public class CommandConfigSetup
         return supportedCategories;
     }
 
-    public ArrayList<JsonFormats.GlobalCommandConfigJson> getCommandConfig()
+    public HashMap<String, Boolean> getCommandConfig()
     {
-        ArrayList<JsonFormats.GlobalCommandConfigJson> commandConfig = new ArrayList<>();
+        HashMap<String, Boolean> commandConfig = new HashMap<>();
 
         for (CommandAttributes ca : CommandRegister.getRegister())
         {
-            commandConfig.add(new JsonFormats().new GlobalCommandConfigJson(ca.getCommandKey(), ((CheckBox) ccSetupScreen.lookup("#"+ca.getCommandKey()+"CheckBox")).isSelected()));
+            commandConfig.put(ca.getCommandKey(), ((CheckBox) ccSetupScreen.lookup("#"+ca.getCommandKey()+"CheckBox")).isSelected());
         }
         return commandConfig;
     }

@@ -2,10 +2,11 @@ package event;
 
 import java.awt.Color;
 
+import configuration.GuildSettings;
+import configuration.SettingsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import configuration.GuildSettingsManager;
 import jara.Core;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Guild;
@@ -22,8 +23,7 @@ public class GuildJoinHandler extends ListenerAdapter
 		User owner = joinEvent.getGuild().getOwner().getUser();
 		Logger logger = LoggerFactory.getLogger(getClass());
 		logger.info("Joined guild "+joinEvent.getGuild().getId());
-		GuildSettingsManager guildSettings = new GuildSettingsManager(joinEvent.getGuild().getId());
-		guildSettings.performNewGuildSetup();
+		SettingsUtil.addNewGuild(joinEvent.getGuild().getId());
 		EmbedBuilder embed = new EmbedBuilder();
 		embed.setColor(Core.getHighlightColour(joinEvent.getGuild().getSelfMember()));
 		embed.setDescription("Hey there, "+owner.getName()+"!\nI'm just sending you this to tell you I'm all ready to go in "+guild.getName()+".\n" +
