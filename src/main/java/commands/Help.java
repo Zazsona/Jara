@@ -3,8 +3,8 @@ package commands;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import configuration.GlobalSettingsManager;
 import configuration.GuildSettingsManager;
+import configuration.SettingsUtil;
 import jara.CommandAttributes;
 import jara.CommandRegister;
 import jara.Core;
@@ -275,7 +275,7 @@ public class Help extends Command {
 		commands.append("~~------------------------------------------------------------~~\n");
 		for (CommandAttributes cmdAttributes : CommandRegister.getCommandsInCategory(categoryID))
 		{
-			if (guildSettings.isCommandEnabled(cmdAttributes.getCommandKey()) && GlobalSettingsManager.isCommandEnabledGlobally(cmdAttributes.getCommandKey()))
+			if (guildSettings.isCommandEnabled(cmdAttributes.getCommandKey()) && SettingsUtil.getGlobalSettings().isCommandEnabled(cmdAttributes.getCommandKey()))
 			{
 				if (!(Collections.disjoint(guildSettings.getPermittedRoles(cmdAttributes.getCommandKey()), roleIDs)) || !limitToPerms)
 				{

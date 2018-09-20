@@ -4,7 +4,7 @@ package commands;
 import audio.Audio;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import configuration.GlobalSettingsManager;
+import configuration.SettingsUtil;
 import jara.Core;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.http.HttpEntity;
@@ -97,7 +97,7 @@ public class CmdUtil
     private static ArrayList<String> wordList;
     public static ArrayList<String> getWordList() throws IOException
     {
-        File localWordsFile = new File(GlobalSettingsManager.getDirectory()+"/wordList.txt");
+        File localWordsFile = new File(SettingsUtil.getDirectory()+"/wordList.txt");
         if (wordList == null)
         {
             wordList = new ArrayList<>();

@@ -3,8 +3,8 @@ package commands.admin;
 import java.util.List;
 
 import commands.Command;
-import configuration.GlobalSettingsManager;
 import configuration.GuildSettingsManager;
+import configuration.SettingsUtil;
 import jara.CommandAttributes;
 import jara.CommandRegister;
 import jara.Core;
@@ -86,7 +86,7 @@ public class Config extends Command {
 			descBuilder.append("/config RemRole [Command] [Role Name]\n\n");
 			descBuilder.append(getGameCategory(msgEvent));
 			descBuilder.append("**============= Commands ==============**\n");
-			for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
+			for (String key : SettingsUtil.getGlobalSettings().getEnabledCommands())
 			{
 				renderCommandData(msgEvent, key, embed);
 			}
@@ -117,7 +117,7 @@ public class Config extends Command {
 		String roleID = roles.get(0).getId();
 		if (parameters[2].equals("*"))
 		{
-			for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
+			for (String key : SettingsUtil.getGlobalSettings().getEnabledCommands())
 			{
 				if (parameters[1].equalsIgnoreCase("addrole"))
 				{
@@ -133,7 +133,7 @@ public class Config extends Command {
 		}
 		else
 		{
-			for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
+			for (String key : SettingsUtil.getGlobalSettings().getEnabledCommands())
 			{
 				if (parameters[2].equalsIgnoreCase(key))
 				{
@@ -161,7 +161,7 @@ public class Config extends Command {
 		embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
 		if (parameters[2].equals("*"))
 		{
-			for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
+			for (String key : SettingsUtil.getGlobalSettings().getEnabledCommands())
 			{
 
 				if (parameters[1].equalsIgnoreCase("enable"))
@@ -181,7 +181,7 @@ public class Config extends Command {
 		{
 			for (CommandAttributes cmdAttributes : CommandRegister.getCommandsInCategory(CommandRegister.getCategoryID(parameters[2])))
 			{
-				if (GlobalSettingsManager.isCommandEnabledGlobally(cmdAttributes.getCommandKey()))
+				if (SettingsUtil.getGlobalSettings().isCommandEnabled(cmdAttributes.getCommandKey()))
 				{
 					if (parameters[1].equalsIgnoreCase("enable"))
 					{
@@ -199,7 +199,7 @@ public class Config extends Command {
 		}
 		else
 		{
-			for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
+			for (String key : SettingsUtil.getGlobalSettings().getEnabledCommands())
 			{
 				if (parameters[2].equalsIgnoreCase(key))
 				{
@@ -278,7 +278,7 @@ public class Config extends Command {
 		{
 			for (CommandAttributes cmdAttributes : CommandRegister.getCommandsInCategory(CommandRegister.getCategoryID(query)))
 			{
-				if (GlobalSettingsManager.isCommandEnabledGlobally(cmdAttributes.getCommandKey()))
+				if (SettingsUtil.getGlobalSettings().isCommandEnabled(cmdAttributes.getCommandKey()))
 				{
 					renderCommandData(msgEvent, cmdAttributes.getCommandKey(), embed);
 				}
@@ -292,7 +292,7 @@ public class Config extends Command {
 		{
 			descBuilder.append(getGameCategory(msgEvent));
 			descBuilder.append("**============= Commands ==============**\n");
-			for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
+			for (String key : SettingsUtil.getGlobalSettings().getEnabledCommands())
 			{
 				renderCommandData(msgEvent, key, embed);
 			}
@@ -300,7 +300,7 @@ public class Config extends Command {
 		else
 		{
 			boolean commandFound = false;
-			for (String key : GlobalSettingsManager.getGloballyEnabledCommandKeys())
+			for (String key : SettingsUtil.getGlobalSettings().getEnabledCommands())
 			{
 				if (key.equalsIgnoreCase(query))
 				{

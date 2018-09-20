@@ -4,12 +4,11 @@ import java.awt.Color;
 
 import javax.security.auth.login.LoginException;
 
-import gui.ConsoleGUI;
+import configuration.SettingsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import configuration.CommandConfiguration;
-import configuration.GlobalSettingsManager;
 import event.GuildJoinHandler;
 import event.GuildLeaveHandler;
 import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
@@ -32,7 +31,7 @@ public class Core //A class for covering the global manners of the bot.
 	    catch (LoginException | IllegalArgumentException e)
 		{
 	    	logger.error("Failed to log in.");
-			String newToken = ConsoleGUI.updateToken();
+			String newToken = ""; //TODO TEMP Headless.updateToken();
 			initialiseDiscordConnection(newToken); //TODO: Headless check
 	    	e.printStackTrace();
 		}
@@ -42,7 +41,7 @@ public class Core //A class for covering the global manners of the bot.
 		CommandConfiguration[] commandConfigs = new CommandConfiguration[CommandRegister.getRegisterSize()];
 		for (int i = 0; i<commandConfigs.length; i++)
 		{
-			commandConfigs[i] = new CommandConfiguration(CommandRegister.getRegister()[i], GlobalSettingsManager.isCommandEnabledGlobally(CommandRegister.getRegister()[i].getCommandKey()));
+			commandConfigs[i] = new CommandConfiguration(CommandRegister.getRegister()[i], SettingsUtil.getGlobalSettings().isCommandEnabled(CommandRegister.getRegister()[i].getCommandKey()));
 		}
 		shardManager.addEventListener(new CommandHandler(commandConfigs));
 	}

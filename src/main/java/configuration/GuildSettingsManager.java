@@ -43,7 +43,7 @@ public class GuildSettingsManager
 	 */
 	public File getDirectory()
 	{
-		return GlobalSettingsManager.getDirectory();
+		return SettingsUtil.getDirectory();
 	}
 	
 	//==================================== Guild Specific Tools ==================================================
@@ -452,7 +452,7 @@ public class GuildSettingsManager
 	 */
 	public void setCategoryEnabled(int categoryID, boolean newStatus)
 	{
-		Logger logger = LoggerFactory.getLogger(GlobalSettingsManager.class);
+		Logger logger = LoggerFactory.getLogger(GuildSettingsManager.class);
 		if (CommandRegister.getCategoryName(categoryID) == null) //Simple verification check to ensure the id is valid.
 		{
 			logger.info("Could not alter category status as the specified category does not exist.");
