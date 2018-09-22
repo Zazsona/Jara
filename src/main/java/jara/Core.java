@@ -18,7 +18,7 @@ import net.dv8tion.jda.core.entities.Member;
 public class Core //A class for covering the global manners of the bot.
 {
 	private static ShardManager shardManager;
-	public static void initialiseDiscordConnection(String clientToken)
+	public static boolean initialiseDiscordConnection(String clientToken)
 	{
 		Logger logger = LoggerFactory.getLogger(Core.class);
 	    try
@@ -27,13 +27,13 @@ public class Core //A class for covering the global manners of the bot.
 		    shardManagerBuilder.setToken(clientToken);
 		    shardManager = shardManagerBuilder.build();
 		    logger.info("Logged in!");
+		    return true;
 		}
 	    catch (LoginException | IllegalArgumentException e)
 		{
 	    	logger.error("Failed to log in.");
-			String newToken = ""; //TODO TEMP Headless.updateToken();
-			initialiseDiscordConnection(newToken); //TODO: Headless check
 	    	e.printStackTrace();
+	    	return false;
 		}
 	}
 	public static void enableCommands()

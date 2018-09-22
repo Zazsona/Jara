@@ -29,6 +29,8 @@ public class HeadedGUIManager extends Application
     private static Review review;
     private static Stage stage;
 
+    private static String updatedToken;
+
 
     @Override
     public void start(Stage primaryStage) throws Exception
@@ -197,6 +199,11 @@ public class HeadedGUIManager extends Application
             JOptionPane.showMessageDialog(null, "ERROR: Unable to locate default browser. Please go to https://discordapp.com/developers/applications/ to set up your bot account.");
         }
     }
+    public static String updateToken()
+    {
+        Application.launch(TokenUpdater.class);
+        return updatedToken;
+    }
     public static DiscordSetup getDiscordSetupController()
     {
         return discordSetup;
@@ -212,6 +219,10 @@ public class HeadedGUIManager extends Application
     public static Review getReviewController()
     {
         return review;
+    }
+    public static void setUpdatedToken(String token)
+    {
+        updatedToken = token;
     }
 
 }

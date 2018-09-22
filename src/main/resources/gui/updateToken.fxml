@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import com.jfoenix.controls.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #36393F;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.headed.TokenUpdater">
+   <children>
+      <VBox alignment="CENTER" maxHeight="200.0" prefHeight="154.0" prefWidth="330.0" style="-fx-background-color: #23272A;">
+         <children>
+            <Pane prefHeight="18.0" prefWidth="330.0" />
+            <ImageView fitHeight="53.0" fitWidth="151.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../connect.png" />
+               </image>
+            </ImageView>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="  Bot Token" wrappingWidth="279.837890625">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Text>
+            <Pane prefHeight="8.0" prefWidth="100.0" />
+            <HBox prefHeight="31.0" prefWidth="211.0">
+               <children>
+                  <Pane prefHeight="31.0" prefWidth="58.0" />
+                  <TextField fx:id="txtFieldToken" prefHeight="25.0" prefWidth="330.0" style="-fx-background-color: #484B51; -fx-text-fill: #FFFFFF;" />
+                  <Pane prefHeight="31.0" prefWidth="58.0" />
+               </children>
+            </HBox>
+            <Pane prefHeight="8.0" prefWidth="100.0" />
+            <HBox prefHeight="38.0" prefWidth="330.0">
+               <children>
+                  <Pane prefHeight="8.0" prefWidth="100.0" />
+                  <StackPane fx:id="enterButton" prefHeight="22.0" prefWidth="119.0">
+                     <children>
+                        <Rectangle fx:id="enterRect" arcHeight="5.0" arcWidth="5.0" fill="#7289da" height="45.0" stroke="TRANSPARENT" strokeType="INSIDE" style="-fx-arc-height: 50; -fx-arc-width: 50;" width="101.0" />
+                        <Text fx:id="navBar_discord_text11" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter" textAlignment="CENTER" wrappingWidth="118.21728515625">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Text>
+                     </children>
+                  </StackPane>
+                  <Pane prefHeight="8.0" prefWidth="100.0" />
+               </children>
+            </HBox>
+         </children>
+         <effect>
+            <DropShadow />
+         </effect>
+      </VBox>
+   </children>
+</HBox>
