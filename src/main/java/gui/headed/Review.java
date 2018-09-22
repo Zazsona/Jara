@@ -1,5 +1,6 @@
 package gui.headed;
 
+import gui.HeadedGUI;
 import jara.CommandRegister;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -79,7 +80,7 @@ public class Review
         DiscordSetup discordSetup = HeadedGUIUtil.getDiscordSetupController();
         if (discordSetup.getClientID().equals(""))
         {
-            JOptionPane.showMessageDialog(null, "You'll need to complete setup before you can invite the bot.");
+            HeadedGUI.showError("You'll need to complete setup before you can invite the bot.");
             return "";
         }
         return "https://discordapp.com/oauth2/authorize?client_id="+discordSetup.getClientID()+"&scope=bot&permissions=8";

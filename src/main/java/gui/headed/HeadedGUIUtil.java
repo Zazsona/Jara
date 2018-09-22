@@ -1,4 +1,5 @@
 package gui.headed;
+import gui.HeadedGUI;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -30,6 +31,8 @@ public class HeadedGUIUtil extends Application
     private static Stage stage;
 
     private static String updatedToken;
+    private static String errorMessage;
+
 
     @Override
     public void start(Stage primaryStage) throws Exception
@@ -195,7 +198,7 @@ public class HeadedGUIUtil extends Application
         catch (IOException e)
         {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "ERROR: Unable to locate default browser. Please go to https://discordapp.com/developers/applications/ to set up your bot account.");
+            HeadedGUI.showError("ERROR: Unable to locate default browser. Please go to https://discordapp.com/developers/applications/ to set up your bot account.");
         }
     }
     public static String showUpdateTokenPane()
@@ -203,7 +206,24 @@ public class HeadedGUIUtil extends Application
         Application.launch(TokenUpdater.class);
         return updatedToken;
     }
+    public static void showErrorPane(String error)
+    {
+        errorMessage = error;
+        try
+        {
+            Application.launch(ErrorPane.class);
+        }
+        catch (IllegalArgumentException e)
+        {
+            new ErrorPane().start(null);
+        }
 
+
+    }
+    public static String getError()
+    {
+        return errorMessage;
+    }
     public static DiscordSetup getDiscordSetupController()
     {
         return discordSetup;
