@@ -19,9 +19,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 
-public class HeadedGUIManager extends Application
+public class HeadedGUIUtil extends Application
 {
-    private static final Logger logger = LoggerFactory.getLogger(HeadedGUIManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(HeadedGUIUtil.class);
 
     private static Welcome welcome;
     private static DiscordSetup discordSetup;
@@ -31,28 +31,27 @@ public class HeadedGUIManager extends Application
 
     private static String updatedToken;
 
-
     @Override
     public void start(Stage primaryStage) throws Exception
     {
         try
         {
-            FXMLLoader fxmlLoader = new FXMLLoader(HeadedGUIManager.class.getClassLoader().getResource("gui/welcome.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(HeadedGUIUtil.class.getClassLoader().getResource("gui/welcome.fxml"));
             Parent welcomeRoot = fxmlLoader.load();
             welcome = fxmlLoader.getController();
             welcome.setRoot(welcomeRoot);
 
-            fxmlLoader = new FXMLLoader(HeadedGUIManager.class.getClassLoader().getResource("gui/discordSetup.fxml"));
+            fxmlLoader = new FXMLLoader(HeadedGUIUtil.class.getClassLoader().getResource("gui/discordSetup.fxml"));
             Parent discordRoot = fxmlLoader.load();
             discordSetup = fxmlLoader.getController();
             discordSetup.setRoot(discordRoot);
 
-            fxmlLoader = new FXMLLoader(HeadedGUIManager.class.getClassLoader().getResource("gui/ccSetup.fxml"));
+            fxmlLoader = new FXMLLoader(HeadedGUIUtil.class.getClassLoader().getResource("gui/ccSetup.fxml"));
             Parent ccRoot = fxmlLoader.load();
             ccSetup = fxmlLoader.getController();
             ccSetup.setRoot(ccRoot);
 
-            fxmlLoader = new FXMLLoader(HeadedGUIManager.class.getClassLoader().getResource("gui/review.fxml"));
+            fxmlLoader = new FXMLLoader(HeadedGUIUtil.class.getClassLoader().getResource("gui/review.fxml"));
             Parent reviewRoot = fxmlLoader.load();
             review = fxmlLoader.getController();
             review.setRoot(reviewRoot);
@@ -60,7 +59,7 @@ public class HeadedGUIManager extends Application
             stage = new Stage();
             stage.setTitle("Jara Setup");
             stage.setScene(new Scene(welcomeRoot, 1280, 800));
-            stage.getIcons().add(new Image(HeadedGUIManager.class.getClassLoader().getResourceAsStream("jara.png")));
+            stage.getIcons().add(new Image(HeadedGUIUtil.class.getClassLoader().getResourceAsStream("jara.png")));
             stage.show();
         }
         catch (IOException e)
@@ -199,11 +198,12 @@ public class HeadedGUIManager extends Application
             JOptionPane.showMessageDialog(null, "ERROR: Unable to locate default browser. Please go to https://discordapp.com/developers/applications/ to set up your bot account.");
         }
     }
-    public static String updateToken()
+    public static String showUpdateTokenPane()
     {
         Application.launch(TokenUpdater.class);
         return updatedToken;
     }
+
     public static DiscordSetup getDiscordSetupController()
     {
         return discordSetup;

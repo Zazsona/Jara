@@ -34,19 +34,19 @@ public class Welcome extends Application
 
     public void initialize()
     {
-        backButton.setOnMouseClicked((event) -> HeadedGUIManager.goBack());
-        backButton.setOnMouseEntered((event) -> HeadedGUIManager.backButtonHover(backRect));
-        backButton.setOnMouseExited((event) -> HeadedGUIManager.backButtonHover(backRect));
+        backButton.setOnMouseClicked((event) -> HeadedGUIUtil.goBack());
+        backButton.setOnMouseEntered((event) -> HeadedGUIUtil.backButtonHover(backRect));
+        backButton.setOnMouseExited((event) -> HeadedGUIUtil.backButtonHover(backRect));
 
-        nextButton.setOnMouseClicked((event) -> HeadedGUIManager.goNext());
-        nextButton.setOnMouseEntered((event) -> HeadedGUIManager.nextButtonHover(nextRect));
-        nextButton.setOnMouseExited((event) -> HeadedGUIManager.nextButtonHover(nextRect));
+        nextButton.setOnMouseClicked((event) -> HeadedGUIUtil.goNext());
+        nextButton.setOnMouseEntered((event) -> HeadedGUIUtil.nextButtonHover(nextRect));
+        nextButton.setOnMouseExited((event) -> HeadedGUIUtil.nextButtonHover(nextRect));
 
-        navBar_discord_text.setOnMouseClicked((event) -> HeadedGUIManager.manageTitleSelection(navBar_discord_text));
+        navBar_discord_text.setOnMouseClicked((event) -> HeadedGUIUtil.manageTitleSelection(navBar_discord_text));
 
-        navBar_configuration_text.setOnMouseClicked((event -> HeadedGUIManager.manageTitleSelection(navBar_configuration_text)));
+        navBar_configuration_text.setOnMouseClicked((event -> HeadedGUIUtil.manageTitleSelection(navBar_configuration_text)));
 
-        navBar_review_text.setOnMouseClicked((event -> HeadedGUIManager.manageTitleSelection(navBar_review_text)));
+        navBar_review_text.setOnMouseClicked((event -> HeadedGUIUtil.manageTitleSelection(navBar_review_text)));
 
     }
     public void show(Stage stage)

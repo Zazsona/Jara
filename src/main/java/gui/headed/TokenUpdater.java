@@ -1,24 +1,16 @@
 package gui.headed;
 
-import configuration.SettingsUtil;
-import jara.CommandRegister;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
-import javax.swing.*;
-import java.io.IOException;
 
 public class TokenUpdater extends Application
 {
@@ -33,11 +25,11 @@ public class TokenUpdater extends Application
     {
         enterButton.setOnMouseClicked((event) ->
                                       {
-                                          HeadedGUIManager.setUpdatedToken(txtFieldToken.getText());
+                                          HeadedGUIUtil.setUpdatedToken(txtFieldToken.getText());
                                           Platform.exit();
                                       });
-        enterButton.setOnMouseEntered((event) -> HeadedGUIManager.nextButtonHover(enterRect));
-        enterButton.setOnMouseExited((event) -> HeadedGUIManager.nextButtonHover(enterRect));
+        enterButton.setOnMouseEntered((event) -> HeadedGUIUtil.nextButtonHover(enterRect));
+        enterButton.setOnMouseExited((event) -> HeadedGUIUtil.nextButtonHover(enterRect));
     }
 
     @Override

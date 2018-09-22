@@ -1,9 +1,7 @@
 package gui.headed;
 
 import jara.CommandRegister;
-import javafx.application.Application;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
@@ -13,7 +11,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import javax.swing.*;
-import java.io.IOException;
 
 public class Review
 {
@@ -42,29 +39,29 @@ public class Review
 
     public void initialize()
     {
-        backButton.setOnMouseClicked((event) -> HeadedGUIManager.goBack());
-        backButton.setOnMouseEntered((event) -> HeadedGUIManager.backButtonHover(backRect));
-        backButton.setOnMouseExited((event) -> HeadedGUIManager.backButtonHover(backRect));
+        backButton.setOnMouseClicked((event) -> HeadedGUIUtil.goBack());
+        backButton.setOnMouseEntered((event) -> HeadedGUIUtil.backButtonHover(backRect));
+        backButton.setOnMouseExited((event) -> HeadedGUIUtil.backButtonHover(backRect));
 
-        nextButton.setOnMouseClicked((event) -> HeadedGUIManager.goNext());
-        nextButton.setOnMouseEntered((event) -> HeadedGUIManager.nextButtonHover(nextRect));
-        nextButton.setOnMouseExited((event) -> HeadedGUIManager.nextButtonHover(nextRect));
+        nextButton.setOnMouseClicked((event) -> HeadedGUIUtil.goNext());
+        nextButton.setOnMouseEntered((event) -> HeadedGUIUtil.nextButtonHover(nextRect));
+        nextButton.setOnMouseExited((event) -> HeadedGUIUtil.nextButtonHover(nextRect));
 
-        navBar_discord_text.setOnMouseClicked((event) -> HeadedGUIManager.manageTitleSelection(navBar_discord_text));
+        navBar_discord_text.setOnMouseClicked((event) -> HeadedGUIUtil.manageTitleSelection(navBar_discord_text));
 
-        navBar_welcome_text.setOnMouseClicked((event -> HeadedGUIManager.manageTitleSelection(navBar_welcome_text)));
+        navBar_welcome_text.setOnMouseClicked((event -> HeadedGUIUtil.manageTitleSelection(navBar_welcome_text)));
 
-        navBar_configuration_text.setOnMouseClicked((event -> HeadedGUIManager.manageTitleSelection(navBar_configuration_text)));
+        navBar_configuration_text.setOnMouseClicked((event -> HeadedGUIUtil.manageTitleSelection(navBar_configuration_text)));
 
-        inviteButton.setOnMouseEntered((event) -> HeadedGUIManager.nextButtonHover(inviteRect));
-        inviteButton.setOnMouseExited((event) -> HeadedGUIManager.nextButtonHover(inviteRect));
+        inviteButton.setOnMouseEntered((event) -> HeadedGUIUtil.nextButtonHover(inviteRect));
+        inviteButton.setOnMouseExited((event) -> HeadedGUIUtil.nextButtonHover(inviteRect));
 
 
 
     }
     public void show(Stage stage)
     {
-        CommandConfigSetup ccSetup = HeadedGUIManager.getCcSetupController();
+        CommandConfigSetup ccSetup = HeadedGUIUtil.getCcSetupController();
 
         StringBuilder supportListBuilder = new StringBuilder();
         for (Integer id : ccSetup.getSupportedCategories())
@@ -73,13 +70,13 @@ public class Review
         }
         supportListLbl.setText(supportListBuilder.toString());
 
-        inviteButton.setOnMouseClicked((event) -> HeadedGUIManager.openWebpage(generateInviteLink()));
+        inviteButton.setOnMouseClicked((event) -> HeadedGUIUtil.openWebpage(generateInviteLink()));
 
         stage.getScene().setRoot(reviewScreen);
     }
     public static String generateInviteLink()
     {
-        DiscordSetup discordSetup = HeadedGUIManager.getDiscordSetupController();
+        DiscordSetup discordSetup = HeadedGUIUtil.getDiscordSetupController();
         if (discordSetup.getClientID().equals(""))
         {
             JOptionPane.showMessageDialog(null, "You'll need to complete setup before you can invite the bot.");

@@ -1,7 +1,7 @@
 package jara;
 
 import configuration.SettingsUtil;
-import gui.headed.HeadedGUIManager;
+import gui.HeadedGUI;
 
 import java.awt.*;
 import java.io.IOException;
@@ -30,7 +30,7 @@ public class Boot
 			}
 			else
 			{
-				token = HeadedGUIManager.updateToken();
+				token = HeadedGUI.updateToken();
 			}
 
 			SettingsUtil.getGlobalSettings().setToken(token);

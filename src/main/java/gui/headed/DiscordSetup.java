@@ -38,23 +38,23 @@ public class DiscordSetup
 
     public void initialize()
     {
-        backButton.setOnMouseClicked((event) -> HeadedGUIManager.goBack());
-        backButton.setOnMouseEntered((event) -> HeadedGUIManager.backButtonHover(backRect));
-        backButton.setOnMouseExited((event) -> HeadedGUIManager.backButtonHover(backRect));
+        backButton.setOnMouseClicked((event) -> HeadedGUIUtil.goBack());
+        backButton.setOnMouseEntered((event) -> HeadedGUIUtil.backButtonHover(backRect));
+        backButton.setOnMouseExited((event) -> HeadedGUIUtil.backButtonHover(backRect));
 
-        nextButton.setOnMouseClicked((event) -> HeadedGUIManager.goNext());
-        nextButton.setOnMouseEntered((event) -> HeadedGUIManager.nextButtonHover(nextRect));
-        nextButton.setOnMouseExited((event) -> HeadedGUIManager.nextButtonHover(nextRect));
+        nextButton.setOnMouseClicked((event) -> HeadedGUIUtil.goNext());
+        nextButton.setOnMouseEntered((event) -> HeadedGUIUtil.nextButtonHover(nextRect));
+        nextButton.setOnMouseExited((event) -> HeadedGUIUtil.nextButtonHover(nextRect));
 
-        navBar_welcome_text.setOnMouseClicked((event) -> HeadedGUIManager.manageTitleSelection(navBar_welcome_text));
+        navBar_welcome_text.setOnMouseClicked((event) -> HeadedGUIUtil.manageTitleSelection(navBar_welcome_text));
 
-        navBar_configuration_text.setOnMouseClicked((event) -> HeadedGUIManager.manageTitleSelection(navBar_configuration_text));
+        navBar_configuration_text.setOnMouseClicked((event) -> HeadedGUIUtil.manageTitleSelection(navBar_configuration_text));
 
-        navBar_review_text.setOnMouseClicked((event) -> HeadedGUIManager.manageTitleSelection(navBar_review_text));
+        navBar_review_text.setOnMouseClicked((event) -> HeadedGUIUtil.manageTitleSelection(navBar_review_text));
 
-        portalButton.setOnMouseClicked((event) -> HeadedGUIManager.openWebpage("https://discordapp.com/developers/applications/"));
-        portalButton.setOnMouseEntered((event) -> HeadedGUIManager.nextButtonHover(portalRect));
-        portalButton.setOnMouseExited((event) -> HeadedGUIManager.nextButtonHover(portalRect));
+        portalButton.setOnMouseClicked((event) -> HeadedGUIUtil.openWebpage("https://discordapp.com/developers/applications/"));
+        portalButton.setOnMouseEntered((event) -> HeadedGUIUtil.nextButtonHover(portalRect));
+        portalButton.setOnMouseExited((event) -> HeadedGUIUtil.nextButtonHover(portalRect));
 
     }
     public void show(Stage stage)

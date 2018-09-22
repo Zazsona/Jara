@@ -1,10 +1,10 @@
 package configuration;
 
-import gui.headed.HeadedGUIManager;
+import gui.HeadedGUI;
+import gui.headed.HeadedGUIUtil;
 import jara.CommandAttributes;
 import jara.CommandRegister;
 import javafx.application.Application;
-import net.dv8tion.jda.core.entities.Guild;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ public class SettingsUtil
             }
             else
             {
-                Application.launch(HeadedGUIManager.class);
+                HeadedGUI.performFirstTimeSetup();
             }
             if (!globalSettings.isSaved())
             {

@@ -7,7 +7,7 @@ package gui;
 //import java.util.ArrayList;
 //import java.util.Scanner;
 
-public class Headless
+public class HeadlessGUI
 {
 //    private static void printLogo()
 //    {
