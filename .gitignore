@@ -8,3 +8,4 @@ gradle/
 .project
 .gradle
 *.iml
+log.out
