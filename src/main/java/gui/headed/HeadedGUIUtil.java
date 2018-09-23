@@ -209,16 +209,7 @@ public class HeadedGUIUtil extends Application
     public static void showErrorPane(String error)
     {
         errorMessage = error;
-        try
-        {
-            Application.launch(ErrorPane.class);
-        }
-        catch (IllegalArgumentException e)
-        {
-            new ErrorPane().start(null);
-        }
-
-
+        new ErrorPane().start(null);
     }
     public static String getError()
     {

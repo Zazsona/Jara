@@ -8,6 +8,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -18,6 +20,8 @@ import java.io.IOException;
 public class ErrorPane extends Application
 {
     @FXML
+    private HBox root;
+    @FXML
     private StackPane okButton;
     @FXML
     private Rectangle okRect;
@@ -26,11 +30,20 @@ public class ErrorPane extends Application
 
     public void initialize()
     {
-        okButton.setOnMouseClicked((event) -> ((Stage) okButton.getScene().getWindow()).close());
+
+        okButton.setOnMouseClicked((event) -> okButton.getScene().getWindow().hide());
         okButton.setOnMouseEntered((event) -> HeadedGUIUtil.nextButtonHover(okRect));
         okButton.setOnMouseExited((event) -> HeadedGUIUtil.nextButtonHover(okRect));
 
         msgTxt.setText(HeadedGUIUtil.getError());
+
+        root.setOnKeyPressed((event) ->
+                                      {
+                                          if (event.getCode() == KeyCode.ENTER)
+                                          {
+                                              root.getScene().getWindow().hide();
+                                          }
+                                      });
     }
 
     @Override
@@ -45,6 +58,7 @@ public class ErrorPane extends Application
             primaryStage.setScene(new Scene(root, 500, 200));
             primaryStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("jara.png")));
             primaryStage.show();
+            root.requestFocus();
         }
         catch (IOException e)
         {

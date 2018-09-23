@@ -21,7 +21,7 @@ public class Boot
 	private static void connectToDiscord()
 	{
 		boolean loggedIn = Core.initialiseDiscordConnection(SettingsUtil.getGlobalSettings().getToken());
-		while (!loggedIn)
+		if (!loggedIn)
 		{
 			String token = "";
 			if (GraphicsEnvironment.isHeadless())
@@ -44,6 +44,10 @@ public class Boot
 				e.printStackTrace();
 			}
 			loggedIn = Core.initialiseDiscordConnection(SettingsUtil.getGlobalSettings().getToken());
+			if (!loggedIn)
+			{
+				System.exit(0); //User closed the window before entering a valid token.
+			}
 		}
 	}
 }
