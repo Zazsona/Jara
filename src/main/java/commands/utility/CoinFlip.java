@@ -10,8 +10,8 @@ public class CoinFlip extends Command
 	public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
 	{
         Random r = new Random();
-        int RandVal = (r.nextInt(2));
-        if (RandVal == 0)
+        boolean isHeads = (r.nextBoolean());
+        if (isHeads)
         {
             msgEvent.getChannel().sendMessage("It's heads!").queue();
         }
