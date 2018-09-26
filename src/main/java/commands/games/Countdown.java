@@ -17,8 +17,10 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 public class Countdown extends Command 
 {
-	TextChannel channel;
-	String letters = "";
+	private TextChannel channel;
+	private String letters = "";
+	private final MessageManager mm = new MessageManager();
+	private final Thread mainThread = Thread.currentThread();
 	
 	@Override
 	public void run(GuildMessageReceivedEvent msgEvent, String... parameters) 
@@ -108,17 +110,22 @@ public class Countdown extends Command
 		embed.setDescription("You've got 30 seconds - On your marks, get set, go!\n\n**"+createBoard()+"**");
 		embed.setThumbnail("https://i.imgur.com/0uNRZWG.png");
 		Message embedMsg = channel.sendMessage(embed.build()).complete();
-		MessageManager mm = new MessageManager();
 		Thread clockThread = new Thread(new clock(embed, embedMsg));
 		clockThread.start();
-		Message[] answers = mm.getNextMessages(channel, 35*1000, Integer.MAX_VALUE); 
+		Message[] answers = mm.getNextMessages(channel, 35*1000, Integer.MAX_VALUE);
 		return answers;
 	}
 	private void generateResults(Message[] answers)
 	{
- 		if (answers.length == 0)
+		if (answers == null)
+		{
+			channel.sendMessage("The game has been quit.").queue();
+			return;
+		}
+ 		else if (answers.length == 0)
 		{
 			channel.sendMessage("Looks like nobody got anything! Better luck next time.").queue();
+			return;
 		}
 		else
 		{
@@ -126,9 +133,9 @@ public class Countdown extends Command
 			for (Message answer : answers)	
 			{
 				String content = answer.getContentDisplay();
-				if (content.length() > 9)
+				if (content.length() > 9 || answer.getAuthor().isBot())
 				{
-					continue; //Most likely just a bot message, anyway.
+					continue;
 				}
 				List<Character> answerLetters = content.toUpperCase().chars().mapToObj((letter) -> Character.valueOf((char) letter)).collect(Collectors.toList()); //Converting each Int returns from chars() into a Character, as char[] cannot be converted into Character[]
 				for (char letter : letters.toCharArray())
@@ -198,18 +205,27 @@ public class Countdown extends Command
 		{
 			try
 			{
-				Thread.sleep(7500);
-				embed.setThumbnail("https://i.imgur.com/llmbGHa.png");
-				msg.editMessage(embed.build()).queue();
-				Thread.sleep(7500);
-				embed.setThumbnail("https://i.imgur.com/JpwwNrY.png");
-				msg.editMessage(embed.build()).queue();
-				Thread.sleep(7500);
-				embed.setThumbnail("https://i.imgur.com/F2deeEY.png");
-				msg.editMessage(embed.build()).queue();
-				Thread.sleep(7500);
-				embed.setThumbnail("https://i.imgur.com/eMrORg8.png");
-				msg.editMessage(embed.build()).queue();
+				String[] clockURLs = {"https://i.imgur.com/llmbGHa.png", "https://i.imgur.com/JpwwNrY.png", "https://i.imgur.com/F2deeEY.png", "https://i.imgur.com/eMrORg8.png"};
+				for (int i = 0; i<4; i++)
+				{
+					Thread.sleep(7500);
+					embed.setThumbnail(clockURLs[i]);
+					msg.editMessage(embed.build()).queue();
+
+					ArrayList<Message> messages = mm.getMessageHistory(); //Check if the user has opted to quit
+					if (messages.size() > 0)
+					{
+						for (Message msg : messages)
+						{
+							if (msg.getContentDisplay().equalsIgnoreCase("/quit")) //TODO: Custom prefix
+							{
+								mainThread.interrupt();
+								Thread.currentThread().interrupt();
+							}
+						}
+					}
+				}
+
 				embed = new EmbedBuilder();
 				embed.setColor(Core.getHighlightColour(channel.getGuild().getSelfMember()));
 				embed.setThumbnail("https://i.imgur.com/3SUuzD1.png");
@@ -218,8 +234,9 @@ public class Countdown extends Command
 			}
 			catch (InterruptedException e)
 			{
-				channel.sendMessage("Uh-oh! Looks like something went wrong. You won't get a warning when time's almost up.").queue();
-				e.printStackTrace();
+				//channel.sendMessage("Uh-oh! Looks like something went wrong. You won't get a warning when time's almost up.").queue();
+				//e.printStackTrace();
+				//User has quit
 			}
 
 		}
