@@ -38,6 +38,12 @@ public class Hangman extends Command
             Message msg = msgManager.getNextMessage(channel);
             boolean correctGuess = false;
 
+            if (msg.getContentDisplay().equalsIgnoreCase("/quit")) //TODO: Guild level check for prefix
+            {
+                attempts = 0;
+                break;
+            }
+
             if (msg.getContentDisplay().length() == 1)
             {
                 if (guessHistory.toString().contains(msg.getContentDisplay().toUpperCase())) //TODO: This should be tidied.

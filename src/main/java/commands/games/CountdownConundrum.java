@@ -80,6 +80,12 @@ public class CountdownConundrum extends Command
             if (message != null)
             {
                 String answer = message.getContentDisplay();
+
+                if (answer.equalsIgnoreCase("/quit")) //TODO: Guild level prefix
+                {
+                    timerThread.interrupt();
+                }
+
                 if (answer.equalsIgnoreCase(conundrums[index][1]))
                 {
                     winner = message.getMember().getEffectiveName();
