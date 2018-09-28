@@ -80,7 +80,6 @@ public class MessageManager
 		} 
 		catch (InterruptedException e) 
 		{
-			e.printStackTrace();
 			guild.getJDA().removeEventListener(messageListener);
 			guildToListen = null;
 			return null; //Let the calling method handle this.
@@ -292,11 +291,11 @@ public class MessageManager
 	 * Takes all messages received from this instance and returns them as an array.
 	 * 
 	 * @return
-	 * Message[] - Full history of all messages from this instance
+	 * ArrayList<Message></Message> - Full history of all messages from this instance
 	 */
-	public Message[] getMessageHistory()
+	public ArrayList<Message> getMessageHistory()
 	{
-		return messageLog.toArray(new Message[messageLog.size()]);
+		return (ArrayList<Message>) messageLog.clone();
 	}
 	/**
 	 * 

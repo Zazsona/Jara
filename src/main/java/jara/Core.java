@@ -5,6 +5,7 @@ import java.awt.Color;
 import javax.security.auth.login.LoginException;
 
 import configuration.SettingsUtil;
+import javafx.application.Application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +65,5 @@ public class Core //A class for covering the global manners of the bot.
 		{
 			return Color.decode("#5967cf"); //Use a default theme.
 		}
-
 	}
 }

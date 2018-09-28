@@ -14,9 +14,6 @@ public class Boot
 		connectToDiscord(); //Once this is called, the bot appears online. If the login details are incorrect, it will hold the thread and prompt the user.
 		Core.startListeners(); //Once this is called, Jara can respond to guild changes
 		Core.enableCommands(); //Once this is called, commands can be used.
-
-		CommandRegister.getCommandsInCategory(CommandRegister.ADMIN);
-		CommandRegister.getCommandsInCategory(CommandRegister.ADMIN);
 	}
 	private static void connectToDiscord()
 	{
