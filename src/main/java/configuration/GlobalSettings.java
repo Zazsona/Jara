@@ -18,15 +18,9 @@ public class GlobalSettings
 
     private String token;
     private HashMap<String, Boolean> commandConfig;
-    private boolean saved;
 
-    public boolean isSaved()
-    {
-        return saved;
-    }
     public void setToken(String token)
     {
-        saved = false;
         this.token = token;
     }
     public String getToken()
@@ -35,11 +29,14 @@ public class GlobalSettings
     }
     public void setCommandConfig(HashMap<String, Boolean> commandConfig)
     {
-        saved = false;
         this.commandConfig = commandConfig;
     }
     public HashMap<String, Boolean> getCommandConfig()
     {
+        if (commandConfig == null)
+        {
+            return null;
+        }
         HashMap<String, Boolean> clone = new HashMap<>();
         clone.putAll(commandConfig);
         return clone;
@@ -54,7 +51,6 @@ public class GlobalSettings
     {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String globalSettingsJson = gson.toJson(this);
-        System.out.println(globalSettingsJson);
         return globalSettingsJson;
     }
 
@@ -89,7 +85,6 @@ public class GlobalSettings
         PrintWriter printWriter = new PrintWriter(new FileOutputStream(settingsFile, false));
         printWriter.print(getJSON());
         printWriter.close();
-        saved = true;
     }
     public void restore() throws IOException, NullPointerException
     {
@@ -98,9 +93,6 @@ public class GlobalSettings
         {
             Gson gson = new Gson();
             GlobalSettings settingsFromFile = gson.fromJson(JSON, GlobalSettings.class);
-
-
-            saved = true; //This is from the file, so it matches what is stored, so is the same as being saved.
 
             this.token = settingsFromFile.getToken();
             this.commandConfig = settingsFromFile.getCommandConfig();
@@ -114,7 +106,6 @@ public class GlobalSettings
     }
     public void updateCommandConfiguration(boolean newState, String... commandKeys)
     {
-        saved = false;
         for (String key : commandKeys)
         {
             if (CommandRegister.getCommand(key).isDisableable())

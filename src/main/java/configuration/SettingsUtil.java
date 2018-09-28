@@ -36,7 +36,7 @@ public class SettingsUtil
             {
                 HeadedGUI.performFirstTimeSetup();
             }
-            if (!globalSettings.isSaved())
+            if (!HeadedGUIUtil.isSetupComplete())
             {
                 logger.info("User has cancelled setup. Aborting...");
                 System.exit(0);
@@ -125,8 +125,17 @@ public class SettingsUtil
         File settingsFile = new File(getDirectory().getAbsolutePath()+"/settings.json");
         if (!settingsFile.exists())
         {
-            logger.info("Settings file does not exist.");
-            return null;
+            logger.info("Settings file does not exist. Creating it...");
+            try
+            {
+                settingsFile.createNewFile();
+                return settingsFile;
+            }
+            catch (IOException e)
+            {
+                logger.error("Could not create settings file.");
+                return null;
+            }
         }
         else
         {

@@ -1,17 +1,25 @@
 package gui.headed;
 
+import configuration.SettingsUtil;
 import gui.HeadedGUI;
 import jara.CommandRegister;
+import jara.Core;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.scene.image.ImageView;
+import net.dv8tion.jda.core.entities.SelfUser;
+import net.dv8tion.jda.core.entities.User;
 
-import javax.swing.*;
+import java.io.IOException;
 
 public class Review
 {
@@ -37,6 +45,14 @@ public class Review
     private Rectangle inviteRect;
     @FXML
     private Label supportListLbl;
+    @FXML
+    public ImageView profileImage;
+    @FXML
+    public Text profileNameText;
+    @FXML
+    public Text profileDiscrimText;
+
+    private boolean invitePressed = false;
 
     public void initialize()
     {
@@ -44,7 +60,7 @@ public class Review
         backButton.setOnMouseEntered((event) -> HeadedGUIUtil.backButtonHover(backRect));
         backButton.setOnMouseExited((event) -> HeadedGUIUtil.backButtonHover(backRect));
 
-        nextButton.setOnMouseClicked((event) -> HeadedGUIUtil.goNext());
+        nextButton.setOnMouseClicked((event) -> completeSetup());
         nextButton.setOnMouseEntered((event) -> HeadedGUIUtil.nextButtonHover(nextRect));
         nextButton.setOnMouseExited((event) -> HeadedGUIUtil.nextButtonHover(nextRect));
 
@@ -56,8 +72,6 @@ public class Review
 
         inviteButton.setOnMouseEntered((event) -> HeadedGUIUtil.nextButtonHover(inviteRect));
         inviteButton.setOnMouseExited((event) -> HeadedGUIUtil.nextButtonHover(inviteRect));
-
-
 
     }
     public void show(Stage stage)
@@ -71,19 +85,36 @@ public class Review
         }
         supportListLbl.setText(supportListBuilder.toString());
 
-        inviteButton.setOnMouseClicked((event) -> HeadedGUIUtil.openWebpage(generateInviteLink()));
-
+        inviteButton.setOnMouseClicked((event) ->
+                                       {
+                                           invitePressed = true;
+                                           HeadedGUIUtil.openWebpage(generateInviteLink(true));
+                                       });
         stage.getScene().setRoot(reviewScreen);
     }
-    public static String generateInviteLink()
+    public static String generateInviteLink(boolean showError)
     {
         DiscordSetup discordSetup = HeadedGUIUtil.getDiscordSetupController();
-        if (discordSetup.getClientID().equals(""))
+        if (discordSetup.getToken().equals(""))
         {
             HeadedGUI.showError("You'll need to complete setup before you can invite the bot.");
             return "";
         }
-        return "https://discordapp.com/oauth2/authorize?client_id="+discordSetup.getClientID()+"&scope=bot&permissions=8";
+        else if (discordSetup.getClientID() != null)
+        {
+            String clientID = discordSetup.getClientID();
+            Core.getShardManager().shutdown();
+            return "https://discordapp.com/oauth2/authorize?client_id="+clientID+"&scope=bot&permissions=8";
+        }
+        else
+        {
+            if (showError)
+            {
+                HeadedGUI.showError("The bot is still loading. Please wait for a few seconds.");
+            }
+            return "";
+        }
+
     }
     public void setRoot(Parent root)
     {
@@ -94,5 +125,46 @@ public class Review
         return reviewScreen;
     }
 
+    private void completeSetup()
+    {
+        String token = HeadedGUIUtil.getDiscordSetupController().getToken();
+        if (!HeadedGUIUtil.getDiscordSetupController().isValidToken())
+        {
+            HeadedGUI.showError("The token is blank or invalid.");
+            return;
+        }
+        else
+        {
+            try
+            {
+                SettingsUtil.getGlobalSettings().setToken(token);
+                SettingsUtil.getGlobalSettings().setCommandConfig(HeadedGUIUtil.getCcSetupController().getCommandConfig());
+                SettingsUtil.getGlobalSettings().save();
+                if (!invitePressed) //Just so we don't have a useless bot running...
+                {
+                    while (generateInviteLink(false).equals(""));
+                    {
+                        try
+                        {
+                            Thread.sleep(100);
+                        }
+                        catch (InterruptedException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                    HeadedGUIUtil.openWebpage(generateInviteLink(false));
+                }
+                HeadedGUIUtil.setSetupComplete(true);
+                Platform.exit();
+            }
+            catch (IOException e)
+            {
+                HeadedGUI.showError("Could not save settings.");
+            }
+
+
+        }
+    }
 
 }

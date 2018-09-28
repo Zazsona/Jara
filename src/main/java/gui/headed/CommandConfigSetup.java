@@ -1,5 +1,6 @@
 package gui.headed;
 
+import configuration.SettingsUtil;
 import jara.CommandAttributes;
 import jara.CommandRegister;
 import javafx.fxml.FXML;
@@ -131,6 +132,11 @@ public class CommandConfigSetup
         bp.setBottom(bottomPane);
         CheckBox checkBox = new CheckBox();
         checkBox.setSelected(true);
+        if (SettingsUtil.getGlobalSettings().getCommandConfig() != null) //Restore from existing config (if possible)
+        {
+            checkBox.setSelected(SettingsUtil.getGlobalSettings().getCommandConfig().get(commandAttributes.getCommandKey()));
+        }
+
         if (!commandAttributes.isDisableable())
         {
             checkBox.setDisable(true);
@@ -187,7 +193,15 @@ public class CommandConfigSetup
 
         for (CommandAttributes ca : CommandRegister.getRegister())
         {
-            commandConfig.put(ca.getCommandKey(), ((CheckBox) ccSetupScreen.lookup("#"+ca.getCommandKey()+"CheckBox")).isSelected());
+            if (CommandRegister.getCommand(ca.getCommandKey()).getCategoryID() != CommandRegister.NOGROUP)
+            {
+                commandConfig.put(ca.getCommandKey(), ((CheckBox) ccSetupScreen.lookup("#"+ca.getCommandKey()+"CheckBox")).isSelected());
+            }
+            else
+            {
+                commandConfig.put(ca.getCommandKey(), true);
+            }
+
         }
         return commandConfig;
     }

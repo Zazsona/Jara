@@ -187,22 +187,6 @@
                      </effect>
                   </VBox>
                   <Pane minWidth="10.0" prefHeight="284.0" prefWidth="50.0" />
-                  <VBox alignment="TOP_CENTER" prefHeight="284.0" prefWidth="200.0" style="-fx-background-color: #23272A;">
-                     <children>
-                        <Pane prefHeight="32.0" prefWidth="200.0" />
-                        <ImageView fitHeight="147.0" fitWidth="180.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../how-to/4.png" />
-                           </image>
-                        </ImageView>
-                        <Pane prefHeight="37.0" prefWidth="200.0" />
-                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Go to &quot;General Information&quot; and enter your client ID below" textAlignment="CENTER" wrappingWidth="195.974609375" />
-                        <Pane prefHeight="23.0" prefWidth="200.0" />
-                     </children>
-                     <effect>
-                        <DropShadow />
-                     </effect>
-                  </VBox>
                </children>
             </HBox>
             <Pane minHeight="20.0" prefHeight="51.0" prefWidth="1280.0" />
@@ -228,19 +212,7 @@
                               <Pane prefHeight="31.0" prefWidth="58.0" />
                            </children>
                         </HBox>
-                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="  Client ID" wrappingWidth="280.69140625">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Text>
                         <Pane prefHeight="8.0" prefWidth="100.0" />
-                        <HBox prefHeight="29.0" prefWidth="586.0">
-                           <children>
-                              <Pane prefHeight="29.0" prefWidth="50.0" />
-                              <TextField fx:id="txtFieldClientID" prefHeight="25.0" prefWidth="322.0" style="-fx-background-color: #484B51; -fx-text-fill: #FFFFFF;" />
-                              <Pane prefHeight="29.0" prefWidth="51.0" />
-                           </children>
-                        </HBox>
                      </children>
                      <effect>
                         <DropShadow />

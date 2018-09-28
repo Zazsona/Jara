@@ -33,6 +33,10 @@ public class HeadedGUIUtil extends Application
     private static String updatedToken;
     private static String errorMessage;
 
+    private static AccountData accData;
+
+    private static boolean complete = false;
+
 
     @Override
     public void start(Stage primaryStage) throws Exception
@@ -234,6 +238,36 @@ public class HeadedGUIUtil extends Application
     public static void setUpdatedToken(String token)
     {
         updatedToken = token;
+    }
+    public static void setAccountData(String username, String discim, String avatarURL, String clientID)
+    {
+        accData = new AccountData(username, discim,  avatarURL, clientID);
+    }
+    public static AccountData getAccountData()
+    {
+        return accData;
+    }
+    public static class AccountData
+    {
+        public AccountData(String username, String discim, String avatarURL, String clientID)
+        {
+            this.username = username;
+            this.discrim = discim;
+            this.avatarURL = avatarURL;
+            this.clientID = clientID;
+        }
+        String username;
+        String discrim;
+        String avatarURL;
+        String clientID;
+    }
+    public static void setSetupComplete(boolean state)
+    {
+        complete = state;
+    }
+    public static boolean isSetupComplete()
+    {
+        return complete;
     }
 
 }
