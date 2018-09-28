@@ -4,6 +4,7 @@ import commands.CmdUtil;
 import configuration.SettingsUtil;
 import jara.Core;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.TextField;
@@ -123,16 +124,24 @@ public class DiscordSetup extends ListenerAdapter
     }
     private void generateAccountData()
     {
-        if (getToken().equals(oldToken)) //We've already tested it.
+        if (!getToken().equals(oldToken)) //If the token has changed, retest it.
         {
-            return;
+            Task<Void> generateAccDataTask = new Task<Void>()
+            {
+                @Override
+                protected Void call() throws Exception
+                {
+                    oldToken = getToken();
+                    tokenIsValid = Core.initialiseDiscordConnection(getToken());
+                    Core.getShardManager().addEventListener(HeadedGUIUtil.getDiscordSetupController());
+                    return null;
+                }
+            };
+            new Thread(generateAccDataTask).start();
         }
-        else
-        {
-            oldToken = getToken();
-            tokenIsValid = Core.initialiseDiscordConnection(getToken());
-            Core.getShardManager().addEventListener(this);
-        }
+
+
+
     }
     @Override
     public void onReady(ReadyEvent re)
