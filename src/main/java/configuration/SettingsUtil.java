@@ -11,13 +11,24 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.BiConsumer;
 
 public class SettingsUtil
 {
-    private static Logger logger = LoggerFactory.getLogger(SettingsUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(SettingsUtil.class);
     private static File directory;
     private static GlobalSettings globalSettings;
+
+    private static HashMap<String, GuildSettings> guildSettingsMap = new HashMap<>();
+    private static HashMap<String, Long> guildSettingsLastCall = new HashMap<>();
 
     public static void initialise()
     {
@@ -42,6 +53,16 @@ public class SettingsUtil
                 System.exit(0);
             }
         }
+        Timer guildCleanTimer = new Timer();
+        guildCleanTimer.schedule(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                cleanInactiveGuilds();
+            }
+        }, 1000*60*30, 1000*60*30);
+
     }
     public void manageNewCommands()
     {
@@ -62,6 +83,11 @@ public class SettingsUtil
         }
         //We don't care if the config has commands not in the register, these will simply be ignored. This allows for backwards compatibility and (in some cases) transfers of settings from forked/modded versions of Jara.
     }
+
+    /**
+     * Returns the global settings.
+     * @return
+     */
     public static GlobalSettings getGlobalSettings()
     {
         return globalSettings;
@@ -142,10 +168,16 @@ public class SettingsUtil
             return settingsFile;
         }
     }
+
+    /**
+     * @param guildID
+     * @return
+     */
     public static File getGuildSettingsFile(String guildID)
     {
         return new File(getGuildSettingsDirectory().getPath()+"/"+guildID+".json");
     }
+
     public static void addNewGuild(String guildId)
     {
         try
@@ -156,7 +188,7 @@ public class SettingsUtil
                 guildFile.delete();
             }
             guildFile.createNewFile();
-            GuildSettings guildSettings = new GuildSettings(guildId);
+            GuildSettings guildSettings = getGuildSettings(guildId);
             guildSettings.setGameCategoryId("");
             guildSettings.generateDefaultCommandConfig();
             guildSettings.save();
@@ -165,6 +197,43 @@ public class SettingsUtil
         {
             e.printStackTrace();
         }
+    }
+    public static GuildSettings getGuildSettings(String guildID)
+    {
+        if (guildSettingsMap.containsKey(guildID))
+        {
+            guildSettingsLastCall.replace(guildID, Instant.now().toEpochMilli());
+            return guildSettingsMap.get(guildID);
+        }
+        else
+        {
+            GuildSettings guildSettings = new GuildSettings(guildID);
+            try
+            {
+                guildSettings.restore();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            guildSettingsMap.put(guildID, guildSettings);
+            guildSettingsLastCall.put(guildID, Instant.now().toEpochMilli());
+            return guildSettings;
+        }
+    }
 
+    /**
+     * This method will de-reference any guild settings for guilds which have not been used within the last hour.<br>
+     * This is automatically performed every 30 minutes.
+     */
+    private static void cleanInactiveGuilds() //It's either this, or the mop & bucket. And there's some dirty shit in those guilds.
+    {
+        guildSettingsLastCall.forEach((id, time) -> {
+                if ((Instant.now().toEpochMilli() - time) >= 1000*60)
+                {
+                    guildSettingsMap.remove(id);
+                    guildSettingsLastCall.remove(id);
+                }
+        });
     }
 }

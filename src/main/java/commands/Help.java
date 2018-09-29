@@ -269,7 +269,7 @@ public class Help extends Command {
 
 				TL;DR, the permission check is for an easier experience, not secrecy. Consider this when setting limitToPerms as true.
 		 */
-		GuildSettings guildSettings = new GuildSettings(guildID);
+		GuildSettings guildSettings = SettingsUtil.getGuildSettings(guildID);
 		StringBuilder commands = new StringBuilder();
 		boolean commandsListed = false;
 		commands.append("~~------------------------------------------------------------~~\n");

@@ -19,7 +19,7 @@ public class Config extends Command { //TODO: Redo this. It's outdated and messy
 	@Override
 	public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
 	{
-		guildSettings = new GuildSettings(msgEvent.getGuild().getId());
+		guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
 		if (parameters.length > 1)
 		{
 			if (parameters[1].equalsIgnoreCase("check"))
@@ -95,7 +95,7 @@ public class Config extends Command { //TODO: Redo this. It's outdated and messy
 			msgEvent.getChannel().sendMessage(embed.build()).queue();
 		}
 	}
-	private void setPermissions(GuildMessageReceivedEvent msgEvent, String... parameters) 
+	private void setPermissions(GuildMessageReceivedEvent msgEvent, String... parameters)
 	{
 		EmbedBuilder embed = new EmbedBuilder();
 		embed.setTitle("============== Config ===============");
@@ -155,7 +155,7 @@ public class Config extends Command { //TODO: Redo this. It's outdated and messy
 		}
 
 	}
-	private void setStatus(GuildMessageReceivedEvent msgEvent, String... parameters) 
+	private void setStatus(GuildMessageReceivedEvent msgEvent, String... parameters)
 	{
 		EmbedBuilder embed = new EmbedBuilder();
 		embed.setTitle("============== Config ===============");
@@ -168,11 +168,11 @@ public class Config extends Command { //TODO: Redo this. It's outdated and messy
 
 				if (parameters[1].equalsIgnoreCase("enable"))
 				{
-					guildSettings.updateCommandConfiguration(true, null, key);
+					guildSettings.modifyCommandConfiguration(true, null, key);
 				}
 				else
 				{
-					guildSettings.updateCommandConfiguration(false, null, key);
+					guildSettings.modifyCommandConfiguration(false, null, key);
 				}
 			}
 			embed.setDescription("All basic commands have been "+parameters[1].toLowerCase()+"d"); //Felt like being lazy here. para[1] is always either "enable"/"disable", this makes it "enabled" or "disabled" in text.
@@ -186,11 +186,11 @@ public class Config extends Command { //TODO: Redo this. It's outdated and messy
 				{
 					if (parameters[1].equalsIgnoreCase("enable"))
 					{
-						guildSettings.updateCommandConfiguration(true, null, cmdAttributes.getCommandKey());
+						guildSettings.modifyCommandConfiguration(true, null, cmdAttributes.getCommandKey());
 					}
 					else
 					{
-						guildSettings.updateCommandConfiguration(false, null, cmdAttributes.getCommandKey());
+						guildSettings.modifyCommandConfiguration(false, null, cmdAttributes.getCommandKey());
 					}
 				}
 			}
@@ -205,7 +205,7 @@ public class Config extends Command { //TODO: Redo this. It's outdated and messy
 				{
 					if (parameters[1].equalsIgnoreCase("enable"))
 					{
-						guildSettings.updateCommandConfiguration(true, null, key);
+						guildSettings.modifyCommandConfiguration(true, null, key);
 					}
 					else
 					{
@@ -215,7 +215,7 @@ public class Config extends Command { //TODO: Redo this. It's outdated and messy
 							msgEvent.getChannel().sendMessage(embed.build()).queue();
 							return;
 						}
-						guildSettings.updateCommandConfiguration(false, null, key);
+						guildSettings.modifyCommandConfiguration(false, null, key);
 					}
 					embed.setDescription(key+" status updated!");
 					msgEvent.getChannel().sendMessage(embed.build()).queue();

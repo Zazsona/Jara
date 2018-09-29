@@ -14,8 +14,6 @@ import java.util.HashMap;
 
 public class GlobalSettings
 {
-    private Logger logger = LoggerFactory.getLogger(getClass());
-
     private String token;
     private HashMap<String, Boolean> commandConfig;
 
@@ -67,12 +65,10 @@ public class GlobalSettings
     {
         if (token == null || commandConfig == null)
         {
-            logger.error("Cannot save, a required element is null.");
             throw new NullPointerException();
         }
         if (commandConfig.size() < CommandRegister.getRegisterSize())
         {
-            logger.error("Cannot save, commands are missing in the config.");
             throw new NullPointerException();
         }
         //TODO: Make it so any unset (missing) commands are disabled?
@@ -99,12 +95,10 @@ public class GlobalSettings
         }
         else
         {
-
-            logger.error("Global settings is empty. Starting setup.");
             throw new NullPointerException(); //There is no data
         }
     }
-    public void updateCommandConfiguration(boolean newState, String... commandKeys)
+    public void modifyCommandConfiguration(boolean newState, String... commandKeys)
     {
         for (String key : commandKeys)
         {
@@ -114,14 +108,14 @@ public class GlobalSettings
             }
         }
     }
-    public void updateCategoryConfiguration(boolean newState, int categoryID)
+    public void modifyCategoryConfiguration(boolean newState, int categoryID)
     {
         ArrayList<String> keys = new ArrayList<>();
         for (CommandAttributes ca : CommandRegister.getCommandsInCategory(categoryID))
         {
             keys.add(ca.getCommandKey());
         }
-        updateCommandConfiguration(newState, keys.toArray(new String[keys.size()]));
+        modifyCommandConfiguration(newState, keys.toArray(new String[keys.size()]));
     }
     public boolean isCommandEnabled(String commandKey)
     {

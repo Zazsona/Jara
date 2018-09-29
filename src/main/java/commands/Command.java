@@ -1,6 +1,7 @@
 package commands;
 
 import configuration.GuildSettings;
+import configuration.SettingsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,7 @@ public abstract class Command //A base class to build commands from.
 	protected TextChannel createGameChannel(GuildMessageReceivedEvent msgEvent, String channelName)
 	{
 		Logger logger = LoggerFactory.getLogger(Command.class);
-		GuildSettings guildSettings = new GuildSettings(msgEvent.getGuild().getId());
+		GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
 		String gameCategoryID = guildSettings.getGameCategoryId();
 		if (gameCategoryID.equals(""))
 		{

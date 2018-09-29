@@ -23,30 +23,21 @@ import java.util.HashMap;
 
 public class GuildSettings
 {
-    private Logger logger = LoggerFactory.getLogger(getClass());
-
     private String guildId;
     private String gameCategoryId;
     private HashMap<String, Config> guildCommandConfig;
-
-    private boolean saved;
 
     public GuildSettings(String guildId)
     {
         this.guildId = guildId;
     }
 
-    public boolean isSaved()
-    {
-        return saved;
-    }
     public String getGuildId()
     {
         return guildId;
     }
     public void setGuildCommandConfig(HashMap<String, Config> guildCommandConfig)
     {
-        saved = false;
         this.guildCommandConfig = guildCommandConfig;
     }
     public HashMap<String, Config> getGuildCommandConfig()
@@ -61,7 +52,6 @@ public class GuildSettings
     }
     public void setPermissions(String key, ArrayList<String> permissions)
     {
-        saved = false;
         guildCommandConfig.get(key).permissions = permissions;
     }
     public String getGameCategoryId()
@@ -70,7 +60,6 @@ public class GuildSettings
     }
     public void setGameCategoryId(String gameCategoryId)
     {
-        saved = false;
         this.gameCategoryId = gameCategoryId;
     }
 
@@ -101,12 +90,10 @@ public class GuildSettings
     {
         if (guildId == null || guildCommandConfig == null)
         {
-            logger.error("Cannot save, a required element is null.");
             throw new NullPointerException();
         }
         if (guildCommandConfig.size() < CommandRegister.getRegisterSize())
         {
-            logger.error("Cannot save, commands are missing in the config.");
             throw new NullPointerException();
         }
         //TODO: Make it so any unset (missing) commands are disabled?
@@ -119,7 +106,6 @@ public class GuildSettings
         PrintWriter printWriter = new PrintWriter(new FileOutputStream(settingsFile, false));
         printWriter.print(getJSON());
         printWriter.close();
-        saved = true;
     }
     public void restore() throws IOException, NullPointerException
     {
@@ -129,22 +115,16 @@ public class GuildSettings
             Gson gson = new Gson();
             GuildSettings settingsFromFile = gson.fromJson(JSON, GuildSettings.class);
 
-
-            saved = true; //This is from the file, so it matches what is stored, so is the same as being saved.
-
             this.gameCategoryId = settingsFromFile.getGameCategoryId();
             this.guildCommandConfig = settingsFromFile.getGuildCommandConfig();
         }
         else
         {
-
-            logger.error("Global settings is empty. Starting setup.");
             throw new NullPointerException(); //There is no data
         }
     }
     public void generateDefaultCommandConfig()
     {
-        saved = false;
         guildCommandConfig = new HashMap<>();
         for (CommandAttributes ca : CommandRegister.getRegister())
         {
@@ -158,9 +138,8 @@ public class GuildSettings
      * @param newPermissions (Can be null)
      * @param commandKeys
      */
-    public void updateCommandConfiguration(Boolean newState, ArrayList<String> newPermissions, String... commandKeys)
+    public void modifyCommandConfiguration(Boolean newState, ArrayList<String> newPermissions, String... commandKeys)
     {
-        saved = false;
         Boolean state;
         ArrayList<String> permissions;
         for (String key : commandKeys)
@@ -187,27 +166,25 @@ public class GuildSettings
             }
         }
     }
-    public void updateCategoryConfiguration(Boolean newState, ArrayList<String> newPermissions, int categoryID)
+    public void modifyCategoryConfiguration(Boolean newState, ArrayList<String> newPermissions, int categoryID)
     {
-        saved = false;
         ArrayList<String> keys = new ArrayList<>();
         for (CommandAttributes ca : CommandRegister.getCommandsInCategory(categoryID))
         {
             keys.add(ca.getCommandKey());
         }
-        updateCommandConfiguration(newState, newPermissions, keys.toArray(new String[keys.size()]));
+        modifyCommandConfiguration(newState, newPermissions, keys.toArray(new String[keys.size()]));
     }
     public void addPermissions(ArrayList<String> roleIDs, String... commandKeys)
     {
-        updatePermissions(true, roleIDs, commandKeys);
+        modifyPermissions(true, roleIDs, commandKeys);
     }
     public void removePermissions(ArrayList<String> roleIDs, String... commandKeys)
     {
-        updatePermissions(false, roleIDs, commandKeys);
+        modifyPermissions(false, roleIDs, commandKeys);
     }
-    private void updatePermissions(boolean add, ArrayList<String> roleIDs, String... commandKeys)
+    private void modifyPermissions(boolean add, ArrayList<String> roleIDs, String... commandKeys)
     {
-        saved = false;
         for (String key : commandKeys)
         {
             boolean state = guildCommandConfig.get(key).enabled;

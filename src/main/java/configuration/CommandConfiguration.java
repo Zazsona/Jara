@@ -1,5 +1,6 @@
 package configuration;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 import jara.CommandRegister;
@@ -32,7 +33,8 @@ public class CommandConfiguration
 	{
 		if (isEnabled() || !attributes.isDisableable()) //If it can't be disabled, run it anyway even if it is disabled. Stops people fucking with settings to the point the bot is unusable.
 		{
-			GuildSettings guildSettings = new GuildSettings(msgEvent.getGuild().getId());
+			GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
+
 			if (guildSettings.isCommandEnabled(attributes.getCommandKey()) && (msgEvent.getMember().isOwner() || guildSettings.isPermitted(msgEvent.getMember(), attributes.getCommandClass())))
 			{
 				Runnable commandRunnable = () -> {
