@@ -221,6 +221,10 @@ public class GuildSettings
     }
     public boolean isPermitted(Member member, String commandKey)
     {
+        if (member.isOwner())
+        {
+            return true;
+        }
         boolean permissionGranted = false;
         ArrayList<String> roleIDs = new ArrayList<>();
         for (Role role : member.getRoles())

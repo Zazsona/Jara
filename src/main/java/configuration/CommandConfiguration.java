@@ -35,7 +35,7 @@ public class CommandConfiguration
 		{
 			GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
 
-			if (guildSettings.isCommandEnabled(attributes.getCommandKey()) && (msgEvent.getMember().isOwner() || guildSettings.isPermitted(msgEvent.getMember(), attributes.getCommandClass())))
+			if (guildSettings.isCommandEnabled(attributes.getCommandKey()) && (guildSettings.isPermitted(msgEvent.getMember(), attributes.getCommandClass())))
 			{
 				Runnable commandRunnable = () -> {
 					try
