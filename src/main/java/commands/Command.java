@@ -2,6 +2,7 @@ package commands;
 
 import configuration.GuildSettings;
 import configuration.SettingsUtil;
+import net.dv8tion.jda.core.entities.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,9 +13,16 @@ import net.dv8tion.jda.core.exceptions.GuildUnavailableException;
 import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.time.temporal.TemporalUnit;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 public abstract class Command //A base class to build commands from.
 {
+	private Timer channelTimeoutTimer;
+
 	public abstract void run(GuildMessageReceivedEvent msgEvent, String... parameters);
 	//TODO: Add a configurable timer for how long after inactivity games should be ended / channels deleted.
 	//TODO: Option to limit channel access (Private games)
@@ -37,6 +45,27 @@ public abstract class Command //A base class to build commands from.
 				{
 					TextChannel channel = (TextChannel) gameCategory.createTextChannel(channelName).complete();
 					msgEvent.getChannel().sendMessage("Game started in "+channel.getAsMention()).queue();
+					int channelTimeout = Integer.parseInt(SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getGameChannelTimeout());
+					if (channelTimeout != 0)
+					{
+						channelTimeoutTimer = new Timer();
+						channelTimeoutTimer.schedule(new TimerTask()
+						{
+							@Override
+							public void run()
+							{
+								if (channel.hasLatestMessage())
+								{
+									Message lastMessage = channel.getMessageById(channel.getLatestMessageIdLong()).complete();
+									OffsetDateTime timeToDelete = lastMessage.getCreationTime().plusSeconds(channelTimeout/1000);
+									if (!lastMessage.getCreationTime().isBefore(timeToDelete))
+									{
+										deleteGameChannel(msgEvent, channel);
+									}
+								}
+							}
+						}, channelTimeout/2, channelTimeout/2);
+					}
 					return channel;
 				}
 				catch (InsufficientPermissionException e)
@@ -82,6 +111,9 @@ public abstract class Command //A base class to build commands from.
 	{
 		if (!channel.equals(msgEvent.getChannel())) //Basically, if this is a game channel...
 		{
+			if (channelTimeoutTimer != null)
+				channelTimeoutTimer.cancel();
+
 			channel.sendMessage("Well played! This channel will be deleted in 30 seconds.").queue();
 			try
 			{

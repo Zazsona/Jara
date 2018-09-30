@@ -25,6 +25,7 @@ public class GuildSettings
 {
     private String guildId;
     private String gameCategoryId;
+    private String gameChannelTimeout;
     private HashMap<String, Config> guildCommandConfig;
 
     public GuildSettings(String guildId)
@@ -116,6 +117,7 @@ public class GuildSettings
             GuildSettings settingsFromFile = gson.fromJson(JSON, GuildSettings.class);
 
             this.gameCategoryId = settingsFromFile.getGameCategoryId();
+            this.gameChannelTimeout = settingsFromFile.getGameChannelTimeout();
             this.guildCommandConfig = settingsFromFile.getGuildCommandConfig();
         }
         else
@@ -240,6 +242,16 @@ public class GuildSettings
     public boolean isPermitted(Member member, Class<? extends Command> command)
     {
         return isPermitted(member, CommandRegister.getCommand(command).getCommandKey());
+    }
+
+    public String getGameChannelTimeout()
+    {
+        return gameChannelTimeout;
+    }
+
+    public void setGameChannelTimeout(String gameChannelTimeout)
+    {
+        this.gameChannelTimeout = gameChannelTimeout;
     }
 
     private class Config
