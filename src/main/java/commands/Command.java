@@ -24,7 +24,6 @@ public abstract class Command //A base class to build commands from.
 	private Timer channelTimeoutTimer;
 
 	public abstract void run(GuildMessageReceivedEvent msgEvent, String... parameters);
-	//TODO: Add a configurable timer for how long after inactivity games should be ended / channels deleted.
 	//TODO: Option to limit channel access (Private games)
 		//- Perhaps give users the ability to define a list(s) of 'friends'?
 	protected TextChannel createGameChannel(GuildMessageReceivedEvent msgEvent, String channelName)
@@ -32,7 +31,7 @@ public abstract class Command //A base class to build commands from.
 		Logger logger = LoggerFactory.getLogger(Command.class);
 		GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
 		String gameCategoryID = guildSettings.getGameCategoryId();
-		if (gameCategoryID.equals(""))
+		if (!guildSettings.isGameChannelsEnabled())
 		{
 			return msgEvent.getChannel();
 		}

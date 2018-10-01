@@ -8,14 +8,8 @@ import jara.CommandAttributes;
 import jara.CommandRegister;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.reflect.Array;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +18,7 @@ import java.util.HashMap;
 public class GuildSettings
 {
     private String guildId;
+    private boolean useGameChannels;
     private String gameCategoryId;
     private String gameChannelTimeout;
     private HashMap<String, Config> guildCommandConfig;
@@ -74,7 +69,6 @@ public class GuildSettings
     {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String globalSettingsJson = gson.toJson(this);
-        System.out.println(globalSettingsJson);
         return globalSettingsJson;
     }
 
@@ -104,9 +98,11 @@ public class GuildSettings
         {
             settingsFile.createNewFile();
         }
-        PrintWriter printWriter = new PrintWriter(new FileOutputStream(settingsFile, false));
+        FileOutputStream fileOutputStream = new FileOutputStream(settingsFile, false);
+        PrintWriter printWriter = new PrintWriter(fileOutputStream);
         printWriter.print(getJSON());
         printWriter.close();
+        fileOutputStream.close();
     }
     public void restore() throws IOException, NullPointerException
     {
@@ -116,6 +112,7 @@ public class GuildSettings
             Gson gson = new Gson();
             GuildSettings settingsFromFile = gson.fromJson(JSON, GuildSettings.class);
 
+            this.useGameChannels = settingsFromFile.isGameChannelsEnabled();
             this.gameCategoryId = settingsFromFile.getGameCategoryId();
             this.gameChannelTimeout = settingsFromFile.getGameChannelTimeout();
             this.guildCommandConfig = settingsFromFile.getGuildCommandConfig();
@@ -252,6 +249,26 @@ public class GuildSettings
     public void setGameChannelTimeout(String gameChannelTimeout)
     {
         this.gameChannelTimeout = gameChannelTimeout;
+    }
+
+    /**
+     * Gets useGameChannels
+     *
+     * @return useGameChannels
+     */
+    public boolean isGameChannelsEnabled()
+    {
+        return useGameChannels;
+    }
+
+    /**
+     * Sets the value of useGameChannels
+     *
+     * @param
+     */
+    public void setUseGameChannels(boolean useGameChannels)
+    {
+        this.useGameChannels = useGameChannels;
     }
 
     private class Config
