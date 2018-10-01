@@ -110,7 +110,6 @@ public class HeadedGUIUtil extends Application
                 break;
             case "discordSetupScreen":
                 welcome.show(stage);
-                //TODO for all: Save progress, Load new window and its state
                 break;
             case "ccSetupScreen":
                 discordSetup.show(stage);
@@ -134,13 +133,9 @@ public class HeadedGUIUtil extends Application
                 break;
             case "discordSetupScreen":
                 ccSetup.show(stage);
-                //TODO for all: Save progress, Load new window and its state
                 break;
             case "ccSetupScreen":
                 review.show(stage);
-                break;
-            case "reviewScreen":
-                //TODO: Create config, launch bot
                 break;
             default:
                 logger.error("Unknown setup window. Cannot go to next.");
