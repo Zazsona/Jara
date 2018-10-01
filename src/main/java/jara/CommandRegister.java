@@ -5,7 +5,7 @@ import java.util.Collections;
 
 import commands.Command;
 import commands.Help;
-import commands.admin.Config;
+import commands.admin.config.ConfigMain;
 import commands.audio.ForceSkip;
 import commands.audio.NowPlaying;
 import commands.audio.Play;
@@ -62,7 +62,7 @@ public class CommandRegister
 			register.add(new CommandAttributes("EightBall", "Tells your fortune.", EightBall.class, new String[] {"8ball", "helix", "fortune"}, TOYS, true));
 			register.add(new CommandAttributes("Jokes", "This command is a joke.", Jokes.class, new String[] {"Joke", "Comedy"}, TOYS, true));
 			register.add(new CommandAttributes("CoinFlip", "Flips a coin.", CoinFlip.class, new String[] {"FlipCoin", "Toss", "cf", "fc", "fiftyfifty", "flipacoin"}, UTILITY, true));
-			register.add(new CommandAttributes("Config", "Modify Bot settings.", Config.class, new String[] {"Settings"}, ADMIN, false));
+			register.add(new CommandAttributes("Config", "Modify Bot settings.", ConfigMain.class, new String[] {"Settings"}, ADMIN, false));
 			register.add(new CommandAttributes("Countdown", "The classic word making game.", Countdown.class, new String[] {"cd"}, GAMES, true));
 			register.add(new CommandAttributes("Help", "Shows command details.", Help.class, new String[] {"?", "commands"}, NOGROUP, false)); //Does help REALLY need to be indexed in help?
             register.add(new CommandAttributes("Randomizer", "Randomises numbers.", Randomizer.class, new String[] {"Randomise", "Randomize", "Randomiser", "Roulette", "Picker", "Selector"}, UTILITY, true));
