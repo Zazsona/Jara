@@ -3,6 +3,7 @@ package commands.audio;
 import audio.Audio;
 import commands.CmdUtil;
 import commands.Command;
+import configuration.SettingsUtil;
 import jara.Core;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -36,8 +37,15 @@ public class Skip extends Command
             {
                 descBuilder.append("Skip vote cancelled.\n");
             }
-
-            int skipVotesRequired = ((vChannel.getMembers().size()-1)/2); //We subtract 1 to ignore the bot. //TODO: Have the percentage of people voting be configurable.
+            /*
+                Let me spell the below operation out, because it's calling a lot of values from various places.
+                1. Get the percentage of people who need to vote, as defined in the guild config
+                2. Convert it to decimal format
+                3. Get the total number of people in the room, ignoring the bot (As it can't vote)
+                4. Multiply these together, to get the total number of people who need to vote for a track skip to happen
+                5. Round this to a valid integer.
+             */
+            int skipVotesRequired = Math.round((SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getTrackSkipPercent()/100)*(vChannel.getMembers().size()-1));
             if (skipVotesRequired == 0) {skipVotesRequired++;} //This is just for formatting, as otherwise it'd appear as "1/0 skips". It has no bearing on functionality.
 
             descBuilder.append("\n");
