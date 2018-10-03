@@ -126,7 +126,7 @@ public class ConfigCommandSettings
                         }
                         else if (request.equals("enable"))
                         {
-                            guildSettings.modifyCommandConfiguration(true, null, ca.getCommandKey());
+                            guildSettings.setCommandConfiguration(true, null, ca.getCommandKey());
                             embed.setDescription(ca.getCommandKey()+" is now enabled.");
                             channel.sendMessage(embed.build()).queue();
                             try
@@ -142,7 +142,7 @@ public class ConfigCommandSettings
                         }
                         else if (request.equals("disable"))
                         {
-                            guildSettings.modifyCommandConfiguration(false, null, ca.getCommandKey());
+                            guildSettings.setCommandConfiguration(false, null, ca.getCommandKey());
                             embed.setDescription(ca.getCommandKey()+" is now disabled.");
                             channel.sendMessage(embed.build()).queue();
                             try

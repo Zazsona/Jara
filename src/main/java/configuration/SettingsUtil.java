@@ -4,7 +4,6 @@ import gui.HeadedGUI;
 import gui.headed.HeadedGUIUtil;
 import jara.CommandAttributes;
 import jara.CommandRegister;
-import javafx.application.Application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,14 +11,9 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.function.BiConsumer;
 
 public class SettingsUtil
 {
@@ -66,7 +60,7 @@ public class SettingsUtil
     }
     public void manageNewCommands()
     {
-        HashMap<String, Boolean> commandConfig = globalSettings.getCommandConfig();
+        HashMap<String, Boolean> commandConfig = globalSettings.getCommandConfigMap();
         if (CommandRegister.getRegisterSize() > commandConfig.size()) //Quick test, if the register is larger then we know config is missing some elements without having to check each key.
         {
             //TODO: Open update GUI
@@ -189,8 +183,7 @@ public class SettingsUtil
             }
             guildFile.createNewFile();
             GuildSettings guildSettings = getGuildSettings(guildId);
-            guildSettings.setGameCategoryId("");
-            guildSettings.generateDefaultCommandConfig();
+            guildSettings.setDefaultSettings();
             guildSettings.save();
         }
         catch (IOException e)
@@ -216,6 +209,10 @@ public class SettingsUtil
             {
                 e.printStackTrace();
             }
+            catch (NullPointerException e) //In theory this will never occur, but better safe than sorry.
+            {
+                guildSettings.setDefaultSettings();
+            }
             guildSettingsMap.put(guildID, guildSettings);
             guildSettingsLastCall.put(guildID, Instant.now().toEpochMilli());
             return guildSettings;
@@ -228,7 +225,7 @@ public class SettingsUtil
      */
     private static void cleanInactiveGuilds() //It's either this, or the mop & bucket. And there's some dirty shit in those guilds.
     {
-        guildSettingsLastCall.forEach((id, time) -> {
+        guildSettingsLastCall.forEach((id, time) -> {   //FIXME: (ConcurrentModificationException).
                 if ((Instant.now().toEpochMilli() - time) >= 1000*60)
                 {
                     guildSettingsMap.remove(id);

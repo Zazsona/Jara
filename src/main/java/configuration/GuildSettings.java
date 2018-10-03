@@ -8,6 +8,8 @@ import jara.CommandAttributes;
 import jara.CommandRegister;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -15,66 +17,42 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class GuildSettings
+public class GuildSettings extends GuildSettingsJson
 {
-    private String guildId;
-    private boolean useGameChannels;
-    private String gameCategoryId;
-    private String gameChannelTimeout;
-    private HashMap<String, Config> guildCommandConfig;
+    /**
+     * The ID for the guild these settings belong to.
+     */
+    private final String guildId;
 
+    /**
+     * The logger.
+     */
+    private static final Logger logger = LoggerFactory.getLogger(GuildSettings.class);
+
+    /**
+     * Constructor
+     * @param guildId
+     */
     public GuildSettings(String guildId)
     {
         this.guildId = guildId;
     }
 
-    public String getGuildId()
-    {
-        return guildId;
-    }
-    public void setGuildCommandConfig(HashMap<String, Config> guildCommandConfig)
-    {
-        this.guildCommandConfig = guildCommandConfig;
-    }
-    public HashMap<String, Config> getGuildCommandConfig()
-    {
-        HashMap<String, Config> clone = new HashMap<>();
-        clone.putAll(guildCommandConfig);
-        return clone;
-    }
-    public ArrayList<String> getPermissions(String key)
-    {
-        return guildCommandConfig.get(key).permissions;
-    }
-    public void setPermissions(String key, ArrayList<String> permissions)
-    {
-        guildCommandConfig.get(key).permissions = permissions;
-    }
-    public String getGameCategoryId()
-    {
-        return gameCategoryId;
-    }
-    public void setGameCategoryId(String gameCategoryId)
-    {
-        this.gameCategoryId = gameCategoryId;
-    }
-
+    //=======================================================  Methods ==========================================================
 
     /**
-     * Builds global settings JSON
+     * Builds guild settings JSON
      * @return
-     * String -  Global Settings in a JSON format
+     * String -  Guild Settings in a JSON format
      */
     public String getJSON()
     {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String globalSettingsJson = gson.toJson(this);
-        return globalSettingsJson;
+        return gson.toJson(this);
     }
 
     /**
-     * Saves the global settings to file.
-     *
+     * Saves the guild settings to file.<br>
      * For this to go through, token and commandConfig must not be null.
      * @throws
      * IOException - Error accessing the file
@@ -83,12 +61,14 @@ public class GuildSettings
      */
     public void save() throws NullPointerException, IOException
     {
-        if (guildId == null || guildCommandConfig == null)
+        if (this.guildId == null || this.commandConfig == null)
         {
+            logger.error("Cannot save, a required element is null.");
             throw new NullPointerException();
         }
-        if (guildCommandConfig.size() < CommandRegister.getRegisterSize())
+        if (this.commandConfig.size() < CommandRegister.getRegisterSize())
         {
+            logger.error("Cannot save, commands are missing in the config.");
             throw new NullPointerException();
         }
         //TODO: Make it so any unset (missing) commands are disabled?
@@ -98,126 +78,111 @@ public class GuildSettings
         {
             settingsFile.createNewFile();
         }
-        FileOutputStream fileOutputStream = new FileOutputStream(settingsFile, false);
-        PrintWriter printWriter = new PrintWriter(fileOutputStream);
+        PrintWriter printWriter = new PrintWriter(new FileOutputStream(settingsFile, false));
         printWriter.print(getJSON());
         printWriter.close();
-        fileOutputStream.close();
     }
+
+    /**
+     * Loads the guild settings from file.
+     * @throws IOException - Unable to access file
+     * @throws NullPointerException - Missing data
+     */
     public void restore() throws IOException, NullPointerException
     {
         String JSON = new String(Files.readAllBytes(SettingsUtil.getGuildSettingsFile(guildId).toPath()));
         if (JSON.length() > 0)
         {
             Gson gson = new Gson();
-            GuildSettings settingsFromFile = gson.fromJson(JSON, GuildSettings.class);
+            GuildSettingsJson settingsFromFile = gson.fromJson(JSON, getClass());
 
-            this.useGameChannels = settingsFromFile.isGameChannelsEnabled();
-            this.gameCategoryId = settingsFromFile.getGameCategoryId();
-            this.gameChannelTimeout = settingsFromFile.getGameChannelTimeout();
-            this.guildCommandConfig = settingsFromFile.getGuildCommandConfig();
+            this.audioConfig.skipVotePercent = settingsFromFile.audioConfig.skipVotePercent;
+            this.gameConfig.useGameChannels = settingsFromFile.gameConfig.useGameChannels;
+            this.gameConfig.gameCategoryId = settingsFromFile.gameConfig.gameCategoryId;
+            this.gameConfig.gameChannelTimeout = settingsFromFile.gameConfig.gameChannelTimeout;
+            this.commandConfig = settingsFromFile.commandConfig;
         }
         else
         {
+            logger.error("Guild settings are empty for "+guildId);
             throw new NullPointerException(); //There is no data
         }
     }
-    public void generateDefaultCommandConfig()
+
+    /**
+     * Applies default settings to the guild config<br>
+     * As with other setter methods, this will not save to file.<br>
+     */
+    public void setDefaultSettings()
     {
-        guildCommandConfig = new HashMap<>();
+        this.commandConfig = new HashMap<>();
+        this.audioConfig = new AudioConfig();
+        this.gameConfig = new GameConfig();
+
         for (CommandAttributes ca : CommandRegister.getRegister())
         {
-            guildCommandConfig.put(ca.getCommandKey(), new Config(!ca.isDisableable(), new ArrayList<>())); //By inverting isDisableable, we are disabling it when isDisablable is true.
+            this.commandConfig.put(ca.getCommandKey(), new GuildSettingsJson.CommandConfig(!ca.isDisableable(), new ArrayList<>())); //By inverting isDisableable, we are disabling the command whenever isDisablable is true.
         }
+
+        setUseGameChannels(false);
+        setTrackSkipPercent(50);
+        setGameChannelTimeout("0");
+        setGameCategoryId("");
     }
+
     /**
-     * Updates the stored information for the command defined by the key. Pass null parameter to retain current value.
-     *
-     * @param newState (Can be null)
-     * @param newPermissions (Can be null)
+     * Allows the role represented by the ID to use the command.
+     * @param roleIDs
      * @param commandKeys
      */
-    public void modifyCommandConfiguration(Boolean newState, ArrayList<String> newPermissions, String... commandKeys)
-    {
-        Boolean state;
-        ArrayList<String> permissions;
-        for (String key : commandKeys)
-        {
-            if (CommandRegister.getCommand(key).isDisableable())
-            {
-                if (newState == null)
-                {
-                    state = guildCommandConfig.get(key).enabled;
-                }
-                else
-                {
-                    state = newState;
-                }
-                if (newPermissions == null)
-                {
-                    permissions = guildCommandConfig.get(key).permissions;
-                }
-                else
-                {
-                    permissions = newPermissions;
-                }
-                guildCommandConfig.replace(key, new Config(newState, permissions));
-            }
-        }
-    }
-    public void modifyCategoryConfiguration(Boolean newState, ArrayList<String> newPermissions, int categoryID)
-    {
-        ArrayList<String> keys = new ArrayList<>();
-        for (CommandAttributes ca : CommandRegister.getCommandsInCategory(categoryID))
-        {
-            keys.add(ca.getCommandKey());
-        }
-        modifyCommandConfiguration(newState, newPermissions, keys.toArray(new String[keys.size()]));
-    }
     public void addPermissions(ArrayList<String> roleIDs, String... commandKeys)
     {
-        modifyPermissions(true, roleIDs, commandKeys);
+        setPermissions(true, roleIDs, commandKeys);
     }
+
+    /**
+     * Denies the role represented by the ID from using the command.
+     * @param roleIDs
+     * @param commandKeys
+     */
     public void removePermissions(ArrayList<String> roleIDs, String... commandKeys)
     {
-        modifyPermissions(false, roleIDs, commandKeys);
+        setPermissions(false, roleIDs, commandKeys);
     }
-    private void modifyPermissions(boolean add, ArrayList<String> roleIDs, String... commandKeys)
+
+    //=================================================== Getters & Setters ======================================================
+
+    /**
+     * @return
+     */
+    public String getGuildId()
     {
-        for (String key : commandKeys)
-        {
-            boolean state = guildCommandConfig.get(key).enabled;
-            ArrayList<String> permissions = guildCommandConfig.get(key).permissions;
-            for (String roleID : roleIDs)
-            {
-                if (add) //If add it true, add the roles.
-                {
-                    permissions.add(roleID);
-                }
-                else //If add is false, remove.
-                {
-                    permissions.remove(roleID);
-                }
-            }
-            guildCommandConfig.replace(key, new Config(state, permissions));
-        }
+        return guildId;
     }
-    public boolean isCommandEnabled(String commandKey)
+
+    /**
+     * @return
+     */
+    private HashMap<String, GuildSettingsJson.CommandConfig> getCommandMap()
     {
-        return guildCommandConfig.get(commandKey).enabled;
+        HashMap<String, CommandConfig> clone = new HashMap<>(this.commandConfig);
+        return clone;
     }
-    public ArrayList<String> getEnabledCommands()
+
+    /**
+     * @param guildCommandConfig
+     */
+    private void setCommandMap(HashMap<String, CommandConfig> guildCommandConfig)
     {
-        ArrayList<String> enabledCommands = new ArrayList<>();
-        for (String key : CommandRegister.getAllCommandKeys())
-        {
-            if (guildCommandConfig.get(key).enabled)
-            {
-                enabledCommands.add(key);
-            }
-        }
-        return enabledCommands;
+        this.commandConfig = guildCommandConfig;
     }
+
+    /**
+     * Checks if the member is allowed to use this command, based on their roles.
+     * @param member
+     * @param commandKey
+     * @return
+     */
     public boolean isPermitted(Member member, String commandKey)
     {
         if (member.isOwner())
@@ -230,55 +195,204 @@ public class GuildSettings
         {
             roleIDs.add(role.getId());
         }
-        if (!Collections.disjoint(guildCommandConfig.get(commandKey).permissions, roleIDs))
+        if (!Collections.disjoint(this.commandConfig.get(commandKey).permissions, roleIDs))
         {
             permissionGranted = true;
         }
         return permissionGranted;
     }
+    /**
+     * Checks if the member is allowed to use this command, based on their roles.
+     * @param member
+     * @param command
+     * @return
+     */
     public boolean isPermitted(Member member, Class<? extends Command> command)
     {
         return isPermitted(member, CommandRegister.getCommand(command).getCommandKey());
     }
 
-    public String getGameChannelTimeout()
+    /**
+     * Returns a list of role IDs who can use this command
+     * @param key
+     * @return ArrayList<String> - List of Role IDs
+     */
+    public ArrayList<String> getPermissions(String key)
     {
-        return gameChannelTimeout;
-    }
-
-    public void setGameChannelTimeout(String gameChannelTimeout)
-    {
-        this.gameChannelTimeout = gameChannelTimeout;
+        return this.commandConfig.get(key).permissions;
     }
 
     /**
-     * Gets useGameChannels
-     *
-     * @return useGameChannels
+     * Modifies the permissions for the specified commands by adding/removing the roles in the list.
+     * @param add whether to add/remove permissions
+     * @param roleIDs the roles to permit
+     * @param commandKeys the commands to affect
+     */
+    private void setPermissions(boolean add, ArrayList<String> roleIDs, String... commandKeys)
+    {
+        for (String key : commandKeys)
+        {
+            boolean state = this.commandConfig.get(key).enabled;
+            ArrayList<String> permissions = this.commandConfig.get(key).permissions;
+            for (String roleID : roleIDs)
+            {
+                if (add) //If add it true, add the roles.
+                {
+                    permissions.add(roleID);
+                }
+                else //If add is false, remove.
+                {
+                    permissions.remove(roleID);
+                }
+            }
+            this.commandConfig.replace(key, new GuildSettingsJson.CommandConfig(state, permissions));
+        }
+    }
+
+    /**
+     * @return
+     */
+    public String getGameCategoryId()
+    {
+        return this.gameConfig.gameCategoryId;
+    }
+
+    /**
+     * @param gameCategoryId
+     */
+    public void setGameCategoryId(String gameCategoryId)
+    {
+        this.gameConfig.gameCategoryId = gameCategoryId;
+    }
+
+    /**
+     * Updates the stored information for the commands defined by their keys. Pass null parameter to retain current value.
+     * @param newState (Can be null)
+     * @param newPermissions (Can be null)
+     * @param commandKeys
+     */
+    public void setCommandConfiguration(Boolean newState, ArrayList<String> newPermissions, String... commandKeys)
+    {
+        Boolean state;
+        ArrayList<String> permissions;
+        for (String key : commandKeys)
+        {
+            if (CommandRegister.getCommand(key).isDisableable())
+            {
+                if (newState == null)
+                {
+                    state = this.commandConfig.get(key).enabled;
+                }
+                else
+                {
+                    state = newState;
+                }
+                if (newPermissions == null)
+                {
+                    permissions = this.commandConfig.get(key).permissions;
+                }
+                else
+                {
+                    permissions = newPermissions;
+                }
+                this.commandConfig.replace(key, new GuildSettingsJson.CommandConfig(state, permissions));
+            }
+        }
+    }
+
+    /**
+     * Updates the stored information for the commands within the category. Pass null parameter to retain current value.
+     * @param newState
+     * @param newPermissions
+     * @param categoryID
+     */
+    public void setCategoryConfiguration(Boolean newState, ArrayList<String> newPermissions, int categoryID)
+    {
+        ArrayList<String> keys = new ArrayList<>();
+        for (CommandAttributes ca : CommandRegister.getCommandsInCategory(categoryID))
+        {
+            keys.add(ca.getCommandKey());
+        }
+        setCommandConfiguration(newState, newPermissions, keys.toArray(new String[0]));
+    }
+
+
+    /**
+     * @param commandKey
+     * @return
+     */
+    public boolean isCommandEnabled(String commandKey)
+    {
+        return this.commandConfig.get(commandKey).enabled;
+    }
+
+    /**
+     * Gets the command keys of all commands enabled in this guild.
+     * @return
+     */
+    public ArrayList<String> getEnabledCommands()
+    {
+        ArrayList<String> enabledCommands = new ArrayList<>();
+        for (String key : CommandRegister.getAllCommandKeys())
+        {
+            if (this.commandConfig.get(key).enabled)
+            {
+                enabledCommands.add(key);
+            }
+        }
+        return enabledCommands;
+    }
+
+
+    /**
+     * @return
+     */
+    public String getGameChannelTimeout()
+    {
+        return this.gameConfig.gameChannelTimeout;
+    }
+
+    /**
+     * @param gameChannelTimeout
+     */
+    public void setGameChannelTimeout(String gameChannelTimeout)
+    {
+        this.gameConfig.gameChannelTimeout = gameChannelTimeout;
+    }
+
+    /**
+     * @return
      */
     public boolean isGameChannelsEnabled()
     {
-        return useGameChannels;
+        return this.gameConfig.useGameChannels;
     }
 
     /**
-     * Sets the value of useGameChannels
-     *
      * @param
      */
     public void setUseGameChannels(boolean useGameChannels)
     {
-        this.useGameChannels = useGameChannels;
+        this.gameConfig.useGameChannels = useGameChannels;
     }
 
-    private class Config
+    /**
+     * @return
+     */
+    public int getTrackSkipPercent()
     {
-        public Config(boolean enabled, ArrayList<String> permissions)
-        {
-            this.enabled = enabled;
-            this.permissions = permissions;
-        }
-        public ArrayList<String> permissions;
-        public boolean enabled;
+        return this.audioConfig.skipVotePercent;
     }
+
+    /**
+     * @param newPercent
+     */
+    public void setTrackSkipPercent(int newPercent)
+    {
+        if (newPercent >= 0 && newPercent <= 100)
+        {
+            this.audioConfig.skipVotePercent = newPercent;
+        }
+    }
+
 }
