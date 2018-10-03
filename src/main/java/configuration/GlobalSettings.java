@@ -12,34 +12,14 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class GlobalSettings
+public class GlobalSettings extends GlobalSettingsJson
 {
-    private String token;
-    private HashMap<String, Boolean> commandConfig;
+    /**
+     * The logger.
+     */
+    private static final Logger logger = LoggerFactory.getLogger(GlobalSettings.class);
 
-    public void setToken(String token)
-    {
-        this.token = token;
-    }
-    public String getToken()
-    {
-        return token;
-    }
-    public void setCommandConfig(HashMap<String, Boolean> commandConfig)
-    {
-        this.commandConfig = commandConfig;
-    }
-    public HashMap<String, Boolean> getCommandConfig()
-    {
-        if (commandConfig == null)
-        {
-            return null;
-        }
-        HashMap<String, Boolean> clone = new HashMap<>();
-        clone.putAll(commandConfig);
-        return clone;
-    }
-
+    //=======================================================  Methods ==========================================================
     /**
      * Builds global settings JSON
      * @return
@@ -48,13 +28,11 @@ public class GlobalSettings
     public String getJSON()
     {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String globalSettingsJson = gson.toJson(this);
-        return globalSettingsJson;
+        return gson.toJson(this);
     }
 
     /**
-     * Saves the global settings to file.
-     *
+     * Saves the global settings to file.<br>
      * For this to go through, token and commandConfig must not be null.
      * @throws
      * java.io.IOException - Error accessing the file
@@ -65,10 +43,12 @@ public class GlobalSettings
     {
         if (token == null || commandConfig == null)
         {
+            logger.error("Cannot save, a required element is null.");
             throw new NullPointerException();
         }
         if (commandConfig.size() < CommandRegister.getRegisterSize())
         {
+            logger.error("Cannot save, commands are missing in the config.");
             throw new NullPointerException();
         }
         //TODO: Make it so any unset (missing) commands are disabled?
@@ -82,6 +62,12 @@ public class GlobalSettings
         printWriter.print(getJSON());
         printWriter.close();
     }
+
+    /**
+     * Loads the guild settings from file.
+     * @throws IOException - Unable to access file
+     * @throws NullPointerException - Missing data
+     */
     public void restore() throws IOException, NullPointerException
     {
         String JSON = new String(Files.readAllBytes(SettingsUtil.getGlobalSettingsFile().toPath()));
@@ -91,14 +77,55 @@ public class GlobalSettings
             GlobalSettings settingsFromFile = gson.fromJson(JSON, GlobalSettings.class);
 
             this.token = settingsFromFile.getToken();
-            this.commandConfig = settingsFromFile.getCommandConfig();
+            this.commandConfig = settingsFromFile.getCommandConfigMap();
         }
         else
         {
+            logger.error("Global settings is empty. Starting setup.");
             throw new NullPointerException(); //There is no data
         }
     }
-    public void modifyCommandConfiguration(boolean newState, String... commandKeys)
+
+
+    //=================================================== Getters & Setters =====================================================
+    /**
+     * @return
+     */
+    public String getToken()
+    {
+        return token;
+    }
+
+    /**
+     * @param token
+     */
+    public void setToken(String token)
+    {
+        this.token = token;
+    }
+
+    /**
+     * @return
+     */
+    public HashMap<String, Boolean> getCommandConfigMap()
+    {
+        if (commandConfig == null)
+        {
+            return null;
+        }
+        HashMap<String, Boolean> clone = new HashMap<>(commandConfig);
+        return clone;
+    }
+    public void setCommandConfigMap(HashMap<String, Boolean> commandConfig)
+    {
+        this.commandConfig = commandConfig;
+    }
+    /**
+     * Updates the stored information for the commands defined by their keys.
+     * @param newState
+     * @param commandKeys
+     */
+    public void setCommandConfiguration(boolean newState, String... commandKeys)
     {
         for (String key : commandKeys)
         {
@@ -108,19 +135,34 @@ public class GlobalSettings
             }
         }
     }
-    public void modifyCategoryConfiguration(boolean newState, int categoryID)
+    /**
+     * Updates the stored information for the commands within the category. Pass null parameter to retain current value.
+     * @param newState
+     * @param categoryID
+     */
+    public void setCategoryConfiguration(boolean newState, int categoryID)
     {
         ArrayList<String> keys = new ArrayList<>();
         for (CommandAttributes ca : CommandRegister.getCommandsInCategory(categoryID))
         {
             keys.add(ca.getCommandKey());
         }
-        modifyCommandConfiguration(newState, keys.toArray(new String[keys.size()]));
+        setCommandConfiguration(newState, keys.toArray(new String[0]));
     }
+
+    /**
+     * @param commandKey
+     * @return
+     */
     public boolean isCommandEnabled(String commandKey)
     {
         return commandConfig.get(commandKey);
     }
+
+    /**
+     * Gets the command keys of all commands enabled on this bot.
+     * @return
+     */
     public ArrayList<String> getEnabledCommands()
     {
         ArrayList<String> enabledCommands = new ArrayList<>();

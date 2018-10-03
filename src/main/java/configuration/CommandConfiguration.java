@@ -1,13 +1,10 @@
 package configuration;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 
-import jara.CommandRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import commands.Command;
 import jara.CommandAttributes;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 

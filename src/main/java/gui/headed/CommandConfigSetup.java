@@ -132,9 +132,9 @@ public class CommandConfigSetup
         bp.setBottom(bottomPane);
         CheckBox checkBox = new CheckBox();
         checkBox.setSelected(true);
-        if (SettingsUtil.getGlobalSettings().getCommandConfig() != null) //Restore from existing config (if possible)
+        if (SettingsUtil.getGlobalSettings().getCommandConfigMap() != null) //Restore from existing config (if possible)
         {
-            checkBox.setSelected(SettingsUtil.getGlobalSettings().getCommandConfig().get(commandAttributes.getCommandKey()));
+            checkBox.setSelected(SettingsUtil.getGlobalSettings().getCommandConfigMap().get(commandAttributes.getCommandKey()));
         }
 
         if (!commandAttributes.isDisableable())
