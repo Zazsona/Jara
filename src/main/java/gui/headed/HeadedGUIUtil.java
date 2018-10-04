@@ -13,7 +13,6 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
@@ -39,7 +38,7 @@ public class HeadedGUIUtil extends Application
 
 
     @Override
-    public void start(Stage primaryStage) throws Exception
+    public void start(Stage primaryStage)
     {
         try
         {
@@ -251,10 +250,10 @@ public class HeadedGUIUtil extends Application
             this.avatarURL = avatarURL;
             this.clientID = clientID;
         }
-        String username;
-        String discrim;
-        String avatarURL;
-        String clientID;
+        final String username;
+        final String discrim;
+        final String avatarURL;
+        final String clientID;
     }
     public static void setSetupComplete(boolean state)
     {

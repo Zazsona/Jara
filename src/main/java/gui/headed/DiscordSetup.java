@@ -1,6 +1,5 @@
 package gui.headed;
 
-import commands.CmdUtil;
 import configuration.SettingsUtil;
 import jara.Core;
 import javafx.application.Platform;
@@ -22,14 +21,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashMap;
-import java.util.Set;
 
 public class DiscordSetup extends ListenerAdapter
 {
+    /**
+     * The last token with which we attempted to connect.
+     */
     private String oldToken = "";
+    /**
+     * The ID of the client
+     */
     private String clientID = "";
-    boolean tokenIsValid = false;
+    /**
+     * Whether or not the token held in the text box is valid
+     */
+    private boolean tokenIsValid = false;
     @FXML
     private VBox discordSetupScreen;
     @FXML
@@ -96,32 +102,58 @@ public class DiscordSetup extends ListenerAdapter
 
 
     }
+    /**
+     * Displays this screen on the stage.
+     * @param stage
+     */
     public void show(Stage stage)
     {
         stage.getScene().setRoot(discordSetupScreen);
     }
 
+    /**
+     * @return
+     */
     public String getToken()
     {
         return txtFieldToken.getText();
     }
+
+    /**
+     * @return
+     */
     public boolean isValidToken()
     {
         return tokenIsValid;
     }
+
+    /**
+     * @return
+     */
     public String getClientID()
     {
         return clientID;
     }
 
+    /**
+     * @param root
+     */
     public void setRoot(Parent root)
     {
         this.discordSetupScreen = (VBox) root;
     }
+
+    /**
+     * @return
+     */
     public Parent getRoot()
     {
         return discordSetupScreen;
     }
+
+    /**
+     * Retrieves the account data for the bot's Discord account
+     */
     private void generateAccountData()
     {
         if (!getToken().equals(oldToken)) //If the token has changed, retest it.
@@ -129,7 +161,7 @@ public class DiscordSetup extends ListenerAdapter
             Task<Void> generateAccDataTask = new Task<Void>()
             {
                 @Override
-                protected Void call() throws Exception
+                protected Void call()
                 {
                     oldToken = getToken();
                     tokenIsValid = Core.initialiseDiscordConnection(getToken());
@@ -139,9 +171,6 @@ public class DiscordSetup extends ListenerAdapter
             };
             new Thread(generateAccDataTask).start();
         }
-
-
-
     }
     @Override
     public void onReady(ReadyEvent re)
@@ -150,12 +179,12 @@ public class DiscordSetup extends ListenerAdapter
                           {
 
                               SelfUser selfUser = Core.getShardManager().getApplicationInfo().getJDA().getSelfUser();
-
                               clientID = selfUser.getId();
-                              HeadedGUIUtil.getReviewController().profileNameText.setText(selfUser.getName());
-                              HeadedGUIUtil.getReviewController().profileDiscrimText.setText("#"+selfUser.getDiscriminator());            //TODO Messy
-                              try
+                              try //Attempt to fill the profile.
                               {
+                                  HeadedGUIUtil.getReviewController().profileNameText.setText(selfUser.getName());
+                                  HeadedGUIUtil.getReviewController().profileDiscrimText.setText("#"+selfUser.getDiscriminator());
+
                                   URLConnection connection = new URL(selfUser.getEffectiveAvatarUrl()).openConnection();
                                   connection.setRequestProperty("User-Agent", "Jara ("+System.getProperty("os.name")+")");
                                   InputStream stream = connection.getInputStream();
@@ -164,6 +193,7 @@ public class DiscordSetup extends ListenerAdapter
                               }
                               catch (IOException e)
                               {
+                                  //We already have a placeholder data for this case
                                   e.printStackTrace();
                               }
 

@@ -56,8 +56,6 @@ public class CommandConfigSetup
     @FXML
     private CheckBox utilityCategoryCheckBox;
 
-    private ArrayList<Integer> supportedCategories;
-
     public void initialize()
     {
         backButton.setOnMouseClicked((event) -> HeadedGUIUtil.goBack());
@@ -111,10 +109,20 @@ public class CommandConfigSetup
             }
         }
     }
+    /**
+     * Displays this screen on the stage.
+     * @param stage
+     */
     public void show(Stage stage)
     {
         stage.getScene().setRoot(ccSetupScreen);
     }
+
+    /**
+     * This method will add the required fields onto the menu for the passed command, allowing the user to view and select it.
+     * @param commandAttributes
+     * @return
+     */
     private BorderPane generateCommandListElement(CommandAttributes commandAttributes)
     {
         BorderPane bp = new BorderPane();
@@ -158,12 +166,17 @@ public class CommandConfigSetup
         return bp;
 
     }
+
+    /**
+     * This method will have all commands in the category match the check box's state
+     * @param categoryCheckBox
+     * @param categoryID
+     */
     private void toggleCategory(CheckBox categoryCheckBox, int categoryID)
     {
-        CommandAttributes[] ca = CommandRegister.getCommandsInCategory(categoryID);
-        for (int i = 0; i<ca.length; i++)
+        for (CommandAttributes ca : CommandRegister.getCommandsInCategory(categoryID))
         {
-            CheckBox checkBox = (CheckBox) ccSetupScreen.lookup("#"+ca[i].getCommandKey()+"CheckBox");
+            CheckBox checkBox = (CheckBox) ccSetupScreen.lookup("#" + ca.getCommandKey() + "CheckBox");
             if (!checkBox.isDisabled())
             {
                 checkBox.setSelected(categoryCheckBox.isSelected());
@@ -171,9 +184,13 @@ public class CommandConfigSetup
         }
     }
 
+    /**
+     * Retrives category IDs where at least one command is enabled.
+     * @return
+     */
     public ArrayList<Integer> getSupportedCategories()
     {
-        supportedCategories = new ArrayList<>();
+        ArrayList<Integer> supportedCategories = new ArrayList<>();
         for (CommandAttributes ca : CommandRegister.getRegister())
         {
             if (!supportedCategories.contains(ca.getCategoryID()) && ca.getCategoryID() != CommandRegister.NOGROUP)
@@ -187,6 +204,10 @@ public class CommandConfigSetup
         return supportedCategories;
     }
 
+    /**
+     * Returns the selected commands as a CommandConfig compatible with GlobalSettings.
+     * @return
+     */
     public HashMap<String, Boolean> getCommandConfig()
     {
         HashMap<String, Boolean> commandConfig = new HashMap<>();
@@ -206,10 +227,17 @@ public class CommandConfigSetup
         return commandConfig;
     }
 
+    /**
+     * @param root
+     */
     public void setRoot(Parent root)
     {
         this.ccSetupScreen = (VBox) root;
     }
+
+    /**
+     * @return
+     */
     public Parent getRoot()
     {
         return ccSetupScreen;

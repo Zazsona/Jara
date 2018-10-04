@@ -5,19 +5,15 @@ import gui.HeadedGUI;
 import jara.CommandRegister;
 import jara.Core;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.image.ImageView;
-import net.dv8tion.jda.core.entities.SelfUser;
-import net.dv8tion.jda.core.entities.User;
 
 import java.io.IOException;
 
@@ -52,6 +48,9 @@ public class Review
     @FXML
     public Text profileDiscrimText;
 
+    /**
+     * Whether the invite button has been pressed.
+     */
     private boolean invitePressed = false;
 
     public void initialize()
@@ -74,6 +73,10 @@ public class Review
         inviteButton.setOnMouseExited((event) -> HeadedGUIUtil.nextButtonHover(inviteRect));
 
     }
+    /**
+     * Displays this screen on the stage.
+     * @param stage
+     */
     public void show(Stage stage)
     {
         CommandConfigSetup ccSetup = HeadedGUIUtil.getCcSetupController();
@@ -92,7 +95,13 @@ public class Review
                                        });
         stage.getScene().setRoot(reviewScreen);
     }
-    public static String generateInviteLink(boolean showError)
+
+    /**
+     * Generates the URL to invite the bot. Required account details to be retrieved via DiscordSetup.generateAccountData()
+     * @param showError Whether to show a loading error
+     * @return the URL as String
+     */
+    private static String generateInviteLink(boolean showError)
     {
         DiscordSetup discordSetup = HeadedGUIUtil.getDiscordSetupController();
         if (discordSetup.getToken().equals(""))
@@ -116,22 +125,33 @@ public class Review
         }
 
     }
+
+    /**
+     * @param root
+     */
     public void setRoot(Parent root)
     {
         this.reviewScreen = (VBox) root;
     }
+
+    /**
+     * @return
+     */
     public Parent getRoot()
     {
         return reviewScreen;
     }
 
+    /**
+     * Accumulates all the data the user has entered and saves it to a Global Settings file.<br>
+     *     This will also open the bot invite page, if the user has not already.
+     */
     private void completeSetup()
     {
         String token = HeadedGUIUtil.getDiscordSetupController().getToken();
         if (!HeadedGUIUtil.getDiscordSetupController().isValidToken())
         {
             HeadedGUI.showError("The token is blank or invalid.");
-            return;
         }
         else
         {
@@ -162,8 +182,6 @@ public class Review
             {
                 HeadedGUI.showError("Could not save settings.");
             }
-
-
         }
     }
 

@@ -10,8 +10,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-
 public class Welcome extends Application
 {
 
@@ -49,6 +47,11 @@ public class Welcome extends Application
         navBar_review_text.setOnMouseClicked((event -> HeadedGUIUtil.manageTitleSelection(navBar_review_text)));
 
     }
+
+    /**
+     * Displays this screen on the stage.
+     * @param stage
+     */
     public void show(Stage stage)
     {
         stage.getScene().setRoot(welcomeScreen);
@@ -57,41 +60,29 @@ public class Welcome extends Application
     @Override
     public void start(Stage primaryStage)
     {
-        try
+        if (primaryStage.getScene() != null)
         {
-            //FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("gui/welcome.fxml"));
-            //Parent root = fxmlLoader.load();
-            if (primaryStage.getScene() != null)
-            {
-                primaryStage.getScene().setRoot(welcomeScreen);
-            }
-            else
-            {
-                primaryStage.setTitle("Jara Setup");
-                primaryStage.setScene(new Scene(welcomeScreen, 1280, 800));
-                //stage = primaryStage;
-            }
-
-            primaryStage.show();
-            if (5 == 4)
-            {
-                throw new IOException();
-            }
+            primaryStage.getScene().setRoot(welcomeScreen);
         }
-        catch (IOException e)
+        else
         {
-            e.printStackTrace();
+            primaryStage.setTitle("Jara Setup");
+            primaryStage.setScene(new Scene(welcomeScreen, 1280, 800));
         }
+        primaryStage.show();
     }
 
-    /*public Stage getStage()
-    {
-        return stage;
-    }*/
+    /**
+     * @param root
+     */
     public void setRoot(Parent root)
     {
         this.welcomeScreen = (VBox) root;
     }
+
+    /**
+     * @return
+     */
     public Parent getRoot()
     {
         return welcomeScreen;

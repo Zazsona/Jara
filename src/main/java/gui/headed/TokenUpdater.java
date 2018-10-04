@@ -3,7 +3,6 @@ package gui.headed;
 import gui.HeadedGUI;
 import jara.Core;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,7 +14,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 public class TokenUpdater extends Application
@@ -61,6 +59,10 @@ public class TokenUpdater extends Application
             e.printStackTrace();
         }
     }
+
+    /**
+     * Performs a check on the token to confirm it is valid. Closes the Window if so.
+     */
     private void enterAction()
     {
         boolean tokenSuccess = Core.initialiseDiscordConnection(txtFieldToken.getText());
