@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -206,12 +207,19 @@ public class SettingsUtil
      */
     private static void cleanInactiveGuilds() //It's either this, or the mop & bucket. And there's some dirty shit in those guilds.
     {
-        guildSettingsLastCall.forEach((id, time) -> {   //FIXME: (ConcurrentModificationException).
-                if ((Instant.now().toEpochMilli() - time) >= 1000*60)
-                {
-                    guildSettingsMap.remove(id);
-                    guildSettingsLastCall.remove(id);
-                }
-        });
+        Thread.currentThread().setName("Guild Cleaner");
+        Iterator guildIterator = guildSettingsLastCall.entrySet().iterator();
+        int guildsRemoved = 0;
+        while (guildIterator.hasNext())
+        {
+            HashMap.Entry<String, Long> guildCall = (HashMap.Entry<String, Long>) guildIterator.next();
+            if ((Instant.now().toEpochMilli() - guildCall.getValue()) >= 1000*60)
+            {
+                guildsRemoved++;
+                guildSettingsMap.remove(guildCall.getKey());
+                guildSettingsLastCall.remove(guildCall.getKey());
+            }
+        }
+        logger.info("Cleared "+guildsRemoved+" guild settings from memory.");
     }
 }
