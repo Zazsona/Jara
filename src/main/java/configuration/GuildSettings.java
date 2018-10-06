@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -66,12 +67,17 @@ public class GuildSettings extends GuildSettingsJson
             logger.error("Cannot save, a required element is null.");
             throw new NullPointerException();
         }
-        if (this.commandConfig.size() < CommandRegister.getRegisterSize())
+        if (!commandConfig.keySet().containsAll(Arrays.asList(CommandRegister.getAllCommandKeys())))
         {
-            logger.error("Cannot save, commands are missing in the config.");
-            throw new NullPointerException();
+            for (String key : CommandRegister.getAllCommandKeys())
+            {
+                if (!commandConfig.keySet().contains(key))
+                {
+                    commandConfig.put(key, new CommandConfig(!CommandRegister.getCommand(key).isDisableable(), new ArrayList<String>()));
+                }
+            }
+            logger.info("Commands were missing in the config for guild "+guildId+", so have been added with disabled state."); //This could get really spammy after an update.
         }
-        //TODO: Make it so any unset (missing) commands are disabled?
 
         File settingsFile = SettingsUtil.getGuildSettingsFile(guildId);
         if (!settingsFile.exists())
@@ -101,6 +107,10 @@ public class GuildSettings extends GuildSettingsJson
             this.gameConfig.gameCategoryId = settingsFromFile.gameConfig.gameCategoryId;
             this.gameConfig.gameChannelTimeout = settingsFromFile.gameConfig.gameChannelTimeout;
             this.commandConfig = settingsFromFile.commandConfig;
+            if (!commandConfig.keySet().containsAll(Arrays.asList(CommandRegister.getAllCommandKeys())))
+            {
+                save(); //This will add the missing commands, and save the config.
+            }
         }
         else
         {

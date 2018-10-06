@@ -58,25 +58,6 @@ public class SettingsUtil
         }, 1000*60*30, 1000*60*30);
 
     }
-    public void manageNewCommands()
-    {
-        HashMap<String, Boolean> commandConfig = globalSettings.getCommandConfigMap();
-        if (CommandRegister.getRegisterSize() > commandConfig.size()) //Quick test, if the register is larger then we know config is missing some elements without having to check each key.
-        {
-            //TODO: Open update GUI
-        }
-        else //Otherwise...
-        {
-            for (CommandAttributes ca : CommandRegister.getRegister()) //Check each key
-            {
-                if (!commandConfig.containsKey(ca.getCommandKey())) //If the key isn't in the config, open updater.
-                {
-                    //TODO: Open update GUI
-                }
-            }
-        }
-        //We don't care if the config has commands not in the register, these will simply be ignored. This allows for backwards compatibility and (in some cases) transfers of settings from forked/modded versions of Jara.
-    }
 
     /**
      * Returns the global settings.

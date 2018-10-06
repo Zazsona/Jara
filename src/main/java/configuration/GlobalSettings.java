@@ -2,6 +2,7 @@ package configuration;
 
 
 import com.google.gson.*;
+import commands.Command;
 import jara.CommandAttributes;
 import jara.CommandRegister;
 import org.slf4j.Logger;
@@ -9,8 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class GlobalSettings extends GlobalSettingsJson
 {
@@ -46,12 +46,20 @@ public class GlobalSettings extends GlobalSettingsJson
             logger.error("Cannot save, a required element is null.");
             throw new NullPointerException();
         }
-        if (commandConfig.size() < CommandRegister.getRegisterSize())
+        if (!commandConfig.keySet().containsAll(Arrays.asList(CommandRegister.getAllCommandKeys())))
         {
-            logger.error("Cannot save, commands are missing in the config.");
-            throw new NullPointerException();
+            if (!commandConfig.keySet().containsAll(Arrays.asList(CommandRegister.getAllCommandKeys())))
+            {
+                for (String key : CommandRegister.getAllCommandKeys())
+                {
+                    if (!commandConfig.keySet().contains(key))
+                    {
+                        commandConfig.put(key, !CommandRegister.getCommand(key).isDisableable());
+                    }
+                }
+                logger.info("Commands were missing in the config, so have been added with disabled state.");
+            }
         }
-        //TODO: Make it so any unset (missing) commands are disabled?
 
         File settingsFile = SettingsUtil.getGlobalSettingsFile();
         if (!settingsFile.exists())
@@ -78,10 +86,20 @@ public class GlobalSettings extends GlobalSettingsJson
 
             this.token = settingsFromFile.getToken();
             this.commandConfig = settingsFromFile.getCommandConfigMap();
+            if (!commandConfig.keySet().containsAll(Arrays.asList(CommandRegister.getAllCommandKeys())))
+            {
+                /*
+                    We are not filling in the commands here because, unlike the guild side, the host has CHOSEN to update the bot.
+                    Therefore, I feel it would be better to open the setup and let them configure it.
+                 */
+                logger.error("Commands are missing from the config. Is it outdated?");
+                throw new NullPointerException(); //TODO: Have all guilds be notified of the update
+                //TODO: Launch update (/new mod) setup
+            }
         }
         else
         {
-            logger.error("Global settings is empty. Starting setup.");
+            logger.error("Global settings is empty.");
             throw new NullPointerException(); //There is no data
         }
     }
