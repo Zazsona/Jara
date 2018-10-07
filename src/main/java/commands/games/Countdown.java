@@ -4,11 +4,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.xml.stream.events.Characters;
-
 import commands.CmdUtil;
 import commands.Command;
-import configuration.SettingsUtil;
 import jara.Core;
 import jara.MessageManager;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -37,22 +34,27 @@ public class Countdown extends Command
 		generateResults(answers);
 
 		super.deleteGameChannel(msgEvent, channel);
-		return;
 	}
+
+	/**
+	 * Creates the list of characters which players have to make a word from.
+	 * @param parameters
+	 * @return
+	 */
 	private String generateLetters(String...parameters)
 	{
 		if (parameters.length > 1)		//If there are several parameters...
 		{
 			StringBuilder rebuiltParams = new StringBuilder();
-			for (int i = 0; i<parameters.length; i++)
+			for (String parameter : parameters)
 			{
-				if (parameters[i].matches("[cv]+"))				//Take only the "C" or "V" ones (i.e, ignore /countdown and any other params that may be added)
+				if (parameter.matches("[cv]+"))                //Take only the "C" or "V" ones (i.e, ignore /countdown and any other params that may be added)
 				{
-					rebuiltParams.append(parameters[i]);
+					rebuiltParams.append(parameter);
 				}
-				if (rebuiltParams.length() == 9-letters.length())
+				if (rebuiltParams.length() == 9 - letters.length())
 				{
-					break;										//Do not allow any more than 9 selections
+					break;                                        //Do not allow any more than 9 selections
 				}
 			}
 			return generateLetters(rebuiltParams.toString());	//Recall the method, now with only one, valid, parameter.
@@ -62,10 +64,9 @@ public class Countdown extends Command
 		parameters[0] = parameters[0].toLowerCase();
 		if (parameters[0].matches("[cv]+"))
 		{
-            ArrayList<Character> consonants = new ArrayList<Character>();
-            consonants.addAll(Arrays.asList('B', 'B', 'C', 'C', 'C', 'D', 'D', 'D', 'D', 'D', 'D', 'F', 'F', 'G', 'G', 'G', 'H', 'H', 'J', 'K', 'L', 'L', 'L', 'L', 'L', 'M', 'M', 'M', 'M', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'P', 'P', 'P', 'P', 'Q', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'V', 'W', 'X', 'Y', 'Z'));
-            ArrayList<Character> vowels = new ArrayList<Character>();
-            vowels.addAll(Arrays.asList('A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'U')); //By having duplicate letters here we can influence the odds of one coming up. 
+			ArrayList<Character> consonants = new ArrayList<>(Arrays.asList('B', 'B', 'C', 'C', 'C', 'D', 'D', 'D', 'D', 'D', 'D', 'F', 'F', 'G', 'G', 'G', 'H', 'H', 'J', 'K', 'L', 'L', 'L', 'L', 'L', 'M', 'M', 'M', 'M', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N', 'P', 'P', 'P', 'P', 'Q', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'V', 'W', 'X', 'Y', 'Z'));
+			//By having duplicate letters here we can influence the odds of one coming up.
+			ArrayList<Character> vowels = new ArrayList<>(Arrays.asList('A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'I', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'U'));
 			Random r = new Random();
             char[] selections = parameters[0].toCharArray();
             lettersBuilder.append(letters); //Get previous progress.
@@ -104,6 +105,12 @@ public class Countdown extends Command
 		}
 		return generateLetters(new MessageManager().getNextMessage(channel).getContentDisplay()); //If there are still selections missing, get 'em.
 	}
+
+	/**
+	 * Starts the clock and begins collecting answers from players. Holds the thread for 35 seconds.
+	 * @param msgEvent
+	 * @return
+	 */
 	private Message[] getAnswers(GuildMessageReceivedEvent msgEvent)
 	{
 		EmbedBuilder embed = new EmbedBuilder();
@@ -113,9 +120,13 @@ public class Countdown extends Command
 		Message embedMsg = channel.sendMessage(embed.build()).complete();
 		Thread clockThread = new Thread(new clock(embed, embedMsg));
 		clockThread.start();
-		Message[] answers = mm.getNextMessages(channel, 35*1000, Integer.MAX_VALUE);
-		return answers;
+		return mm.getNextMessages(channel, 35*1000, Integer.MAX_VALUE);
 	}
+
+	/**
+	 * Generates a winner from the answers provided.
+	 * @param answers
+	 */
 	private void generateResults(Message[] answers)
 	{
 		if (answers == null)
@@ -138,7 +149,7 @@ public class Countdown extends Command
 				{
 					continue;
 				}
-				List<Character> answerLetters = content.toUpperCase().chars().mapToObj((letter) -> Character.valueOf((char) letter)).collect(Collectors.toList()); //Converting each Int returns from chars() into a Character, as char[] cannot be converted into Character[]
+				List<Character> answerLetters = content.toUpperCase().chars().mapToObj((letter) -> (char) letter).collect(Collectors.toList()); //Converting each Int returns from chars() into a Character, as char[] cannot be converted into Character[]
 				for (char letter : letters.toCharArray())
 				{
 					answerLetters.remove(Character.valueOf(letter));
@@ -192,10 +203,14 @@ public class Countdown extends Command
 		}
 
 	}
+
+	/**
+	 * The clock used to update the embed and check if the game has been quit.
+	 */
 	private class clock implements Runnable
 	{
 		EmbedBuilder embed;
-		Message msg;
+		final Message msg;
 		public clock(EmbedBuilder embed, Message msg)
 		{
 			this.embed = embed;
@@ -243,24 +258,28 @@ public class Countdown extends Command
 		}
 		
 	}
+
+	/**
+	 * Displays the letters players can use in a pretty format.
+	 * @return
+	 */
 	private String createBoard()
 	{
 		StringBuilder boardBuilder = new StringBuilder();
 		for (char letter : letters.toLowerCase().toCharArray())
 		{
-			boardBuilder.append(":regional_indicator_"+letter+":");
+			boardBuilder.append(":regional_indicator_").append(letter).append(":");
 		}
 		return boardBuilder.toString();
 	}
+
+	/**
+	 * Checks whether the supplied answer is rude or not.
+	 * @param answer
+	 * @return
+	 */
 	private boolean isRude(String answer)
 	{
-		if (answer.contains("piss") || answer.equals("poo") || answer.contains("poop") ||  answer.equals("pee") || answer.equals("butt") || answer.contains("butts") || answer.contains("fuck") || answer.contains("shit") || answer.contains("arse") || answer.contains("bugger") || answer.contains("bollocks") || answer.contains("bugger") || answer.contains("ass") || answer.contains("crap") || answer.contains("bitch") || answer.contains("bastard") || answer.contains("cunt") || answer.contains("twat") || answer.contains("boobs") || answer.equals("tits") || answer.equals("tit") || answer.contains("bellend") || answer.contains("cock") || answer.contains("clunge") || answer.contains("knob") || answer.contains("minge") || answer.contains("prick") || answer.contains("dildo") || answer.contains("jizz") || answer.contains("slag") || answer.contains("slut") || answer.contains("whore") || answer.contains("shag") || answer.equals("sex") || answer.contains("knob") || answer.contains("wank"))
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return answer.contains("piss") || answer.equals("poo") || answer.contains("poop") || answer.equals("pee") || answer.equals("butt") || answer.contains("butts") || answer.contains("fuck") || answer.contains("shit") || answer.contains("arse") || answer.contains("bollocks") || answer.contains("bugger") || answer.contains("ass") || answer.contains("crap") || answer.contains("bitch") || answer.contains("bastard") || answer.contains("cunt") || answer.contains("twat") || answer.contains("boobs") || answer.equals("tits") || answer.equals("tit") || answer.contains("bellend") || answer.contains("cock") || answer.contains("clunge") || answer.contains("minge") || answer.contains("prick") || answer.contains("dildo") || answer.contains("jizz") || answer.contains("slag") || answer.contains("slut") || answer.contains("whore") || answer.contains("shag") || answer.equals("sex") || answer.contains("knob") || answer.contains("wank");
 	}
 }

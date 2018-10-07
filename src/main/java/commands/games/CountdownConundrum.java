@@ -17,7 +17,7 @@ public class CountdownConundrum extends Command
     private EmbedBuilder embed;
     private Message embedMsg;
 
-
+    @SuppressWarnings("SpellCheckingInspection")
     @Override
     public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
     {
@@ -113,10 +113,8 @@ public class CountdownConundrum extends Command
         }
 
         super.deleteGameChannel(msgEvent, channel);
-        return;
-
     }
-    public String[][] getConundrums()
+    private String[][] getConundrums() //TODO: Generate conundrums from word list?
     {
         String[][] conundrums = new String[40][2];
         conundrums[0][0] = "Soartrip";
