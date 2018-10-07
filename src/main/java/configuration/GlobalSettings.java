@@ -93,7 +93,7 @@ public class GlobalSettings extends GlobalSettingsJson
                     Therefore, I feel it would be better to open the setup and let them configure it.
                  */
                 logger.error("Commands are missing from the config. Is it outdated?");
-                throw new NullPointerException(); //TODO: Have all guilds be notified of the update
+                throw new NullPointerException();
                 //TODO: Launch update (/new mod) setup
             }
         }

@@ -61,7 +61,7 @@ public class Core //A class for covering the global manners of the bot.
 		{
 			return selfMember.getRoles().get(0).getColor(); //Try to set it to the bot's primary role colour
 		}
-		catch (IndexOutOfBoundsException e)	//If the bot has no role
+		catch (IndexOutOfBoundsException | NullPointerException e)	//If the bot has no role
 		{
 			return Color.decode("#5967cf"); //Use a default theme.
 		}

@@ -6,6 +6,8 @@ import com.google.gson.GsonBuilder;
 import commands.Command;
 import jara.CommandAttributes;
 import jara.CommandRegister;
+import jara.Core;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import org.slf4j.Logger;
@@ -110,6 +112,11 @@ public class GuildSettings extends GuildSettingsJson
             if (!commandConfig.keySet().containsAll(Arrays.asList(CommandRegister.getAllCommandKeys())))
             {
                 save(); //This will add the missing commands, and save the config.
+
+                EmbedBuilder embed = new EmbedBuilder();
+                embed.setDescription("The bot has been updated with new commands/settings added!\nUse /config to configure these, they have been disabled for now.");
+                embed.setColor(Core.getHighlightColour(null));
+                Core.getShardManager().getGuildById(guildId).getOwner().getUser().openPrivateChannel().complete().sendMessage(embed.build());
             }
         }
         else
