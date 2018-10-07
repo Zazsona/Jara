@@ -6,6 +6,10 @@ import java.util.HashMap;
 public abstract class GuildSettingsJson
 {
     /**
+     * The Character used to summon the bot
+     */
+    protected char commandPrefix;
+    /**
      * The guild's audio settings.
      */
     protected AudioConfig audioConfig;

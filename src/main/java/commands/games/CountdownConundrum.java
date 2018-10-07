@@ -81,7 +81,7 @@ public class CountdownConundrum extends Command
             {
                 String answer = message.getContentDisplay();
 
-                if (answer.equalsIgnoreCase("/quit")) //TODO: Guild level prefix
+                if (answer.length() == 5 && answer.toLowerCase().endsWith("quit"))
                 {
                     timerThread.interrupt();
                 }

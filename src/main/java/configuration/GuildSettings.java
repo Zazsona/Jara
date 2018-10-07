@@ -104,6 +104,7 @@ public class GuildSettings extends GuildSettingsJson
             Gson gson = new Gson();
             GuildSettingsJson settingsFromFile = gson.fromJson(JSON, getClass());
 
+            this.commandPrefix = settingsFromFile.commandPrefix;
             this.audioConfig.skipVotePercent = settingsFromFile.audioConfig.skipVotePercent;
             this.gameConfig.useGameChannels = settingsFromFile.gameConfig.useGameChannels;
             this.gameConfig.gameCategoryId = settingsFromFile.gameConfig.gameCategoryId;
@@ -141,6 +142,7 @@ public class GuildSettings extends GuildSettingsJson
             this.commandConfig.put(ca.getCommandKey(), new GuildSettingsJson.CommandConfig(!ca.isDisableable(), new ArrayList<>())); //By inverting isDisableable, we are disabling the command whenever isDisablable is true.
         }
 
+        setCommandPrefix('/');
         setUseGameChannels(false);
         setTrackSkipPercent(50);
         setGameChannelTimeout("0");
@@ -177,6 +179,22 @@ public class GuildSettings extends GuildSettingsJson
         return guildId;
     }
 
+    /**
+     * Consider using SettingsUtil#getCommandChar instead if you don't need any other settings.
+     * @return
+     */
+    public Character getCommandPrefix()
+    {
+        return this.commandPrefix;
+    }
+
+    /**
+     * @param newChar
+     */
+    public void setCommandPrefix(Character newChar)
+    {
+        this.commandPrefix = newChar;
+    }
     /**
      * @return
      */

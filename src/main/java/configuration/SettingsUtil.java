@@ -2,8 +2,6 @@ package configuration;
 
 import gui.HeadedGUI;
 import gui.headed.HeadedGUIUtil;
-import jara.CommandAttributes;
-import jara.CommandRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +22,7 @@ public class SettingsUtil
 
     private static HashMap<String, GuildSettings> guildSettingsMap = new HashMap<>();
     private static HashMap<String, Long> guildSettingsLastCall = new HashMap<>();
+    private static HashMap<String, Character> guildCommandPrefix = new HashMap<>();
 
     public static void initialise()
     {
@@ -199,6 +198,30 @@ public class SettingsUtil
             guildSettingsLastCall.put(guildID, Instant.now().toEpochMilli());
             return guildSettings;
         }
+    }
+
+    public static Character getGuildCommandPrefix(String guildID)
+    {
+        if (guildCommandPrefix.containsKey(guildID))
+        {
+            return guildCommandPrefix.get(guildID);
+        }
+        else
+        {
+            Character commandPrefix = getGuildSettings(guildID).getCommandPrefix();
+            guildCommandPrefix.put(guildID, commandPrefix);
+            return commandPrefix;
+        }
+    }
+
+    /**
+     * Reloads the cached Guild command prefix. Only really useful for if it has just been changed in settings.
+     * @param guildID
+     */
+    public static void refreshGuildCommandPrefix(String guildID)
+    {
+        guildCommandPrefix.remove(guildID);
+        getGuildCommandPrefix(guildID);
     }
 
     /**

@@ -8,6 +8,7 @@ import javax.xml.stream.events.Characters;
 
 import commands.CmdUtil;
 import commands.Command;
+import configuration.SettingsUtil;
 import jara.Core;
 import jara.MessageManager;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -217,7 +218,7 @@ public class Countdown extends Command
 					{
 						for (Message msg : messages)
 						{
-							if (msg.getContentDisplay().equalsIgnoreCase("/quit")) //TODO: Custom prefix
+							if (msg.getContentDisplay().length() == 5 && msg.getContentDisplay().toLowerCase().endsWith("quit"))
 							{
 								mainThread.interrupt();
 								Thread.currentThread().interrupt();

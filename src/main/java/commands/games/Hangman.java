@@ -38,7 +38,7 @@ public class Hangman extends Command
             Message msg = msgManager.getNextMessage(channel);
             boolean correctGuess = false;
 
-            if (msg.getContentDisplay().equalsIgnoreCase("/quit")) //TODO: Guild level check for prefix
+            if (msg.getContentDisplay().length() == 5 && msg.getContentDisplay().toLowerCase().endsWith("quit"))
             {
                 attempts = 0;
                 break;

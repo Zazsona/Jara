@@ -14,10 +14,8 @@ import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
-import java.time.temporal.TemporalUnit;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 public abstract class Command //A base class to build commands from.
 {

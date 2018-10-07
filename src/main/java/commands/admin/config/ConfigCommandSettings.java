@@ -45,7 +45,7 @@ public class ConfigCommandSettings
             Message msg = msgManager.getNextMessage(channel);
             if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
             {
-                if (msg.getContentDisplay().equalsIgnoreCase("/quit"))
+                if (msg.getContentDisplay().length() == 5 && msg.getContentDisplay().toLowerCase().endsWith("quit"))
                 {
                     embed.setDescription("Config closed.");
                     channel.sendMessage(embed.build()).queue();
@@ -76,7 +76,7 @@ public class ConfigCommandSettings
                     descBuilder.append("Enable/Disable\n");
                     descBuilder.append("AddRoles [RoleName1 RoleName2 ...RoleNameN]\n");
                     descBuilder.append("RemoveRoles [RoleName1 RoleName2 ...RoleNameN]\n");
-                    descBuilder.append("/Quit - Exit");
+                    descBuilder.append("Quit - Exit");
                     embed.setDescription(descBuilder.toString());
                     channel.sendMessage(embed.build()).queue();
 
@@ -156,7 +156,7 @@ public class ConfigCommandSettings
                                 e.printStackTrace();
                             }
                         }
-                        else if (request.endsWith("quit"))
+                        else if (request.startsWith("quit"))
                         {
                             embed.setDescription("Config closed.");
                             channel.sendMessage(embed.build()).queue();

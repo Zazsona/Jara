@@ -114,6 +114,7 @@ public class ConfigGameSettings
                 else
                 {
                     embed.setDescription("Unknown response. Would you like to enable game channels? [Y/n]");
+                    channel.sendMessage(embed.build()).queue();
                 }
             }
         }
@@ -135,7 +136,7 @@ public class ConfigGameSettings
             Message msg = new MessageManager().getNextMessage(channel);
             if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
             {
-                if (msg.getContentDisplay().equalsIgnoreCase("/quit"))
+                if (msg.getContentDisplay().length() == 5 && msg.getContentDisplay().toLowerCase().endsWith("quit"))
                 {
                     embed.setDescription("Config closed.");
                     channel.sendMessage(embed.build()).queue();
@@ -223,7 +224,7 @@ public class ConfigGameSettings
             Message msg = new MessageManager().getNextMessage(channel);
             if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
             {
-                if (msg.getContentDisplay().equalsIgnoreCase("/quit"))
+                if (msg.getContentDisplay().length() == 5 && msg.getContentDisplay().toLowerCase().endsWith("quit"))
                 {
                     embed.setDescription("Config closed.");
                     channel.sendMessage(embed.build()).queue();

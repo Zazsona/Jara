@@ -15,17 +15,18 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 @SuppressWarnings("SpellCheckingInspection")
 public class Help extends Command {
 
+	private String prefix;
 	@Override
 	public void run(GuildMessageReceivedEvent msgEvent, String... parameters) 
 	{
+		prefix = SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId()).toString();
 		EmbedBuilder embed = new EmbedBuilder();
 		embed.setAuthor("Help Menu", null, null);
 		embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
 		if (parameters.length == 1)
 		{
-
-			embed.setDescription("To get a list of commands, use /help [Topic]. For more information, use /about\n" +
-										 "By default, only commands you have access to are shown. use \"/help [Topic] all\" to see every command.");
+			embed.setDescription("To get a list of commands, use "+prefix+"help [Topic]. For more information, use "+prefix+"about\n" +
+										 "By default, only commands you have access to are shown. use \""+prefix+"help [Topic] all\" to see every command.");
 			String topics = 
 					"**Games** - SP/MP experiences to keep you busy!\n"
 					+ "**Toys** - Quick fun commands.\n"
@@ -120,7 +121,7 @@ public class Help extends Command {
 		}
 		else if (key.equalsIgnoreCase("EightBall"))
 		{
-			paramSetups.add("/EightBall (Question about the future)");
+			paramSetups.add(prefix+"EightBall (Question about the future)");
 			infoBuilder.append("Unsure about what the future holds? Consult the eight ball to get the answers you seek.");
 		}
 		else if (key.equalsIgnoreCase("Jokes"))
@@ -133,15 +134,15 @@ public class Help extends Command {
 		}
 		else if (key.equalsIgnoreCase("Config"))
 		{
-			paramSetups.add("/config");
-			paramSetups.add("/config check [Command]/[Command Category]/GameCategory");
-			paramSetups.add("/config SetGameCategory (Channel Category Name)");
-			paramSetups.add("/config RemGameCategory");
-			paramSetups.add("/config enable [Command]");
-			paramSetups.add("/config disable [Command]");
-			paramSetups.add("/config AddRole [Command] [Role Name]");
-			paramSetups.add("/config RemRole [Command] [Role Name]");
-			infoBuilder.append("This is the primary command for customising the bot for your guild. Use /config check * to view the full current configuration.\n"
+			paramSetups.add(prefix+"config");
+			paramSetups.add(prefix+"config check [Command]/[Command Category]/GameCategory");
+			paramSetups.add(prefix+"config SetGameCategory (Channel Category Name)");
+			paramSetups.add(prefix+"config RemGameCategory");
+			paramSetups.add(prefix+"config enable [Command]");
+			paramSetups.add(prefix+"config disable [Command]");
+			paramSetups.add(prefix+"config AddRole [Command] [Role Name]");
+			paramSetups.add(prefix+"config RemRole [Command] [Role Name]");
+			infoBuilder.append("This is the primary command for customising the bot for your guild. Use "+prefix+"config check * to view the full current configuration.\n"
 					+ "\n"
 					+ "Options:\n"
 					+ "Check - Displays settings the specified item\n"
@@ -154,9 +155,9 @@ public class Help extends Command {
 		}
 		else if (key.equalsIgnoreCase("Countdown"))
 		{
-			paramSetups.add("/Countdown");
-			paramSetups.add("/Countdown (List of selections)");
-			paramSetups.add("/Countdown (selection1) (selection2) ... (selection9)");
+			paramSetups.add(prefix+"Countdown");
+			paramSetups.add(prefix+"Countdown (List of selections)");
+			paramSetups.add(prefix+"Countdown (selection1) (selection2) ... (selection9)");
 			infoBuilder.append("Try your skills at the classic word game: Countdown!\n"
 					+ "\n"
 					+ "To win, you must create the longest word you can come up with using just the letters generated.\n"
@@ -165,29 +166,29 @@ public class Help extends Command {
 		}
 		else if (key.equalsIgnoreCase("CountdownConundrum"))
 		{
-			paramSetups.add("/CountdownConundrum");
+			paramSetups.add(prefix+"CountdownConundrum");
 			infoBuilder.append("Fancy yourself a wordsmith? Try to figure out the nine letter word from the anagram.");
 		}
 		else if (key.equalsIgnoreCase("Hangman"))
 		{
-			paramSetups.add("/Hangman");
+			paramSetups.add(prefix+"Hangman");
 			infoBuilder.append("Guess the word by entering each letter at a time to save Mr.Unfortunate.\nBe careful, though. Guess wrong eight times and it's game over.");
 		}
 		else if (key.equalsIgnoreCase("Help"))
 		{
-			paramSetups.add("/Help");
-			paramSetups.add("/Help (Command)");
-			paramSetups.add("/Help (Category)");
+			paramSetups.add(prefix+"Help");
+			paramSetups.add(prefix+"Help (Command)");
+			paramSetups.add(prefix+"Help (Category)");
 			infoBuilder.append(":thinking:");
 		}
 		else if (key.equalsIgnoreCase("Randomizer"))
         {
-            paramSetups.add("/Randomizer [Option1] [Option2] ... [OptionN]");
+            paramSetups.add(prefix+"Randomizer [Option1] [Option2] ... [OptionN]");
             infoBuilder.append("Randomly selects an item from the list.");
         }
         else if (key.equalsIgnoreCase("Say"))
 		{
-			paramSetups.add("/Say [Sentence]");
+			paramSetups.add(prefix+"Say [Sentence]");
 			infoBuilder.append("Have the bot repeat a sentence.");
 		}
 		else if (key.equalsIgnoreCase("Timecard"))
@@ -204,7 +205,7 @@ public class Help extends Command {
 		}
 		else if (key.equalsIgnoreCase("Play"))
 		{
-			paramSetups.add("/Play [Link]");
+			paramSetups.add(prefix+"Play [Link]");
 			infoBuilder.append("Plays the track at the link. Supports:\nYouTube\nSoundCloud\nBandcamp\nVimeo\nTwitch\nHTTP URLs");
 		}
 		else if (key.equalsIgnoreCase("Skip"))
@@ -286,7 +287,7 @@ public class Help extends Command {
 		}
 		if (!commandsListed)
 		{
-			commands.append("You don't have permission to use any of these commands. Use `/help [Category] all` to see all enabled commands. \n");
+			commands.append("You don't have permission to use any of these commands. Use `"+prefix+"help [Category] all` to see all enabled commands. \n");
 		}
 		commands.append("~~------------------------------------------------------------~~\n");
 
