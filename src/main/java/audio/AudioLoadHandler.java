@@ -7,15 +7,16 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 public class AudioLoadHandler implements AudioLoadResultHandler
 {
-    Audio audio;
-    public byte result;
+    private final Audio audio;
+    private Audio.RequestResult result;
+
     public AudioLoadHandler(Audio audio)
     {
         this.audio = audio;
-        this.result = audio.REQUEST_PENDING;
+        this.result = Audio.RequestResult.REQUEST_PENDING;
     }
 
-    public byte getResult()
+    public Audio.RequestResult getResult()
     {
         return result;
     }
@@ -26,11 +27,11 @@ public class AudioLoadHandler implements AudioLoadResultHandler
         if (!audio.isAudioPlayingInGuild())
         {
             audio.getPlayer().playTrack(audio.getTrackQueue().get(0));
-            result = audio.REQUEST_NOW_PLAYING;
+            result = Audio.RequestResult.REQUEST_NOW_PLAYING;
         }
         else
         {
-            result = audio.REQUEST_ADDED_TO_QUEUE;
+            result = Audio.RequestResult.REQUEST_ADDED_TO_QUEUE;
         }
 
     }
@@ -45,11 +46,11 @@ public class AudioLoadHandler implements AudioLoadResultHandler
         if (!audio.isAudioPlayingInGuild())
         {
             audio.getPlayer().playTrack(audio.getTrackQueue().get(0));
-            result = audio.REQUEST_NOW_PLAYING;
+            result = Audio.RequestResult.REQUEST_NOW_PLAYING;
         }
         else
         {
-            result = audio.REQUEST_ADDED_TO_QUEUE;
+            result = Audio.RequestResult.REQUEST_ADDED_TO_QUEUE;
         }
 
     }
@@ -58,14 +59,14 @@ public class AudioLoadHandler implements AudioLoadResultHandler
     public void noMatches()
     {
         //No source found
-        result = audio.REQUEST_IS_BAD;
+        result = Audio.RequestResult.REQUEST_IS_BAD;
     }
 
     @Override
     public void loadFailed(FriendlyException e)
     {
         //Error
-        result = audio.REQUEST_RESULTED_IN_ERROR;
+        result = Audio.RequestResult.REQUEST_RESULTED_IN_ERROR;
         e.printStackTrace();
     }
 }

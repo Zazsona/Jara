@@ -40,7 +40,10 @@ public class ScheduleHandler extends AudioEventAdapter
         }
         else
         {
-            //TODO: Leave channel
+            new Thread(() ->
+                       {
+                           audio.getAudioManager().closeAudioConnection();
+                       }).start();
         }
 
     }

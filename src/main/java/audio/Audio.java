@@ -8,6 +8,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.VoiceChannel;
+import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.core.managers.AudioManager;
 
 import java.util.ArrayList;
@@ -16,16 +17,20 @@ import java.util.ArrayList;
 public class Audio
 {
 	private ArrayList<AudioTrack> trackQueue = new ArrayList<>();
-	private AudioPlayerManager playerManager;
-	private AudioPlayer player;
-	private AudioManager audioManager;
+	private final AudioPlayerManager playerManager;
+	private final AudioPlayer player;
+	private final AudioManager audioManager;
 
-	public static final byte REQUEST_PENDING = 0;
-	public static final byte REQUEST_NOW_PLAYING = 1;
-	public static final byte REQUEST_ADDED_TO_QUEUE = 2;
-	public static final byte REQUEST_RESULTED_IN_ERROR = 3;
-	public static final byte REQUEST_USER_NOT_IN_VOICE = 4;
-	public static final byte REQUEST_IS_BAD = 5;
+	public enum RequestResult
+	{
+		REQUEST_PENDING,
+		REQUEST_NOW_PLAYING,
+		REQUEST_ADDED_TO_QUEUE,
+		REQUEST_RESULTED_IN_ERROR,
+		REQUEST_USER_NOT_IN_VOICE,
+		REQUEST_IS_BAD,
+		REQUEST_CHANNEL_PERMISSION_DENIED
+	}
 
 	private ArrayList<String> skipVotes = new ArrayList<>(); //This stores the user IDs of those who have voted to skip (Prevents the same user voting multiple times)
 
@@ -43,7 +48,7 @@ public class Audio
 		player.addListener(scheduleHandler);
 	}
 
-	public byte play(Member member, String query)
+	public RequestResult play(Member member, String query)
 	{
 		try
 		{
@@ -52,23 +57,31 @@ public class Audio
 			{
 				if (!isAudioPlayingInGuild())
 				{
-					audioManager.openAudioConnection(channel);
+					try
+					{
+						audioManager.openAudioConnection(channel);
+					}
+					catch (InsufficientPermissionException e)
+					{
+						return RequestResult.REQUEST_CHANNEL_PERMISSION_DENIED;
+					}
+
 				}
 				AudioLoadHandler audioLoadHandler = new AudioLoadHandler(this);
 				playerManager.loadItem(query, audioLoadHandler); //If audio is already playing, it will be added to the queue instead.
-				while (audioLoadHandler.getResult() == REQUEST_PENDING)
+				while (audioLoadHandler.getResult() == RequestResult.REQUEST_PENDING)
 				{
 					Thread.sleep(3); //TODO: This, more elegantly.
 				}
 				return audioLoadHandler.getResult();
 			}
-			return REQUEST_USER_NOT_IN_VOICE;
+			return RequestResult.REQUEST_USER_NOT_IN_VOICE;
 		}
 		catch (Exception e)
 		{
 			//Error setting up audio
 			e.printStackTrace();
-			return REQUEST_RESULTED_IN_ERROR;
+			return RequestResult.REQUEST_RESULTED_IN_ERROR;
 		}
 	}
 
@@ -149,6 +162,15 @@ public class Audio
 	public void resetSkipVote()
 	{
 		skipVotes = new ArrayList<>();
+	}
+
+	/**
+	 * Gets AudioManager
+	 * @return
+	 */
+	public AudioManager getAudioManager()
+	{
+		return audioManager;
 	}
 
 
