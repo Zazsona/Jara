@@ -17,7 +17,7 @@ public class Play extends Command
     public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
     {
         VoiceChannel vChannel = msgEvent.getMember().getVoiceState().getChannel();
-        if (vChannel != null)
+        if (vChannel != null && vChannel.getUserLimit()<vChannel.getMembers().size())
         {
             Audio audio = CmdUtil.getGuildAudio(msgEvent.getGuild().getId());
             TextChannel channel = msgEvent.getChannel();
@@ -69,6 +69,12 @@ public class Play extends Command
                 case REQUEST_CHANNEL_PERMISSION_DENIED:
                     embed.setTitle("Permission Denied");
                     embed.setDescription("I can't find you in any voice channels! Please make sure you're in one I have access to.");
+                    channel.sendMessage(embed.build()).queue();
+                    break;
+
+                case REQUEST_CHANNEL_FULL:
+                    embed.setTitle("Channel Full");
+                    embed.setDescription("There's no space for me in that channel.");
                     channel.sendMessage(embed.build()).queue();
                     break;
 

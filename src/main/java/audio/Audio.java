@@ -29,6 +29,7 @@ public class Audio
 		REQUEST_RESULTED_IN_ERROR,
 		REQUEST_USER_NOT_IN_VOICE,
 		REQUEST_IS_BAD,
+        REQUEST_CHANNEL_FULL,
 		REQUEST_CHANNEL_PERMISSION_DENIED
 	}
 
@@ -55,6 +56,10 @@ public class Audio
 			VoiceChannel channel = member.getVoiceState().getChannel();
 			if (channel != null)
 			{
+			    if (channel.getUserLimit() <= channel.getMembers().size())
+                {
+                    return RequestResult.REQUEST_CHANNEL_FULL;
+                }
 				if (!isAudioPlayingInGuild())
 				{
 					try
