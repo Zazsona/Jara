@@ -28,6 +28,11 @@ public abstract class GuildSettingsJson
          * The percentage of total members in a voice channel (excluding the bot) who need to vote for a track to be skipped.
          */
         protected int skipVotePercent;
+
+        /**
+         * Whether or not to leave voice channels when no audio is playing
+         */
+        protected boolean useVoiceLeaving;
     }
     protected class GameConfig
     {

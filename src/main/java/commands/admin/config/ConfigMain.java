@@ -22,7 +22,7 @@ public class ConfigMain extends Command
         if (parameters.length == 1)
         {
             embed.setDescription("Welcome to the Config\nTo select a menu, use `"+SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId())+"config [selection]`.");
-            embed.addField("Menus", "**Prefix**\n**GameSettings**\n**CommandSettings**\n**Reset**", true);
+            embed.addField("Menus", "**Prefix**\n**AudioSettings**\n**GameSettings**\n**CommandSettings**\n**Reset**", true);
             channel.sendMessage(embed.build()).queue();
         }
         else if (parameters.length > 1)
@@ -31,6 +31,10 @@ public class ConfigMain extends Command
             if (parameters[1].equalsIgnoreCase("prefix"))
             {
                 new ConfigMainSettings(guildSettings, channel).modifyPrefix(msgEvent);
+            }
+            else if (parameters[1].equalsIgnoreCase("audiosettings"))
+            {
+                new ConfigAudioSettings(guildSettings, channel).showMenu(msgEvent);
             }
             else if (parameters[1].equalsIgnoreCase("gamesettings"))
             {

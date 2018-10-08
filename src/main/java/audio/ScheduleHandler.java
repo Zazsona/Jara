@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import configuration.SettingsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,12 +39,9 @@ public class ScheduleHandler extends AudioEventAdapter
         {
             audio.getPlayer().playTrack(audio.getTrackQueue().get(0));
         }
-        else
+        else if (SettingsUtil.getGuildSettings(audio.getAudioManager().getGuild().getId()).isVoiceLeavingEnabled())
         {
-            new Thread(() ->
-                       {
-                           audio.getAudioManager().closeAudioConnection();
-                       }).start();
+            new Thread(() -> audio.getAudioManager().closeAudioConnection()).start();
         }
 
     }

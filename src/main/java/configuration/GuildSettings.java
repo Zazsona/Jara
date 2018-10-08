@@ -106,10 +106,11 @@ public class GuildSettings extends GuildSettingsJson
 
             this.commandPrefix = settingsFromFile.commandPrefix;
             this.audioConfig.skipVotePercent = settingsFromFile.audioConfig.skipVotePercent;
+            this.audioConfig.useVoiceLeaving = settingsFromFile.audioConfig.useVoiceLeaving;
             this.gameConfig.useGameChannels = settingsFromFile.gameConfig.useGameChannels;
             this.gameConfig.gameCategoryId = settingsFromFile.gameConfig.gameCategoryId;
             this.gameConfig.gameChannelTimeout = settingsFromFile.gameConfig.gameChannelTimeout;
-            this.commandConfig = settingsFromFile.commandConfig;
+            this.commandConfig = new HashMap<>(settingsFromFile.commandConfig);
             if (!commandConfig.keySet().containsAll(Arrays.asList(CommandRegister.getAllCommandKeys())))
             {
                 save(); //This will add the missing commands, and save the config.
@@ -141,7 +142,7 @@ public class GuildSettings extends GuildSettingsJson
         {
             this.commandConfig.put(ca.getCommandKey(), new GuildSettingsJson.CommandConfig(!ca.isDisableable(), new ArrayList<>())); //By inverting isDisableable, we are disabling the command whenever isDisablable is true.
         }
-
+        setVoiceLeaving(true);
         setCommandPrefix('/');
         setUseGameChannels(false);
         setTrackSkipPercent(50);
@@ -428,6 +429,22 @@ public class GuildSettings extends GuildSettingsJson
         {
             this.audioConfig.skipVotePercent = newPercent;
         }
+    }
+
+    /**
+     * @return
+     */
+    public boolean isVoiceLeavingEnabled()
+    {
+        return this.audioConfig.useVoiceLeaving;
+    }
+
+    /**
+     * @param state
+     */
+    public void setVoiceLeaving(boolean state)
+    {
+        this.audioConfig.useVoiceLeaving = state;
     }
 
 }
