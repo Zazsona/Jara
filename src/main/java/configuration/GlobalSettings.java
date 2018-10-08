@@ -158,7 +158,7 @@ public class GlobalSettings extends GlobalSettingsJson
      * @param newState
      * @param categoryID
      */
-    public void setCategoryConfiguration(boolean newState, int categoryID)
+    public void setCategoryConfiguration(boolean newState, CommandRegister.Category categoryID)
     {
         ArrayList<String> keys = new ArrayList<>();
         for (CommandAttributes ca : CommandRegister.getCommandsInCategory(categoryID))

@@ -17,14 +17,25 @@ import commands.toys.*;
 import commands.utility.*;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
+import static jara.CommandRegister.Category.*;
+
 public class CommandRegister
 {
-	public static final int NOGROUP = 0;
+	public enum Category
+	{
+		NOGROUP,
+		GAMES,
+		UTILITY,
+		TOYS,
+		AUDIO,
+		ADMIN
+	}
+	/*public static final int NOGROUP = 0;
 	public static final int GAMES = 1;
 	public static final int UTILITY = 2;
 	public static final int TOYS = 3;
 	public static final int AUDIO = 4;
-	public static final int ADMIN = 5;
+	public static final int ADMIN = 5;*/
 	private static ArrayList<CommandAttributes> register;
 
 	private static ArrayList<CommandAttributes> adminCommands;
@@ -198,10 +209,10 @@ public class CommandRegister
 	 * Returns the command's category ID.<br>
 	 * @param key - Command key
 	 * @return
-	 * 0-4 - The category ID.<br>
-	 * -1 - Command key does not exist.
+	 * Category - The category ID.<br>
+	 * null - Command key does not exist.
 	 */
-	public static int getCommandCategory(String key)
+	public static Category getCommandCategory(String key)
 	{
 		getRegister();
 		for (CommandAttributes commandAttributes : register)
@@ -211,7 +222,7 @@ public class CommandRegister
 				return commandAttributes.getCategoryID();
 			}
 		}
-		return -1; //Invalid key
+		return null; //Invalid key
 	}
 	/**
 	 * Converts a category ID into a category name.
@@ -220,7 +231,7 @@ public class CommandRegister
 	 * String - Category name
 	 * null = Invalid id.
 	 */
-	public static String getCategoryName(int id)
+	public static String getCategoryName(Category id)
 	{
 		switch (id) 
 		{
@@ -243,10 +254,10 @@ public class CommandRegister
 	 * Converts a category ID into a category name.
 	 * @param name - The name of the category
 	 * @return
-	 * int - Category ID
-	 * -1 = Invalid name.
+	 * Category - Category ID
+	 * null = Invalid name.
 	 */
-	public static int getCategoryID(String name)
+	public static Category getCategoryID(String name)
 	{
 		name = name.toLowerCase();
 		switch (name)
@@ -266,7 +277,7 @@ public class CommandRegister
 			case "admin":
 				return ADMIN;
 		}
-		return -1; //Invalid nsme.
+		return null; //Invalid nsme.
 	}
 
 	/**
@@ -277,15 +288,13 @@ public class CommandRegister
 	public static ArrayList<String> getCategoryNames()
 	{
 		ArrayList<String> names = new ArrayList<String>();
-		int i = 0;
-		while (getCategoryName(i) != null)
+		for (Category category : Category.values())
 		{
-			names.add(getCategoryName(i));
-			i++;
+			names.add(getCategoryName(category));
 		}
 		return names;
 	}
-	public static CommandAttributes[] getCommandsInCategory(int categoryID)
+	public static CommandAttributes[] getCommandsInCategory(Category categoryID)
 	{
 		ArrayList<CommandAttributes> categoryCommands;
 		switch (categoryID)
@@ -321,7 +330,7 @@ public class CommandRegister
 			return generateCommandsInCategory(categoryID);
 		}
 	}
-	private static CommandAttributes[] generateCommandsInCategory(int categoryID)
+	private static CommandAttributes[] generateCommandsInCategory(Category categoryID)
 	{
 		System.out.println("Generating commands");
 		getRegister();

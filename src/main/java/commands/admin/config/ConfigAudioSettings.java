@@ -42,6 +42,10 @@ public class ConfigAudioSettings
                     modifyVoiceLeaving(msgEvent);
                     break;
                 }
+                else if (msgContent.equalsIgnoreCase("/quit") || msgContent.equalsIgnoreCase("/exit"))
+                {
+                    break;
+                }
                 else
                 {
                     embed.setDescription("Unrecognised category. Please try again.");

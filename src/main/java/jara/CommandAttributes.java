@@ -7,11 +7,11 @@ public class CommandAttributes
 	private final String commandKey;
 	private final Class<? extends Command> commandClass;
 	private final String[] aliases; //Text strings that will call the command
-	private final int category;
+	private final CommandRegister.Category category;
 	private final boolean disableable;
 	private final String description;
 
-	public CommandAttributes(String commandKeyArg, String descriptionArg, Class<? extends Command> commandClassArg, String[] aliasesArg, int categoryArg, boolean disableableArg)
+	public CommandAttributes(String commandKeyArg, String descriptionArg, Class<? extends Command> commandClassArg, String[] aliasesArg, CommandRegister.Category categoryArg, boolean disableableArg)
 	{
 		commandKey = commandKeyArg;
 		description = descriptionArg;
@@ -67,7 +67,7 @@ public class CommandAttributes
 	 * @return
 	 * int - The id number
 	 */
-	public int getCategoryID()
+	public CommandRegister.Category getCategoryID()
 	{
 		return category;
 	}

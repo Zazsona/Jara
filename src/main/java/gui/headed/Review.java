@@ -82,7 +82,7 @@ public class Review
         CommandConfigSetup ccSetup = HeadedGUIUtil.getCcSetupController();
 
         StringBuilder supportListBuilder = new StringBuilder();
-        for (Integer id : ccSetup.getSupportedCategories())
+        for (CommandRegister.Category id : ccSetup.getSupportedCategories())
         {
             supportListBuilder.append(CommandRegister.getCategoryName(id)).append("\n");
         }

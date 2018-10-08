@@ -342,7 +342,7 @@ public class GuildSettings extends GuildSettingsJson
      * @param newPermissions
      * @param categoryID
      */
-    public void setCategoryConfiguration(Boolean newState, ArrayList<String> newPermissions, int categoryID)
+    public void setCategoryConfiguration(Boolean newState, ArrayList<String> newPermissions, CommandRegister.Category categoryID)
     {
         ArrayList<String> keys = new ArrayList<>();
         for (CommandAttributes ca : CommandRegister.getCommandsInCategory(categoryID))

@@ -17,6 +17,8 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static jara.CommandRegister.Category.*;
+
 public class CommandConfigSetup
 {
     @FXML
@@ -72,11 +74,11 @@ public class CommandConfigSetup
 
         navBar_review_text.setOnMouseClicked((event) -> HeadedGUIUtil.manageTitleSelection(navBar_review_text));
 
-        adminCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(adminCategoryCheckBox, CommandRegister.ADMIN));
-        audioCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(audioCategoryCheckBox, CommandRegister.AUDIO));
-        gamesCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(gamesCategoryCheckBox, CommandRegister.GAMES));
-        toysCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(toysCategoryCheckBox, CommandRegister.TOYS));
-        utilityCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(utilityCategoryCheckBox, CommandRegister.UTILITY));
+        adminCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(adminCategoryCheckBox, ADMIN));
+        audioCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(audioCategoryCheckBox, AUDIO));
+        gamesCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(gamesCategoryCheckBox, GAMES));
+        toysCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(toysCategoryCheckBox, TOYS));
+        utilityCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(utilityCategoryCheckBox, UTILITY));
 
         for (CommandAttributes ca : CommandRegister.getRegister())
         {
@@ -91,19 +93,19 @@ public class CommandConfigSetup
 
             switch (ca.getCategoryID())
             {
-                case CommandRegister.GAMES:
+                case GAMES:
                     gamesList.getChildren().addAll(topSpacePane, generateCommandListElement(ca), bottomSpacePane);
                     break;
-                case CommandRegister.UTILITY:
+                case UTILITY:
                     utilityList.getChildren().addAll(topSpacePane, generateCommandListElement(ca), bottomSpacePane);
                     break;
-                case CommandRegister.TOYS:
+                case TOYS:
                     toysList.getChildren().addAll(topSpacePane, generateCommandListElement(ca), bottomSpacePane);
                     break;
-                case CommandRegister.AUDIO:
+                case AUDIO:
                     audioList.getChildren().addAll(topSpacePane, generateCommandListElement(ca), bottomSpacePane);
                     break;
-                case CommandRegister.ADMIN:
+                case ADMIN:
                     adminList.getChildren().addAll(topSpacePane, generateCommandListElement(ca), bottomSpacePane);
                     break;
             }
@@ -172,7 +174,7 @@ public class CommandConfigSetup
      * @param categoryCheckBox
      * @param categoryID
      */
-    private void toggleCategory(CheckBox categoryCheckBox, int categoryID)
+    private void toggleCategory(CheckBox categoryCheckBox, CommandRegister.Category categoryID)
     {
         for (CommandAttributes ca : CommandRegister.getCommandsInCategory(categoryID))
         {
@@ -188,12 +190,12 @@ public class CommandConfigSetup
      * Retrives category IDs where at least one command is enabled.
      * @return
      */
-    public ArrayList<Integer> getSupportedCategories()
+    public ArrayList<CommandRegister.Category> getSupportedCategories()
     {
-        ArrayList<Integer> supportedCategories = new ArrayList<>();
+        ArrayList<CommandRegister.Category> supportedCategories = new ArrayList<>();
         for (CommandAttributes ca : CommandRegister.getRegister())
         {
-            if (!supportedCategories.contains(ca.getCategoryID()) && ca.getCategoryID() != CommandRegister.NOGROUP)
+            if (!supportedCategories.contains(ca.getCategoryID()) && ca.getCategoryID() != NOGROUP)
             {
                 if (((CheckBox) ccSetupScreen.lookup("#"+ca.getCommandKey()+"CheckBox")).isSelected())
                 {
@@ -214,7 +216,7 @@ public class CommandConfigSetup
 
         for (CommandAttributes ca : CommandRegister.getRegister())
         {
-            if (CommandRegister.getCommand(ca.getCommandKey()).getCategoryID() != CommandRegister.NOGROUP)
+            if (CommandRegister.getCommand(ca.getCommandKey()).getCategoryID() != NOGROUP)
             {
                 commandConfig.put(ca.getCommandKey(), ((CheckBox) ccSetupScreen.lookup("#"+ca.getCommandKey()+"CheckBox")).isSelected());
             }

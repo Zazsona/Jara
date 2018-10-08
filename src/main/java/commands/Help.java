@@ -12,6 +12,8 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
+import static jara.CommandRegister.Category.*;
+
 @SuppressWarnings("SpellCheckingInspection")
 public class Help extends Command {
 
@@ -58,23 +60,23 @@ public class Help extends Command {
 
 			if (parameters[1].equalsIgnoreCase("games"))
 			{
-				embed.setDescription(buildCommandList(CommandRegister.GAMES, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
+				embed.setDescription(buildCommandList(GAMES, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
 			}
 			else if (parameters[1].equalsIgnoreCase("toys"))
 			{
-				embed.setDescription(buildCommandList(CommandRegister.TOYS, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
+				embed.setDescription(buildCommandList(TOYS, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
 			}
 			else if (parameters[1].equalsIgnoreCase("utility"))
 			{
-				embed.setDescription(buildCommandList(CommandRegister.UTILITY, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
+				embed.setDescription(buildCommandList(UTILITY, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
 			}
 			else if (parameters[1].equalsIgnoreCase("audio"))
 			{
-				embed.setDescription(buildCommandList(CommandRegister.AUDIO, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
+				embed.setDescription(buildCommandList(AUDIO, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
 			}
 			else if (parameters[1].equalsIgnoreCase("admin"))
 			{
-				embed.setDescription(buildCommandList(CommandRegister.ADMIN, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
+				embed.setDescription(buildCommandList(ADMIN, msgEvent.getGuild().getId(), roleIDs, limitToPerms));
 			}
 			else
 			{
@@ -261,7 +263,7 @@ public class Help extends Command {
 		}
 		return cmdDescBuilder.toString();
 	}
-	private String buildCommandList(int categoryID, String guildID, ArrayList<String> roleIDs, boolean limitToPerms)
+	private String buildCommandList(CommandRegister.Category categoryID, String guildID, ArrayList<String> roleIDs, boolean limitToPerms)
 	{
 		/*
 				limitToPerms is used here to bypass the permissions check.
