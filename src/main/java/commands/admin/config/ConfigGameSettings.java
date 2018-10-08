@@ -90,10 +90,7 @@ public class ConfigGameSettings
 
                     embed.setDescription("Game Channels has been enabled.");
                     channel.sendMessage(embed.build()).queue();
-                    if (guildSettings.getGameCategoryId().equals(""))
-                    {
-                        modifyGameCategory(msgEvent);
-                    }
+                    break;
                 }
                 else if (response.startsWith("n"))
                 {
@@ -110,6 +107,7 @@ public class ConfigGameSettings
                     }
                     embed.setDescription("Game Channels has been disabled.");
                     channel.sendMessage(embed.build()).queue();
+                    break;
                 }
                 else
                 {
@@ -117,6 +115,10 @@ public class ConfigGameSettings
                     channel.sendMessage(embed.build()).queue();
                 }
             }
+        }
+        if (guildSettings.isGameChannelsEnabled() && guildSettings.getGameCategoryId().equals(""))
+        {
+            modifyGameCategory(msgEvent);
         }
     }
     private void modifyGameCategory(GuildMessageReceivedEvent msgEvent)
