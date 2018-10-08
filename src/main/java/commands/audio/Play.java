@@ -17,7 +17,7 @@ public class Play extends Command
     public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
     {
         VoiceChannel vChannel = msgEvent.getMember().getVoiceState().getChannel();
-        if (vChannel != null && vChannel.getUserLimit()<vChannel.getMembers().size())
+        if (vChannel != null && ((vChannel.getUserLimit() == 0) || (vChannel.getUserLimit() > vChannel.getMembers().size())))
         {
             Audio audio = CmdUtil.getGuildAudio(msgEvent.getGuild().getId());
             TextChannel channel = msgEvent.getChannel();
