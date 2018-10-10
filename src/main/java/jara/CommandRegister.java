@@ -6,10 +6,7 @@ import java.util.Collections;
 import commands.Command;
 import commands.Help;
 import commands.admin.config.ConfigMain;
-import commands.audio.ForceSkip;
-import commands.audio.NowPlaying;
-import commands.audio.Play;
-import commands.audio.Skip;
+import commands.audio.*;
 import commands.games.Countdown;
 import commands.games.CountdownConundrum;
 import commands.games.Hangman;
@@ -30,12 +27,6 @@ public class CommandRegister
 		AUDIO,
 		ADMIN
 	}
-	/*public static final int NOGROUP = 0;
-	public static final int GAMES = 1;
-	public static final int UTILITY = 2;
-	public static final int TOYS = 3;
-	public static final int AUDIO = 4;
-	public static final int ADMIN = 5;*/
 	private static ArrayList<CommandAttributes> register;
 
 	private static ArrayList<CommandAttributes> adminCommands;
@@ -87,6 +78,7 @@ public class CommandRegister
 			register.add(new CommandAttributes("Skip", "Votes to skip the track", Skip.class, new String[] {"Stop", "Pass", "Next"}, AUDIO, true));
 			register.add(new CommandAttributes("ForceSkip", "Forces the track to skip.", ForceSkip.class, new String[] {"AdminSkip", "InstaSkip", "FireTheDJ", "ForceNext"}, AUDIO, true));
 			register.add(new CommandAttributes("NowPlaying", "Current track details.", NowPlaying.class, new String[] {"NP", "CP", "CurrentlyPlaying", "TrackInfo", "SongInfo", "MusicInfo", "AudioInfo"}, AUDIO, true));
+			register.add(new CommandAttributes("Pause", "Pauses current track.", Pause.class, new String[] {"Resume"}, AUDIO, true));
 		}
 		return register.toArray(new CommandAttributes[register.size()]);
 	}

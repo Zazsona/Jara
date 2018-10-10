@@ -56,7 +56,7 @@ public class Audio
 			VoiceChannel channel = member.getVoiceState().getChannel();
 			if (channel != null)
 			{
-			    if (channel.getUserLimit() <= channel.getMembers().size())
+			    if (channel.getUserLimit() != 0 && channel.getUserLimit() > channel.getMembers().size())
                 {
                     return RequestResult.REQUEST_CHANNEL_FULL;
                 }

@@ -55,9 +55,9 @@ public class ScheduleHandler extends AudioEventAdapter
         {
             audio.getPlayer().playTrack(audio.getTrackQueue().get(0));
         }
-        else
+        else if (SettingsUtil.getGuildSettings(audio.getAudioManager().getGuild().getId()).isVoiceLeavingEnabled())
         {
-            //TODO: Leave channel
+            new Thread(() -> audio.getAudioManager().closeAudioConnection()).start();
         }
     }
 }
