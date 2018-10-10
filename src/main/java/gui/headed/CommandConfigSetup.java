@@ -144,7 +144,16 @@ public class CommandConfigSetup
         checkBox.setSelected(true);
         if (SettingsUtil.getGlobalSettings().getCommandConfigMap() != null) //Restore from existing config (if possible)
         {
-            checkBox.setSelected(SettingsUtil.getGlobalSettings().getCommandConfigMap().get(commandAttributes.getCommandKey()));
+            try
+            {
+                checkBox.setSelected(SettingsUtil.getGlobalSettings().getCommandConfigMap().get(commandAttributes.getCommandKey()));
+            }
+            catch (NullPointerException e) //New command
+            {
+                checkBox.setSelected(false);
+                //bp.setStyle("-fx-background-color: #7289da;");
+                bp.setStyle("-fx-background-color: #51555e;");
+            }
         }
 
         if (!commandAttributes.isDisableable())
