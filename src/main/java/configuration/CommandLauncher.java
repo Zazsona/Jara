@@ -8,17 +8,17 @@ import org.slf4j.LoggerFactory;
 import jara.CommandAttributes;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
-public class CommandConfiguration
+public class CommandLauncher
 {
-	private boolean enabledState; //Whether the config allows this command to be used
-	private CommandAttributes attributes;
+	private final boolean enabledState; //Whether the config allows this command to be used
+	private final CommandAttributes attributes;
 	
-	public CommandConfiguration(CommandAttributes attributes, boolean enabledState)
+	public CommandLauncher(CommandAttributes attributes, boolean enabledState)
 	{
 		this.attributes = attributes;
 		this.enabledState = enabledState;
 	}
-	
+
 	/**
 	 *Creates a new instance of the command and runs it on a separate thread.
 	 *
@@ -31,7 +31,7 @@ public class CommandConfiguration
 		if (isEnabled() || !attributes.isDisableable()) //If it can't be disabled, run it anyway even if it is disabled. Stops people fucking with settings to the point the bot is unusable.
 		{
 			GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
-
+			System.out.println(attributes.getCommandKey());
 			if (guildSettings.isCommandEnabled(attributes.getCommandKey()) && (guildSettings.isPermitted(msgEvent.getMember(), attributes.getCommandClass())))
 			{
 				Runnable commandRunnable = () -> {
@@ -42,13 +42,13 @@ public class CommandConfiguration
 					catch (InstantiationException | IllegalAccessException e)
 					{
 						msgEvent.getChannel().sendMessage("Sorry, I was unable to run the command.").queue();
-						Logger logger = LoggerFactory.getLogger(CommandConfiguration.class);
+						Logger logger = LoggerFactory.getLogger(CommandLauncher.class);
 						logger.error("A command request was sent but could not be fulfilled.\nCommand: "+parameters.toString()+"\nGuild: "+msgEvent.getGuild().getId()+" ("+msgEvent.getGuild().getName()+")\nUser: "+msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+"Channel: "+msgEvent.getChannel().getId()+" ("+msgEvent.getChannel().getName()+")\nDate/Time: "+LocalDateTime.now().toString());
 						e.printStackTrace();
 					}
 				};
 				Thread commandThread = new Thread(commandRunnable);
-				commandThread.setName(attributes.getCommandKey()+"-Thread");
+				commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getCommandKey()+"-Thread");
 				commandThread.start();
 				return;
 			}
@@ -60,7 +60,7 @@ public class CommandConfiguration
 		}
 		else
 		{
-			Logger logger = LoggerFactory.getLogger(CommandConfiguration.class);
+			Logger logger = LoggerFactory.getLogger(CommandLauncher.class);
 			logger.info(msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+" attempted to use the command "+parameters[0]+", however it's disabled. Please enable it in the config.");
 		}
 
