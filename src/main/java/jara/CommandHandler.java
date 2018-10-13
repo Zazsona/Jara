@@ -1,16 +1,19 @@
 package jara;
 
-import configuration.CommandConfiguration;
+import configuration.CommandLauncher;
+import configuration.GuildSettingsJson;
 import configuration.SettingsUtil;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
+import java.util.HashMap;
+
 public class CommandHandler extends ListenerAdapter 
 {
-	CommandConfiguration[] commandConfigs; //Contains details on all commands.
-	public CommandHandler(CommandConfiguration[] commandConfigsArg)
+	private final CommandLauncher[] commandLaunchers; //Contains details on all commands.
+	public CommandHandler(CommandLauncher[] commandConfigsArg)
 	{
-		commandConfigs = commandConfigsArg.clone();
+		commandLaunchers = commandConfigsArg.clone();
 	}
 	
 	@Override 
@@ -18,10 +21,11 @@ public class CommandHandler extends ListenerAdapter
 	{
 		String commandString = msgEvent.getMessage().getContentDisplay();
 		String commandPrefix = SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId()).toString();
+        HashMap<String, GuildSettingsJson.CustomCommandConfig> customGuildCommands = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandMap();
 		if (commandString.startsWith(commandPrefix))									   //Prefix to signify that a command is being called.
 		{
 			String[] command = commandString.split(" ");							   //Separating parameters.
-			for (CommandConfiguration commandConfig : commandConfigs)
+			for (CommandLauncher commandConfig : commandLaunchers)
 			{
 				if (commandConfig.isEnabled())								//While execute() does an enabled check anyway, this saves us iterating through aliases.
 				{
@@ -35,6 +39,21 @@ public class CommandHandler extends ListenerAdapter
 					}
 				}
 			}
+            for (String customKey : customGuildCommands.keySet())
+            {
+            	CommandLauncher customCommandLauncher = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandLauncher(customKey);
+                if (SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).isCommandEnabled(customKey))								//While execute() does an enabled check anyway, this saves us iterating through aliases.
+                {
+                    for (String alias : customCommandLauncher.getAliases())
+                    {
+                        if (command[0].equalsIgnoreCase(commandPrefix+alias))
+                        {
+                            customCommandLauncher.execute(msgEvent, command);
+                            return;
+                        }
+                    }
+                }
+            }
 			
 		}
 

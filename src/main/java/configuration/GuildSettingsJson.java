@@ -1,5 +1,7 @@
 package configuration;
 
+import jara.CommandRegister;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -12,15 +14,20 @@ public abstract class GuildSettingsJson
     /**
      * The guild's audio settings.
      */
-    protected AudioConfig audioConfig;
+    protected AudioConfig audioConfig = new AudioConfig();
     /**
      * The guild's game settings.
      */
-    protected GameConfig gameConfig;
+    protected GameConfig gameConfig = new GameConfig();
     /**
      * The guild's command settings.
      */
-    protected HashMap<String, CommandConfig> commandConfig;
+    protected HashMap<String, CommandConfig> commandConfig = new HashMap<>();
+
+    /**
+     * The user made custom commands for this guild.
+     */
+    protected HashMap<String, CustomCommandConfig> customCommandsConfig = new HashMap<>();
 
     protected class AudioConfig
     {
@@ -70,6 +77,80 @@ public abstract class GuildSettingsJson
         {
             this.enabled = enabled;
             this.permissions = permissions;
+        }
+    }
+    public class CustomCommandConfig
+    {
+        /**
+         * The command key
+         */
+        private String key;
+        /**
+         * The strings which can be used to call the command
+         */
+        private String[] aliases;
+        /**
+         * A short description to describe the command
+         */
+        private String description;
+        /**
+         * The category of the command
+         */
+        private CommandRegister.Category category;
+        /**
+         * The text that will be returned when a user calls the command.
+         */
+        private String message;
+
+        /**
+         * @return
+         */
+        public String getKey()
+        {
+            return key;
+        }
+
+        /**
+         * @return
+         */
+        public String[] getAliases()
+        {
+            return aliases;
+        }
+        /**
+         * @return description
+         */
+        public String getDescription()
+        {
+            return description;
+        }
+
+        /**
+         * @return category
+         */
+        public CommandRegister.Category getCategory()
+        {
+            return category;
+        }
+
+        /**
+         * @return message
+         */
+        public String getMessage()
+        {
+            return message;
+        }
+
+        /**
+         * Constructor
+         */
+        protected CustomCommandConfig(String key, String[] aliases, String description, CommandRegister.Category category, String message)
+        {
+            this.key = key;
+            this.aliases = aliases;
+            this.description = description;
+            this.category = category;
+            this.message = message;
         }
     }
 }

@@ -4,6 +4,7 @@ package configuration;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import commands.Command;
+import commands.CustomCommand;
 import jara.CommandAttributes;
 import jara.CommandRegister;
 import jara.Core;
@@ -15,10 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 
 public class GuildSettings extends GuildSettingsJson
 {
@@ -75,7 +73,7 @@ public class GuildSettings extends GuildSettingsJson
             {
                 if (!commandConfig.keySet().contains(key))
                 {
-                    commandConfig.put(key, new CommandConfig(!CommandRegister.getCommand(key).isDisableable(), new ArrayList<String>()));
+                    commandConfig.put(key, new CommandConfig(!CommandRegister.getCommand(key).isDisableable(), new ArrayList<>()));
                 }
             }
             logger.info("Commands were missing in the config for guild "+guildId+", so have been added with disabled state."); //This could get really spammy after an update.
@@ -105,6 +103,7 @@ public class GuildSettings extends GuildSettingsJson
             GuildSettingsJson settingsFromFile = gson.fromJson(JSON, getClass());
 
             this.commandPrefix = settingsFromFile.commandPrefix;
+            this.customCommandsConfig = settingsFromFile.customCommandsConfig;
             this.audioConfig.skipVotePercent = settingsFromFile.audioConfig.skipVotePercent;
             this.audioConfig.useVoiceLeaving = settingsFromFile.audioConfig.useVoiceLeaving;
             this.gameConfig.useGameChannels = settingsFromFile.gameConfig.useGameChannels;
@@ -127,7 +126,6 @@ public class GuildSettings extends GuildSettingsJson
             throw new NullPointerException(); //There is no data
         }
     }
-
     /**
      * Applies default settings to the guild config<br>
      * As with other setter methods, this will not save to file.<br>
@@ -135,6 +133,7 @@ public class GuildSettings extends GuildSettingsJson
     public void setDefaultSettings()
     {
         this.commandConfig = new HashMap<>();
+        this.customCommandsConfig = new HashMap<>();
         this.audioConfig = new AudioConfig();
         this.gameConfig = new GameConfig();
 
@@ -201,8 +200,7 @@ public class GuildSettings extends GuildSettingsJson
      */
     private HashMap<String, GuildSettingsJson.CommandConfig> getCommandMap()
     {
-        HashMap<String, CommandConfig> clone = new HashMap<>(this.commandConfig);
-        return clone;
+        return new HashMap<>(this.commandConfig);
     }
 
     /**
@@ -446,5 +444,100 @@ public class GuildSettings extends GuildSettingsJson
     {
         this.audioConfig.useVoiceLeaving = state;
     }
+
+    /**
+     * Adda a custom command for this guild. These are simple commands which users can make which will simply reply back with a predefined message.
+     * @param key
+     * @param aliases
+     * @param category
+     * @param message
+     * @param enabled
+     * @param permissions
+     */
+    public void addCustomCommand(String key, String[] aliases, String description, CommandRegister.Category category, String message, boolean enabled, ArrayList<String> permissions)
+    {
+        key = key.toLowerCase();
+        customCommandsConfig.put(key, new CustomCommandConfig(key, aliases, description, category, message));
+        commandConfig.put(key, new CommandConfig(true, new ArrayList<>()));
+    }
+
+    /**
+     * Removes a custom command for this guild.
+     * @param key
+     */
+    public void removeCustomCommand(String key)
+    {
+        key = key.toLowerCase();
+        customCommandsConfig.remove(key);
+        commandConfig.remove(key);
+    }
+
+    /**
+     * @param key
+     * @return CustomCommandConfig - The custom guild command.
+     * @return null - Invalid key/alias
+     */
+    public CustomCommandConfig getCustomCommand(String key)
+    {
+        key = key.toLowerCase();
+        if (customCommandsConfig.containsKey(key))
+        {
+            return customCommandsConfig.get(key.toLowerCase());
+        }
+        else
+        {
+            for (Map.Entry<String, CustomCommandConfig> entry : customCommandsConfig.entrySet())
+            {
+                for (String alias : entry.getValue().getAliases())
+                {
+                    if (key.equals(alias))
+                    {
+                        return customCommandsConfig.get(entry.getKey());
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the HashMap with the custom command config details.<br>
+     * The key is the command key, with the value being of type CustomCommandConfig.
+     * @return
+     */
+    public HashMap<String, CustomCommandConfig> getCustomCommandMap()
+    {
+        return customCommandsConfig;
+    }
+
+    /**
+     * Generates the command attributes for the specified custom command
+     * @param key
+     * @return CommandAttributes - The command's attributes
+     * @return null - Invalid key
+     */
+    public CommandAttributes getCustomCommandAttributes(String key)
+    {
+        key = key.toLowerCase();
+        CustomCommandConfig ccc = getCustomCommand(key);
+        if (ccc == null)
+        {
+            return null;
+        }
+        return new CommandAttributes(ccc.getKey(), ccc.getDescription(), CustomCommand.class, ccc.getAliases(), ccc.getCategory(), true);
+    }
+
+    /**
+     * Returns the custom command's launcher.
+     * @param key
+     * @return CommandLauncher = The custom command's launcher
+     * @return null - Invalid key
+     */
+    public CommandLauncher getCustomCommandLauncher(String key)
+    {
+        key = key.toLowerCase();
+        return new CommandLauncher(getCustomCommandAttributes(key), isCommandEnabled(key));
+    }
+
 
 }

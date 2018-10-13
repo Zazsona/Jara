@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import commands.Command;
+import commands.CustomCommand;
 import commands.Help;
+import commands.admin.AddCommand;
 import commands.admin.config.ConfigMain;
 import commands.audio.*;
 import commands.games.Countdown;
@@ -80,6 +82,8 @@ public class CommandRegister
 			register.add(new CommandAttributes("NowPlaying", "Current track details.", NowPlaying.class, new String[] {"NP", "CP", "CurrentlyPlaying", "TrackInfo", "SongInfo", "MusicInfo", "AudioInfo"}, AUDIO, true));
 			register.add(new CommandAttributes("Pause", "Pauses current track.", Pause.class, new String[] {"Resume"}, AUDIO, true));
 			register.add(new CommandAttributes("Replay", "Adds current track to queue again.", Replay.class, new String[] {"Repeat"}, AUDIO, true));
+			register.add(new CommandAttributes("AddCommand", "Adds a custom command.", AddCommand.class, new String[] {"CustomCommand"}, ADMIN, true));
+			register.add(new CommandAttributes("CustomCommand", "Custom Command Template.", CustomCommand.class, new String[0], NOGROUP, false)); //TODO: Make this disableable
 		}
 		return register.toArray(new CommandAttributes[register.size()]);
 	}
