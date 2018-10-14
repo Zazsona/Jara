@@ -166,39 +166,41 @@ public class CommandRegister
 	 */
 	public static CommandAttributes getCommand(String alias)
 	{
-		getRegister();
-		int min = 0;
-		int max = getRegisterSize();
-		int charIndex = 0;
+		try
+		{
+			getRegister();
+			int min = 0;
+			int max = getRegisterSize();
+			int charIndex = 0;
 		/*================================================================
 		We first check for command keys, as this should be what the
 		majority of requests use, thus saving us having to trawl through
 		ALL aliases when we don't have to.
 		================================================================*/
-		while (min <= max)
-		{
-			int mid = (max+min)/2;
+			while (min <= max)
+			{
+				int mid = (max+min)/2;
 
-			if (getRegister()[mid].getCommandKey().charAt(charIndex) < alias.charAt(charIndex))
-			{
-				min = mid+1;
-				charIndex = 0;
-			}
-			else if (getRegister()[mid].getCommandKey().charAt(charIndex) > alias.charAt(charIndex))
-			{
-				max = mid-1;
-				charIndex = 0;
-			}
-			else if (getRegister()[mid].getCommandKey().charAt(charIndex) == alias.charAt(charIndex))
-			{
-				if (getRegister()[mid].getCommandKey().equalsIgnoreCase(alias))
+				if (getRegister()[mid].getCommandKey().charAt(charIndex) < alias.charAt(charIndex))
 				{
-					return getRegister()[mid];
+					min = mid+1;
+					charIndex = 0;
 				}
-				charIndex++;
-			}
+				else if (getRegister()[mid].getCommandKey().charAt(charIndex) > alias.charAt(charIndex))
+				{
+					max = mid-1;
+					charIndex = 0;
+				}
+				else if (getRegister()[mid].getCommandKey().charAt(charIndex) == alias.charAt(charIndex))
+				{
+					if (getRegister()[mid].getCommandKey().equalsIgnoreCase(alias))
+					{
+						return getRegister()[mid];
+					}
+					charIndex++;
+				}
 
-		}
+			}
 
 		/*===============================================================
 		Well shit, it's not a key.
@@ -215,23 +217,28 @@ public class CommandRegister
 
 		================================================================*/
 
-		boolean match = false;
-		for (CommandAttributes commandAttributes : register)
-		{
-			for (String regAlias : commandAttributes.getAliases())
+			boolean match = false;
+			for (CommandAttributes commandAttributes : register)
 			{
-				if (alias.equalsIgnoreCase(regAlias))							
+				for (String regAlias : commandAttributes.getAliases())
 				{
-					match = true;
-					break;
+					if (alias.equalsIgnoreCase(regAlias))
+					{
+						match = true;
+						break;
+					}
+				}
+				if (match)
+				{
+					return commandAttributes;
 				}
 			}
-			if (match)
-			{
-				return commandAttributes;
-			}
+			return null; //Bad alias
 		}
-		return null; //Bad alias
+		catch (ArrayIndexOutOfBoundsException e) //Likely a custom command
+		{
+			return null;
+		}
 	}
 	/**
 	 * Returns the total count of all registered commands.
