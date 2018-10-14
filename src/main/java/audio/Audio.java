@@ -16,11 +16,30 @@ import java.util.ArrayList;
 
 public class Audio
 {
+	/**
+	 * The list of tracks waiting to be played, including that currently playing
+	 */
 	private ArrayList<AudioTrack> trackQueue = new ArrayList<>();
+	/**
+	 * The guild's player manager
+	 */
 	private final AudioPlayerManager playerManager;
+	/**
+	 * The guild's player
+	 */
 	private final AudioPlayer player;
+	/**
+	 * The guild's audio manager
+	 */
 	private final AudioManager audioManager;
+	/**
+	 * This stores the user IDs of those who have voted to skip (Prevents the same user voting multiple times)
+	 */
+	private ArrayList<String> skipVotes = new ArrayList<>();
 
+	/**
+	 * The result of a play Request.
+	 */
 	public enum RequestResult
 	{
 		REQUEST_PENDING,
@@ -34,8 +53,11 @@ public class Audio
 		REQUEST_CHANNEL_PERMISSION_DENIED
 	}
 
-	private ArrayList<String> skipVotes = new ArrayList<>(); //This stores the user IDs of those who have voted to skip (Prevents the same user voting multiple times)
-
+	/**
+	 * Constructor.
+	 *
+	 * @param guild The guild to associate with this audio instance
+	 */
 	public Audio(Guild guild)
 	{
 		playerManager = new DefaultAudioPlayerManager();
@@ -50,6 +72,12 @@ public class Audio
 		player.addListener(scheduleHandler);
 	}
 
+	/**
+	 * Plays the requested track to the member
+	 * @param member The user to play the track to
+	 * @param query The track to play
+	 * @return RequestResult - The result of the request
+	 */
 	public RequestResult play(Member member, String query)
 	{
 		try
@@ -91,6 +119,12 @@ public class Audio
 		}
 	}
 
+	/**
+	 * Checks to see if audio is playing in the guild
+	 * @return
+	 * true - Audio playing<br>
+	 * false - Audio not playing
+	 */
 	public Boolean isAudioPlayingInGuild()
 	{
 		return (getPlayer().getPlayingTrack() != null);
@@ -98,8 +132,7 @@ public class Audio
 
 	/**
 	 * Returns the currently queued tracks. The currently playing track is at index 0.
-	 * @return
-	 * ArrayList<AudioTrack> - The tracks.
+	 * @return AudioTrack ArrayList
 	 */
 	public ArrayList<AudioTrack> getTrackQueue()
 	{
@@ -143,9 +176,9 @@ public class Audio
 
 	/**
 	 * Inverts the user's current vote state.
-	 * @param userID
+	 * @param userID The user who has voted
 	 * @return
-	 * true - Vote added
+	 * true - Vote added<br>
 	 * false - Vote removed
 	 */
 	public boolean registerSkipVote(String userID)
@@ -171,8 +204,7 @@ public class Audio
 	}
 
 	/**
-	 * Gets AudioManager
-	 * @return
+	 * @return AudioManager - The guild's audio manager
 	 */
 	public AudioManager getAudioManager()
 	{

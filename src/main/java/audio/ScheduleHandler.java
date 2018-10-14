@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 
 public class ScheduleHandler extends AudioEventAdapter
 {
+    /**
+     * The audio instance for this guild
+     */
     private Audio audio;
     public ScheduleHandler(Audio audio)
     {

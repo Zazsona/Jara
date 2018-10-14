@@ -6,9 +6,19 @@ import net.dv8tion.jda.core.audio.AudioSendHandler;
 
 public class AudioSendingHandler implements AudioSendHandler
 {
+    /**
+     * The audio player for this guild
+     */
     private final AudioPlayer audioPlayer;
+    /**
+     * The last audio frame
+     */
     private AudioFrame lastFrame;
 
+    /**
+     * Constructor
+     * @param audioPlayer The guild's audio player
+     */
     public AudioSendingHandler(AudioPlayer audioPlayer)
     {
         this.audioPlayer = audioPlayer;

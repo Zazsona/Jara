@@ -7,7 +7,13 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 public class AudioLoadHandler implements AudioLoadResultHandler
 {
+    /**
+     * The Audio instance for this guild
+     */
     private final Audio audio;
+    /**
+     * The result of the load
+     */
     private Audio.RequestResult result;
 
     public AudioLoadHandler(Audio audio)
@@ -16,10 +22,14 @@ public class AudioLoadHandler implements AudioLoadResultHandler
         this.result = Audio.RequestResult.REQUEST_PENDING;
     }
 
+    /**
+     * @return RequestResult - The result of the load
+     */
     public Audio.RequestResult getResult()
     {
         return result;
     }
+
     @Override
     public void trackLoaded(AudioTrack track)
     {
