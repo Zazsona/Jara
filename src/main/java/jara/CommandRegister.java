@@ -50,11 +50,11 @@ public class CommandRegister
 	{
 		if (register == null)
 		{
-			register = new ArrayList<CommandAttributes>();
+			register = new ArrayList<>();
 			/*============================================
 			 * 
 			 * The layout for adding a new class should be quite simple.
-			 * Simply create a new CommandAttributes class in the list, and pass the Command Key, Command Class, and then any aliases.
+			 * Simply create a new CommandAttributes class in the list, and pass the Command properties.
 			 * All other operations (Adding them to settings, indexing them at boot, etc.) will be done automatically.
 			 * 
 			 * I also highly recommend you include details about the command in Help, such as parameters and what it does. Aliases and category will be done automatically.
@@ -84,10 +84,32 @@ public class CommandRegister
 			register.add(new CommandAttributes("Replay", "Adds current track to queue again.", Replay.class, new String[] {"Repeat"}, AUDIO, true));
 			register.add(new CommandAttributes("AddCommand", "Adds a custom command.", AddCommand.class, new String[] {"CustomCommand"}, ADMIN, true));
 			register.add(new CommandAttributes("CustomCommand", "Custom Command Template.", CustomCommand.class, new String[0], NOGROUP, false)); //TODO: Make this disableable
+
+			register.sort((ca1, ca2) ->
+						  {
+							  try
+							  {
+								  int charIndex = 0;
+								  char ca1KeyChar = ca1.getCommandKey().charAt(charIndex);
+								  char ca2KeyChar = ca2.getCommandKey().charAt(charIndex);
+								  while (ca1KeyChar == ca2KeyChar)
+								  {
+									  charIndex++;
+									  ca1KeyChar = ca1.getCommandKey().charAt(charIndex);
+									  ca2KeyChar = ca2.getCommandKey().charAt(charIndex);
+								  }
+								  return Character.compare(ca1KeyChar, ca2KeyChar);
+							  }
+							  catch (IndexOutOfBoundsException e) //This will throw if two commands have the same key. This should NEVER occur.
+							  {
+								  return 0;
+							  }
+
+						  });
 		}
-		return register.toArray(new CommandAttributes[register.size()]);
+		return register.toArray(new CommandAttributes[0]);
 	}
-	/*
+	/**
 	 * Returns all strings which can be used to trigger commands. 
 	 * @return
 	 * String[] - All command aliases
@@ -95,14 +117,14 @@ public class CommandRegister
 	public static String[] getAllCommandAliases()
 	{
 		getRegister();
-		ArrayList<String> aliases = new ArrayList<String>();
+		ArrayList<String> aliases = new ArrayList<>();
 		for (CommandAttributes commandAttributes : register)
 		{
 			Collections.addAll(aliases, commandAttributes.getAliases());
 		}
-		return aliases.toArray(new String[aliases.size()]); 
+		return aliases.toArray(new String[0]);
 	}
-	/*
+	/**
 	 * Returns all Classes which are registered commands
 	 * @return
 	 * ArrayList<Class<? extends Command>> - The classes.
@@ -111,7 +133,7 @@ public class CommandRegister
 	public static ArrayList<Class<? extends Command>> getAllCommandClasses()
 	{
 		getRegister();
-		ArrayList<Class<? extends Command>> classes = new ArrayList<Class<? extends Command>>();
+		ArrayList<Class<? extends Command>> classes = new ArrayList<>();
 		for (CommandAttributes commandAttributes : register)
 		{
 			classes.add(commandAttributes.getCommandClass());
@@ -127,12 +149,12 @@ public class CommandRegister
 	public static String[] getAllCommandKeys()
 	{
 		getRegister();
-		ArrayList<String> keys = new ArrayList<String>();
+		ArrayList<String> keys = new ArrayList<>();
 		for (CommandAttributes commandAttributes : register)
 		{
 			keys.add(commandAttributes.getCommandKey());
 		}
-		return keys.toArray(new String[keys.size()]);
+		return keys.toArray(new String[0]);
 	}
 	/**
 	 * Returns the class' attributes. Note this does not include any configuration details, so is true for guild & global contexts.
@@ -145,31 +167,70 @@ public class CommandRegister
 	public static CommandAttributes getCommand(String alias)
 	{
 		getRegister();
-		for (CommandAttributes commandAttributes : register)					//================================================================
+		int min = 0;
+		int max = getRegisterSize();
+		int charIndex = 0;
+		/*================================================================
+		We first check for command keys, as this should be what the
+		majority of requests use, thus saving us having to trawl through
+		ALL aliases when we don't have to.
+		================================================================*/
+		while (min <= max)
 		{
-			if (commandAttributes.getCommandKey().equalsIgnoreCase(alias))		//We first check for command keys, as this should be what the
-			{																	//majority of requests use, thus saving us having to trawl through
-				return commandAttributes;										//ALL aliases when we don't have to.
+			int mid = (max+min)/2;
+
+			if (getRegister()[mid].getCommandKey().charAt(charIndex) < alias.charAt(charIndex))
+			{
+				min = mid+1;
+				charIndex = 0;
 			}
-		}																		//================================================================
-		
-																				//Well shit, it's not a key.
+			else if (getRegister()[mid].getCommandKey().charAt(charIndex) > alias.charAt(charIndex))
+			{
+				max = mid-1;
+				charIndex = 0;
+			}
+			else if (getRegister()[mid].getCommandKey().charAt(charIndex) == alias.charAt(charIndex))
+			{
+				if (getRegister()[mid].getCommandKey().equalsIgnoreCase(alias))
+				{
+					return getRegister()[mid];
+				}
+				charIndex++;
+			}
+
+		}
+
+		/*===============================================================
+		Well shit, it's not a key.
+
+		You can do many things while this runs.
+		I find a fan favourite is annoying a friend.
+
+		Other suggestions are:
+		- Make a cuppa
+		- Fix Northern Rail's train timetables
+		- Play a flash game
+		- Mark everything as duplicate on SO
+		- Implement this better
+
+		================================================================*/
+
 		boolean match = false;
-		for (CommandAttributes commandAttributes : register)					//================================================================
+		for (CommandAttributes commandAttributes : register)
 		{
-			for (String regAlias : commandAttributes.getAliases())				//You can do many things while this runs.
-			{																	//I find a fan favourite is annoying a fellow human.
+			for (String regAlias : commandAttributes.getAliases())
+			{
 				if (alias.equalsIgnoreCase(regAlias))							
-				{																//Other suggestions are:
-					match = true;												//Make a cuppa
-					break;														//Find out what a "It's coming home" is.
-				}																//Fix Northern Rail's train timetables
-			}																	//Play a flash game
-			if (match)													        //Rent a dog
-			{																	//Mark everything as duplicate on SO
-				return commandAttributes;										//Come up with a faster algorithm.
+				{
+					match = true;
+					break;
+				}
 			}
-		}																		//================================================================
+			if (match)
+			{
+				return commandAttributes;
+			}
+		}
 		return null; //Bad alias
 	}
 	/**
@@ -211,15 +272,7 @@ public class CommandRegister
 	 */
 	public static Category getCommandCategory(String key)
 	{
-		getRegister();
-		for (CommandAttributes commandAttributes : register)
-		{
-			if (commandAttributes.getCommandKey().equalsIgnoreCase(key))
-			{
-				return commandAttributes.getCategoryID();
-			}
-		}
-		return null; //Invalid key
+		return getCommand(key).getCategoryID();
 	}
 	/**
 	 * Converts a category ID into a category name.
@@ -284,13 +337,19 @@ public class CommandRegister
 	 */
 	public static ArrayList<String> getCategoryNames()
 	{
-		ArrayList<String> names = new ArrayList<String>();
+		ArrayList<String> names = new ArrayList<>();
 		for (Category category : Category.values())
 		{
 			names.add(getCategoryName(category));
 		}
 		return names;
 	}
+
+	/**
+	 * Returns the Command Attributes all all commands in this category.
+	 * @param categoryID
+	 * @return CommandAttributes[] - Array of attributes.
+	 */
 	public static CommandAttributes[] getCommandsInCategory(Category categoryID)
 	{
 		ArrayList<CommandAttributes> categoryCommands;
@@ -319,7 +378,6 @@ public class CommandRegister
 		}
 		if (categoryCommands != null)
 		{
-			System.out.println("Commands already generated.");
 			return adminCommands.toArray(new CommandAttributes[register.size()]);
 		}
 		else
@@ -327,9 +385,14 @@ public class CommandRegister
 			return generateCommandsInCategory(categoryID);
 		}
 	}
+
+	/**
+	 * Generates the list of commands in this category. Use getCommandsInCategory() instead where possible for cached results.
+	 * @param categoryID
+	 * @return
+	 */
 	private static CommandAttributes[] generateCommandsInCategory(Category categoryID)
 	{
-		System.out.println("Generating commands");
 		getRegister();
 		ArrayList<CommandAttributes> categoryCommands = new ArrayList<>();
 		for (CommandAttributes cmdAttributes : register)
@@ -362,8 +425,15 @@ public class CommandRegister
 				adminCommands = categoryCommands;
 				break;
 		}
-		return categoryCommands.toArray(new CommandAttributes[categoryCommands.size()]);
+		return categoryCommands.toArray(new CommandAttributes[0]);
 	}
+
+	/**
+	 * Opens the help page to for the specified command.
+	 *
+	 * @param msgEvent
+	 * @param clazz
+	 */
 	public static void sendHelpInfo(GuildMessageReceivedEvent msgEvent, Class<? extends Command> clazz)
 	{
 		new Help().run(msgEvent, "/?", CommandRegister.getCommand(clazz).getCommandKey());
