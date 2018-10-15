@@ -31,29 +31,36 @@ public class CommandLauncher
 		if (isEnabled() || !attributes.isDisableable()) //If it can't be disabled, run it anyway even if it is disabled. Stops people fucking with settings to the point the bot is unusable.
 		{
 			GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
-			if (guildSettings.isCommandEnabled(attributes.getCommandKey()) && (guildSettings.isPermitted(msgEvent.getMember(), attributes.getCommandClass())))
+			if (guildSettings.isCommandEnabled(attributes.getCommandKey()))
 			{
-				Runnable commandRunnable = () -> {
-					try
-					{
-						attributes.getCommandClass().newInstance().run(msgEvent, parameters);
-					}
-					catch (InstantiationException | IllegalAccessException e)
-					{
-						msgEvent.getChannel().sendMessage("Sorry, I was unable to run the command.").queue();
-						Logger logger = LoggerFactory.getLogger(CommandLauncher.class);
-						logger.error("A command request was sent but could not be fulfilled.\nCommand: "+parameters.toString()+"\nGuild: "+msgEvent.getGuild().getId()+" ("+msgEvent.getGuild().getName()+")\nUser: "+msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+"Channel: "+msgEvent.getChannel().getId()+" ("+msgEvent.getChannel().getName()+")\nDate/Time: "+LocalDateTime.now().toString());
-						e.printStackTrace();
-					}
-				};
-				Thread commandThread = new Thread(commandRunnable);
-				commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getCommandKey()+"-Thread");
-				commandThread.start();
-				return;
+				if (guildSettings.isPermitted(msgEvent.getMember(), attributes.getCommandClass()))
+				{
+					Runnable commandRunnable = () -> {
+						try
+						{
+							attributes.getCommandClass().newInstance().run(msgEvent, parameters);
+						}
+						catch (InstantiationException | IllegalAccessException e)
+						{
+							msgEvent.getChannel().sendMessage("Sorry, I was unable to run the command.").queue();
+							Logger logger = LoggerFactory.getLogger(CommandLauncher.class);
+							logger.error("A command request was sent but could not be fulfilled.\nCommand: "+parameters.toString()+"\nGuild: "+msgEvent.getGuild().getId()+" ("+msgEvent.getGuild().getName()+")\nUser: "+msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+"Channel: "+msgEvent.getChannel().getId()+" ("+msgEvent.getChannel().getName()+")\nDate/Time: "+LocalDateTime.now().toString());
+							e.printStackTrace();
+						}
+					};
+					Thread commandThread = new Thread(commandRunnable);
+					commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getCommandKey()+"-Thread");
+					commandThread.start();
+					return;
+				}
+				else
+				{
+					msgEvent.getChannel().sendMessage("You do not have permission to use this command.").queue();
+				}
 			}
 			else
 			{
-				msgEvent.getChannel().sendMessage("This command is disabled, or you do not have permission to use it.").queue();
+				msgEvent.getChannel().sendMessage("This command is disabled.").queue();
 			}
 			
 		}
@@ -63,6 +70,15 @@ public class CommandLauncher
 			logger.info(msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+" attempted to use the command "+parameters[0]+", however it's disabled. Please enable it in the config.");
 		}
 
+	}
+
+	/**
+	 * Returns the command key for the command associated with this launcher.
+	 * @return String - The key
+	 */
+	public String getCommandKey()
+	{
+		return attributes.getCommandKey();
 	}
 	/**
 	 * 

@@ -25,45 +25,32 @@ public class CommandHandler extends ListenerAdapter
 
 		if (commandString.startsWith(commandPrefix))									   //Prefix to signify that a command is being called.
 		{
-			HashMap<String, GuildSettingsJson.CustomCommandConfig> customGuildCommands = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandMap();
-
 			String[] command = commandString.split(" ");							   //Separating parameters.
-			for (CommandLauncher commandLauncher : commandLaunchers)
+			String key = command[0].replaceFirst(commandPrefix, "");
+
+			int min = 0;
+			int max = commandLaunchers.length;
+			while (min <= max)
 			{
-				if (commandLauncher.isEnabled())								//While execute() does an enabled check anyway, this saves us iterating through aliases.
+				int mid = (max+min)/2;
+
+				if (commandLaunchers[mid].getCommandKey().compareToIgnoreCase(key) < 0)
 				{
-					for (String alias : commandLauncher.getAliases())
-					{
-						if (command[0].equalsIgnoreCase(commandPrefix+alias))
-						{
-							commandLauncher.execute(msgEvent, command);
-							return;
-						}
-					}
+					min = mid+1;
+				}
+				else if (commandLaunchers[mid].getCommandKey().compareToIgnoreCase(key) > 0)
+				{
+					max = mid-1;
+				}
+				else if (commandLaunchers[mid].getCommandKey().compareToIgnoreCase(key) == 0)
+				{
+					commandLaunchers[mid].execute(msgEvent, command);
+					return;
 				}
 			}
-			//The command was not found in the global register, so let's check out the custom one.
 
-            for (String customKey : customGuildCommands.keySet())
-            {
-            	CustomCommandLauncher customCommandLauncher = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandLauncher(customKey);
-                if (SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).isCommandEnabled(customKey))								//While execute() does an enabled check anyway, this saves us iterating through aliases.
-                {
-                    for (String alias : customCommandLauncher.getAliases())
-                    {
-                        if (command[0].equalsIgnoreCase(commandPrefix+alias))
-                        {
-                            customCommandLauncher.execute(msgEvent, command);
-                            return;
-                        }
-                    }
-                }
-                else
-				{
-					msgEvent.getChannel().sendMessage("This command is disabled. Please talk to your guild owner if you wish to have it enabled.").queue();
-				}
-            }
-			
+			//The command was not found in the global register, so let's check out the custom one.
+			SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandLauncher(key.toLowerCase()).execute(msgEvent, command);
 		}
 
 	}

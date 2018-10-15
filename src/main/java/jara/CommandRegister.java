@@ -1,7 +1,10 @@
 package jara;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 
 import commands.Command;
 import commands.CustomCommand;
@@ -85,27 +88,10 @@ public class CommandRegister
 			register.add(new CommandAttributes("AddCommand", "Adds a custom command.", AddCommand.class, new String[] {"CustomCommand"}, ADMIN, true));
 			register.add(new CommandAttributes("CustomCommand", "Custom Command Template.", CustomCommand.class, new String[0], NOGROUP, false)); //TODO: Make this disableable
 
-			register.sort((ca1, ca2) ->
-						  {
-							  try
-							  {
-								  int charIndex = 0;
-								  char ca1KeyChar = ca1.getCommandKey().charAt(charIndex);
-								  char ca2KeyChar = ca2.getCommandKey().charAt(charIndex);
-								  while (ca1KeyChar == ca2KeyChar)
-								  {
-									  charIndex++;
-									  ca1KeyChar = ca1.getCommandKey().charAt(charIndex);
-									  ca2KeyChar = ca2.getCommandKey().charAt(charIndex);
-								  }
-								  return Character.compare(ca1KeyChar, ca2KeyChar);
-							  }
-							  catch (IndexOutOfBoundsException e) //This will throw if two commands have the same key. This should NEVER occur.
-							  {
-								  return 0;
-							  }
-
-						  });
+			/*
+					Sort the commands into alphabetical order based on their keys
+			 */
+			register.sort(Comparator.comparing(CommandAttributes::getCommandKey));
 		}
 		return register.toArray(new CommandAttributes[0]);
 	}
@@ -128,7 +114,6 @@ public class CommandRegister
 	 * Returns all Classes which are registered commands
 	 * @return
 	 * ArrayList<Class<? extends Command>> - The classes.
-	 * 
 	 */
 	public static ArrayList<Class<? extends Command>> getAllCommandClasses()
 	{
@@ -171,74 +156,74 @@ public class CommandRegister
 			getRegister();
 			int min = 0;
 			int max = getRegisterSize();
-			int charIndex = 0;
-		/*================================================================
-		We first check for command keys, as this should be what the
-		majority of requests use, thus saving us having to trawl through
-		ALL aliases when we don't have to.
-		================================================================*/
+
+			/*================================================================
+			We first check for command keys, as this should be what the
+			majority of requests use, thus saving us having to trawl through
+			ALL aliases when we don't have to.
+			================================================================*/
+
 			while (min <= max)
 			{
 				int mid = (max+min)/2;
 
-				if (getRegister()[mid].getCommandKey().charAt(charIndex) < alias.charAt(charIndex))
+				if (getRegister()[mid].getCommandKey().compareToIgnoreCase(alias) < 0)
 				{
 					min = mid+1;
-					charIndex = 0;
 				}
-				else if (getRegister()[mid].getCommandKey().charAt(charIndex) > alias.charAt(charIndex))
+				else if (getRegister()[mid].getCommandKey().compareToIgnoreCase(alias) > 0)
 				{
 					max = mid-1;
-					charIndex = 0;
 				}
-				else if (getRegister()[mid].getCommandKey().charAt(charIndex) == alias.charAt(charIndex))
+				else if (getRegister()[mid].getCommandKey().compareToIgnoreCase(alias) == 0)
 				{
-					if (getRegister()[mid].getCommandKey().equalsIgnoreCase(alias))
-					{
-						return getRegister()[mid];
-					}
-					charIndex++;
+					return getRegister()[mid];
 				}
-
 			}
 
-		/*===============================================================
-		Well shit, it's not a key.
+			/*===============================================================
+			Well shit, it's not a key.
 
-		You can do many things while this runs.
-		I find a fan favourite is annoying a friend.
+			You can do many things while this runs.
+			I find a fan favourite is annoying a friend.
 
-		Other suggestions are:
-		- Make a cuppa
-		- Fix Northern Rail's train timetables
-		- Play a flash game
-		- Mark everything as duplicate on SO
-		- Implement this better
+			Other suggestions are:
+			- Make a cuppa
+			- Fix Northern Rail's train timetables
+			- Play a flash game
+			- Mark everything as duplicate on SO
 
-		================================================================*/
+			================================================================*/
 
-			boolean match = false;
 			for (CommandAttributes commandAttributes : register)
 			{
-				for (String regAlias : commandAttributes.getAliases())
+				min = 0;
+				max = commandAttributes.getAliases().length;
+				while (min <= max)
 				{
-					if (alias.equalsIgnoreCase(regAlias))
+					int mid = (max+min)/2;
+
+					if (commandAttributes.getAliases()[mid].compareToIgnoreCase(alias) < 0)
 					{
-						match = true;
-						break;
+						min = mid+1;
 					}
-				}
-				if (match)
-				{
-					return commandAttributes;
+					else if (commandAttributes.getAliases()[mid].compareToIgnoreCase(alias) > 0)
+					{
+						max = mid-1;
+					}
+					else if (commandAttributes.getAliases()[mid].compareToIgnoreCase(alias) == 0)
+					{
+						return commandAttributes;
+					}
 				}
 			}
 			return null; //Bad alias
 		}
-		catch (ArrayIndexOutOfBoundsException e) //Likely a custom command
+		catch (ArrayIndexOutOfBoundsException e)
 		{
-			return null;
+			return null; //Command is not in register.
 		}
+
 	}
 	/**
 	 * Returns the total count of all registered commands.

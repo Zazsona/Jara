@@ -24,6 +24,19 @@ public class CommandAttributes
 		}
 		category = categoryArg;
 		disableable = disableableArg;
+
+		//Sort aliases alphabetically
+		for (int i = 1; i<getAliases().length; i++)
+		{
+			int index = i-1;
+			String element = getAliases()[i];
+			while ((index > -1) && (element.compareTo(getAliases()[index]) < 0))
+			{
+				getAliases()[index+1] = getAliases()[index];
+				index--;
+			}
+			getAliases()[index+1] = element;
+		}
 	}
 
 	/**

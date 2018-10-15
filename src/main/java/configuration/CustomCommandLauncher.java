@@ -51,12 +51,12 @@ public class CustomCommandLauncher extends CommandLauncher
             }
             else
             {
-                msgEvent.getChannel().sendMessage("This command is disabled, or you do not have permission to use it.").queue();
+                msgEvent.getChannel().sendMessage("You do not have permission to use this command.").queue();
             }
         }
         else
         {
-            msgEvent.getChannel().sendMessage("This command is disabled, or you do not have permission to use it.").queue();
+            msgEvent.getChannel().sendMessage("This command is disabled.").queue();
         }
     }
 }
