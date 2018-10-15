@@ -53,6 +53,10 @@ public class CommandHandler extends ListenerAdapter
                         }
                     }
                 }
+                else
+				{
+					msgEvent.getChannel().sendMessage("This command is disabled. Please talk to your guild owner if you wish to have it enabled.").queue();
+				}
             }
 			
 		}

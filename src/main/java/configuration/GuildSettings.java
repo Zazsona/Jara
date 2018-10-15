@@ -311,7 +311,12 @@ public class GuildSettings extends GuildSettingsJson
         ArrayList<String> permissions;
         for (String key : commandKeys)
         {
-            if (CommandRegister.getCommand(key).isDisableable())
+            CommandAttributes ca = getCustomCommand(key)!=null ? getCustomCommandAttributes(key) : CommandRegister.getCommand(key);
+            if (ca == null)
+            {
+                return;
+            }
+            else if (ca.isDisableable())
             {
                 if (newState == null)
                 {

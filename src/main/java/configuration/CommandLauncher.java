@@ -31,7 +31,6 @@ public class CommandLauncher
 		if (isEnabled() || !attributes.isDisableable()) //If it can't be disabled, run it anyway even if it is disabled. Stops people fucking with settings to the point the bot is unusable.
 		{
 			GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
-			System.out.println(attributes.getCommandKey());
 			if (guildSettings.isCommandEnabled(attributes.getCommandKey()) && (guildSettings.isPermitted(msgEvent.getMember(), attributes.getCommandClass())))
 			{
 				Runnable commandRunnable = () -> {

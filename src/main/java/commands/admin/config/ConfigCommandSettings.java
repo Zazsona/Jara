@@ -33,7 +33,12 @@ public class ConfigCommandSettings
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
         StringBuilder descBuilder = new StringBuilder();
         descBuilder.append("Please enter the command you would like to modify.\n\n");
+
         for (String key : SettingsUtil.getGlobalSettings().getEnabledCommands())
+        {
+            descBuilder.append("**").append(key).append("**\n");
+        }
+        for (String key : guildSettings.getCustomCommandMap().keySet())
         {
             descBuilder.append("**").append(key).append("**\n");
         }
@@ -52,7 +57,12 @@ public class ConfigCommandSettings
                     break;
                 }
                 CommandAttributes ca = CommandRegister.getCommand(msg.getContentDisplay());
-                if (ca != null)
+                if (ca == null) //If null, it may be a custom command
+                {
+                    ca = guildSettings.getCustomCommandAttributes(msg.getContentDisplay());
+                }
+
+                if (ca != null) //If it is either a custom command or a regular command...
                 {
                     descBuilder = new StringBuilder();
                     descBuilder.append("**Command:** ").append(ca.getCommandKey()).append("\n");
