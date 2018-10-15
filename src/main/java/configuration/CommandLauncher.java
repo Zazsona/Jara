@@ -10,8 +10,8 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 public class CommandLauncher
 {
-	private final boolean enabledState; //Whether the config allows this command to be used
-	private final CommandAttributes attributes;
+	protected final boolean enabledState; //Whether the config allows this command to be used
+	protected final CommandAttributes attributes;
 	
 	public CommandLauncher(CommandAttributes attributes, boolean enabledState)
 	{
@@ -53,7 +53,7 @@ public class CommandLauncher
 			}
 			else
 			{
-				msgEvent.getChannel().sendMessage("This command is disabled. Please talk to your guild owner if you wish to have it enabled.").queue();
+				msgEvent.getChannel().sendMessage("This command is disabled, or you do not have permission to use it.").queue();
 			}
 			
 		}

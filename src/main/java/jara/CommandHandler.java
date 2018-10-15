@@ -1,6 +1,7 @@
 package jara;
 
 import configuration.CommandLauncher;
+import configuration.CustomCommandLauncher;
 import configuration.GuildSettingsJson;
 import configuration.SettingsUtil;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -21,27 +22,31 @@ public class CommandHandler extends ListenerAdapter
 	{
 		String commandString = msgEvent.getMessage().getContentDisplay();
 		String commandPrefix = SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId()).toString();
-        HashMap<String, GuildSettingsJson.CustomCommandConfig> customGuildCommands = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandMap();
+
 		if (commandString.startsWith(commandPrefix))									   //Prefix to signify that a command is being called.
 		{
+			HashMap<String, GuildSettingsJson.CustomCommandConfig> customGuildCommands = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandMap();
+
 			String[] command = commandString.split(" ");							   //Separating parameters.
-			for (CommandLauncher commandConfig : commandLaunchers)
+			for (CommandLauncher commandLauncher : commandLaunchers)
 			{
-				if (commandConfig.isEnabled())								//While execute() does an enabled check anyway, this saves us iterating through aliases.
+				if (commandLauncher.isEnabled())								//While execute() does an enabled check anyway, this saves us iterating through aliases.
 				{
-					for (String alias : commandConfig.getAliases())
+					for (String alias : commandLauncher.getAliases())
 					{
 						if (command[0].equalsIgnoreCase(commandPrefix+alias))
 						{
-							commandConfig.execute(msgEvent, command);
+							commandLauncher.execute(msgEvent, command);
 							return;
 						}
 					}
 				}
 			}
+			//The command was not found in the global register, so let's check out the custom one.
+
             for (String customKey : customGuildCommands.keySet())
             {
-            	CommandLauncher customCommandLauncher = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandLauncher(customKey);
+            	CustomCommandLauncher customCommandLauncher = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandLauncher(customKey);
                 if (SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).isCommandEnabled(customKey))								//While execute() does an enabled check anyway, this saves us iterating through aliases.
                 {
                     for (String alias : customCommandLauncher.getAliases())

@@ -538,10 +538,10 @@ public class GuildSettings extends GuildSettingsJson
      * @return CommandLauncher = The custom command's launcher
      * @return null - Invalid key
      */
-    public CommandLauncher getCustomCommandLauncher(String key)
+    public CustomCommandLauncher getCustomCommandLauncher(String key)
     {
         key = key.toLowerCase();
-        return new CommandLauncher(getCustomCommandAttributes(key), isCommandEnabled(key));
+        return new CustomCommandLauncher(getCustomCommandAttributes(key));
     }
 
 
