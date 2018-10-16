@@ -12,16 +12,24 @@ import java.util.Random;
 
 public class CountdownConundrum extends Command
 {
-    private TextChannel channel;
+    /**
+     * The time it took to guess the conundrum
+     */
     private int seconds;
+    /**
+     * The embed
+     */
     private EmbedBuilder embed;
+    /**
+     * The message containing the embed
+     */
     private Message embedMsg;
 
     @SuppressWarnings("SpellCheckingInspection")
     @Override
     public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
     {
-        channel = super.createGameChannel(msgEvent, msgEvent.getMember().getEffectiveName() + "s-countdown-conundrum");
+        TextChannel channel = super.createGameChannel(msgEvent, msgEvent.getMember().getEffectiveName() + "s-countdown-conundrum");
         String winner = "";
         String[][] conundrums = getConundrums();
         Random r = new Random();
@@ -114,6 +122,11 @@ public class CountdownConundrum extends Command
 
         super.deleteGameChannel(msgEvent, channel);
     }
+
+    /**
+     * Gets the list of conundrums, where the first dimension defines the conundrum, with the second dimension having the anagram in index 0, and the answer in index 1.
+     * @return String[][] - The conundrums
+     */
     private String[][] getConundrums() //TODO: Generate conundrums from word list?
     {
         String[][] conundrums = new String[40][2];

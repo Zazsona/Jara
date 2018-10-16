@@ -15,9 +15,21 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 public class Countdown extends Command 
 {
+	/**
+	 * The channel to send & receive messages with
+	 */
 	private TextChannel channel;
+	/**
+	 * The letters players can use
+	 */
 	private String letters = "";
+	/**
+	 * The message manager
+	 */
 	private final MessageManager mm = new MessageManager();
+	/**
+	 * The game's main logic thread
+	 */
 	private final Thread mainThread = Thread.currentThread();
 	
 	@Override
@@ -38,8 +50,8 @@ public class Countdown extends Command
 
 	/**
 	 * Creates the list of characters which players have to make a word from.
-	 * @param parameters
-	 * @return
+	 * @param parameters the command parameters to search for entries
+	 * @return String - The letters to guess from
 	 */
 	private String generateLetters(String...parameters)
 	{
@@ -108,8 +120,8 @@ public class Countdown extends Command
 
 	/**
 	 * Starts the clock and begins collecting answers from players. Holds the thread for 35 seconds.
-	 * @param msgEvent
-	 * @return
+	 * @param msgEvent the context to gather messages from
+	 * @return Message[] - The messages received during the clock period
 	 */
 	private Message[] getAnswers(GuildMessageReceivedEvent msgEvent)
 	{
@@ -125,7 +137,7 @@ public class Countdown extends Command
 
 	/**
 	 * Generates a winner from the answers provided.
-	 * @param answers
+	 * @param answers the players' answers
 	 */
 	private void generateResults(Message[] answers)
 	{
@@ -216,6 +228,7 @@ public class Countdown extends Command
 			this.embed = embed;
 			this.msg = msg;
 		}
+
 		@Override
 		public void run() 
 		{
@@ -250,9 +263,7 @@ public class Countdown extends Command
 			}
 			catch (InterruptedException e)
 			{
-				//channel.sendMessage("Uh-oh! Looks like something went wrong. You won't get a warning when time's almost up.").queue();
-				//e.printStackTrace();
-				//User has quit
+				return; //The game has been quit
 			}
 
 		}
@@ -261,7 +272,7 @@ public class Countdown extends Command
 
 	/**
 	 * Displays the letters players can use in a pretty format.
-	 * @return
+	 * @return String - the letter board
 	 */
 	private String createBoard()
 	{
@@ -275,8 +286,10 @@ public class Countdown extends Command
 
 	/**
 	 * Checks whether the supplied answer is rude or not.
-	 * @param answer
+	 * @param answer the winning answer
 	 * @return
+	 * true - The answer is vulgar<br>
+	 * false - The answer is clean
 	 */
 	private boolean isRude(String answer)
 	{

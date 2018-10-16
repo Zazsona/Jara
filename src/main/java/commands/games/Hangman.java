@@ -40,7 +40,6 @@ public class Hangman extends Command
 
             if (msg.getContentDisplay().length() == 5 && msg.getContentDisplay().toLowerCase().endsWith("quit"))
             {
-                attempts = 0;
                 break;
             }
 
