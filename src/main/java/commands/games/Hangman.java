@@ -2,12 +2,15 @@ package commands.games;
 
 import commands.CmdUtil;
 import commands.Command;
+import configuration.SettingsUtil;
 import jara.Core;
 import jara.MessageManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
+
+import java.util.Arrays;
 
 public class Hangman extends Command
 {
@@ -16,110 +19,164 @@ public class Hangman extends Command
     {
         TextChannel channel = super.createGameChannel(msgEvent, msgEvent.getMember().getEffectiveName()+"s-hangman");
         String word = CmdUtil.getRandomWord(); //Select a random word from "WordList"
+
         while (word.length() > 15 || word.length() < 5) //We don't want a giant word, that'd be unfair. But we also don't want a tiny one.
         {
             word = CmdUtil.getRandomWord();
         }
-        String progress = word.replaceAll("[a-zA-Z]", "#");
-        byte attempts = 8;
-        StringBuilder guessHistory = new StringBuilder();
+        char[] progress = new char[word.length()];
+        Arrays.fill(progress, '#');
 
-        MessageManager msgManager = new MessageManager();
-
-        EmbedBuilder embed = new EmbedBuilder();
-        embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
-        embed.setTitle("Hangman");
-        embed.setDescription(":game_die:  Welcome to Hangman! The word's **" + progress + "**. :game_die: ");
+        EmbedBuilder embed = getEmbedStyle(msgEvent);
+        embed.setDescription(":game_die:  Welcome to Hangman! The word's **" + String.valueOf(progress) + "**. :game_die: ");
         channel.sendMessage(embed.build()).queue();
 
-        while (attempts>0 && !word.equals(progress))
+        boolean success = startGame(msgEvent, word, progress, channel);
+        endGame(msgEvent, channel, word, success);
+    }
+
+    /**
+     * Main game logic method. This runs Hangman until a win or lose condition is found.
+     * @param msgEvent context
+     * @param word the word to guess
+     * @param progress the players' progress towards the word
+     * @param channel the channel to interact with
+     * @return
+     * true - Players' win<br>
+     * false - Bot's win
+     */
+    private boolean startGame(GuildMessageReceivedEvent msgEvent, String word, char[] progress, TextChannel channel)
+    {
+        StringBuilder guessHistory = new StringBuilder();
+        MessageManager msgManager = new MessageManager();
+        byte attempts = 8;
+
+        while (attempts>0)
         {
-            EmbedBuilder gameEmbed = new EmbedBuilder();
+            EmbedBuilder gameEmbed = getEmbedStyle(msgEvent);
             Message msg = msgManager.getNextMessage(channel);
             boolean correctGuess = false;
 
-            if (msg.getContentDisplay().length() == 5 && msg.getContentDisplay().toLowerCase().endsWith("quit"))
+            if (msg.getContentDisplay().equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId()) + "quit"))
             {
-                break;
+                return false; //The game has been quit, and as such lost.
             }
-
-            if (msg.getContentDisplay().length() == 1)
+            else if (msg.getContentDisplay().length() == 1) //If the message is only one char in length...
             {
-                if (guessHistory.toString().contains(msg.getContentDisplay().toUpperCase())) //TODO: This should be tidied.
+                if (guessHistory.toString().contains(msg.getContentDisplay().toUpperCase())) //Check if it is a previous guess...
                 {
-                    gameEmbed.setTitle("Hangman");
-                    gameEmbed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
                     gameEmbed.setDescription("You've already used that letter. Try another.");
                     channel.sendMessage(gameEmbed.build()).queue();
-                    continue;
+                    continue;   //If it is, inform the user & skip it.
                 }
-                char guess = msg.getContentDisplay().toLowerCase().charAt(0);
-                guessHistory.append(", ").append(Character.toUpperCase(guess));
-
-                char[] wordArray = word.toCharArray();
-                char[] progressArray = progress.toCharArray();
-
-                for (int i =0; i<wordArray.length; i++)
+                else    //If it isn't, see how they did.
                 {
-                    if (wordArray[i] == guess)
+                    /*
+
+                        The main gameplay logic sits here. This determines if they have correctly guessed a letter.
+
+                     */
+                    char guess = msg.getContentDisplay().toLowerCase().charAt(0);
+                    guessHistory.append(", ").append(Character.toUpperCase(guess));
+
+                    for (int i = 0; i < word.length(); i++) //Check if word contains the guess.
                     {
-                        progressArray[i] = guess;
+                        if (word.charAt(i) == guess)        //If it does...
+                        {
+                            progress[i] = guess;
+                            correctGuess = true;            //Register this in progress; mark the guess as correct.
+                        }
+                    }
+
+
+                    if (correctGuess)
+                    {
                         gameEmbed.setDescription("**You got one!**");
                         gameEmbed.setThumbnail("https://i.imgur.com/mBPBip8.png");
-                        correctGuess = true;
+                        if (Arrays.equals(word.toCharArray(), progress))
+                        {
+                            return true;
+                        }
                     }
-                }
-
-                progress = String.valueOf(progressArray);
-
-                if (!correctGuess)
-                {
-                    gameEmbed.setDescription("**Uh-oh! That's not it.**");
-                    attempts--;
-                    switch (attempts)
+                    else //If they guessed incorrectly...
                     {
-                        case 7:
-                            gameEmbed.setThumbnail("https://i.imgur.com/NynGFvk.png");
-                            break;
-                        case 6:
-                            gameEmbed.setThumbnail("https://i.imgur.com/jF1MxtR.png");
-                            break;
-                        case 5:
-                            gameEmbed.setThumbnail("https://i.imgur.com/a1d7xvA.png");
-                            break;
-                        case 4:
-                            gameEmbed.setThumbnail("https://i.imgur.com/wKm9Uyn.png");
-                            break;
-                        case 3:
-                            gameEmbed.setThumbnail("https://i.imgur.com/ZwxnCKS.png");
-                            break;
-                        case 2:
-                            gameEmbed.setThumbnail("https://i.imgur.com/nv7UCAy.png");
-                            break;
-                        case 1:
-                            gameEmbed.setThumbnail("https://i.imgur.com/zYfry8y.png");
-                            break;
-                        //If 0, that's game over.
-                    }  //Generate Hangman image
-                }
+                        attempts--;
+                        gameEmbed.setThumbnail(getHangmanImage(attempts));
+                        gameEmbed.setDescription("**Uh-oh! That's not it.**");
+                    }
 
-                gameEmbed.setTitle("Hangman");
-                gameEmbed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
-                gameEmbed.addField("Progress", progress, true);
-                gameEmbed.addField("Guesses", guessHistory.toString().substring(2), true);
-                if (attempts<=0)                    //Basically, we don't want to send a standard 'progress' embed, and then follow it up with a win/lose one. With this, we're replacing the progress one.
-                {
-                    gameEmbed.setDescription("**Oh no! I'm afraid you didn't quite get it. The word was "+word+"**");
-                    gameEmbed.setThumbnail("https://i.imgur.com/8ragw82.png");
+                    gameEmbed.addField("Progress", String.valueOf(progress), true);
+                    gameEmbed.addField("Guesses", guessHistory.toString().substring(2), true);      //Run this regardless of correct or incorrect guess.
+                    channel.sendMessage(gameEmbed.build()).queue();
                 }
-                else if (progress.equals(word))
-                {
-                    gameEmbed.setDescription("**Congratulations! You win. The word was "+word+"**");
-                    gameEmbed.setThumbnail("https://i.imgur.com/aRkU3aD.png");
-                }
-                channel.sendMessage(gameEmbed.build()).queue();
             }
         }
+        return false;
+    }
+
+    /**
+     * Gets the respective Hangman image for the current failed attempt.
+     * @param attempts
+     * @return String - The image URL
+     */
+    private String getHangmanImage(byte attempts)
+    {
+        switch (attempts)  //Generate Hangman image
+        {
+            case 7:
+                return ("https://i.imgur.com/NynGFvk.png");
+            case 6:
+                return ("https://i.imgur.com/jF1MxtR.png");
+            case 5:
+                return ("https://i.imgur.com/a1d7xvA.png");
+            case 4:
+                return ("https://i.imgur.com/wKm9Uyn.png");
+            case 3:
+                return ("https://i.imgur.com/ZwxnCKS.png");
+            case 2:
+                return ("https://i.imgur.com/nv7UCAy.png");
+            case 1:
+                return ("https://i.imgur.com/zYfry8y.png");
+            case 0:
+                return ("https://i.imgur.com/5a7HY94.png");
+        }
+        return null;
+    }
+
+    /**
+     * Outputs the winner and performs tidy up
+     * @param msgEvent context
+     * @param channel channel to announce in
+     * @param word the final word
+     * @param success whether the players succeeded
+     */
+    private void endGame(GuildMessageReceivedEvent msgEvent, TextChannel channel, String word, boolean success)
+    {
+        EmbedBuilder embed = getEmbedStyle(msgEvent);
+        if (!success)
+        {
+            embed.setDescription("**Oh no! The word was "+word+"**.");
+            embed.setThumbnail("https://i.imgur.com/mhqyyd2.png");
+        }
+        else
+        {
+            embed.setDescription("**Congratulations! You win. The word was "+word+"**.");
+            embed.setThumbnail("https://i.imgur.com/aRkU3aD.png");
+        }
+        channel.sendMessage(embed.build()).queue();
         super.deleteGameChannel(msgEvent, channel);
+    }
+
+    /**
+     * Gets the base embed style for this game
+     * @param msgEvent context
+     * @return EmbedBuilder - a pre-styled embed. Just add milk.
+     */
+    private EmbedBuilder getEmbedStyle(GuildMessageReceivedEvent msgEvent)
+    {
+        EmbedBuilder embed = new EmbedBuilder();
+        embed.setTitle("Hangman");
+        embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+        return embed;
     }
 }
