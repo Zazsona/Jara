@@ -529,7 +529,10 @@ public class GuildSettings extends GuildSettingsJson
         {
             return null;
         }
-        return new CommandAttributes(ccc.getKey(), ccc.getDescription(), CustomCommand.class, ccc.getAliases(), ccc.getCategory(), true);
+        else
+        {
+            return new CommandAttributes(ccc.getKey(), ccc.getDescription(), CustomCommand.class, ccc.getAliases(), ccc.getCategory(), true);
+        }
     }
 
     /**
@@ -541,7 +544,16 @@ public class GuildSettings extends GuildSettingsJson
     public CustomCommandLauncher getCustomCommandLauncher(String key)
     {
         key = key.toLowerCase();
-        return new CustomCommandLauncher(getCustomCommandAttributes(key));
+        CommandAttributes ca = getCustomCommandAttributes(key);
+        if (ca == null)
+        {
+            return null;
+        }
+        else
+        {
+            return new CustomCommandLauncher(getCustomCommandAttributes(key));
+        }
+
     }
 
 

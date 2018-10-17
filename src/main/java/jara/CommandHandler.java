@@ -2,12 +2,9 @@ package jara;
 
 import configuration.CommandLauncher;
 import configuration.CustomCommandLauncher;
-import configuration.GuildSettingsJson;
 import configuration.SettingsUtil;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-
-import java.util.HashMap;
 
 public class CommandHandler extends ListenerAdapter 
 {
@@ -50,7 +47,11 @@ public class CommandHandler extends ListenerAdapter
 			}
 
 			//The command was not found in the global register, so let's check out the custom one.
-			SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandLauncher(key.toLowerCase()).execute(msgEvent, command);
+			CustomCommandLauncher ccl = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandLauncher(key.toLowerCase());
+			if (ccl != null)
+			{
+				ccl.execute(msgEvent, command);
+			}
 		}
 
 	}
