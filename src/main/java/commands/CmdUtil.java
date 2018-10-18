@@ -18,15 +18,28 @@ import org.apache.http.util.EntityUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class CmdUtil
 {
+    /**
+     * A list of almost every english word
+     */
+    private static ArrayList<String> wordList;
+    /**
+     * A list of radom topics
+     */
+    private static ArrayList<String> topicList;
+    /**
+     * A map of guildID to that guild's audio instance.
+     */
     private static HashMap<String, Audio> guildAudios = new HashMap<>();
     /**
      * This method sends a HTTP request to the specified URL.
@@ -94,7 +107,12 @@ public class CmdUtil
             return "";
         }
     }
-    private static ArrayList<String> wordList;
+
+    /**
+     * Loads the entire word list into memory.
+     * @return
+     * @throws IOException
+     */
     public static ArrayList<String> getWordList() throws IOException
     {
         File localWordsFile = new File(SettingsUtil.getDirectory()+"/wordList.txt");
@@ -130,6 +148,11 @@ public class CmdUtil
         }
         return wordList;
     }
+
+    /**
+     * Gets a random word from the word list. If the word list is not loaded into memory, this will load it.
+     * @return String - The random word of any length
+     */
     public static String getRandomWord()
     {
         Random r = new Random();
@@ -144,6 +167,12 @@ public class CmdUtil
         }
 
     }
+
+    /**
+     * Gets the audio instance for the guild defined by guildID
+     * @param guildID the guild to get the audio instance for
+     * @return Audio - The audio instance
+     */
     public static Audio getGuildAudio(String guildID)
     {
 
@@ -157,6 +186,12 @@ public class CmdUtil
             return guildAudios.get(guildID);
         }
     }
+
+    /**
+     * Gets audio track details in a pretty format
+     * @param track the track to detail
+     * @return String - the formatted details
+     */
     public static String formatAudioTrackDetails(AudioTrack track)
     {
         AudioTrackInfo requestedTrackInfo = track.getInfo();
@@ -195,5 +230,41 @@ public class CmdUtil
             return String.format("00:%02d", seconds); //It'd look weird if it was just seconds.
         }
     }
+
+    /**
+     * Loads the entire topic list into memory
+     * @return
+     * @throws IOException
+     */
+    public static ArrayList<String> getTopicList() throws IOException
+    {
+        try
+        {
+            if (topicList == null)
+            {
+                topicList = new ArrayList<>();
+                File topicsFile = new File(CmdUtil.class.getResource("/game/topics.txt").toURI());
+                Scanner scanner = new Scanner(topicsFile);
+                while (scanner.hasNextLine())
+                {
+                    topicList.add(scanner.nextLine());
+                }
+                scanner.close();
+            }
+            return topicList;
+        }
+        catch (URISyntaxException e)
+        {
+            e.printStackTrace();
+            throw new IOException(); //URI is hardcoded, so something else has gone fucky here.
+        }
+
+    }
+
+    public static String getRandomTopic() throws IOException
+    {
+        return getTopicList().get(new Random().nextInt(getTopicList().size()));
+    }
+
 
 }
