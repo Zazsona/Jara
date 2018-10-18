@@ -15,6 +15,7 @@ import commands.audio.*;
 import commands.games.Countdown;
 import commands.games.CountdownConundrum;
 import commands.games.Hangman;
+import commands.games.LastWord;
 import commands.toys.*;
 import commands.utility.*;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -87,6 +88,7 @@ public class CommandRegister
 			register.add(new CommandAttributes("Replay", "Adds current track to queue again.", Replay.class, new String[] {"Repeat"}, AUDIO, true));
 			register.add(new CommandAttributes("AddCommand", "Adds a custom command.", AddCommand.class, new String[] {"CustomCommand"}, ADMIN, true));
 			register.add(new CommandAttributes("CustomCommand", "Custom Command Template.", CustomCommand.class, new String[0], NOGROUP, false)); //TODO: Make this disableable
+			register.add(new CommandAttributes("LastWord", "Get the last word in.", LastWord.class, new String[] {"TheLastWord", "Scattergories", "Topics"}, GAMES, true));
 
 			/*
 					Sort the commands into alphabetical order based on their keys
