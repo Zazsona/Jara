@@ -1,7 +1,7 @@
 package commands.games;
 
 import commands.CmdUtil;
-import commands.Command;
+import commands.GameCommand;
 import configuration.SettingsUtil;
 import jara.Core;
 import jara.MessageManager;
@@ -12,7 +12,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 import java.util.Arrays;
 
-public class Hangman extends Command
+public class Hangman extends GameCommand
 {
     @Override
     public void run(GuildMessageReceivedEvent msgEvent, String... parameters)

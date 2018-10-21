@@ -1,7 +1,7 @@
 package commands.games;
 
 import commands.CmdUtil;
-import commands.Command;
+import commands.GameCommand;
 import jara.Core;
 import jara.MessageManager;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Random;
 
-public class LastWord extends Command
+public class LastWord extends GameCommand
 {
     private static Logger logger = LoggerFactory.getLogger(LastWord.class);
     private TextChannel channel;

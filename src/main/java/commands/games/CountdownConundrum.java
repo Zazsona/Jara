@@ -1,6 +1,6 @@
 package commands.games;
 
-import commands.Command;
+import commands.GameCommand;
 import jara.Core;
 import jara.MessageManager;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.Random;
 import java.util.Scanner;
 
-public class CountdownConundrum extends Command
+public class CountdownConundrum extends GameCommand
 {
     private static Logger logger = LoggerFactory.getLogger(CountdownConundrum.class);
     /**

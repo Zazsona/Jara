@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import commands.CmdUtil;
-import commands.Command;
+import commands.GameCommand;
 import jara.Core;
 import jara.MessageManager;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -13,7 +13,7 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
-public class Countdown extends Command 
+public class Countdown extends GameCommand
 {
 	/**
 	 * The channel to send & receive messages with
