@@ -3,11 +3,13 @@ package configuration;
 
 import com.google.gson.*;
 import commands.Command;
+import gui.HeadedGUI;
 import jara.CommandAttributes;
 import jara.CommandRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
@@ -93,8 +95,14 @@ public class GlobalSettings extends GlobalSettingsJson
                     Therefore, I feel it would be better to open the setup and let them configure it.
                  */
                 logger.error("Commands are missing from the config. Is it outdated?");
-                throw new NullPointerException();
-                //TODO: Launch update (/new mod) setup
+                if (GraphicsEnvironment.isHeadless())
+                {
+                    //TODO: Terminal ver.
+                }
+                else
+                {
+                    HeadedGUI.showUpdateConfig();
+                }
             }
         }
         else
