@@ -17,42 +17,44 @@ public class CommandHandler extends ListenerAdapter
 	@Override 
 	public void onGuildMessageReceived(GuildMessageReceivedEvent msgEvent) //Reads commands
 	{
-		String commandString = msgEvent.getMessage().getContentDisplay();
-		String commandPrefix = SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId()).toString();
-
-		if (commandString.startsWith(commandPrefix))									   //Prefix to signify that a command is being called.
+		if (!msgEvent.getAuthor().isBot()) //This is to prevent /say abuse from this bot & others, which would allow users to execute commands under the bot's permissions.
 		{
-			String[] command = commandString.split(" ");							   //Separating parameters.
-			String key = command[0].replaceFirst(commandPrefix, "");
+			String commandString = msgEvent.getMessage().getContentDisplay();
+			String commandPrefix = SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId()).toString();
 
-			int min = 0;
-			int max = commandLaunchers.length;
-			while (min <= max)
+			if (commandString.startsWith(commandPrefix))									   //Prefix to signify that a command is being called.
 			{
-				int mid = (max+min)/2;
+				String[] command = commandString.split(" ");							   //Separating parameters.
+				String key = command[0].replaceFirst(commandPrefix, "");
 
-				if (commandLaunchers[mid].getCommandKey().compareToIgnoreCase(key) < 0)
+				int min = 0;
+				int max = commandLaunchers.length;
+				while (min <= max)
 				{
-					min = mid+1;
-				}
-				else if (commandLaunchers[mid].getCommandKey().compareToIgnoreCase(key) > 0)
-				{
-					max = mid-1;
-				}
-				else if (commandLaunchers[mid].getCommandKey().compareToIgnoreCase(key) == 0)
-				{
-					commandLaunchers[mid].execute(msgEvent, command);
-					return;
-				}
-			}
+					int mid = (max+min)/2;
 
-			//The command was not found in the global register, so let's check out the custom one.
-			CustomCommandLauncher ccl = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandLauncher(key.toLowerCase());
-			if (ccl != null)
-			{
-				ccl.execute(msgEvent, command);
+					if (commandLaunchers[mid].getCommandKey().compareToIgnoreCase(key) < 0)
+					{
+						min = mid+1;
+					}
+					else if (commandLaunchers[mid].getCommandKey().compareToIgnoreCase(key) > 0)
+					{
+						max = mid-1;
+					}
+					else if (commandLaunchers[mid].getCommandKey().compareToIgnoreCase(key) == 0)
+					{
+						commandLaunchers[mid].execute(msgEvent, command);
+						return;
+					}
+				}
+
+				//The command was not found in the global register, so let's check out the custom one.
+				CustomCommandLauncher ccl = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandLauncher(key.toLowerCase());
+				if (ccl != null)
+				{
+					ccl.execute(msgEvent, command);
+				}
 			}
 		}
-
 	}
 }
