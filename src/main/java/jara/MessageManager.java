@@ -11,6 +11,9 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
+/**
+ * Class to streamline message collection.
+ */
 public class MessageManager
 {
 	private final Object lock = new Object();
@@ -21,7 +24,7 @@ public class MessageManager
 	private final MessageListener messageListener;
 	public MessageManager()
 	{
-		messageLog = new ArrayList<Message>();
+		messageLog = new ArrayList<>();
 		messageListener = new MessageListener();
 	}
 	/**
@@ -31,11 +34,11 @@ public class MessageManager
 	 * <br>
 	 * This function will block the thread until the message count has been received, or the timeout elapses.<br>
 	 * <br>
-	 * @param guild - The guild to listen to
-	 * @param timeout - The amount of time to record messages for
-	 * @param messageCount - The number of messages to record
+	 * @param guild The guild to listen to
+	 * @param timeout The amount of time to record messages for
+	 * @param messageCount The number of messages to record
 	 * @return
-	 * Message[] - The messages sent after the method was called, size matches messageCount
+	 * Message[] - The messages sent after the method was called, size matches messageCount<br>
 	 * null - If the thread is interrupted before a message is received, or a timeout occurs.
 	 */
 	private Message[] futureGuildMessageCollector(Guild guild, int timeout, int messageCount)
@@ -52,7 +55,7 @@ public class MessageManager
 				{
 			        RuntimeMXBean runtimeBean = ManagementFactory.getRuntimeMXBean();
 			        long startTime = runtimeBean.getUptime(); //Getting the time to check for spurious wake-up or timeout later.
-					lock.wait(timeout); 
+					lock.wait(timeout);
 					if (timeout > 0)
 					{
 						long timeSinceStart = runtimeBean.getUptime() - startTime - timeout; //This will be zero or less if timeout has expired
@@ -91,9 +94,9 @@ public class MessageManager
 	 * <br>
 	 * This function will block the thread until the message count has been received, or the timeout elapses.<br>
 	 * <br>
-	 * @param channel - The channel to listen to
-	 * @param timeout - The amount of time to record messages for
-	 * @param messageCount - The number of messages to record
+	 * @param channel The channel to listen to
+	 * @param timeout The amount of time to record messages for
+	 * @param messageCount The number of messages to record
 	 * @return
 	 * Message[] - The messages sent after the method was called, size matches messageCount
 	 * null - If the thread is interrupted before a message is received, or a timeout occurs.
@@ -154,7 +157,7 @@ public class MessageManager
 	 * Waits and returns the first message to be sent in any channel of the guild after invocation.<br>
 	 * This method will block the thread while waiting for a message.
 	 * 
-	 * @param guild - The guild to listen to
+	 * @param guild The guild to listen to
 	 * @return
 	 * Message - The message.
 	 */
@@ -174,7 +177,7 @@ public class MessageManager
 	 * Waits and returns the first message to be sent in the channel after invocation.<br>
 	 * This method will block the thread while waiting for a message.
 	 * 
-	 * @param channel - The channel to listen to
+	 * @param channel The channel to listen to
 	 * @return
 	 * Message - The message.
 	 */
@@ -194,8 +197,8 @@ public class MessageManager
 	 * Waits and returns the first message to be sent in the guild after invocation and within a set time.<br>
 	 * This method will block the thread while waiting for a message, or for the time limit to elapse.
 	 * 
-	 * @param guild - The guild to listen to
-	 * @param timeout - The amount of time to record for
+	 * @param guild The guild to listen to
+	 * @param timeout The amount of time to record for
 	 * @return
 	 * Message - The message.
 	 */
@@ -215,8 +218,8 @@ public class MessageManager
 	 * Waits and returns the first message to be sent in the channel after invocation and within a set time.<br>
 	 * This method will block the thread while waiting for a message, or for the time limit to elapse.
 	 * 
-	 * @param channel - The channel to listen to
-	 * @param timeout - The amount of time to record for
+	 * @param channel The channel to listen to
+	 * @param timeout The amount of time to record for
 	 * @return
 	 * Message - The message.
 	 */
@@ -237,8 +240,8 @@ public class MessageManager
 	 * Waits and returns the first X messages to be sent in the guild after invocation.<br>
 	 * This method will block the thread while waiting for all messages.
 	 * 
-	 * @param guild - The guild to listen to
-	 * @param count - Message count required
+	 * @param guild The guild to listen to
+	 * @param count Message count required
 	 * @return
 	 * Message[] - Array of messages received equal to count.
 	 */
@@ -250,8 +253,8 @@ public class MessageManager
 	 * Waits and returns the first X messages to be sent in the channel after invocation.<br>
 	 * This method will block the thread while waiting for all messages.
 	 * 
-	 * @param channel - The channel to listen to
-	 * @param count - Message count required
+	 * @param channel The channel to listen to
+	 * @param count Message count required
 	 * @return
 	 * Message[] - Array of messages received equal to count.
 	 */
@@ -263,9 +266,9 @@ public class MessageManager
 	 * Waits and returns the first X messages to be sent in the guild after invocation and within the time limit.<br>
 	 * This method will block the thread while waiting for all messages or for the time limit to expire.
 	 * 
-	 * @param guild - The guild to listen to
-	 * @param count - Message count required
-	 * @param timeout - The amount of time to record for
+	 * @param guild The guild to listen to
+	 * @param count Message count required
+	 * @param timeout The amount of time to record for
 	 * @return
 	 * Message[] - Array of messages received equal to count.
 	 */
@@ -277,9 +280,9 @@ public class MessageManager
 	 * Waits and returns the first X messages to be sent in the channel after invocation and within the time limit.<br>
 	 * This method will block the thread while waiting for all messages or for the time limit to expire.
 	 * 
-	 * @param channel - The channel to listen to
-	 * @param count - Message count required
-	 * @param timeout - The amount of time to record for
+	 * @param channel The channel to listen to
+	 * @param count Message count required
+	 * @param timeout The amount of time to record for
 	 * @return
 	 * Message[] - Array of messages received equal to count.
 	 */
@@ -291,7 +294,7 @@ public class MessageManager
 	 * Takes all messages received from this instance and returns them as an array.
 	 * 
 	 * @return
-	 * ArrayList<Message></Message> - Full history of all messages from this instance
+	 * ArrayList<Message>- Full history of all messages from this instance
 	 */
 	public ArrayList<Message> getMessageHistory()
 	{
@@ -304,7 +307,7 @@ public class MessageManager
 	 * 
 	 * If the total amount of messages requested is less than the total available, as many as possible will be returned.
 	 * 
-	 * @param count - The number of messages to get
+	 * @param count The number of messages to get
 	 * @return
 	 * Message[] - Array of messages requested
 	 */
@@ -327,7 +330,7 @@ public class MessageManager
 	 * 
 	 * If the total amount of messages requested is less than the total available, as many as possible will be returned.
 	 * 
-	 * @param count - The number of messages to get
+	 * @param count The number of messages to get
 	 * @return
 	 * Message[] - Array of messages requested
 	 */
@@ -349,7 +352,7 @@ public class MessageManager
 	 * The output here will match that of the last getNextMessage.
 	 * 
 	 * @return
-	 * Message - The last received message
+	 * Message - The last received message<br>
 	 * null - No messages have been received.
 	 */
 	public Message getLastMessage()
@@ -368,7 +371,7 @@ public class MessageManager
 	 * Note: Running this while gathering future messages will not work.
 	 * 
 	 * @return
-	 * true - Message history reset.
+	 * true - Message history reset.<br>
 	 * false - Message history not reset.
 	 */
 	public boolean resetMessageHistory()
@@ -388,29 +391,33 @@ public class MessageManager
 		@Override
 		public void onGuildMessageReceived(GuildMessageReceivedEvent msgEvent)
 		{
-			if (guildToListen != null)									//These checks set limits on where messages can be read from and are based on what parameters			
-			{															//where passed to the previous methods.
-				if (!guildToListen.equals(msgEvent.getGuild()))
-				{
-					return;
-				}
-			}
-			if (channelToListen != null)
+			if (!msgEvent.getAuthor().isBot())
 			{
-				if (!channelToListen.equals(msgEvent.getChannel()))
+				if (guildToListen != null)									//These checks set limits on where messages can be read from and are based on what parameters
+				{															//were passed to the previous methods.
+					if (!guildToListen.equals(msgEvent.getGuild()))
+					{
+						return;
+					}
+				}
+				if (channelToListen != null)
 				{
-					return;
+					if (!channelToListen.equals(msgEvent.getChannel()))
+					{
+						return;
+					}
+				}
+				messageLog.add(msgEvent.getMessage());
+				messagesToGet--;
+				if (messagesToGet <= 0)
+				{
+					synchronized (lock)
+					{
+						lock.notifyAll();
+					}
 				}
 			}
-			messageLog.add(msgEvent.getMessage());
-			messagesToGet--;
-			if (messagesToGet <= 0)
-			{
-				synchronized (lock)
-				{
-					lock.notifyAll();
-				}
-			}
+
 		}
 	}
 
