@@ -51,7 +51,7 @@ public class CommandAttributes
 	/**
 	 * 
 	 * Simple get for all the different text strings
-	 * that will call the command.
+	 * that will call the command. Sorted alphabetically.
 	 * 
 	 * @return
 	 * String[] - List of all command aliases

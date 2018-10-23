@@ -1,6 +1,7 @@
 package jara;
 
 import java.awt.Color;
+import java.util.HashMap;
 
 import javax.security.auth.login.LoginException;
 
@@ -38,12 +39,16 @@ public class Core //A class for covering the global manners of the bot.
 	}
 	public static void enableCommands()
 	{
-		CommandLauncher[] commandConfigs = new CommandLauncher[CommandRegister.getRegisterSize()];
-		for (int i = 0; i<commandConfigs.length; i++)
+		HashMap<String, CommandLauncher> commands = new HashMap<>();
+		for (CommandAttributes ca : CommandRegister.getRegister())
 		{
-			commandConfigs[i] = new CommandLauncher(CommandRegister.getRegister()[i], SettingsUtil.getGlobalSettings().isCommandEnabled(CommandRegister.getRegister()[i].getCommandKey()));
+			CommandLauncher cl = new CommandLauncher(ca, SettingsUtil.getGlobalSettings().isCommandEnabled(ca.getCommandKey()));
+			for (String alias : ca.getAliases())
+			{
+				commands.put(alias.toLowerCase(), cl);
+			}
 		}
-		shardManager.addEventListener(new CommandHandler(commandConfigs));
+		shardManager.addEventListener(new CommandHandler(commands));
 	}
 	public static void startListeners()
 	{

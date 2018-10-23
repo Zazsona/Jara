@@ -6,12 +6,14 @@ import configuration.SettingsUtil;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
+import java.util.HashMap;
+
 public class CommandHandler extends ListenerAdapter 
 {
-	private final CommandLauncher[] commandLaunchers; //Contains details on all commands.
-	public CommandHandler(CommandLauncher[] commandConfigsArg)
+	private final HashMap<String, CommandLauncher> commandLaunchers; //Contains details on all commands.
+	public CommandHandler(HashMap<String, CommandLauncher> commandLaunchers)
 	{
-		commandLaunchers = commandConfigsArg.clone();
+		this.commandLaunchers = commandLaunchers;
 	}
 	
 	@Override 
@@ -24,35 +26,48 @@ public class CommandHandler extends ListenerAdapter
 
 			if (commandString.startsWith(commandPrefix))									   //Prefix to signify that a command is being called.
 			{
+
 				String[] command = commandString.split(" ");							   //Separating parameters.
-				String key = command[0].replaceFirst(commandPrefix, "");
+				String key = command[0].replaceFirst(commandPrefix, "").toLowerCase();
 
-				int min = 0;
-				int max = commandLaunchers.length;
-				while (min <= max)
+				CommandLauncher cl = commandLaunchers.get(key);
+				if (cl == null)
 				{
-					int mid = (max+min)/2;
+					cl = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandLauncher(key.toLowerCase());
 
-					if (commandLaunchers[mid].getCommandKey().compareToIgnoreCase(key) < 0)
+					if (cl == null)
 					{
-						min = mid+1;
-					}
-					else if (commandLaunchers[mid].getCommandKey().compareToIgnoreCase(key) > 0)
-					{
-						max = mid-1;
-					}
-					else if (commandLaunchers[mid].getCommandKey().compareToIgnoreCase(key) == 0)
-					{
-						commandLaunchers[mid].execute(msgEvent, command);
-						return;
+						for (String customCommandKey : SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandMap().keySet())
+						{
+							cl = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandLauncher(customCommandKey);
+							String[] aliases = cl.getAliases();
+
+							int min = 0;
+							int max = aliases.length-1;
+							while (min <= max)
+							{
+								int mid = (max+min)/2;
+
+								if (aliases[mid].compareToIgnoreCase(key) < 0)
+								{
+									min = mid+1;
+								}
+								else if (aliases[mid].compareToIgnoreCase(key) > 0)
+								{
+									max = mid-1;
+								}
+								else if (aliases[mid].compareToIgnoreCase(key) == 0)
+								{
+									break;
+								}
+							}
+							cl = null; //We haven't found any valid command launcher.
+						}
 					}
 				}
-
-				//The command was not found in the global register, so let's check out the custom one.
-				CustomCommandLauncher ccl = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandLauncher(key.toLowerCase());
-				if (ccl != null)
+				if (cl != null)
 				{
-					ccl.execute(msgEvent, command);
+					cl.execute(msgEvent, command);
 				}
 			}
 		}
