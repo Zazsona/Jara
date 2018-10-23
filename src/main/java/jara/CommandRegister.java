@@ -1,15 +1,13 @@
 package jara;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
 import commands.Command;
 import commands.CustomCommand;
 import commands.Help;
-import commands.admin.AddCommand;
+import commands.admin.CustomCommandManager;
 import commands.admin.config.ConfigMain;
 import commands.audio.*;
 import commands.games.*;
@@ -83,7 +81,7 @@ public class CommandRegister
 			register.add(new CommandAttributes("NowPlaying", "Current track details.", NowPlaying.class, new String[] {"NP", "CP", "CurrentlyPlaying", "TrackInfo", "SongInfo", "MusicInfo", "AudioInfo"}, AUDIO, true));
 			register.add(new CommandAttributes("Pause", "Pauses current track.", Pause.class, new String[] {"Resume"}, AUDIO, true));
 			register.add(new CommandAttributes("Replay", "Adds current track to queue again.", Replay.class, new String[] {"Repeat"}, AUDIO, true));
-			register.add(new CommandAttributes("AddCommand", "Adds a custom command.", AddCommand.class, new String[] {"CustomCommand"}, ADMIN, true));
+			register.add(new CommandAttributes("CustomCommandManager", "Manage custom commands.", CustomCommandManager.class, new String[] {"AddCustomCommand", "EditCustomCommand", "RemoveCustomCommand", "DeleteCustomCommand", "CustomCommands", "CCM"}, ADMIN, true));
 			register.add(new CommandAttributes("CustomCommand", "Custom Command Template.", CustomCommand.class, new String[0], NOGROUP, false)); //TODO: Make this disableable
 			register.add(new CommandAttributes("LastWord", "Get the last word in.", LastWord.class, new String[] {"TheLastWord", "Scattergories", "Topics"}, GAMES, true));
 			register.add(new CommandAttributes("PassTheBomb", "Quick! Pass the bomb!", PassTheBomb.class, new String[] {"HotPotato", "BombPass"}, GAMES, true));
@@ -277,18 +275,18 @@ public class CommandRegister
 	{
 		switch (id) 
 		{
-		case NOGROUP:
-			return "No Group";
-		case GAMES:
-			return "Games";
-		case UTILITY:
-			return "Utility";
-		case TOYS:
-			return "Toys";
-		case AUDIO:
-			return "Audio";
-		case ADMIN:
-			return "Admin";
+			case NOGROUP:
+				return "No Group";
+			case GAMES:
+				return "Games";
+			case UTILITY:
+				return "Utility";
+			case TOYS:
+				return "Toys";
+			case AUDIO:
+				return "Audio";
+			case ADMIN:
+				return "Admin";
 		}
 		return null; //Invalid id.
 	}
@@ -319,7 +317,7 @@ public class CommandRegister
 			case "admin":
 				return ADMIN;
 		}
-		return null; //Invalid nsme.
+		return null; //Invalid name.
 	}
 
 	/**
