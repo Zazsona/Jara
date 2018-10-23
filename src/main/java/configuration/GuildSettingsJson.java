@@ -2,8 +2,11 @@ package configuration;
 
 import jara.CommandRegister;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public abstract class GuildSettingsJson
 {
@@ -101,6 +104,14 @@ public abstract class GuildSettingsJson
          * The text that will be returned when a user calls the command.
          */
         private String message;
+        /**
+         * A list of roles to add/remove to the user
+         */
+        private ArrayList<String> roleIDs;
+        /**
+         * The audio link to play.
+         */
+        private String audioLink;
 
         /**
          * @return
@@ -142,15 +153,81 @@ public abstract class GuildSettingsJson
         }
 
         /**
+         * @return
+         */
+        public String getAudioLink()
+        {
+            return audioLink;
+        }
+
+        /**
+         * @return
+         */
+        public ArrayList<String> getRoles()
+        {
+            return (ArrayList<String>) roleIDs.clone();
+        }
+
+        public void modifyAliases(String... aliases)
+        {
+            ArrayList<String> aliasesList = new ArrayList<>();
+            aliasesList.addAll(Arrays.asList(this.aliases));
+            for (String alias : aliases)
+            {
+                if (aliasesList.contains(alias))
+                {
+                    aliasesList.remove(alias);
+                }
+                else
+                {
+                    aliasesList.add(alias);
+                }
+            }
+            this.aliases = aliasesList.toArray(aliases);
+        }
+
+        public void setDescription(String description)
+        {
+            this.description = description;
+        }
+        public void setCategory(CommandRegister.Category category)
+        {
+            this.category = category;
+        }
+        public void setMessage(String message)
+        {
+            this.message = message;
+        }
+        public void modifyRoles(String... roleIDs)
+        {
+            for (String roleID : roleIDs)
+            {
+                if (this.roleIDs.contains(roleID))
+                {
+                    this.roleIDs.remove(roleID);
+                }
+                else
+                {
+                    this.roleIDs.add(roleID);
+                }
+            }
+        }
+        public void setAudioLink(String audioLink)
+        {
+            this.audioLink = audioLink;
+        }
+        /**
          * Constructor
          */
-        protected CustomCommandConfig(String key, String[] aliases, String description, CommandRegister.Category category, String message)
+        protected CustomCommandConfig(String key, String[] aliases, String description, CommandRegister.Category category, ArrayList<String> roleIDs, String audioLink, String message)
         {
             this.key = key;
             this.aliases = aliases;
             this.description = description;
             this.category = category;
             this.message = message;
+            this.roleIDs = roleIDs;
+            this.audioLink = audioLink;
         }
     }
 }

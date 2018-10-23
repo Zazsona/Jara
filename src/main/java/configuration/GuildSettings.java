@@ -454,16 +454,26 @@ public class GuildSettings extends GuildSettingsJson
      * Adda a custom command for this guild. These are simple commands which users can make which will simply reply back with a predefined message.
      * @param key
      * @param aliases
+     * @param description
      * @param category
+     * @param roleIDs
+     * @param audioLink
      * @param message
-     * @param enabled
-     * @param permissions
+     *
+     * @return
+     * CustomCommandConfig - The new Command<br>
+     * null - A command with that key already exists.
      */
-    public void addCustomCommand(String key, String[] aliases, String description, CommandRegister.Category category, String message, boolean enabled, ArrayList<String> permissions)
+    public CustomCommandConfig addCustomCommand(String key, String[] aliases, String description, CommandRegister.Category category, ArrayList<String> roleIDs, String audioLink, String message)
     {
         key = key.toLowerCase();
-        customCommandsConfig.put(key, new CustomCommandConfig(key, aliases, description, category, message));
+        if (customCommandsConfig.containsKey(key))
+        {
+            return null;
+        }
+        customCommandsConfig.put(key, new CustomCommandConfig(key, aliases, description, category, roleIDs, audioLink, message));
         commandConfig.put(key, new CommandConfig(true, new ArrayList<>()));
+        return customCommandsConfig.get(key);
     }
 
     /**
