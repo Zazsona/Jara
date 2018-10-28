@@ -20,10 +20,11 @@ public class ConfigAudioSettings
         this.channel = channel;
     }
 
-    public void showMenu(GuildMessageReceivedEvent msgEvent)
+    public void showMenu(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
-        embed.setDescription("What would you like to modify?\n**Skip Votes**\n**Voice Leaving**");
+        String embedDescription = "What would you like to modify?\nSay `quit` to close this menu.\n**Skip Votes**\n**Voice Leaving**";
+        embed.setDescription(embedDescription);
         channel.sendMessage(embed.build()).queue();
 
         while (true)
@@ -35,27 +36,27 @@ public class ConfigAudioSettings
                 if (msgContent.equalsIgnoreCase("skip votes") || msgContent.equalsIgnoreCase("skipvotes"))
                 {
                     modifySkipVotes(msgEvent);
-                    break;
                 }
                 else if (msgContent.equalsIgnoreCase("voice leaving") || msgContent.equalsIgnoreCase("voiceleaving"))
                 {
                     modifyVoiceLeaving(msgEvent);
-                    break;
                 }
-                else if (msgContent.equalsIgnoreCase("/quit") || msgContent.equalsIgnoreCase("/exit"))
+                else if (msgContent.equalsIgnoreCase("quit"))
                 {
-                    break;
+                    return;
                 }
                 else
                 {
                     embed.setDescription("Unrecognised category. Please try again.");
                     channel.sendMessage(embed.build()).queue();
+                    embed.setDescription(embedDescription);
                 }
+                channel.sendMessage(embed.build()).queue();
             }
         }
     }
 
-    public void modifySkipVotes(GuildMessageReceivedEvent msgEvent)
+    private void modifySkipVotes(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
         StringBuilder descBuilder = new StringBuilder();
@@ -76,45 +77,36 @@ public class ConfigAudioSettings
                 response = response.replace("%", "");
                 if (Pattern.matches("[0-9]*", response))
                 {
-                    guildSettings.setTrackSkipPercent(Integer.parseInt(response));
-                    try
+                    int percentage = Integer.parseInt(response);
+                    if (percentage < 0 || percentage > 100)
                     {
-                        guildSettings.save();
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                        embed.setDescription("An error occurred when saving settings.");
+                        embed.setDescription("Invalid percentage value. Please enter a value between 0 and 100.");
                         channel.sendMessage(embed.build()).queue();
                     }
-                    catch (NumberFormatException e)
+                    else
                     {
-                        embed.setDescription("Unknown percentage value. Please enter a percentage.");
-                        channel.sendMessage(embed.build());
+                        guildSettings.setTrackSkipPercent(Integer.parseInt(response));
+                        guildSettings.save();
+                        embed.setDescription("Skip percentage has been set to "+response+"%.");
+                        channel.sendMessage(embed.build()).queue();
+                        break;
                     }
-
-                    embed.setDescription("Skip percentage has been set to "+response+"%.");
-                    channel.sendMessage(embed.build()).queue();
                 }
                 else
                 {
                     embed.setDescription("Unknown percentage value. Please enter a percentage.");
-                    channel.sendMessage(embed.build());
+                    channel.sendMessage(embed.build()).queue();
                 }
             }
         }
     }
 
-    private void modifyVoiceLeaving(GuildMessageReceivedEvent msgEvent)
+    private void modifyVoiceLeaving(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
-        StringBuilder descBuilder = new StringBuilder();
-        if (!guildSettings.getGameCategoryId().equals(""))
-        {
-            descBuilder.append("Current value: **").append(guildSettings.isVoiceLeavingEnabled()).append("**\n\n");
-        }
-        descBuilder.append("This setting will make it so the bot leaves the voice channel when no audio is playing.\n\n Would you like to enable it? [Y/n]");
-        embed.setDescription(descBuilder.toString());
+        String descBuilder = "Current value: **" + guildSettings.isVoiceLeavingEnabled() + "**\n\n" +
+                "This setting will make it so the bot leaves the voice channel when no audio is playing.\n\n Would you like to enable it? [Y/n]";
+        embed.setDescription(descBuilder);
         channel.sendMessage(embed.build()).queue();
 
         while (true)
@@ -126,17 +118,7 @@ public class ConfigAudioSettings
                 if (response.startsWith("y"))
                 {
                     guildSettings.setVoiceLeaving(true);
-                    try
-                    {
-                        guildSettings.save();
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                        embed.setDescription("An error occurred when saving settings.");
-                        channel.sendMessage(embed.build()).queue();
-                    }
-
+                    guildSettings.save();
                     embed.setDescription("Voice Leaving has been enabled.");
                     channel.sendMessage(embed.build()).queue();
                     break;
@@ -144,16 +126,7 @@ public class ConfigAudioSettings
                 else if (response.startsWith("n"))
                 {
                     guildSettings.setVoiceLeaving(false);
-                    try
-                    {
-                        guildSettings.save();
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                        embed.setDescription("An error occurred when saving settings.");
-                        channel.sendMessage(embed.build()).queue();
-                    }
+                    guildSettings.save();
                     embed.setDescription("Voice Leaving has been disabled.");
                     channel.sendMessage(embed.build()).queue();
                     break;

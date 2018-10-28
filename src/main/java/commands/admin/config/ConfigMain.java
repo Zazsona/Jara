@@ -10,7 +10,7 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
-import java.util.regex.Pattern;
+import java.io.IOException;
 
 public class ConfigMain extends Command
 {
@@ -18,40 +18,63 @@ public class ConfigMain extends Command
     public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
     {
         TextChannel channel = msgEvent.getChannel();
+        MessageManager mm = new MessageManager();
         EmbedBuilder embed = getEmbedStyle(msgEvent);
-        if (parameters.length == 1)
+        String embedDescription = "Welcome to the Config\nPlease select a menu, or say `quit` to cancel.";
+        embed.setDescription(embedDescription);
+        embed.addField("Menus", "**Prefix**\n**AudioSettings**\n**GameSettings**\n**CommandSettings**\n**Reset**", true);
+        channel.sendMessage(embed.build()).queue();
+        try
         {
-            embed.setDescription("Welcome to the Config\nTo select a menu, use `"+SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId())+"config [selection]`.");
-            embed.addField("Menus", "**Prefix**\n**AudioSettings**\n**GameSettings**\n**CommandSettings**\n**Reset**", true);
-            channel.sendMessage(embed.build()).queue();
+            while (true)
+            {
+                Message msg = mm.getNextMessage(channel);
+                if (SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+                {
+                    String selection = msg.getContentDisplay();
+                    final GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
+                    if (selection.equalsIgnoreCase("prefix"))
+                    {
+                        new ConfigMainSettings(guildSettings, channel).modifyPrefix(msgEvent);
+                    }
+                    else if (selection.equalsIgnoreCase("audiosettings"))
+                    {
+                        new ConfigAudioSettings(guildSettings, channel).showMenu(msgEvent);
+                    }
+                    else if (selection.equalsIgnoreCase("gamesettings"))
+                    {
+                        new ConfigGameSettings(guildSettings, channel).showMenu(msgEvent);
+                    }
+                    else if (selection.equalsIgnoreCase("commandsettings"))
+                    {
+                        new ConfigCommandSettings(guildSettings, channel).showMenu(msgEvent);
+                    }
+                    else if (selection.equalsIgnoreCase("reset"))
+                    {
+                        //TODO: Make a guild setup wizard and link to it here.
+                    }
+                    else if (selection.equalsIgnoreCase("quit"))
+                    {
+                        embed.setDescription("Config closed.");
+                        embed.clearFields();
+                        channel.sendMessage(embed.build()).queue();
+                        break;
+                    }
+                    else
+                    {
+                        embed.setDescription("Unknown menu: "+selection+". To quit, enter \"quit\".");
+                        channel.sendMessage(embed.build()).queue();
+                        embed.setDescription(embedDescription);
+                    }
+                    channel.sendMessage(embed.build()).queue();
+                }
+            }
         }
-        else if (parameters.length > 1)
+        catch (IOException e)
         {
-            final GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
-            if (parameters[1].equalsIgnoreCase("prefix"))
-            {
-                new ConfigMainSettings(guildSettings, channel).modifyPrefix(msgEvent);
-            }
-            else if (parameters[1].equalsIgnoreCase("audiosettings"))
-            {
-                new ConfigAudioSettings(guildSettings, channel).showMenu(msgEvent);
-            }
-            else if (parameters[1].equalsIgnoreCase("gamesettings"))
-            {
-                new ConfigGameSettings(guildSettings, channel).showMenu(msgEvent);
-            }
-            else if (parameters[1].equalsIgnoreCase("commandsettings"))
-            {
-                new ConfigCommandSettings(guildSettings, channel).showMenu(msgEvent);
-            }
-            else if (parameters[1].equalsIgnoreCase("reset"))
-            {
-                //TODO: Make a guild setup wizard and link to it here.
-            }
-            else
-            {
-                embed.setDescription("Unknown menu: "+parameters[1]);
-            }
+            e.printStackTrace();
+            embed.setDescription("An error occurred when saving settings.");
+            channel.sendMessage(embed.build()).queue();
         }
     }
 

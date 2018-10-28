@@ -20,10 +20,11 @@ public class ConfigGameSettings
         this.channel = channel;
     }
 
-    public void showMenu(GuildMessageReceivedEvent msgEvent)
+    public void showMenu(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
-        embed.setDescription("What would you like to modify?\n**Game Channels**\n**Game Category**\n**Channel Timeout**\n**Concurrent Games**");
+        String embedDescription = "What would you like to modify?\nSay `quit` to close this menu.\n**Game Channels**\n**Game Category**\n**Channel Timeout**\n**Concurrent Games**";
+        embed.setDescription(embedDescription);
         channel.sendMessage(embed.build()).queue();
 
         while (true)
@@ -35,33 +36,35 @@ public class ConfigGameSettings
                 if (msgContent.equalsIgnoreCase("Game category") || msgContent.equalsIgnoreCase("gamecategory"))
                 {
                     modifyGameCategory(msgEvent);
-                    break;
                 }
                 else if (msgContent.equalsIgnoreCase("channel timeout") || msgContent.equalsIgnoreCase("channeltimeout"))
                 {
                     modifyChannelTimeout(msgEvent);
-                    break;
                 }
                 else if (msgContent.equalsIgnoreCase("game channels") || msgContent.equalsIgnoreCase("gamechannels"))
                 {
                     modifyGameChannels(msgEvent);
-                    break;
                 }
                 else if (msgContent.equalsIgnoreCase("concurrent games") || msgContent.equalsIgnoreCase("concurrentgames"))
                 {
                     modifyConcurrentGameInChannel(msgEvent);
-                    break;
+                }
+                else if (msgContent.equalsIgnoreCase("quit"))
+                {
+                    return;
                 }
                 else
                 {
                     embed.setDescription("Unrecognised category. Please try again.");
                     channel.sendMessage(embed.build()).queue();
+                    embed.setDescription(embedDescription);
                 }
+                channel.sendMessage(embed.build()).queue();
             }
         }
     }
 
-    private void modifyGameChannels(GuildMessageReceivedEvent msgEvent)
+    private void modifyGameChannels(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
         StringBuilder descBuilder = new StringBuilder();
@@ -82,17 +85,7 @@ public class ConfigGameSettings
                 if (response.startsWith("y"))
                 {
                     guildSettings.setUseGameChannels(true);
-                    try
-                    {
-                        guildSettings.save();
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                        embed.setDescription("An error occurred when saving settings.");
-                        channel.sendMessage(embed.build()).queue();
-                    }
-
+                    guildSettings.save();
                     embed.setDescription("Game Channels has been enabled.");
                     channel.sendMessage(embed.build()).queue();
                     break;
@@ -100,16 +93,7 @@ public class ConfigGameSettings
                 else if (response.startsWith("n"))
                 {
                     guildSettings.setUseGameChannels(false);
-                    try
-                    {
-                        guildSettings.save();
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                        embed.setDescription("An error occurred when saving settings.");
-                        channel.sendMessage(embed.build()).queue();
-                    }
+                    guildSettings.save();
                     embed.setDescription("Game Channels has been disabled.");
                     channel.sendMessage(embed.build()).queue();
                     break;
@@ -126,7 +110,7 @@ public class ConfigGameSettings
             modifyGameCategory(msgEvent);
         }
     }
-    private void modifyGameCategory(GuildMessageReceivedEvent msgEvent)
+    private void modifyGameCategory(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
         StringBuilder descBuilder = new StringBuilder();
@@ -143,12 +127,6 @@ public class ConfigGameSettings
             Message msg = new MessageManager().getNextMessage(channel);
             if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
             {
-                if (msg.getContentDisplay().length() == 5 && msg.getContentDisplay().toLowerCase().endsWith("quit"))
-                {
-                    embed.setDescription("Config closed.");
-                    channel.sendMessage(embed.build()).queue();
-                    break;
-                }
                 String id = msg.getContentDisplay();
                 if (Pattern.matches(id, "[0-9]*"))
                 {
@@ -160,48 +138,24 @@ public class ConfigGameSettings
                     else
                     {
                         guildSettings.setGameCategoryId(id);
-                        try
-                        {
-                            guildSettings.save();
-                            embed.setDescription("Game Category Id set to: "+id);
-                        }
-                        catch (IOException e)
-                        {
-                            e.printStackTrace();
-                            embed.setDescription("An error occurred when saving to config.");
-                        }
-                        finally
-                        {
-                            channel.sendMessage(embed.build()).queue();
-                        }
-                        break;
+                        guildSettings.save();
+                        embed.setDescription("Game Category Id set to: "+id);
+                        channel.sendMessage(embed.build()).queue();
                     }
                 }
                 else
                 {
                     if (channel.getGuild().getCategoriesByName(id, true).size() == 0)
                     {
-                        embed.setDescription("Category does not exist: "+id);
+                        embed.setDescription("Category does not exist: "+id+". Please try again.");
                         channel.sendMessage(embed.build()).queue();
                     }
                     else
                     {
                         id = channel.getGuild().getCategoriesByName(id, true).get(0).getId();
                         guildSettings.setGameCategoryId(id);
-                        try
-                        {
-                            guildSettings.save();
-                            embed.setDescription("Game Category Id set to: "+id);
-                        }
-                        catch (IOException e)
-                        {
-                            e.printStackTrace();
-                            embed.setDescription("An error occurred when saving to config.");
-                        }
-                        finally
-                        {
-                            channel.sendMessage(embed.build()).queue();
-                        }
+                        guildSettings.save();
+                        channel.sendMessage(embed.build()).queue();
                         break;
                     }
                 }
@@ -210,7 +164,7 @@ public class ConfigGameSettings
 
 
     }
-    private void modifyChannelTimeout(GuildMessageReceivedEvent msgEvent)
+    private void modifyChannelTimeout(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
         StringBuilder descBuilder = new StringBuilder();
@@ -231,96 +185,68 @@ public class ConfigGameSettings
             Message msg = new MessageManager().getNextMessage(channel);
             if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
             {
-                if (msg.getContentDisplay().length() == 5 && msg.getContentDisplay().toLowerCase().endsWith("quit"))
-                {
-                    embed.setDescription("Config closed.");
-                    channel.sendMessage(embed.build()).queue();
-                    break;
-                }
                 String timeout = msg.getContentDisplay();
                 if (Pattern.matches(timeout, "[0-9]*"))
                 {
                     guildSettings.setGameChannelTimeout(timeout);
-                    try
+                    guildSettings.save();
+                    if (timeout.length() >= 10)
                     {
-                        guildSettings.save();
-                        if (timeout.length() >= 3)
-                        {
-                            embed.setDescription("Game Channel Timeout set to a whopping "+timeout+"\n\nRemember, this feature can be disabled by setting minutes to 0.");
-                        }
-                        else
-                        {
-                            embed.setDescription("Game Channel Timeout set to: "+timeout);
-                        }
-
+                        embed.setDescription("Game Channel Timeout set to a whopping "+timeout+"\n\nRemember, this feature can be disabled by setting minutes to 0.");
                     }
-                    catch (IOException e)
+                    else
                     {
-                        e.printStackTrace();
-                        embed.setDescription("An error occurred when saving to config.");
+                        embed.setDescription("Game Channel Timeout set to: "+timeout);
                     }
-                    finally
-                    {
-                        channel.sendMessage(embed.build()).queue();
-                    }
+                    channel.sendMessage(embed.build()).queue();
                     break;
                 }
                 else
                 {
-                    embed.setDescription("Could not find a valid timeout value");
-                    channel.sendMessage(embed.build());
+                    embed.setDescription("Could not find a valid timeout value. Please try again.");
+                    channel.sendMessage(embed.build()).queue();
                 }
             }
 
         }
     }
 
-    private void modifyConcurrentGameInChannel(GuildMessageReceivedEvent msgEvent)
+    private void modifyConcurrentGameInChannel(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
-        try
-        {
-            StringBuilder descBuilder = new StringBuilder();
-            descBuilder.append("Current value: **").append(guildSettings.isConcurrentGameInChannelAllowed()).append("**\n\n");
-            descBuilder.append("This setting modified the ability to have multiple games run simultaneously in the same channel. The setting is only relevant if game channels are disabled.\n\n Enable concurrent games in a single channel? [Y/n]");
-            embed.setDescription(descBuilder.toString());
-            channel.sendMessage(embed.build()).queue();
+        String descBuilder = "Current value: **" + guildSettings.isConcurrentGameInChannelAllowed() + "**\n\n" +
+                "This setting modified the ability to have multiple games run simultaneously in the same channel. The setting is only relevant if game channels are disabled.\n\n Enable concurrent games in a single channel? [Y/n]";
+        embed.setDescription(descBuilder);
+        channel.sendMessage(embed.build()).queue();
 
-            while (true)
+        while (true)
+        {
+            Message msg = new MessageManager().getNextMessage(channel);
+            if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
             {
-                Message msg = new MessageManager().getNextMessage(channel);
-                if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+                String response = msg.getContentDisplay().toLowerCase();
+                if (response.startsWith("y"))
                 {
-                    String response = msg.getContentDisplay().toLowerCase();
-                    if (response.startsWith("y"))
-                    {
-                        guildSettings.setConcurrentGameInChannelAllowed(true);
-                        guildSettings.save();
-                        embed.setDescription("Concurrent games have been enabled.");
-                        channel.sendMessage(embed.build()).queue();
-                        break;
-                    }
-                    else if (response.startsWith("n"))
-                    {
-                        guildSettings.setConcurrentGameInChannelAllowed(false);
-                        guildSettings.save();
-                        embed.setDescription("Concurrent games have been disabled.");
-                        channel.sendMessage(embed.build()).queue();
-                        break;
-                    }
-                    else
-                    {
-                        embed.setDescription("Unknown response. Would you like to enable concurrent games in a channel? [Y/n]");
-                        channel.sendMessage(embed.build()).queue();
-                    }
+                    guildSettings.setConcurrentGameInChannelAllowed(true);
+                    guildSettings.save();
+                    embed.setDescription("Concurrent games have been enabled.");
+                    channel.sendMessage(embed.build()).queue();
+                    break;
+                }
+                else if (response.startsWith("n"))
+                {
+                    guildSettings.setConcurrentGameInChannelAllowed(false);
+                    guildSettings.save();
+                    embed.setDescription("Concurrent games have been disabled.");
+                    channel.sendMessage(embed.build()).queue();
+                    break;
+                }
+                else
+                {
+                    embed.setDescription("Unknown response. Would you like to enable concurrent games in a channel? [Y/n]");
+                    channel.sendMessage(embed.build()).queue();
                 }
             }
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-            embed.setDescription("An error occurred when saving settings.");
-            channel.sendMessage(embed.build()).queue();
         }
 
     }

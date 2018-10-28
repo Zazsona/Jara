@@ -9,7 +9,6 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 import java.io.IOException;
-import java.util.regex.Pattern;
 
 public class ConfigMainSettings
 {
@@ -22,13 +21,12 @@ public class ConfigMainSettings
         this.channel = channel;
     }
 
-    public void modifyPrefix(GuildMessageReceivedEvent msgEvent)
+    public void modifyPrefix(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
-        StringBuilder descBuilder = new StringBuilder();
-        descBuilder.append("**Current Value**: ").append(SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId()));
-        descBuilder.append("\n\n").append("The prefix is the character used to summon the bot, and is entered before each command (E.g **/**Help)\nPlease enter a new prefix value.");
-        embed.setDescription(descBuilder.toString());
+        String descBuilder = "**Current Value**: " + SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId()) +
+                "\n\n" + "The prefix is the character used to summon the bot, and is entered before each command (E.g **/**Help)\nPlease enter a new prefix value.";
+        embed.setDescription(descBuilder);
         msgEvent.getChannel().sendMessage(embed.build()).queue();
 
         MessageManager mm = new MessageManager();
@@ -48,15 +46,7 @@ public class ConfigMainSettings
                 {
                     GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
                     guildSettings.setCommandPrefix(prefix.charAt(0));
-                    try
-                    {
-                        guildSettings.save();
-                    }
-                    catch (IOException e)
-                    {
-                        channel.sendMessage("An error occurred when saving.").queue();
-                        e.printStackTrace();
-                    }
+                    guildSettings.save();
                     SettingsUtil.refreshGuildCommandPrefix(msgEvent.getGuild().getId());
                     embed.setDescription("Prefix set to "+prefix);
                     channel.sendMessage(embed.build()).queue();
@@ -64,7 +54,7 @@ public class ConfigMainSettings
                 }
                 else
                 {
-                    embed.setDescription("Invalid prefix. The prefix can only be 1 character long.");
+                    embed.setDescription("Invalid prefix. The prefix can only be 1 character long. Please try again.");
                     channel.sendMessage(embed.build()).queue();
                 }
             }
