@@ -59,6 +59,11 @@ public abstract class GuildSettingsJson
          * The timer resets whenever a message is sent in the channel.
          */
         protected String gameChannelTimeout;
+        /**
+         * Defines whether to have multiple games running simultaneously in a single channel or not<br>
+         * This is ignored if useGameChannels is enabled, as that enforces this by design.
+         */
+        protected boolean concurrentGameInChannelAllowed;
     }
     protected class CommandConfig
     {

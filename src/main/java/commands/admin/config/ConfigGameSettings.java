@@ -23,7 +23,7 @@ public class ConfigGameSettings
     public void showMenu(GuildMessageReceivedEvent msgEvent)
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
-        embed.setDescription("What would you like to modify?\n**Game Channels**\n**Game Category**\n**Channel Timeout**");
+        embed.setDescription("What would you like to modify?\n**Game Channels**\n**Game Category**\n**Channel Timeout**\n**Concurrent Games**");
         channel.sendMessage(embed.build()).queue();
 
         while (true)
@@ -45,6 +45,11 @@ public class ConfigGameSettings
                 else if (msgContent.equalsIgnoreCase("game channels") || msgContent.equalsIgnoreCase("gamechannels"))
                 {
                     modifyGameChannels(msgEvent);
+                    break;
+                }
+                else if (msgContent.equalsIgnoreCase("concurrent games") || msgContent.equalsIgnoreCase("concurrentgames"))
+                {
+                    modifyConcurrentGameInChannel(msgEvent);
                     break;
                 }
                 else
@@ -270,6 +275,55 @@ public class ConfigGameSettings
         }
     }
 
+    private void modifyConcurrentGameInChannel(GuildMessageReceivedEvent msgEvent)
+    {
+        EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
+        try
+        {
+            StringBuilder descBuilder = new StringBuilder();
+            descBuilder.append("Current value: **").append(guildSettings.isConcurrentGameInChannelAllowed()).append("**\n\n");
+            descBuilder.append("This setting modified the ability to have multiple games run simultaneously in the same channel. The setting is only relevant if game channels are disabled.\n\n Enable concurrent games in a single channel? [Y/n]");
+            embed.setDescription(descBuilder.toString());
+            channel.sendMessage(embed.build()).queue();
+
+            while (true)
+            {
+                Message msg = new MessageManager().getNextMessage(channel);
+                if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+                {
+                    String response = msg.getContentDisplay().toLowerCase();
+                    if (response.startsWith("y"))
+                    {
+                        guildSettings.setConcurrentGameInChannelAllowed(true);
+                        guildSettings.save();
+                        embed.setDescription("Concurrent games have been enabled.");
+                        channel.sendMessage(embed.build()).queue();
+                        break;
+                    }
+                    else if (response.startsWith("n"))
+                    {
+                        guildSettings.setConcurrentGameInChannelAllowed(false);
+                        guildSettings.save();
+                        embed.setDescription("Concurrent games have been disabled.");
+                        channel.sendMessage(embed.build()).queue();
+                        break;
+                    }
+                    else
+                    {
+                        embed.setDescription("Unknown response. Would you like to enable concurrent games in a channel? [Y/n]");
+                        channel.sendMessage(embed.build()).queue();
+                    }
+                }
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            embed.setDescription("An error occurred when saving settings.");
+            channel.sendMessage(embed.build()).queue();
+        }
+
+    }
 
 
 }

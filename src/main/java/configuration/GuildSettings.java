@@ -109,6 +109,7 @@ public class GuildSettings extends GuildSettingsJson
             this.gameConfig.useGameChannels = settingsFromFile.gameConfig.useGameChannels;
             this.gameConfig.gameCategoryId = settingsFromFile.gameConfig.gameCategoryId;
             this.gameConfig.gameChannelTimeout = settingsFromFile.gameConfig.gameChannelTimeout;
+            this.gameConfig.concurrentGameInChannelAllowed = settingsFromFile.gameConfig.concurrentGameInChannelAllowed;
             this.commandConfig = new HashMap<>(settingsFromFile.commandConfig);
             if (!commandConfig.keySet().containsAll(Arrays.asList(CommandRegister.getAllCommandKeys())))
             {
@@ -147,6 +148,7 @@ public class GuildSettings extends GuildSettingsJson
         setTrackSkipPercent(50);
         setGameChannelTimeout("0");
         setGameCategoryId("");
+        setConcurrentGameInChannelAllowed(false);
     }
 
     /**
@@ -564,6 +566,24 @@ public class GuildSettings extends GuildSettingsJson
             return new CustomCommandLauncher(getCustomCommandAttributes(key));
         }
 
+    }
+
+    /**
+     * Sets the ability to have two or more games running in a channel simultaneously.
+     * @param state
+     */
+    public void setConcurrentGameInChannelAllowed(boolean state)
+    {
+        this.gameConfig.concurrentGameInChannelAllowed = state;
+    }
+
+    /**
+     * Gets if two or more games can be running in a single channel simultaneously
+     * @return
+     */
+    public boolean isConcurrentGameInChannelAllowed()
+    {
+        return this.gameConfig.concurrentGameInChannelAllowed;
     }
 
 
