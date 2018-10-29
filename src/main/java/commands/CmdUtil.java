@@ -15,6 +15,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import javax.print.URIException;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -110,43 +111,28 @@ public class CmdUtil
 
     /**
      * Loads the entire word list into memory.
-     * @return
+     * @return a list of almost every english word
      * @throws IOException
      */
     public static ArrayList<String> getWordList() throws IOException
     {
-        File localWordsFile = new File(SettingsUtil.getDirectory()+"/wordList.txt");
-        if (wordList == null)
+        try
         {
+            File wordFile = new File(CmdUtil.class.getResource("/wordList.txt").toURI());
             wordList = new ArrayList<>();
-            if (!localWordsFile.exists())
+            Scanner scanner = new Scanner(wordFile);
+            while (scanner.hasNext())
             {
-                URLConnection cloudWordsFile = new URL("https://raw.githubusercontent.com/Zazsona/Jara/master/assets/wordsList.txt").openConnection();
-                cloudWordsFile.connect();
-                Scanner scanner = new Scanner(cloudWordsFile.getInputStream());
-
-                PrintWriter printWriter = new PrintWriter(localWordsFile);
-                while (scanner.hasNext())
-                {
-                    String word = scanner.nextLine();
-                    wordList.add(word);
-                    printWriter.println(word);
-                }
-                scanner.close();
-                printWriter.close();
+                String word = scanner.nextLine();
+                wordList.add(word);
             }
-            else
-            {
-                Scanner scanner = new Scanner(localWordsFile);
-                while (scanner.hasNext())
-                {
-                    String word = scanner.nextLine();
-                    wordList.add(word);
-                }
-                scanner.close();
-            }
+            scanner.close();
+            return wordList;
         }
-        return wordList;
+        catch (URISyntaxException e)
+        {
+            throw new IOException(); //URI is hard coded, something else went wrong.
+        }
     }
 
     /**
