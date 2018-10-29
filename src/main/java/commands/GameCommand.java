@@ -30,7 +30,7 @@ public abstract class GameCommand extends Command //A base class to build comman
 	 * This is for holding channels currently running games, in order to enact the one game per channel configuration option.
 	 * It is redundant to put "GameChannels" in here if that option is enabled, as these are deleted automatically.
 	 */
-	private HashMap<String, ArrayList<String>> channelsRunningGames;
+	private HashMap<String, ArrayList<String>> channelsRunningGames = new HashMap<>();
 
 	//TODO: Option to limit channel access (Private games)
 		//- Perhaps give users the ability to define a list(s) of 'friends'?

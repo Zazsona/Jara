@@ -62,7 +62,12 @@ public class CustomCommand extends Command
         }
     }
 
-
+    /**
+     * Returns the key used to call the command
+     * @param guildID the guild in which the command was called
+     * @param call the command request
+     * @return the call key
+     */
     private String getKey(String guildID, String call)
     {
         return call.replaceFirst(SettingsUtil.getGuildCommandPrefix(guildID).toString(), "");

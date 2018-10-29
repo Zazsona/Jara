@@ -17,7 +17,11 @@ import static jara.CommandRegister.Category.*;
 @SuppressWarnings("SpellCheckingInspection")
 public class Help extends Command {
 
+	/**
+	 * The command prefix for this guild
+	 */
 	private String prefix;
+
 	@Override
 	public void run(GuildMessageReceivedEvent msgEvent, String... parameters) 
 	{
@@ -89,8 +93,8 @@ public class Help extends Command {
 
 	/**
 	 * Returns the parameters and instructions for a command.
-	 * @param key - The command key
-	 * @return ArrayList<String> Command parameters and info. Index 0 contains the instructions
+	 * @param key The command key
+	 * @return Command parameters and info. Index 0 contains the instructions
 	 */
 	private ArrayList<String> getCommandExplanation(String key, String guildID)
 	{
@@ -254,8 +258,8 @@ public class Help extends Command {
 
 	/**
 	 * Builds the page for a specific command's details
-	 * @param alias - A command alias
-	 * @return String - The command help page
+	 * @param alias A command alias
+	 * @return The command help page
 	 */
 	private String buildEmbedDesc(String alias, String guildID)
 	{
@@ -305,11 +309,11 @@ public class Help extends Command {
 	 * <br>
 	 * TL;DR, the permission check is for an easier experience, not secrecy. Consider this when setting limitToPerms as true.
 	 *
-	 * @param categoryID - The category to list
-	 * @param guildID - The guild to check permissions for
-	 * @param roleIDs - The roles to limit commands to
-	 * @param limitToPerms - Whether to limit shown commands to roles or not
-	 * @return String - The command list
+	 * @param categoryID The category to list
+	 * @param guildID The guild to check permissions for
+	 * @param roleIDs The roles to limit commands to
+	 * @param limitToPerms Whether to limit shown commands to roles or not
+	 * @return The command list
 	 */
 	private String buildCommandList(CommandRegister.Category categoryID, String guildID, ArrayList<String> roleIDs, boolean limitToPerms)
 	{

@@ -44,10 +44,9 @@ public class CmdUtil
     private static HashMap<String, Audio> guildAudios = new HashMap<>();
     /**
      * This method sends a HTTP request to the specified URL.
-     * @param URL
-     * @return
-     * String - The data returned from the request
-     * null - Error occured.
+     * @param URL the URL to send a request to
+     * @return The data returned from the request<br>
+     * null - Error occurred.
      */
     public static String sendHTTPRequest(String URL)
     {
@@ -57,11 +56,10 @@ public class CmdUtil
     /**
      * This method sends a HTTP request to the specified URL, including the specified headers.<br>
      * The HashMap's key will be used as the header name, with the data as the header data.
-     * @param URL
-     * @param headers
-     * @return
-     * String - The data returned from the request
-     * null - Error occured.
+     * @param URL the URL to send a request to
+     * @param headers the header data to include
+     * @return The data returned from the request<br>
+     * null - Error occurred.
      */
     public static String sendHTTPRequestWithHeader(String URL, HashMap<String, String> headers)
     {
@@ -137,7 +135,7 @@ public class CmdUtil
 
     /**
      * Gets a random word from the word list. If the word list is not loaded into memory, this will load it.
-     * @return String - The random word of any length
+     * @return a random word of any length
      */
     public static String getRandomWord()
     {
@@ -157,7 +155,7 @@ public class CmdUtil
     /**
      * Gets the audio instance for the guild defined by guildID
      * @param guildID the guild to get the audio instance for
-     * @return Audio - The audio instance
+     * @return The audio instance
      */
     public static Audio getGuildAudio(String guildID)
     {
@@ -176,7 +174,7 @@ public class CmdUtil
     /**
      * Gets audio track details in a pretty format
      * @param track the track to detail
-     * @return String - the formatted details
+     * @return the formatted details
      */
     public static String formatAudioTrackDetails(AudioTrack track)
     {
@@ -190,9 +188,8 @@ public class CmdUtil
 
     /**
      * Converts milliseconds to HH:mm:ss. If there are no hours, it becomes mm:ss.
-     * @param ms
-     * @return
-     * String - the time format.
+     * @param ms time to pretty in milliseconds
+     * @return the time format.
      */
     public static String formatMillisecondsToHhMmSs(long ms)
     {
@@ -219,7 +216,7 @@ public class CmdUtil
 
     /**
      * Loads the entire topic list into memory
-     * @return
+     * @return the topic list
      * @throws IOException
      */
     public static ArrayList<String> getTopicList() throws IOException
@@ -247,6 +244,11 @@ public class CmdUtil
 
     }
 
+    /**
+     * Gets a random topic based from the topic list.
+     * @return a topic
+     * @throws IOException
+     */
     public static String getRandomTopic() throws IOException
     {
         return getTopicList().get(new Random().nextInt(getTopicList().size()));
