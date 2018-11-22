@@ -7,6 +7,7 @@ import java.util.Comparator;
 import commands.Command;
 import commands.CustomCommand;
 import commands.Help;
+import commands.utility.Poll;
 import commands.admin.CustomCommandManager;
 import commands.admin.config.ConfigMain;
 import commands.audio.*;
@@ -85,7 +86,7 @@ public class CommandRegister
 			register.add(new CommandAttributes("CustomCommand", "Custom Command Template.", CustomCommand.class, new String[0], NOGROUP, false)); //TODO: Make this disableable
 			register.add(new CommandAttributes("LastWord", "Get the last word in.", LastWord.class, new String[] {"TheLastWord", "Scattergories", "Topics"}, GAMES, true));
 			register.add(new CommandAttributes("PassTheBomb", "Quick! Pass the bomb!", PassTheBomb.class, new String[] {"HotPotato", "BombPass"}, GAMES, true));
-
+			register.add(new CommandAttributes("Poll", "Get a democratic vote.", Poll.class, new String[] {"Strawpoll"}, UTILITY, true));
 			/*
 					Sort the commands into alphabetical order based on their keys
 			 */

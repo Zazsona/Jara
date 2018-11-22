@@ -1,7 +1,6 @@
 package jara;
 
 import configuration.CommandLauncher;
-import configuration.CustomCommandLauncher;
 import configuration.SettingsUtil;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -26,7 +25,6 @@ public class CommandHandler extends ListenerAdapter
 
 			if (commandString.startsWith(commandPrefix))									   //Prefix to signify that a command is being called.
 			{
-
 				String[] command = commandString.split(" ");							   //Separating parameters.
 				String key = command[0].replaceFirst(commandPrefix, "").toLowerCase();
 
