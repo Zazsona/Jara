@@ -11,15 +11,12 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
-import java.util.Random;
-import java.util.regex.Pattern;
-
 public class Connect4 extends GameCommand
 {
-    private Counter[][] counters = new Counter[7][6];
+    private final Counter[][] counters = new Counter[7][6];
     private EmbedBuilder embed;
     private TextChannel channel;
-    private MessageManager mm = new MessageManager();
+    private final MessageManager mm = new MessageManager();
     private Member player1;
     private Member player2;
     private boolean isPlayer1Turn = true;
@@ -60,6 +57,7 @@ public class Connect4 extends GameCommand
         }
         try
         {
+            embed.setThumbnail("https://i.imgur.com/rIBssX0.png");
             if (winner.equals(Counter.NONE))
             {
                 sendBoard("**The board is full. Game over!**");
@@ -88,7 +86,7 @@ public class Connect4 extends GameCommand
     private void sendBoard(String customMessage)
     {
         StringBuilder descBuilder = new StringBuilder();
-        descBuilder.append(customMessage+"\n\n");
+        descBuilder.append(customMessage).append("\n\n");
         descBuilder.append(":regional_indicator_a: :regional_indicator_b: :regional_indicator_c: :regional_indicator_d: :regional_indicator_e: :regional_indicator_f: :regional_indicator_g:\n\n");
         for (int j = counters[0].length-1; j>-1; j--)
         {
@@ -124,7 +122,7 @@ public class Connect4 extends GameCommand
             Message msg = mm.getNextMessage(channel);
             int column;
 
-            if (msg.getContentDisplay().matches("[A-Ga-g]") || msg.getContentDisplay().equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId()) + "quit")) //Ifit is a valid input
+            if (msg.getContentDisplay().matches("[A-Ga-g]") || msg.getContentDisplay().equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId()) + "quit")) //If it is a valid input
             {
                 if (player1 == null && isPlayer1Turn)
                 {
