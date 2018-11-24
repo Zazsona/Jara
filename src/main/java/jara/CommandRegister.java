@@ -87,6 +87,7 @@ public class CommandRegister
 			register.add(new CommandAttributes("LastWord", "Get the last word in.", LastWord.class, new String[] {"TheLastWord", "Scattergories", "Topics"}, GAMES, true));
 			register.add(new CommandAttributes("PassTheBomb", "Quick! Pass the bomb!", PassTheBomb.class, new String[] {"HotPotato", "BombPass"}, GAMES, true));
 			register.add(new CommandAttributes("Poll", "Get a democratic vote.", Poll.class, new String[] {"Strawpoll"}, UTILITY, true));
+			register.add(new CommandAttributes("Connect4", "Get four in a row to win.", Connect4.class, new String[] {"ConnectFour", "FourInARow", "4InARow"}, GAMES, true));
 			/*
 					Sort the commands into alphabetical order based on their keys
 			 */
