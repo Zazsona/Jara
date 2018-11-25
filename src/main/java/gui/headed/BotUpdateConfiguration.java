@@ -103,7 +103,7 @@ public class BotUpdateConfiguration extends Application
             bottomSpacePane.setMaxHeight(topSpacePane.getMaxHeight());
             bottomSpacePane.setPrefHeight(topSpacePane.getPrefHeight());
 
-            switch (ca.getCategoryID())
+            switch (ca.getCategory())
             {
                 case GAMES:
                     gamesList.getChildren().addAll(topSpacePane, generateCommandListElement(ca), bottomSpacePane);
@@ -207,11 +207,11 @@ public class BotUpdateConfiguration extends Application
         ArrayList<CommandRegister.Category> supportedCategories = new ArrayList<>();
         for (CommandAttributes ca : CommandRegister.getRegister())
         {
-            if (!supportedCategories.contains(ca.getCategoryID()) && ca.getCategoryID() != NOGROUP)
+            if (!supportedCategories.contains(ca.getCategory()) && ca.getCategory() != NOGROUP)
             {
                 if (((CheckBox) botUpdateConfigurationScreen.lookup("#"+ca.getCommandKey()+"CheckBox")).isSelected())
                 {
-                    supportedCategories.add(ca.getCategoryID());
+                    supportedCategories.add(ca.getCategory());
                 }
             }
         }
@@ -228,7 +228,7 @@ public class BotUpdateConfiguration extends Application
 
         for (CommandAttributes ca : CommandRegister.getRegister())
         {
-            if (CommandRegister.getCommand(ca.getCommandKey()).getCategoryID() != NOGROUP)
+            if (CommandRegister.getCommand(ca.getCommandKey()).getCategory() != NOGROUP)
             {
                 commandConfig.put(ca.getCommandKey(), ((CheckBox) botUpdateConfigurationScreen.lookup("#"+ca.getCommandKey()+"CheckBox")).isSelected());
             }

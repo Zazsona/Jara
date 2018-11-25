@@ -91,7 +91,7 @@ public class CommandConfigSetup
             bottomSpacePane.setMaxHeight(topSpacePane.getMaxHeight());
             bottomSpacePane.setPrefHeight(topSpacePane.getPrefHeight());
 
-            switch (ca.getCategoryID())
+            switch (ca.getCategory())
             {
                 case GAMES:
                     gamesList.getChildren().addAll(topSpacePane, generateCommandListElement(ca), bottomSpacePane);
@@ -204,11 +204,11 @@ public class CommandConfigSetup
         ArrayList<CommandRegister.Category> supportedCategories = new ArrayList<>();
         for (CommandAttributes ca : CommandRegister.getRegister())
         {
-            if (!supportedCategories.contains(ca.getCategoryID()) && ca.getCategoryID() != NOGROUP)
+            if (!supportedCategories.contains(ca.getCategory()) && ca.getCategory() != NOGROUP)
             {
                 if (((CheckBox) ccSetupScreen.lookup("#"+ca.getCommandKey()+"CheckBox")).isSelected())
                 {
-                    supportedCategories.add(ca.getCategoryID());
+                    supportedCategories.add(ca.getCategory());
                 }
             }
         }
@@ -225,7 +225,7 @@ public class CommandConfigSetup
 
         for (CommandAttributes ca : CommandRegister.getRegister())
         {
-            if (CommandRegister.getCommand(ca.getCommandKey()).getCategoryID() != NOGROUP)
+            if (CommandRegister.getCommand(ca.getCommandKey()).getCategory() != NOGROUP)
             {
                 commandConfig.put(ca.getCommandKey(), ((CheckBox) ccSetupScreen.lookup("#"+ca.getCommandKey()+"CheckBox")).isSelected());
             }

@@ -325,7 +325,7 @@ public class Help extends Command {
 		Collections.addAll(cas, CommandRegister.getCommandsInCategory(categoryID));
 		for (String key : guildSettings.getCustomCommandMap().keySet())
 		{
-			if (guildSettings.getCustomCommandAttributes(key).getCategoryID() == categoryID)
+			if (guildSettings.getCustomCommandAttributes(key).getCategory() == categoryID)
 			{
 				cas.add(guildSettings.getCustomCommandAttributes(key));
 			}

@@ -264,7 +264,7 @@ public class CommandRegister
 	 */
 	public static Category getCommandCategory(String key)
 	{
-		return getCommand(key).getCategoryID();
+		return getCommand(key).getCategory();
 	}
 	/**
 	 * Converts a category ID into a category name.
@@ -389,7 +389,7 @@ public class CommandRegister
 		ArrayList<CommandAttributes> categoryCommands = new ArrayList<>();
 		for (CommandAttributes cmdAttributes : register)
 		{
-			if (cmdAttributes.getCategoryID() == categoryID)
+			if (cmdAttributes.getCategory() == categoryID)
 			{
 				categoryCommands.add(cmdAttributes);
 			}
