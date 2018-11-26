@@ -19,9 +19,16 @@ import java.util.jar.JarFile;
 
 public class ModuleManager
 {
-    Logger logger = LoggerFactory.getLogger(getClass());
+    /**
+     * Logger
+     */
+    private static final Logger logger = LoggerFactory.getLogger(ModuleManager.class);
 
-    public LinkedList<CommandAttributes> getAllCommandAttributes()
+    /**
+     * Parses through each jar within the modules folder and gathers its {@link CommandAttributes}.
+     * @return the list of {@link CommandAttributes}
+     */
+    public static LinkedList<CommandAttributes> getAllCommandAttributes()
     {
         LinkedList<CommandAttributes> cas = new LinkedList<>();
         File moduleDir = new File(SettingsUtil.getDirectory() + "/modules/");
@@ -34,7 +41,9 @@ public class ModuleManager
             {
                 if (file.isFile() && file.getName().endsWith(".jar"))
                 {
-                    cas.add(getCommandAttributes(file.getPath()));
+                    CommandAttributes ca = getCommandAttributes(file.getPath());
+                    if (ca != null)
+                        cas.add(ca);
                 }
             }
             catch (IOException e)
@@ -49,13 +58,29 @@ public class ModuleManager
         return cas;
     }
 
-    private CommandAttributes getCommandAttributes(String jarPath) throws ClassNotFoundException, IOException
+    /**
+     * Gets the {@link CommandAttributes} for the specified jar.
+     * @param jarPath the jar to analyse
+     * @return the attributes of the command in the module, or null if unavailable
+     * @throws ClassNotFoundException jar layout is invalid
+     * @throws IOException unable to access jar
+     */
+    private static CommandAttributes getCommandAttributes(String jarPath) throws ClassNotFoundException, IOException
     {
+        CommandAttributes ca = null;
         JarFile jarFile = new JarFile(jarPath);
         Enumeration<JarEntry> entries = jarFile.entries();
 
-        URL[] urls = { new URL("jar:file:" + jarPath + "!/") };
+        URL[] urls = {new URL("jar:file:" + jarPath + "!/")};
         URLClassLoader cl = URLClassLoader.newInstance(urls);
+
+        JarEntry jarPact = jarFile.getJarEntry("pact.json");
+        if (jarPact == null)
+        {
+            logger.error(jarFile.getName() + " has no pact.");
+            return null;
+        }
+
         while (entries.hasMoreElements())
         {
             JarEntry jarEntry = entries.nextElement();
@@ -69,20 +94,26 @@ public class ModuleManager
 
             if (Command.class.isAssignableFrom(c))
             {
-                JarEntry jarPact = jarFile.getJarEntry("pact.json");
-                if (jarPact == null)
-                {
-                    logger.error(jarFile.getName() + " has no pact.");
-                    break;
-                }
                 CommandAttributes pactCA = getAttributesInPact(jarFile, jarPact);
-                return new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), c, pactCA.getAliases(), pactCA.getCategory(), pactCA.isDisableable());
+                ca = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), c, pactCA.getAliases(), pactCA.getCategory(), pactCA.isDisableable());
             }
         }
-        return null;
+        if (ca == null)
+        {
+            logger.info(jarFile.getName()+" has no entry point. (That is, a class that extends Command)");                  //Some (few) modules won't be commands. This allows for that possibility along with highlighting the error in case it is intended to be a command.
+            return null;
+        }
+        return ca;
     }
 
-    private CommandAttributes getAttributesInPact(JarFile jarFile, JarEntry jarPact) throws IOException
+    /**
+     * Gets the attributes defined in the pact file and converts them to {@link CommandAttributes}.
+     * @param jarFile the jar of the module
+     * @param jarPact the pact
+     * @return the {@link CommandAttributes} defined in the pact. The class will be null.
+     * @throws IOException unable to access pact
+     */
+    private static CommandAttributes getAttributesInPact(JarFile jarFile, JarEntry jarPact) throws IOException
     {
         InputStreamReader is = new InputStreamReader(jarFile.getInputStream(jarPact));
         BufferedReader br = new BufferedReader(is);
