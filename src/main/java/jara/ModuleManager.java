@@ -12,13 +12,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Enumeration;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class ModuleManager
 {
+    private static HashSet<String> reservedAliases;
     /**
      * Logger
      */
@@ -30,6 +30,7 @@ public class ModuleManager
      */
     public static LinkedList<CommandAttributes> getAllCommandAttributes()
     {
+        reservedAliases = new HashSet<>();
         LinkedList<CommandAttributes> cas = new LinkedList<>();
         File moduleDir = new File(SettingsUtil.getDirectory() + "/modules/");
         if (!moduleDir.exists())
@@ -43,7 +44,11 @@ public class ModuleManager
                 {
                     CommandAttributes ca = getCommandAttributes(file.getPath());
                     if (ca != null)
+                    {
                         cas.add(ca);
+                        reservedAliases.addAll(Arrays.asList(ca.getAliases()));
+                    }
+
                 }
             }
             catch (IOException e)
@@ -95,6 +100,31 @@ public class ModuleManager
             if (Command.class.isAssignableFrom(c))
             {
                 CommandAttributes pactCA = getAttributesInPact(jarFile, jarPact);
+                /*
+                    Here we check to ensure there isn't any alias overlap, as this would cause issues with alias hunting.
+                 */
+                if (!Collections.disjoint(reservedAliases, Arrays.asList(pactCA.getAliases()))); //Fucking arrays.
+                {
+                    logger.info(jarFile.getName()+" has overlapping aliases in the pact:");
+                    ArrayList<String> aliases = new ArrayList<>();
+                    for (String alias : pactCA.getAliases())
+                    {
+                        if (!reservedAliases.contains(alias))
+                        {
+                            aliases.add(alias);
+                        }
+                        else
+                        {
+                            logger.info(alias);
+                        }
+                    }
+                    logger.info("These will be ignored from "+jarFile.getName());
+                    if (aliases.size() == 0)
+                    {
+                        logger.error(jarEntry.getName()+" has NO non-conflicting aliases. It cannot be run.");
+                    }
+                    pactCA = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), c, aliases.toArray(pactCA.getAliases()), pactCA.getCategory(), pactCA.isDisableable()); //TODO: Maybe it's time to add some setters.
+                }
                 ca = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), c, pactCA.getAliases(), pactCA.getCategory(), pactCA.isDisableable());
             }
         }
@@ -126,4 +156,7 @@ public class ModuleManager
         Gson gson = new Gson();
         return gson.fromJson(jsonBuilder.toString(), CommandAttributes.class);
     }
+
+    //TODO: Prevent key overlap (Do not load the module in this case?)
+    //TODO: Help menus
 }
