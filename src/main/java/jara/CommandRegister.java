@@ -60,6 +60,8 @@ public class CommandRegister
 			 * I also highly recommend you include details about the command in Help, such as parameters and what it does. Aliases and category will be done automatically.
 			 * ===========================================
 			 */
+
+			//TODO: Move (most) of these to modules.
 			register.add(new CommandAttributes("Ping", "Tests the connection.", Ping.class, new String[] {"Pong", "Test"}, UTILITY, true));
 			register.add(new CommandAttributes("Report", "Displays Bot stats.", Report.class, new String[] {"Status", "Stats"}, UTILITY, true));
 			register.add(new CommandAttributes("About", "Shows Bot credits.", About.class, new String[] {"Credits", "Authors"}, UTILITY, false));
@@ -88,6 +90,9 @@ public class CommandRegister
 			register.add(new CommandAttributes("PassTheBomb", "Quick! Pass the bomb!", PassTheBomb.class, new String[] {"HotPotato", "BombPass"}, GAMES, true));
 			register.add(new CommandAttributes("Poll", "Get a democratic vote.", Poll.class, new String[] {"Strawpoll"}, UTILITY, true));
 			register.add(new CommandAttributes("Connect4", "Get four in a row to win.", Connect4.class, new String[] {"ConnectFour", "FourInARow", "4InARow"}, GAMES, true));
+
+			register.addAll(new ModuleManager().getAllCommandAttributes());			//Load mods
+
 			/*
 					Sort the commands into alphabetical order based on their keys
 			 */
@@ -370,7 +375,7 @@ public class CommandRegister
 		}
 		if (categoryCommands != null)
 		{
-			return adminCommands.toArray(new CommandAttributes[register.size()]);
+			return categoryCommands.toArray(new CommandAttributes[register.size()]);
 		}
 		else
 		{

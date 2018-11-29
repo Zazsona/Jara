@@ -3,6 +3,7 @@ package jara;
 import com.google.gson.Gson;
 import commands.Command;
 import configuration.SettingsUtil;
+import exceptions.ConflictException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,9 @@ import java.util.jar.JarFile;
 
 public class ModuleManager
 {
+    /**
+     * Set containing all registered aliases.
+     */
     private static HashSet<String> reservedAliases;
     /**
      * Logger
@@ -48,16 +52,11 @@ public class ModuleManager
                         cas.add(ca);
                         reservedAliases.addAll(Arrays.asList(ca.getAliases()));
                     }
-
                 }
             }
-            catch (IOException e)
+            catch (IOException | ClassNotFoundException | ConflictException e)
             {
-                logger.error("An error occurred when attempting to load a module.");
-            }
-            catch (ClassNotFoundException e)
-            {
-                logger.error("An error occurred when attempting to load classes in the module.");
+                logger.error(e.getMessage());
             }
         }
         return cas;
@@ -69,8 +68,9 @@ public class ModuleManager
      * @return the attributes of the command in the module, or null if unavailable
      * @throws ClassNotFoundException jar layout is invalid
      * @throws IOException unable to access jar
+     * @throws ConflictException unable to resolve pact conflicts
      */
-    private static CommandAttributes getCommandAttributes(String jarPath) throws ClassNotFoundException, IOException
+    private static CommandAttributes getCommandAttributes(String jarPath) throws ClassNotFoundException, IOException, ConflictException
     {
         CommandAttributes ca = null;
         JarFile jarFile = new JarFile(jarPath);
@@ -82,8 +82,7 @@ public class ModuleManager
         JarEntry jarPact = jarFile.getJarEntry("pact.json");
         if (jarPact == null)
         {
-            logger.error(jarFile.getName() + " has no pact.");
-            return null;
+            throw new ClassNotFoundException(jarFile.getName() + " has no pact.");
         }
 
         while (entries.hasMoreElements())
@@ -100,58 +99,25 @@ public class ModuleManager
             if (Command.class.isAssignableFrom(c))
             {
                 CommandAttributes pactCA = getAttributesInPact(jarFile, jarPact);
-                /*
-                    Here we check to ensure there isn't any alias overlap, as this would cause issues with alias hunting.
-                 */
-                if (!Collections.disjoint(reservedAliases, Arrays.asList(pactCA.getAliases()))) //Fucking arrays.
-                {
-                    if (reservedAliases.contains(pactCA.getCommandKey()))
-                    {
-                        logger.error(jarFile.getName()+" has a conflicting key: "+pactCA.getCommandKey()+". It cannot be used.");
-                        break;
-                    }
-                    else
-                    {
-                        logger.info(jarFile.getName()+" has overlapping aliases in the pact:");
-                        ArrayList<String> aliases = new ArrayList<>();
-                        for (String alias : pactCA.getAliases())
-                        {
-                            if (!reservedAliases.contains(alias))
-                            {
-                                aliases.add(alias);
-                            }
-                            else
-                            {
-                                logger.info(alias);
-                            }
-                        }
-                        logger.info("These will be ignored from "+jarFile.getName());
-                        if (aliases.size() == 0)
-                        {
-                            logger.error(jarEntry.getName()+" has NO non-conflicting aliases. It cannot be run.");
-                        }
-                        pactCA = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), c, aliases.toArray(pactCA.getAliases()), pactCA.getCategory(), pactCA.isDisableable()); //TODO: Maybe it's time to add some setters.
-                    }
-                }
                 ca = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), c, pactCA.getAliases(), pactCA.getCategory(), pactCA.isDisableable());
             }
         }
-        if (ca == null)
+        if (ca == null) //If no Command class is found...
         {
-            logger.info(jarFile.getName()+" has no entry point. (That is, a class that extends Command)");                  //Some (few) modules won't be commands. This allows for that possibility along with highlighting the error in case it is intended to be a command.
-            return null;
+            throw new ClassNotFoundException(jarFile.getName()+" has no entry point. (That is, a class that extends Command)");
         }
         return ca;
     }
 
     /**
-     * Gets the attributes defined in the pact file and converts them to {@link CommandAttributes}.
+     * Gets the non-conflicting attributes defined in the pact file and converts them to {@link CommandAttributes}.
      * @param jarFile the jar of the module
      * @param jarPact the pact
-     * @return the {@link CommandAttributes} defined in the pact. The class will be null.
+     * @return the {@link CommandAttributes} defined in the pact, where the class will be null.
      * @throws IOException unable to access pact
+     * @throws ConflictException unable to resolve conflicts
      */
-    private static CommandAttributes getAttributesInPact(JarFile jarFile, JarEntry jarPact) throws IOException
+    private static CommandAttributes getAttributesInPact(JarFile jarFile, JarEntry jarPact) throws IOException, ConflictException
     {
         InputStreamReader is = new InputStreamReader(jarFile.getInputStream(jarPact));
         BufferedReader br = new BufferedReader(is);
@@ -162,7 +128,51 @@ public class ModuleManager
             jsonBuilder.append(line);
         }
         Gson gson = new Gson();
-        return gson.fromJson(jsonBuilder.toString(), CommandAttributes.class);
+        CommandAttributes pactCA = gson.fromJson(jsonBuilder.toString(), CommandAttributes.class);
+        return resolveConflicts(jarFile, pactCA);
+
+    }
+
+    /**
+     * Attempts to resolve any conflicts with the aliases in the pact.<br>
+     *     Key conflicts cannot be resolved, as these must be unique.
+     * @param jarFile the jar file of the module
+     * @param pactCA the command attributes in the pact
+     * @return the resolved command attributes with a null class.
+     * @throws ConflictException unable to resolve conflicts
+     */
+    private static CommandAttributes resolveConflicts(JarFile jarFile, CommandAttributes pactCA) throws ConflictException
+    {
+        if (!Collections.disjoint(reservedAliases, Arrays.asList(pactCA.getAliases()))) //Fucking arrays.
+        {
+            if (reservedAliases.contains(pactCA.getCommandKey()))
+            {
+                throw new ConflictException(jarFile.getName()+" has a conflicting key: "+pactCA.getCommandKey()+". It cannot be used.");
+            }
+            else
+            {
+                logger.info(jarFile.getName()+" has overlapping aliases in the pact:");
+                ArrayList<String> aliases = new ArrayList<>();
+                for (String alias : pactCA.getAliases())
+                {
+                    if (!reservedAliases.contains(alias))
+                    {
+                        aliases.add(alias);
+                    }
+                    else
+                    {
+                        logger.info(alias);
+                    }
+                }
+                logger.info("These will be ignored from "+jarFile.getName());
+                if (aliases.size() == 0)
+                {
+                    throw new ConflictException(jarFile.getName()+" has NO non-conflicting aliases. It cannot be run.");
+                }
+                pactCA = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), null, aliases.toArray(pactCA.getAliases()), pactCA.getCategory(), pactCA.isDisableable()); //TODO: Maybe it's time to add some setters.
+            }
+        }
+        return pactCA;
     }
 
     //TODO: Help menus
