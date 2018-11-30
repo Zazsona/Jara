@@ -59,6 +59,7 @@ public class ModuleManager
                 logger.error(e.getMessage());
             }
         }
+        logger.info("Loaded "+cas.size()+" modules.");
         return cas;
     }
 
@@ -80,10 +81,6 @@ public class ModuleManager
         URLClassLoader cl = URLClassLoader.newInstance(urls);
 
         JarEntry jarPact = jarFile.getJarEntry("pact.json");
-        if (jarPact == null)
-        {
-            throw new ClassNotFoundException(jarFile.getName() + " has no pact.");
-        }
 
         while (entries.hasMoreElements())
         {
@@ -96,11 +93,15 @@ public class ModuleManager
             className = className.replace("/", ".");
             Class c = cl.loadClass(className);
 
-            if (Command.class.isAssignableFrom(c))
+            if (Command.class.isAssignableFrom(c) && jarPact != null)
             {
                 CommandAttributes pactCA = getAttributesInPact(jarFile, jarPact);
                 ca = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), c, pactCA.getAliases(), pactCA.getCategory(), pactCA.isDisableable());
             }
+        }
+        if (jarPact == null)
+        {
+            throw new ClassNotFoundException(jarFile.getName() + " has no pact.");
         }
         if (ca == null) //If no Command class is found...
         {
@@ -130,7 +131,6 @@ public class ModuleManager
         Gson gson = new Gson();
         CommandAttributes pactCA = gson.fromJson(jsonBuilder.toString(), CommandAttributes.class);
         return resolveConflicts(jarFile, pactCA);
-
     }
 
     /**
@@ -149,7 +149,7 @@ public class ModuleManager
             {
                 throw new ConflictException(jarFile.getName()+" has a conflicting key: "+pactCA.getCommandKey()+". It cannot be used.");
             }
-            else
+            else    //TODO: One possible idea here is to remove the aliases from the modules that will end up with the highest quantity. However, this is an expensive operation as there may be many modules with conflicting aliases, which need to be searched for.
             {
                 logger.info(jarFile.getName()+" has overlapping aliases in the pact:");
                 ArrayList<String> aliases = new ArrayList<>();
@@ -169,7 +169,7 @@ public class ModuleManager
                 {
                     throw new ConflictException(jarFile.getName()+" has NO non-conflicting aliases. It cannot be run.");
                 }
-                pactCA = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), null, aliases.toArray(pactCA.getAliases()), pactCA.getCategory(), pactCA.isDisableable()); //TODO: Maybe it's time to add some setters.
+                pactCA = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), null, aliases.toArray(pactCA.getAliases()), pactCA.getCategory(), pactCA.isDisableable());
             }
         }
         return pactCA;
