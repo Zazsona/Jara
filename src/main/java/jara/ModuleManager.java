@@ -2,6 +2,7 @@ package jara;
 
 import com.google.gson.Gson;
 import commands.Command;
+import commands.NewHelp;
 import configuration.SettingsUtil;
 import exceptions.ConflictException;
 import org.slf4j.Logger;
@@ -97,6 +98,16 @@ public class ModuleManager
             {
                 CommandAttributes pactCA = getAttributesInPact(jarFile, jarPact);
                 ca = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), c, pactCA.getAliases(), pactCA.getCategory(), pactCA.isDisableable());
+
+                JarEntry jarHelp = jarFile.getJarEntry("help.json");
+                if (jarHelp != null)
+                {
+                    NewHelp.addPage(pactCA.getCommandKey(), getHelpPage(jarFile, jarHelp));
+                }
+                else
+                {
+                    logger.info(jarFile.getName()+" has no help page.");
+                }
             }
         }
         if (jarPact == null)
@@ -131,6 +142,27 @@ public class ModuleManager
         Gson gson = new Gson();
         CommandAttributes pactCA = gson.fromJson(jsonBuilder.toString(), CommandAttributes.class);
         return resolveConflicts(jarFile, pactCA);
+    }
+
+    /**
+     * Gets the help info for the specified module and file
+     * @param jarFile the jar of the module
+     * @param jarHelp the help page entry in the jar
+     * @return the help page
+     * @throws IOException unable to access help page
+     */
+    private static NewHelp.HelpPage getHelpPage(JarFile jarFile, JarEntry jarHelp) throws IOException //TODO: Combine this and getCommandAttributesInPact, as functionality is near identical.
+    {
+        InputStreamReader is = new InputStreamReader(jarFile.getInputStream(jarHelp));
+        BufferedReader br = new BufferedReader(is);
+        StringBuilder jsonBuilder = new StringBuilder();
+        String line;
+        while ((line = br.readLine()) != null)
+        {
+            jsonBuilder.append(line);
+        }
+        Gson gson = new Gson();
+        return gson.fromJson(jsonBuilder.toString(), NewHelp.HelpPage.class);
     }
 
     /**
