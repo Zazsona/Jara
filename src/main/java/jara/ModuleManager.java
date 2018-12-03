@@ -6,6 +6,7 @@ import commands.Load;
 import commands.NewHelp;
 import configuration.SettingsUtil;
 import exceptions.ConflictException;
+import exceptions.InvalidModuleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,7 @@ public class ModuleManager
      * @return the list of {@link CommandAttributes}
      * @throws IOException one or more fatal errors occurred during module loading
      */
-    public static LinkedList<CommandAttributes> loadModules() throws IOException
+    public static LinkedList<CommandAttributes> loadModules() throws InvalidModuleException
     {
         onLoadClasses = new HashMap<>();
         reservedAliases = new HashSet<>();
@@ -96,7 +97,7 @@ public class ModuleManager
         }
         else
         {
-            throw new IOException("Attempted to load "+cas.size()+" modules, but failed. ("+errors+" errors) ("+warnings+" warnings)");
+            throw new InvalidModuleException("Attempted to load "+cas.size()+" modules, but failed. ("+errors+" errors) ("+warnings+" warnings)");
         }
     }
 

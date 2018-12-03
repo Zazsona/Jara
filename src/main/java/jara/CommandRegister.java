@@ -91,7 +91,7 @@ public class CommandRegister
 			register.add(new CommandAttributes("Poll", "Get a democratic vote.", Poll.class, new String[] {"Strawpoll"}, UTILITY, true));
 			register.add(new CommandAttributes("Connect4", "Get four in a row to win.", Connect4.class, new String[] {"ConnectFour", "FourInARow", "4InARow"}, GAMES, true));
 
-			register.addAll(new ModuleManager().getAllCommandAttributes());			//Load mods
+			register.addAll(new ModuleManager().loadModules());			//Load mods
 
 			/*
 					Sort the commands into alphabetical order based on their keys
