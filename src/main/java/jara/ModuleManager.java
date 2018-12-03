@@ -2,6 +2,7 @@ package jara;
 
 import com.google.gson.Gson;
 import commands.Command;
+import commands.Load;
 import commands.NewHelp;
 import configuration.SettingsUtil;
 import exceptions.ConflictException;
@@ -28,13 +29,27 @@ public class ModuleManager
      * Logger
      */
     private static final Logger logger = LoggerFactory.getLogger(ModuleManager.class);
+    /**
+     * The collection of classes to be run during program boot
+     */
+    private static HashMap<Class<? extends Load>, JarFile> onLoadClasses;
 
+    /**
+     * The number of issues that will not impact operations
+     */
+    private static int warnings = 0;
+    /**
+     * The number of issues that may have an impact on operation
+     */
+    private static int errors = 0;
     /**
      * Parses through each jar within the modules folder and gathers its {@link CommandAttributes}.
      * @return the list of {@link CommandAttributes}
+     * @throws IOException one or more fatal errors occurred during module loading
      */
-    public static LinkedList<CommandAttributes> getAllCommandAttributes()
+    public static LinkedList<CommandAttributes> loadModules() throws IOException
     {
+        onLoadClasses = new HashMap<>();
         reservedAliases = new HashSet<>();
         LinkedList<CommandAttributes> cas = new LinkedList<>();
         File moduleDir = new File(SettingsUtil.getDirectory() + "/modules/");
@@ -47,7 +62,7 @@ public class ModuleManager
             {
                 if (file.isFile() && file.getName().endsWith(".jar"))
                 {
-                    CommandAttributes ca = getCommandAttributes(file.getPath());
+                    CommandAttributes ca = loadModule(file.getPath());
                     if (ca != null)
                     {
                         cas.add(ca);
@@ -58,10 +73,31 @@ public class ModuleManager
             catch (IOException | ClassNotFoundException | ConflictException e)
             {
                 logger.error(e.getMessage());
+                errors++;
             }
         }
-        logger.info("Loaded "+cas.size()+" modules.");
-        return cas;
+        for (Class<? extends Load> c : onLoadClasses.keySet())
+        {
+            try
+            {
+                c.newInstance().load();
+            }
+            catch (InstantiationException | IllegalAccessException e)
+            {
+                logger.error("Unable to instantiate "+onLoadClasses.get(c).getName()+"'s load class. There is a high risk this module will not perform correctly, if at all.");
+                errors++;
+            }
+
+        }
+        if (errors <= 0)
+        {
+            logger.info("Loaded "+cas.size()+" modules. ("+warnings+" warnings)");
+            return cas;
+        }
+        else
+        {
+            throw new IOException("Attempted to load "+cas.size()+" modules, but failed. ("+errors+" errors) ("+warnings+" warnings)");
+        }
     }
 
     /**
@@ -72,7 +108,7 @@ public class ModuleManager
      * @throws IOException unable to access jar
      * @throws ConflictException unable to resolve pact conflicts
      */
-    private static CommandAttributes getCommandAttributes(String jarPath) throws ClassNotFoundException, IOException, ConflictException
+    private static CommandAttributes loadModule(String jarPath) throws ClassNotFoundException, IOException, ConflictException
     {
         CommandAttributes ca = null;
         JarFile jarFile = new JarFile(jarPath);
@@ -107,15 +143,22 @@ public class ModuleManager
                 else
                 {
                     logger.info(jarFile.getName()+" has no help page.");
+                    warnings++;
                 }
+            }
+            if (Load.class.isAssignableFrom(c))
+            {
+                onLoadClasses.put(c, jarFile);
             }
         }
         if (jarPact == null)
         {
+            warnings++;
             throw new ClassNotFoundException(jarFile.getName() + " has no pact.");
         }
         if (ca == null) //If no Command class is found...
         {
+            warnings++;
             throw new ClassNotFoundException(jarFile.getName()+" has no entry point. (That is, a class that extends Command)");
         }
         return ca;
@@ -131,29 +174,34 @@ public class ModuleManager
      */
     private static CommandAttributes getAttributesInPact(JarFile jarFile, JarEntry jarPact) throws IOException, ConflictException
     {
-        InputStreamReader is = new InputStreamReader(jarFile.getInputStream(jarPact));
-        BufferedReader br = new BufferedReader(is);
-        StringBuilder jsonBuilder = new StringBuilder();
-        String line;
-        while ((line = br.readLine()) != null)
-        {
-            jsonBuilder.append(line);
-        }
         Gson gson = new Gson();
-        CommandAttributes pactCA = gson.fromJson(jsonBuilder.toString(), CommandAttributes.class);
+        CommandAttributes pactCA = gson.fromJson(getJson(jarFile, jarPact), CommandAttributes.class);
         return resolveConflicts(jarFile, pactCA);
     }
 
     /**
-     * Gets the help info for the specified module and file
+     * Gets the help page for the module
      * @param jarFile the jar of the module
-     * @param jarHelp the help page entry in the jar
-     * @return the help page
-     * @throws IOException unable to access help page
+     * @param jarHelp the help file
+     * @return the {@link commands.NewHelp.HelpPage} from the file
+     * @throws IOException unable to access file
      */
-    private static NewHelp.HelpPage getHelpPage(JarFile jarFile, JarEntry jarHelp) throws IOException //TODO: Combine this and getCommandAttributesInPact, as functionality is near identical.
+    private static NewHelp.HelpPage getHelpPage(JarFile jarFile, JarEntry jarHelp) throws IOException
     {
-        InputStreamReader is = new InputStreamReader(jarFile.getInputStream(jarHelp));
+        Gson gson = new Gson();
+        return gson.fromJson(getJson(jarFile, jarHelp), NewHelp.HelpPage.class);
+    }
+
+    /**
+     * Gets the json data from the specified file as a String
+     * @param jarFile the jar of the module
+     * @param jarEntry the file in the jar
+     * @return the json as a String
+     * @throws IOException unable to access jar page
+     */
+    private static String getJson(JarFile jarFile, JarEntry jarEntry) throws IOException
+    {
+        InputStreamReader is = new InputStreamReader(jarFile.getInputStream(jarEntry));
         BufferedReader br = new BufferedReader(is);
         StringBuilder jsonBuilder = new StringBuilder();
         String line;
@@ -161,8 +209,7 @@ public class ModuleManager
         {
             jsonBuilder.append(line);
         }
-        Gson gson = new Gson();
-        return gson.fromJson(jsonBuilder.toString(), NewHelp.HelpPage.class);
+        return jsonBuilder.toString();
     }
 
     /**
@@ -179,6 +226,7 @@ public class ModuleManager
         {
             if (reservedAliases.contains(pactCA.getCommandKey()))
             {
+                errors++;
                 throw new ConflictException(jarFile.getName()+" has a conflicting key: "+pactCA.getCommandKey()+". It cannot be used.");
             }
             else    //TODO: One possible idea here is to remove the aliases from the modules that will end up with the highest quantity. However, this is an expensive operation as there may be many modules with conflicting aliases, which need to be searched for.
@@ -199,6 +247,7 @@ public class ModuleManager
                 logger.info("These will be ignored from "+jarFile.getName());
                 if (aliases.size() == 0)
                 {
+                    errors++;
                     throw new ConflictException(jarFile.getName()+" has NO non-conflicting aliases. It cannot be run.");
                 }
                 pactCA = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), null, aliases.toArray(pactCA.getAliases()), pactCA.getCategory(), pactCA.isDisableable());
