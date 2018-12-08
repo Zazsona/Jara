@@ -7,4 +7,5 @@ bin/
 .project
 .gradle
 *.iml
+*.log
 log.out
