@@ -24,11 +24,7 @@ public class NewHelp extends Command
 
     public static void addPage(String key, HelpPage hp)
     {
-        if (!pageMap.containsKey(key))
-        {
-            pageMap.put(key, hp);
-        }
-        else
+        if (pageMap.put(key, hp) != null)
         {
             throw new IllegalArgumentException("That key has already been set.");
         }
@@ -65,7 +61,7 @@ public class NewHelp extends Command
     private String getPage(GuildMessageReceivedEvent msgEvent, String[] parameters)
     {
         CommandRegister.Category category = getCategory(parameters[1]);
-        boolean limitToPerms = msgEvent.getMember().isOwner() | (parameters.length == 3 && parameters[2].equalsIgnoreCase("all")); //TODO: Check this doesn't OOB
+        boolean limitToPerms = msgEvent.getMember().isOwner() | (parameters.length == 3 && parameters[2].equalsIgnoreCase("all"));
         if (category != null)
         {
             LinkedList<String> commandInfo = new LinkedList<>();
@@ -110,7 +106,7 @@ public class NewHelp extends Command
         }
         else
         {
-            return getCommandPage(parameters[1]);
+            return getCommandPage(parameters[1].toLowerCase());
         }
     }
 
@@ -125,11 +121,25 @@ public class NewHelp extends Command
         if (helpPage != null)
         {
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("**Parameters**\n");
-            for (String param : helpPage.params)
+            stringBuilder.append("**Aliases**\n");
+            for (String alias : CommandRegister.getCommand(key).getAliases())
             {
-                stringBuilder.append(prefix).append(param).append("\n");
+                stringBuilder.append(alias).append(", ");
             }
+            stringBuilder.setLength(stringBuilder.length()-2);
+            stringBuilder.append("\n**Parameters**\n");
+            if (helpPage.params.length > 0)
+            {
+                for (String param : helpPage.params)
+                {
+                    stringBuilder.append(prefix).append(param).append("\n");
+                }
+            }
+            else
+            {
+                stringBuilder.append(prefix).append(key).append("\n");
+            }
+
             stringBuilder.append("**Description\n**");
             stringBuilder.append(helpPage.description);
             return stringBuilder.toString();
@@ -138,9 +148,13 @@ public class NewHelp extends Command
         {
             CommandAttributes ca = guildSettings.getCustomCommandAttributes(key);
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("**Parameters**");
-            stringBuilder.append(prefix).append(key).append("\n");
-            stringBuilder.append("**Description\n**");
+            stringBuilder.append("**Aliases**\n");
+            for (String alias : guildSettings.getCustomCommand(key).getAliases())
+            {
+                stringBuilder.append(alias).append(", ");
+            }
+            stringBuilder.setLength(stringBuilder.length()-2);
+            stringBuilder.append("\n**Description\n**");
             stringBuilder.append("A custom command.\n\n").append(ca.getDescription());
             return stringBuilder.toString();
         }
@@ -162,6 +176,4 @@ public class NewHelp extends Command
         return null;
     }
 }
-//TODO: Custom command help
-//TODO: Aliases
 //TODO: Pages in categories (EmbedDescriptions have a size limit. As such we need to allow for these and make it so users can have 100s of modules in each category.

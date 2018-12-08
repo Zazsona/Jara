@@ -139,10 +139,17 @@ public class ModuleManager
                 JarEntry jarHelp = jarFile.getJarEntry("help.json");
                 if (jarHelp != null)
                 {
-                    NewHelp.addPage(pactCA.getCommandKey(), getHelpPage(jarFile, jarHelp));
+                    for (String alias : ca.getAliases())
+                    {
+                        NewHelp.addPage(alias.toLowerCase(), getHelpPage(jarFile, jarHelp));
+                    }
                 }
                 else
                 {
+                    for (String alias : ca.getAliases())
+                    {
+                        NewHelp.addPage(alias.toLowerCase(), new NewHelp.HelpPage()); //Default values
+                    }
                     logger.info(jarFile.getName()+" has no help page.");
                     warnings++;
                 }
