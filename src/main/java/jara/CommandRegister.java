@@ -7,6 +7,7 @@ import java.util.Comparator;
 import commands.Command;
 import commands.CustomCommand;
 import commands.Help;
+import commands.NewHelp;
 import commands.utility.Poll;
 import commands.admin.CustomCommandManager;
 import commands.admin.config.ConfigMain;
@@ -70,7 +71,7 @@ public class CommandRegister
 			register.add(new CommandAttributes("CoinFlip", "Flips a coin.", CoinFlip.class, new String[] {"FlipCoin", "Toss", "cf", "fc", "fiftyfifty", "flipacoin"}, UTILITY, true));
 			register.add(new CommandAttributes("Config", "Modify Bot settings.", ConfigMain.class, new String[] {"Settings"}, ADMIN, false));
 			register.add(new CommandAttributes("Countdown", "The classic word making game.", Countdown.class, new String[] {"cd"}, GAMES, true));
-			register.add(new CommandAttributes("Help", "Shows command details.", Help.class, new String[] {"?", "commands"}, NOGROUP, false)); //Does help REALLY need to be indexed in help?
+			register.add(new CommandAttributes("Help", "Shows command details.", NewHelp.class, new String[] {"?", "commands"}, NOGROUP, false)); //Does help REALLY need to be indexed in help?
             register.add(new CommandAttributes("Randomizer", "Randomises numbers.", Randomizer.class, new String[] {"Randomise", "Randomize", "Randomiser", "Roulette", "Picker", "Selector"}, UTILITY, true));
 			register.add(new CommandAttributes("Say", "Make the bot echo.", Say.class, new String[] {"Speak", "Talk"}, TOYS, true));
 			register.add(new CommandAttributes("Timecard", "Spongebob Timecards.", Timecard.class, new String[] {"SpongebobCard", "Timescreen"}, TOYS, true));
