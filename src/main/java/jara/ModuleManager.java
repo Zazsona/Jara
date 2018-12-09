@@ -20,6 +20,9 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+/**
+ * Responsible for module management (that is, loads, controls, and resolve issues with jars placed in the modules folder)
+ */
 public class ModuleManager
 {
     /**
@@ -263,6 +266,4 @@ public class ModuleManager
         }
         return pactCA;
     }
-
-    //TODO: Help menus
 }

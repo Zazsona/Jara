@@ -10,21 +10,50 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 import java.util.*;
 
+/**
+ * Provides help details for built-in, module, and custom commands.
+ */
 public class NewHelp extends Command
 {
+    /**
+     * The command prefix used for this guild
+     */
     private String prefix;
+    /**
+     * The settings for this guild
+     */
     private GuildSettings guildSettings;
+    /**
+     * A static map holding all of the {@link HelpPage}s recorded. Indexed by command key
+     */
     private static HashMap<String, HelpPage> pageMap = new HashMap<>();
+
+    /**
+     * Layout for help pages, where params lists the various call parameters, and description provides detailed information about the command.
+     */
     public static class HelpPage
     {
+        /**
+         * The parameters that may be used to call the command<br>
+         * [Param] indicates required<br>
+         * (Param) indicates optional
+         */
         final String[] params = new String[0];
+        /**
+         * A detailed description about what the command does, and how to use it.
+         */
         final String description = "No information has been provided for this command.";
     }
 
-
-    public static void addPage(String key, HelpPage hp)
+    /**
+     * This method adds a page to the HelpPage map
+     * @param alias the alias to provide help for
+     * @param hp the {@link HelpPage} to associated with it
+     * @throws IllegalArgumentException alias already registered
+     */
+    public static void addPage(String alias, HelpPage hp)
     {
-        if (pageMap.put(key, hp) != null)
+        if (pageMap.put(alias, hp) != null)
         {
             throw new IllegalArgumentException("That key has already been set.");
         }
@@ -58,10 +87,17 @@ public class NewHelp extends Command
         msgEvent.getChannel().sendMessage(embed.build()).queue();
     }
 
+    /**
+     * Gets the formatted page the user has requested
+     * @param msgEvent the context
+     * @param parameters the user's request
+     * @param embed the embed to set
+     * @return a formatted embed with the requested help details
+     */
     private EmbedBuilder getPage(GuildMessageReceivedEvent msgEvent, String[] parameters, EmbedBuilder embed)
     {
         CommandRegister.Category category = getCategory(parameters[1]);
-        boolean limitToPerms = msgEvent.getMember().isOwner() | (parameters.length == 3 && parameters[2].equalsIgnoreCase("all"));
+        boolean limitToPerms = !(msgEvent.getMember().isOwner() | (parameters.length >= 3 && parameters[2].equalsIgnoreCase("all")));
         if (category != null)
         {
             LinkedList<String> commandInfo = new LinkedList<>();
@@ -124,21 +160,26 @@ public class NewHelp extends Command
         }
     }
 
-    private String getCommandPage(String key)
+    /**
+     * Gets a specific command's details
+     * @param alias the alias to get the help page for
+     * @return the page as a string
+     */
+    private String getCommandPage(String alias)
     {
         /*
             No permissions check here is deliberate. The aim of removing those commands from the list is so that the user gets a list of commands they can use, thus do not have to play the guessing game.
             By not doing the check here they can still find out about the other commands when seeing them be used.
          */
 
-        HelpPage helpPage = pageMap.get(key);
+        HelpPage helpPage = pageMap.get(alias);
         if (helpPage != null)
         {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("**Aliases**\n");
-            for (String alias : CommandRegister.getCommand(key).getAliases())
+            for (String otherAlias : CommandRegister.getCommand(alias).getAliases())
             {
-                stringBuilder.append(alias).append(", ");
+                stringBuilder.append(otherAlias).append(", ");
             }
             stringBuilder.setLength(stringBuilder.length()-2);
             stringBuilder.append("\n**Parameters**\n");
@@ -151,21 +192,21 @@ public class NewHelp extends Command
             }
             else
             {
-                stringBuilder.append(prefix).append(key).append("\n");
+                stringBuilder.append(prefix).append(alias).append("\n");
             }
 
             stringBuilder.append("**Description\n**");
             stringBuilder.append(helpPage.description);
             return stringBuilder.toString();
         }
-        else if (guildSettings.getCustomCommandAttributes(key) != null)
+        else if (guildSettings.getCustomCommandAttributes(alias) != null)
         {
-            CommandAttributes ca = guildSettings.getCustomCommandAttributes(key);
+            CommandAttributes ca = guildSettings.getCustomCommandAttributes(alias);
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("**Aliases**\n");
-            for (String alias : guildSettings.getCustomCommand(key).getAliases())
+            for (String otherAlias : guildSettings.getCustomCommand(alias).getAliases())
             {
-                stringBuilder.append(alias).append(", ");
+                stringBuilder.append(otherAlias).append(", ");
             }
             stringBuilder.setLength(stringBuilder.length()-2);
             stringBuilder.append("\n**Description\n**");
@@ -174,10 +215,15 @@ public class NewHelp extends Command
         }
         else
         {
-            return "PICNIC Error: Unknown Parameter \""+key+"\". Usage: /Help [Category]/[Command] (all) (Page #)";
+            return "PICNIC Error: Unknown Parameter \""+alias+"\". Usage: /Help [Category]/[Command] (all) (Page #)";
         }
     }
 
+    /**
+     * Gets the category in the user's request
+     * @param parameter the user request
+     * @return the category, or null if it is an invalid request
+     */
     private CommandRegister.Category getCategory(String parameter)
     {
         for (CommandRegister.Category category : CommandRegister.Category.values())
