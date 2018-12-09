@@ -53,12 +53,12 @@ public class NewHelp extends Command
         }
         else if (parameters.length >= 2)
         {
-            embed.setDescription(getPage(msgEvent, parameters));
+            embed = getPage(msgEvent, parameters, embed);
         }
         msgEvent.getChannel().sendMessage(embed.build()).queue();
     }
 
-    private String getPage(GuildMessageReceivedEvent msgEvent, String[] parameters)
+    private EmbedBuilder getPage(GuildMessageReceivedEvent msgEvent, String[] parameters, EmbedBuilder embed)
     {
         CommandRegister.Category category = getCategory(parameters[1]);
         boolean limitToPerms = msgEvent.getMember().isOwner() | (parameters.length == 3 && parameters[2].equalsIgnoreCase("all"));
@@ -92,7 +92,8 @@ public class NewHelp extends Command
 
             if (commandInfo.size() == 0)
             {
-                return ("Sorry, looks like I haven't got anything for you here.");
+                 embed.setDescription("Sorry, looks like I haven't got anything for you here.");
+                 return embed;
             }
             else
             {
@@ -101,12 +102,25 @@ public class NewHelp extends Command
                 {
                     descBuilder.append(command).append("\n");
                 }
-                return descBuilder.toString();
+                if (descBuilder.length() > 2047) //Check if pages are required
+                {
+                    int pageNo = (parameters.length >= 3 && parameters[parameters.length-1].matches("[0-9]*")) ? 1 : Integer.parseInt(parameters[parameters.length-1]); //We check the final parameter as to avoid conflicts with "all"
+                    int pageTotal = (int) Math.ceil(descBuilder.length()/2048);
+                    embed.setFooter("Page "+pageNo+" of "+pageTotal+".", "");
+                    for (int i = 1; i<pageNo; i++)
+                    {
+                        int lastEntryEnd = descBuilder.substring(0, 2048).lastIndexOf("\n")+1;
+                        descBuilder.replace(0, lastEntryEnd, "");
+                    }
+                }
+                embed.setDescription(descBuilder.toString());
+                return embed;
             }
         }
         else
         {
-            return getCommandPage(parameters[1].toLowerCase());
+            embed.setDescription(getCommandPage(parameters[1].toLowerCase()));
+            return embed;
         }
     }
 
@@ -160,7 +174,7 @@ public class NewHelp extends Command
         }
         else
         {
-            return "PICNIC Error: Unknown Parameter \""+key+"\". Usage: /Help [Category]/[Command]";
+            return "PICNIC Error: Unknown Parameter \""+key+"\". Usage: /Help [Category]/[Command] (all) (Page #)";
         }
     }
 
@@ -176,4 +190,3 @@ public class NewHelp extends Command
         return null;
     }
 }
-//TODO: Pages in categories (EmbedDescriptions have a size limit. As such we need to allow for these and make it so users can have 100s of modules in each category.
