@@ -65,6 +65,7 @@ public class ConfigMain extends Command
                         embed.setDescription("Unknown menu: "+selection+". To quit, enter \"quit\".");
                         channel.sendMessage(embed.build()).queue();
                         embed.setDescription(embedDescription);
+                        continue;
                     }
                     channel.sendMessage(embed.build()).queue();
                 }

@@ -344,16 +344,14 @@ public class CommandRegister
 
 	/**
 	 * Returns the Command Attributes all all commands in this category.
-	 * @param categoryID
+	 * @param category
 	 * @return CommandAttributes[] - Array of attributes.
 	 */
-	public static CommandAttributes[] getCommandsInCategory(Category categoryID)
+	public static CommandAttributes[] getCommandsInCategory(Category category)
 	{
 		ArrayList<CommandAttributes> categoryCommands;
-		switch (categoryID)
+		switch (category)
 		{
-			default:
-				return null;
 			case NOGROUP:
 				categoryCommands = noGroupCommands;
 				break;
@@ -372,14 +370,16 @@ public class CommandRegister
 			case ADMIN:
 				categoryCommands = adminCommands;
 				break;
+			default:
+				return null;
 		}
 		if (categoryCommands != null)
 		{
-			return categoryCommands.toArray(new CommandAttributes[register.size()]);
+			return categoryCommands.toArray(new CommandAttributes[0]);
 		}
 		else
 		{
-			return generateCommandsInCategory(categoryID);
+			return generateCommandsInCategory(category);
 		}
 	}
 
@@ -394,17 +394,15 @@ public class CommandRegister
 		ArrayList<CommandAttributes> categoryCommands = new ArrayList<>();
 		for (CommandAttributes cmdAttributes : register)
 		{
-			if (cmdAttributes.getCategory() == categoryID)
+			if (cmdAttributes.getCategory().equals(categoryID))
 			{
 				categoryCommands.add(cmdAttributes);
 			}
 		}
 		switch (categoryID)
 		{
-			default:
-				return null;
 			case NOGROUP:
-				 noGroupCommands = categoryCommands;
+				noGroupCommands = categoryCommands;
 				break;
 			case GAMES:
 				gamesCommands = categoryCommands;
@@ -421,6 +419,8 @@ public class CommandRegister
 			case ADMIN:
 				adminCommands = categoryCommands;
 				break;
+			default:
+				return null;
 		}
 		return categoryCommands.toArray(new CommandAttributes[0]);
 	}

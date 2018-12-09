@@ -231,6 +231,7 @@ public class GuildSettings extends GuildSettingsJson
         {
             roleIDs.add(role.getId());
         }
+        roleIDs.add(member.getGuild().getPublicRole().getId()); //everyone role is not included in getRoles()
         if (!Collections.disjoint(this.commandConfig.get(commandKey).permissions, roleIDs))
         {
             permissionGranted = true;
