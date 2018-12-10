@@ -49,7 +49,7 @@ public class ModuleManager
     /**
      * Parses through each jar within the modules folder and gathers its {@link CommandAttributes}.
      * @return the list of {@link CommandAttributes}
-     * @throws IOException one or more fatal errors occurred during module loading
+     * @throws InvalidModuleException one or more fatal errors occurred during module loading
      */
     public static LinkedList<CommandAttributes> loadModules() throws InvalidModuleException
     {

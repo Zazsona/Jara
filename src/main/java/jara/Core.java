@@ -56,15 +56,11 @@ public class Core //A class for covering the global manners of the bot.
 		}
 		catch (InvalidModuleException e)
 		{
-			if (GraphicsEnvironment.isHeadless())
-			{
-				logger.error(e.getMessage()+"\nA log has been created.");
-			}
-			else
+			logger.error(e.getMessage()+"\nA log has been created.");
+			if (!GraphicsEnvironment.isHeadless())
 			{
 				HeadedGUI.showError(e.getMessage()+"\nA log has been created.");
 			}
-			//TODO: Create log
 		}
 
 	}

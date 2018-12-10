@@ -377,5 +377,4 @@ public class CustomCommandManager extends Command
         embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
         return embed;
     }
-    //TODO: Implement this (Ensure key and alias are lower case when saving)
 }

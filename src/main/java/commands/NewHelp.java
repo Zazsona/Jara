@@ -65,12 +65,12 @@ public class NewHelp extends Command
         guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
         prefix = SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId()).toString();
         EmbedBuilder embed = new EmbedBuilder();
-        embed.setAuthor("Help Menu", null, null);
+        embed.setAuthor("======== Help Menu ========", null, null);
         embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+        embed.setThumbnail("https://i.imgur.com/4TUoYOM.png");
         if (parameters.length == 1)
         {
-            embed.setDescription("To get a list of commands, use "+prefix+"help [Category].\n" +
-                                         "By default, only commands you have access to are shown. use \""+prefix+"help [Category] all\" to see every command.");
+            embed.setDescription("To get a list of commands, use "+prefix+"help [Category] (all).");
             String topics =
                     "**Games** - SP/MP experiences to keep you busy!\n"
                             + "**Toys** - Quick fun commands.\n"
@@ -109,7 +109,7 @@ public class NewHelp extends Command
                 if (SettingsUtil.getGlobalSettings().isCommandEnabled(ca.getCommandKey()) && guildSettings.isCommandEnabled(ca.getCommandKey()))
                 {
                     if (!limitToPerms || guildSettings.isPermitted(msgEvent.getMember(), ca.getCommandKey()))
-                        commandInfo.add(ca.getCommandKey()+" - "+ca.getDescription());
+                        commandInfo.add("**"+ca.getCommandKey()+"** - "+ca.getDescription());
                 }
             }
             for (String key : guildSettings.getCustomCommandMap().keySet())
@@ -118,7 +118,7 @@ public class NewHelp extends Command
                 if (guildSettings.getCustomCommandAttributes(key).getCategory() == category)
                 {
                     if (!limitToPerms || guildSettings.isPermitted(msgEvent.getMember(), key))
-                        commandInfo.add(key+" - "+ca.getDescription());
+                        commandInfo.add("**"+key+"** - "+ca.getDescription());
                 }
             }
             commandInfo.sort(Comparator.naturalOrder());
@@ -176,13 +176,13 @@ public class NewHelp extends Command
         if (helpPage != null)
         {
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("**Aliases**\n");
+            stringBuilder.append("__Aliases__\n");
             for (String otherAlias : CommandRegister.getCommand(alias).getAliases())
             {
                 stringBuilder.append(otherAlias).append(", ");
             }
             stringBuilder.setLength(stringBuilder.length()-2);
-            stringBuilder.append("\n**Parameters**\n");
+            stringBuilder.append("\n\n__Parameters__\n");
             if (helpPage.params.length > 0)
             {
                 for (String param : helpPage.params)
@@ -195,7 +195,7 @@ public class NewHelp extends Command
                 stringBuilder.append(prefix).append(alias).append("\n");
             }
 
-            stringBuilder.append("**Description\n**");
+            stringBuilder.append("\n__Description__\n");
             stringBuilder.append(helpPage.description);
             return stringBuilder.toString();
         }
@@ -203,13 +203,13 @@ public class NewHelp extends Command
         {
             CommandAttributes ca = guildSettings.getCustomCommandAttributes(alias);
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("**Aliases**\n");
+            stringBuilder.append("__Aliases__\n");
             for (String otherAlias : guildSettings.getCustomCommand(alias).getAliases())
             {
                 stringBuilder.append(otherAlias).append(", ");
             }
             stringBuilder.setLength(stringBuilder.length()-2);
-            stringBuilder.append("\n**Description\n**");
+            stringBuilder.append("\n\n__Description__\n");
             stringBuilder.append("A custom command.\n\n").append(ca.getDescription());
             return stringBuilder.toString();
         }
