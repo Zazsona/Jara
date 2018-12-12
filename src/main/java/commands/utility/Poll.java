@@ -12,6 +12,7 @@ public class Poll extends Command
 	@Override
 	public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
 	{
+		parameters = checkForCommaSeparation(parameters);
 		if (parameters.length > 21)
 		{
 			msgEvent.getChannel().sendMessage("ERROR: Limit of 20 options.").queue();
@@ -35,6 +36,25 @@ public class Poll extends Command
 			{
 				msg.addReaction(reactions[i-1]).queue();
 			}
+		}
+	}
+
+	private String[] checkForCommaSeparation(String[] parameters)
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(parameters[0]+","); //Separation for the command call.
+		for (int i = 1; i<parameters.length; i++)
+		{
+			stringBuilder.append(parameters[i]).append(" ");
+		}
+		String[] list = stringBuilder.toString().split("[,]");
+		if (list.length > 2)
+		{
+			return list;
+		}
+		else
+		{
+			return parameters;
 		}
 	}
 }
