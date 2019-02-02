@@ -88,6 +88,7 @@ public class CommandRegister
 			register.add(new CommandAttributes("PassTheBomb", "Quick! Pass the bomb!", PassTheBomb.class, new String[] {"HotPotato", "BombPass"}, GAMES, true));
 			register.add(new CommandAttributes("Poll", "Get a democratic vote.", Poll.class, new String[] {"Strawpoll"}, UTILITY, true));
 			register.add(new CommandAttributes("Connect4", "Get four in a row to win.", Connect4.class, new String[] {"ConnectFour", "FourInARow", "4InARow"}, GAMES, true));
+			register.add(new CommandAttributes("WordSearch", "Find the words.", WordSearch.class, new String[] {"WordHunt", "WordFinder", "SearchWords"}, GAMES, true));
 			register.add(new CommandAttributes("MCServer", "Fetches Minecraft server info.", MinecraftServerQuery.class, new String[] {"MinecraftServer", "MinecraftQuery", "MinecraftServerStatus"}, UTILITY, true));
 			/*
 					Sort the commands into alphabetical order based on their keys
