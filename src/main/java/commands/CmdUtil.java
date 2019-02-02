@@ -116,15 +116,18 @@ public class CmdUtil
     {
         try
         {
-            File wordFile = new File(CmdUtil.class.getResource("/wordList.txt").toURI());
-            wordList = new ArrayList<>();
-            Scanner scanner = new Scanner(wordFile);
-            while (scanner.hasNext())
+            if (wordList == null)
             {
-                String word = scanner.nextLine();
-                wordList.add(word);
+                File wordFile = new File(CmdUtil.class.getResource("/wordList.txt").toURI());
+                wordList = new ArrayList<>();
+                Scanner scanner = new Scanner(wordFile);
+                while (scanner.hasNext())
+                {
+                    String word = scanner.nextLine();
+                    wordList.add(word);
+                }
+                scanner.close();
             }
-            scanner.close();
             return wordList;
         }
         catch (URISyntaxException e)

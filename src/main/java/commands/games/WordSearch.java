@@ -23,6 +23,7 @@ public class WordSearch extends GameCommand
 
     private MessageEmbed buildGrid()
     {
+        long time = System.currentTimeMillis(); //remove
         String[][] board = new String[9][9];
         String[] words = new String[6];
         for (int i = 0; i<words.length; i++)
@@ -31,21 +32,28 @@ public class WordSearch extends GameCommand
             {
                 do
                 {
-                    words[i] = CmdUtil.getRandomWord();
-                } while (words[i].length() > board.length);
+                    words[i] = CmdUtil.getRandomWord().toUpperCase();
+                } while (words[i].length() > board.length-2);
+
             } while (!placeWord(words[i], board));
         }
+        long placementTime = System.currentTimeMillis();
+        System.out.println("Placement: "+((placementTime-time)/1000)+" seconds.");
 
+        Random r = new Random();
+        String[] letters = {"A", "A", "A", "B","B","B", "C", "C", "C", "C", "D","D","D", "E","E","E","E", "F","F", "G","G","G", "H", "I", "J", "K", "L","L","L", "M","M","M", "N","N", "O", "P","P", "Q", "R","R","R", "S", "S", "S", "S", "S", "S", "S", "S", "T", "U", "V", "W", "X", "Y", "Z"};
         for (int x = 0; x<board.length; x++)
         {
             for (int y = 0; y<board[x].length; y++)
             {
                 if (board[x][y] == null)
                 {
-                    board[x][y] = CmdUtil.getRandomWord().substring(0, 1); //This gets the general pattern of word starting letters, avoiding cases where, for example, Z comes up as often as A, despite Zs infrequent use.
+                    board[x][y] = letters[r.nextInt(letters.length)];
                 }
             }
         }
+        long fillTime = System.currentTimeMillis();
+        System.out.println("Fill: "+((fillTime-placementTime)/1000+" seconds."));
 
         StringBuilder sb = new StringBuilder();
         sb.append("```+-----------------------------------+ \n");
@@ -58,7 +66,9 @@ public class WordSearch extends GameCommand
             sb.append("|\n+-----------------------------------+\n");
         }
         sb.append("```");
-        
+        long graphicTime = System.currentTimeMillis();
+        System.out.println("Graphics: "+((graphicTime-fillTime)/1000)+" seconds.");
+
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setDescription(sb.toString());
         embedBuilder.addField("Words", words[0]+"\n"+words[1], true);
@@ -83,17 +93,17 @@ public class WordSearch extends GameCommand
                     case 0:
                         for (int i = 0; i<word.length(); i++)
                         {
-                            if (board[x][y+i] != null)                                          //First check to ensure there is space for the word
+                            if (board[x][y+i] != null)                                       //First check to ensure there is space for the word
                             {
-                                throw new ArrayIndexOutOfBoundsException("Position occupied.");
+                                if (!board[x][y+i].equals(word.substring(i, i+1)))
+                                {
+                                    throw new ArrayIndexOutOfBoundsException("Position occupied.");
+                                }
                             }
                         }
                         for (int i = 0; i<word.length(); i++)                                   //Place the word
                         {
-                            if (board[x][y+i] == null)
-                            {
-                                board[x][y+i] = word.substring(i, i+1);
-                            }
+                            board[x][y+i] = word.substring(i, i+1);
                         }
                         break;
                     case 1:
@@ -101,15 +111,15 @@ public class WordSearch extends GameCommand
                         {
                             if (board[x+i][y+i] != null)
                             {
-                                throw new ArrayIndexOutOfBoundsException("Position occupied.");
+                                if (!board[x+i][y+i].equals(word.substring(i, i+1)))
+                                {
+                                    throw new ArrayIndexOutOfBoundsException("Position occupied.");
+                                }
                             }
                         }
                         for (int i = 0; i<word.length(); i++)
                         {
-                            if (board[x+i][y+i] == null)
-                            {
-                                board[x+i][y+i] = word.substring(i, i+1);
-                            }
+                            board[x+i][y+i] = word.substring(i, i+1);
                         }
                         break;
                     case 2:
@@ -117,15 +127,15 @@ public class WordSearch extends GameCommand
                         {
                             if (board[x+i][y] != null)
                             {
-                                throw new ArrayIndexOutOfBoundsException("Position occupied.");
+                                if (!board[x+i][y].equals(word.substring(i, i+1)))
+                                {
+                                    throw new ArrayIndexOutOfBoundsException("Position occupied.");
+                                }
                             }
                         }
                         for (int i = 0; i<word.length(); i++)
                         {
-                            if (board[x+i][y] == null)
-                            {
-                                board[x+i][y] = word.substring(i, i+1);
-                            }
+                            board[x+i][y] = word.substring(i, i+1);
                         }
                         break;
                     case 3:
@@ -133,15 +143,15 @@ public class WordSearch extends GameCommand
                         {
                             if (board[x+i][y-i] != null)
                             {
-                                throw new ArrayIndexOutOfBoundsException("Position occupied.");
+                                if (!board[x+i][y-i].equals(word.substring(i, i+1)))
+                                {
+                                    throw new ArrayIndexOutOfBoundsException("Position occupied.");
+                                }
                             }
                         }
                         for (int i = 0; i<word.length(); i++)
                         {
-                            if (board[x+i][y-i] == null)
-                            {
-                                board[x+i][y-i] = word.substring(i, i+1);
-                            }
+                            board[x+i][y-i] = word.substring(i, i+1);
                         }
                         break;
                     case 4:
@@ -149,15 +159,15 @@ public class WordSearch extends GameCommand
                         {
                             if (board[x][y-i] != null)
                             {
-                                throw new ArrayIndexOutOfBoundsException("Position occupied.");
+                                if (!board[x][y-i].equals(word.substring(i, i+1)))
+                                {
+                                    throw new ArrayIndexOutOfBoundsException("Position occupied.");
+                                }
                             }
                         }
                         for (int i = 0; i<word.length(); i++)
                         {
-                            if (board[x][y-i] == null)
-                            {
-                                board[x][y-i] = word.substring(i, i+1);
-                            }
+                            board[x][y-i] = word.substring(i, i+1);
                         }
                         break;
                     case 5:
@@ -165,15 +175,15 @@ public class WordSearch extends GameCommand
                         {
                             if (board[x-i][y-i] != null)
                             {
-                                throw new ArrayIndexOutOfBoundsException("Position occupied.");
+                                if (!board[x-i][y-i].equals(word.substring(i, i+1)))
+                                {
+                                    throw new ArrayIndexOutOfBoundsException("Position occupied.");
+                                }
                             }
                         }
                         for (int i = 0; i<word.length(); i++)
                         {
-                            if (board[x-i][y-i] == null)
-                            {
-                                board[x-i][y-i] = word.substring(i, i+1);
-                            }
+                            board[x-i][y-i] = word.substring(i, i+1);
                         }
                         break;
                     case 6:
@@ -181,15 +191,15 @@ public class WordSearch extends GameCommand
                         {
                             if (board[x-i][y] != null)
                             {
-                                throw new ArrayIndexOutOfBoundsException("Position occupied.");
+                                if (!board[x-i][y].equals(word.substring(i, i+1)))
+                                {
+                                    throw new ArrayIndexOutOfBoundsException("Position occupied.");
+                                }
                             }
                         }
                         for (int i = 0; i<word.length(); i++)
                         {
-                            if (board[x-i][y] == null)
-                            {
-                                board[x-i][y] = word.substring(i, i+1);
-                            }
+                            board[x-i][y] = word.substring(i, i+1);
                         }
                         break;
                     case 7:
@@ -197,15 +207,15 @@ public class WordSearch extends GameCommand
                         {
                             if (board[x-i][y+i] != null)
                             {
-                                throw new ArrayIndexOutOfBoundsException("Position occupied.");
+                                if (!board[x-i][y+i].equals(word.substring(i, i+1)))
+                                {
+                                    throw new ArrayIndexOutOfBoundsException("Position occupied.");
+                                }
                             }
                         }
                         for (int i = 0; i<word.length(); i++)
                         {
-                            if (board[x-i][y+i] == null)
-                            {
-                                board[x-i][y+i] = word.substring(i, i+1);
-                            }
+                            board[x-i][y+i] = word.substring(i, i+1);
                         }
                         break;
                 }
