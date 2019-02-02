@@ -23,7 +23,7 @@ public class WordSearch extends GameCommand
 
     private MessageEmbed buildGrid()
     {
-        String[][] board = new String[10][10];
+        String[][] board = new String[9][9];
         String[] words = new String[6];
         for (int i = 0; i<words.length; i++)
         {
@@ -48,33 +48,22 @@ public class WordSearch extends GameCommand
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("```+---------------------------------------+         Words:\n");
+        sb.append("```+-----------------------------------+ \n");
         for (int x = 0; x<board.length; x++)
         {
             for (int y = 0; y<board[x].length; y++)
             {
                 sb.append("| ").append(board[x][y]+" ");
             }
-            if (x < words.length)
-            {
-                sb.append("|\n+---------------------------------------+         "+words[x]+"\n");
-            }
-            else
-            {
-                sb.append("|\n+---------------------------------------+\n");
-            }
-
+            sb.append("|\n+-----------------------------------+\n");
         }
         sb.append("```");
-        StringBuilder listSb = new StringBuilder();
-        for (String word : words)
-        {
-            listSb.append(word).append("\n");
-        }
-        channel.sendMessage(sb.toString()).queue();
+        
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setDescription(sb.toString());
-        embedBuilder.addField("Words", listSb.toString(), false);
+        embedBuilder.addField("Words", words[0]+"\n"+words[1], true);
+        embedBuilder.addField("", words[2]+"\n"+words[3], true);
+        embedBuilder.addField("", words[4]+"\n"+words[5], true);
         embedBuilder.setColor(Core.getHighlightColour(channel.getGuild().getSelfMember()));
         return embedBuilder.build();
     }
