@@ -289,10 +289,7 @@ public class WordSearch extends GameCommand
 
         if (input.length() == 4)
         {
-            System.out.println(wordCoords);
-            System.out.println(input);
             String backwardsInput = (input.substring(input.length()-2)+input.substring(0, 2));
-            System.out.println(backwardsInput);
             if (wordCoords.containsKey(input) || wordCoords.containsKey(backwardsInput))
             {
                 int completeWords = 0;
