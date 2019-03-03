@@ -20,7 +20,7 @@ public class Replay extends Command
         else
         {
             EmbedBuilder embed = new EmbedBuilder();
-            embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+            embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
             embed.setThumbnail("https://i.imgur.com/wHdSqH5.png");
             embed.setTitle("Now Playing...");
             embed.setDescription("No track is currently playing.");

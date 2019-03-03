@@ -32,7 +32,7 @@ public class LastWord extends GameCommand
             EmbedBuilder embed = new EmbedBuilder();
             embed.setTitle("Last Word");
             embed.setDescription(":game_die: Welcome to The Last Word! :game_die:\nI'm looking for **"+ CmdUtil.getRandomTopic()+"** starting with **"+letter+"**");
-            embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+            embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
             embed.setThumbnail("https://i.imgur.com/hvphthX.png");
             channel.sendMessage(embed.build()).queue();
 
@@ -55,7 +55,7 @@ public class LastWord extends GameCommand
         boolean winnerFound = false;
         EmbedBuilder embed = new EmbedBuilder();
         embed.setTitle("Last Word");
-        embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+        embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
         embed.setThumbnail("https://i.imgur.com/hvphthX.png");
         try
         {

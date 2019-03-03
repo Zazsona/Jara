@@ -1,5 +1,6 @@
 package commands.games;
 
+import commands.CmdUtil;
 import commands.GameCommand;
 import jara.Core;
 import jara.MessageManager;
@@ -47,7 +48,7 @@ public class CountdownConundrum extends GameCommand
             String[] conundrum = getConundrum();
             Random r = new Random();
             embed = new EmbedBuilder();
-            embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+            embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
             embed.setTitle("Countdown Conundrum");
             embed.setThumbnail("https://i.imgur.com/0uNRZWG.png");
             embed.setDescription("Find the anagram before time runs out!\n\n***"+conundrum[1].toUpperCase()+"***");

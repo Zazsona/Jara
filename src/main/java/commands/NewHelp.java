@@ -66,7 +66,7 @@ public class NewHelp extends Command
         prefix = SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId()).toString();
         EmbedBuilder embed = new EmbedBuilder();
         embed.setAuthor("======== Help Menu ========", null, null);
-        embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+        embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
         embed.setThumbnail("https://i.imgur.com/4TUoYOM.png");
         if (parameters.length == 1)
         {

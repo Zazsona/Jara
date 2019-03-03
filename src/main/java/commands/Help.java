@@ -28,7 +28,7 @@ public class Help extends Command {
 		prefix = SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId()).toString();
 		EmbedBuilder embed = new EmbedBuilder();
 		embed.setAuthor("Help Menu", null, null);
-		embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+		embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
 		if (parameters.length == 1)
 		{
 			embed.setDescription("To get a list of commands, use "+prefix+"help [Topic]. For more information, use "+prefix+"about\n" +

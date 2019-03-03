@@ -1,5 +1,6 @@
 package commands.games;
 
+import commands.CmdUtil;
 import commands.GameCommand;
 import configuration.SettingsUtil;
 import jara.Core;
@@ -35,7 +36,7 @@ public class Connect4 extends GameCommand
          */
         channel = super.createGameChannel(msgEvent, msgEvent.getMember().getEffectiveName()+"s-connect4");
         embed = new EmbedBuilder();
-        embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+        embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
         embed.setTitle("Connect 4");
         Counter winner = null;
         for (int i = 0; i<counters.length; i++)

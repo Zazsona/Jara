@@ -130,6 +130,7 @@ public class ModuleManager
             {
                 continue;
             }
+            System.out.println(jarEntry.getName());
             String className = jarEntry.getName().substring(0, jarEntry.getName().length() - 6);
             className = className.replace("/", ".");
             Class c = cl.loadClass(className);

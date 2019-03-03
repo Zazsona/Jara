@@ -28,7 +28,7 @@ public class Play extends Command
             AudioTrackInfo requestedTrackInfo = null;
 
             EmbedBuilder embed = new EmbedBuilder();
-            embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+            embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
             embed.setThumbnail("https://i.imgur.com/wHdSqH5.png");
             embed.setTitle("Now Playing...");
 
@@ -98,7 +98,7 @@ public class Play extends Command
         else
         {
             EmbedBuilder embed = new EmbedBuilder();
-            embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+            embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
             embed.setThumbnail("https://i.imgur.com/wHdSqH5.png");
             embed.setTitle("Error");
             embed.setDescription("You must be in a voice channel to use this command.");
