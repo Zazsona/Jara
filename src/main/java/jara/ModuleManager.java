@@ -14,8 +14,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.*;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -46,6 +48,7 @@ public class ModuleManager
      * The number of issues that may have an impact on operation
      */
     private static int errors = 0;
+
     /**
      * Parses through each jar within the modules folder and gathers its {@link CommandAttributes}.
      * @return the list of {@link CommandAttributes}
@@ -54,7 +57,7 @@ public class ModuleManager
     public static LinkedList<CommandAttributes> loadModules() throws InvalidModuleException
     {
         onLoadClasses = new HashMap<>();
-        reservedAliases = new HashSet<>();
+        reservedAliases = new HashSet<>(); //TODO: Add in-built commands.
         LinkedList<CommandAttributes> cas = new LinkedList<>();
         File moduleDir = new File(SettingsUtil.getDirectory() + "/modules/");
         if (!moduleDir.exists())
@@ -126,42 +129,12 @@ public class ModuleManager
         while (entries.hasMoreElements())
         {
             JarEntry jarEntry = entries.nextElement();
-            if (jarEntry.isDirectory() || !jarEntry.getName().endsWith(".class"))
+            if (jarEntry.getName().endsWith(".class"))
             {
-                continue;
+                ca = loadClass(ca, jarFile, cl, jarPact, jarEntry);
             }
-            System.out.println(jarEntry.getName());
-            String className = jarEntry.getName().substring(0, jarEntry.getName().length() - 6);
-            className = className.replace("/", ".");
-            Class c = cl.loadClass(className);
+            //TODO: It's possible to load in files from a module's resources using Java 7's FileSystem, however, this will require an external process.
 
-            if (Command.class.isAssignableFrom(c) && jarPact != null)
-            {
-                CommandAttributes pactCA = getAttributesInPact(jarFile, jarPact);
-                ca = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), c, pactCA.getAliases(), pactCA.getCategory(), pactCA.isDisableable());
-
-                JarEntry jarHelp = jarFile.getJarEntry("help.json");
-                if (jarHelp != null)
-                {
-                    for (String alias : ca.getAliases())
-                    {
-                        NewHelp.addPage(alias.toLowerCase(), getHelpPage(jarFile, jarHelp));
-                    }
-                }
-                else
-                {
-                    for (String alias : ca.getAliases())
-                    {
-                        NewHelp.addPage(alias.toLowerCase(), new NewHelp.HelpPage()); //Default values
-                    }
-                    logger.info(jarFile.getName()+" has no help page.");
-                    warnings++;
-                }
-            }
-            if (Load.class.isAssignableFrom(c))
-            {
-                onLoadClasses.put(c, jarFile);
-            }
         }
         if (jarPact == null)
         {
@@ -172,6 +145,54 @@ public class ModuleManager
         {
             warnings++;
             throw new ClassNotFoundException(jarFile.getName()+" has no entry point. (That is, a class that extends Command)");
+        }
+        return ca;
+    }
+
+    /**
+     * Loads a class from the specified module setup
+     * @param ca the command attributes associated with this module setup
+     * @param jarFile the module's jar
+     * @param cl the classloader
+     * @param jarPact the module's pact
+     * @param jarEntry the class' jar entry
+     * @return potentially modified CommandAttributes
+     * @throws ClassNotFoundException
+     * @throws IOException
+     * @throws ConflictException
+     */
+    private static CommandAttributes loadClass(CommandAttributes ca, JarFile jarFile, URLClassLoader cl, JarEntry jarPact, JarEntry jarEntry) throws ClassNotFoundException, IOException, ConflictException
+    {
+        String className = jarEntry.getName().substring(0, jarEntry.getName().length() - 6);
+        className = className.replace("/", ".");
+        Class c = cl.loadClass(className);
+
+        if (Command.class.isAssignableFrom(c) && jarPact != null)
+        {
+            CommandAttributes pactCA = getAttributesInPact(jarFile, jarPact);
+            ca = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), c, pactCA.getAliases(), pactCA.getCategory(), pactCA.isDisableable());
+
+            JarEntry jarHelp = jarFile.getJarEntry("help.json"); //We only load help after identifying it's a command
+            if (jarHelp != null)
+            {
+                for (String alias : ca.getAliases())
+                {
+                    NewHelp.addPage(alias.toLowerCase(), getHelpPage(jarFile, jarHelp));
+                }
+            }
+            else
+            {
+                for (String alias : ca.getAliases())
+                {
+                    NewHelp.addPage(alias.toLowerCase(), new NewHelp.HelpPage()); //Default values
+                }
+                logger.info(jarFile.getName()+" has no help page.");
+                warnings++;
+            }
+        }
+        if (Load.class.isAssignableFrom(c))
+        {
+            onLoadClasses.put(c, jarFile);
         }
         return ca;
     }

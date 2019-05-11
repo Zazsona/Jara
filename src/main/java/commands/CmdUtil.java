@@ -30,6 +30,9 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Don't remove items from this API, as it will break the modules that rely on them.
+ */
 public class CmdUtil
 {
     /**
@@ -37,7 +40,7 @@ public class CmdUtil
      */
     private static ArrayList<String> wordList;
     /**
-     * A list of radom topics
+     * A list of random topics
      */
     private static ArrayList<String> topicList;
     /**
