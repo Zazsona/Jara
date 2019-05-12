@@ -14,7 +14,7 @@ public class NowPlaying extends Command
     public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
     {
         EmbedBuilder embed = new EmbedBuilder();
-        embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+        embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
         embed.setThumbnail("https://i.imgur.com/wHdSqH5.png");
         embed.setTitle("Now Playing...");
         Audio audio = CmdUtil.getGuildAudio(msgEvent.getGuild().getId());

@@ -76,11 +76,11 @@ public class CommandAttributes
 		return commandClass;
 	}
 	/**
-	 * Returns the class' category as its ID.<br>
+	 * Returns the command's category.<br>
 	 * @return
-	 * int - The id number
+	 * Category - The category
 	 */
-	public CommandRegister.Category getCategoryID()
+	public CommandRegister.Category getCategory()
 	{
 		return category;
 	}

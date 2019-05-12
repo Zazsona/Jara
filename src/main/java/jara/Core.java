@@ -1,11 +1,13 @@
 package jara;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.HashMap;
 
 import javax.security.auth.login.LoginException;
 
 import configuration.SettingsUtil;
+import exceptions.InvalidModuleException;
+import gui.HeadedGUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +20,7 @@ import net.dv8tion.jda.core.entities.Member;
 
 public class Core //A class for covering the global manners of the bot.
 {
+	private static Logger logger = LoggerFactory.getLogger(Core.class);
 	private static ShardManager shardManager;
 	public static boolean initialiseDiscordConnection(String clientToken)
 	{
@@ -27,7 +30,6 @@ public class Core //A class for covering the global manners of the bot.
 		    DefaultShardManagerBuilder shardManagerBuilder = new DefaultShardManagerBuilder();
 		    shardManagerBuilder.setToken(clientToken);
 		    shardManager = shardManagerBuilder.build();
-		    logger.info("Logged in!");
 		    return true;
 		}
 	    catch (LoginException | IllegalArgumentException e)
@@ -39,16 +41,28 @@ public class Core //A class for covering the global manners of the bot.
 	}
 	public static void enableCommands()
 	{
-		HashMap<String, CommandLauncher> commands = new HashMap<>();
-		for (CommandAttributes ca : CommandRegister.getRegister())
+		try
 		{
-			CommandLauncher cl = new CommandLauncher(ca, SettingsUtil.getGlobalSettings().isCommandEnabled(ca.getCommandKey()));
-			for (String alias : ca.getAliases())
+			HashMap<String, CommandLauncher> commands = new HashMap<>();
+			for (CommandAttributes ca : CommandRegister.getRegister())
 			{
-				commands.put(alias.toLowerCase(), cl);
+				CommandLauncher cl = new CommandLauncher(ca, SettingsUtil.getGlobalSettings().isCommandEnabled(ca.getCommandKey()));
+				for (String alias : ca.getAliases())
+				{
+					commands.put(alias.toLowerCase(), cl);
+				}
+			}
+			shardManager.addEventListener(new CommandHandler(commands));
+		}
+		catch (InvalidModuleException e)
+		{
+			logger.error(e.getMessage()+"\nA log has been created.");
+			if (!GraphicsEnvironment.isHeadless())
+			{
+				HeadedGUI.showError(e.getMessage()+"\nA log has been created.");
 			}
 		}
-		shardManager.addEventListener(new CommandHandler(commands));
+
 	}
 	public static void startListeners()
 	{
@@ -58,16 +72,5 @@ public class Core //A class for covering the global manners of the bot.
 	public static ShardManager getShardManager()
 	{
 		return shardManager;
-	}
-	public static Color getHighlightColour(Member selfMember)
-	{
-		try
-		{
-			return selfMember.getRoles().get(0).getColor(); //Try to set it to the bot's primary role colour
-		}
-		catch (IndexOutOfBoundsException | NullPointerException e)	//If the bot has no role
-		{
-			return Color.decode("#5967cf"); //Use a default theme.
-		}
 	}
 }

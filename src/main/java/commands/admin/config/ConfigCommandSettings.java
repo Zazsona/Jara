@@ -105,6 +105,10 @@ public class ConfigCommandSettings
 
         for (String roleName : params)
         {
+            if (roleName.equalsIgnoreCase("everyone"))
+            {
+                roleName = "@everyone";
+            }
             List<Role> rolesWithName = channel.getGuild().getRolesByName(roleName, true);
             if (rolesWithName.size() > 0)
             {
@@ -151,7 +155,7 @@ public class ConfigCommandSettings
         profileBuilder.append("**Roles:** ");
         for (String roleID : guildSettings.getPermissions(ca.getCommandKey()))
         {
-            profileBuilder.append(channel.getGuild().getRoleById(roleID).getName()+", ");
+            profileBuilder.append(channel.getGuild().getRoleById(roleID).getName().replace("@", "")+", "); //removing "@" prevents pinging with the @everyone role.
         }
         profileBuilder.append("\n==========\n");
         profileBuilder.append("**Controls:**\n");

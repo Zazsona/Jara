@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import commands.CmdUtil;
 import commands.Command;
 import jara.Core;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -31,7 +32,7 @@ public class Report extends Command
 		EmbedBuilder embed = new EmbedBuilder();
 		embed.setTitle(msgEvent.getJDA().getSelfUser().getName()+" Report:");
 		embed.setDescription(reportSB.toString());
-		embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+		embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
 		
         msgEvent.getChannel().sendMessage(embed.build()).queue();
 	}

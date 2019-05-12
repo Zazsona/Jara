@@ -1,5 +1,6 @@
 package event;
 
+import commands.CmdUtil;
 import configuration.SettingsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ public class GuildJoinHandler extends ListenerAdapter
 		logger.info("Joined guild "+joinEvent.getGuild().getId());
 		SettingsUtil.addNewGuild(joinEvent.getGuild().getId());
 		EmbedBuilder embed = new EmbedBuilder();
-		embed.setColor(Core.getHighlightColour(joinEvent.getGuild().getSelfMember()));
+		embed.setColor(CmdUtil.getHighlightColour(joinEvent.getGuild().getSelfMember()));
 		embed.setDescription("Hey there, "+owner.getName()+"!\nI'm just sending you this to tell you I'm all ready to go in "+guild.getName()+".\n" +
 									 "\nTo get started, use `/config` in your guild with a channel I have access to, there you will be able to enable commands and features!\n\n" +
 									 "**Quick Links to get you started:**\n" +

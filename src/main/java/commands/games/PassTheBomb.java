@@ -63,7 +63,7 @@ public class PassTheBomb extends GameCommand
             EmbedBuilder embed = new EmbedBuilder();
             embed.setTitle("Pass The Bomb");
             embed.setDescription(":game_die: Welcome to Pass The Bomb! :game_die:\nI'm looking for **"+ CmdUtil.getRandomTopic()+"** starting with **"+letter+"**\n\n**"+ players.get(0).getEffectiveName()+"**, you're up first! 10 seconds. Go!");
-            embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+            embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
             embed.setThumbnail("https://i.imgur.com/LxPYsv7.png");
             channel.sendMessage(embed.build()).queue();
 
@@ -82,7 +82,7 @@ public class PassTheBomb extends GameCommand
     {
         EmbedBuilder embed = new EmbedBuilder();
         embed.setTitle("Pass The Bomb");
-        embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+        embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
         embed.setThumbnail("https://i.imgur.com/LxPYsv7.png");
 
         MessageManager mm = new MessageManager();

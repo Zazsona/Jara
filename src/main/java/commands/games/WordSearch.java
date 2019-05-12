@@ -35,7 +35,7 @@ public class WordSearch extends GameCommand
             embedBuilder.addField("Words", words[0]+"\n"+words[1], true);
             embedBuilder.addField("", words[2]+"\n"+words[3], true);
             embedBuilder.addField("", words[4]+"\n"+words[5], true);
-            embedBuilder.setColor(Core.getHighlightColour(channel.getGuild().getSelfMember()));
+            embedBuilder.setColor(CmdUtil.getHighlightColour(channel.getGuild().getSelfMember()));
             channel.sendMessage(embedBuilder.build()).queue();
 
             if (complete)
@@ -49,7 +49,7 @@ public class WordSearch extends GameCommand
     {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setDescription("Welcome to Word Search! Simply enter the co-ordinates of the word when you find it, and try to find all "+words.length+"!\nE.g: B5-F9");
-        embedBuilder.setColor(Core.getHighlightColour(channel.getGuild().getSelfMember()));
+        embedBuilder.setColor(CmdUtil.getHighlightColour(channel.getGuild().getSelfMember()));
         channel.sendMessage(embedBuilder.build()).queue();
     }
 
@@ -57,7 +57,7 @@ public class WordSearch extends GameCommand
     {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setDescription("That's a wrap! Thanks for playing.");
-        embedBuilder.setColor(Core.getHighlightColour(channel.getGuild().getSelfMember()));
+        embedBuilder.setColor(CmdUtil.getHighlightColour(channel.getGuild().getSelfMember()));
         channel.sendMessage(embedBuilder.build()).queue();
         super.deleteGameChannel(msgEvent, channel);
     }

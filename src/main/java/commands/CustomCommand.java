@@ -25,7 +25,7 @@ public class CustomCommand extends Command
             if (!customCommand.getMessage().equals(""))
             {
                 EmbedBuilder embed = new EmbedBuilder();
-                embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+                embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
                 embed.setTitle(key);
                 embed.setDescription(customCommand.getMessage());
                 msgEvent.getChannel().sendMessage(embed.build()).queue();
@@ -47,7 +47,7 @@ public class CustomCommand extends Command
         catch (NullPointerException e)
         {
             EmbedBuilder embed = new EmbedBuilder();
-            embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+            embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
             embed.setTitle("Error");
             embed.setDescription("You must specify a custom command key."); //Reeeeally I'd rather they not use this method anyway, but hey, no harm in having the option.
             msgEvent.getChannel().sendMessage(embed.build()).queue();
@@ -55,7 +55,7 @@ public class CustomCommand extends Command
         catch (InsufficientPermissionException e)
         {
             EmbedBuilder embed = new EmbedBuilder();
-            embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+            embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
             embed.setTitle("Error");
             embed.setDescription("I do not have sufficient permissions / role hierarchy to fully perform the command.");
             msgEvent.getChannel().sendMessage(embed.build()).queue();

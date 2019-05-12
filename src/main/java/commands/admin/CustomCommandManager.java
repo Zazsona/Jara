@@ -1,5 +1,6 @@
 package commands.admin;
 
+import commands.CmdUtil;
 import commands.Command;
 import configuration.GuildSettings;
 import configuration.GuildSettingsJson;
@@ -374,8 +375,7 @@ public class CustomCommandManager extends Command
     private EmbedBuilder getEmbedStyle(GuildMessageReceivedEvent msgEvent)
     {
         EmbedBuilder embed = new EmbedBuilder();
-        embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+        embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
         return embed;
     }
-    //TODO: Implement this (Ensure key and alias are lower case when saving)
 }

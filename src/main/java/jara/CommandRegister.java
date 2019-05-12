@@ -7,6 +7,7 @@ import java.util.Comparator;
 import commands.Command;
 import commands.CustomCommand;
 import commands.Help;
+import commands.NewHelp;
 import commands.utility.Poll;
 import commands.admin.CustomCommandManager;
 import commands.admin.config.ConfigMain;
@@ -60,6 +61,8 @@ public class CommandRegister
 			 * I also highly recommend you include details about the command in Help, such as parameters and what it does. Aliases and category will be done automatically.
 			 * ===========================================
 			 */
+
+			//TODO: Move (most) of these to modules.
 			register.add(new CommandAttributes("Ping", "Tests the connection.", Ping.class, new String[] {"Pong", "Test"}, UTILITY, true));
 			register.add(new CommandAttributes("Report", "Displays Bot stats.", Report.class, new String[] {"Status", "Stats"}, UTILITY, true));
 			register.add(new CommandAttributes("About", "Shows Bot credits.", About.class, new String[] {"Credits", "Authors"}, UTILITY, false));
@@ -68,7 +71,7 @@ public class CommandRegister
 			register.add(new CommandAttributes("CoinFlip", "Flips a coin.", CoinFlip.class, new String[] {"FlipCoin", "Toss", "cf", "fc", "fiftyfifty", "flipacoin"}, UTILITY, true));
 			register.add(new CommandAttributes("Config", "Modify Bot settings.", ConfigMain.class, new String[] {"Settings"}, ADMIN, false));
 			register.add(new CommandAttributes("Countdown", "The classic word making game.", Countdown.class, new String[] {"cd"}, GAMES, true));
-			register.add(new CommandAttributes("Help", "Shows command details.", Help.class, new String[] {"?", "commands"}, NOGROUP, false)); //Does help REALLY need to be indexed in help?
+			register.add(new CommandAttributes("Help", "Shows command details.", NewHelp.class, new String[] {"?", "commands"}, NOGROUP, false)); //Does help REALLY need to be indexed in help?
             register.add(new CommandAttributes("Randomizer", "Randomises numbers.", Randomizer.class, new String[] {"Randomise", "Randomize", "Randomiser", "Roulette", "Picker", "Selector"}, UTILITY, true));
 			register.add(new CommandAttributes("Say", "Make the bot echo.", Say.class, new String[] {"Speak", "Talk"}, TOYS, true));
 			register.add(new CommandAttributes("Timecard", "Spongebob Timecards.", Timecard.class, new String[] {"SpongebobCard", "Timescreen"}, TOYS, true));
@@ -90,6 +93,9 @@ public class CommandRegister
 			register.add(new CommandAttributes("Connect4", "Get four in a row to win.", Connect4.class, new String[] {"ConnectFour", "FourInARow", "4InARow"}, GAMES, true));
 			register.add(new CommandAttributes("WordSearch", "Find the words.", WordSearch.class, new String[] {"WordHunt", "WordFinder", "SearchWords"}, GAMES, true));
 			register.add(new CommandAttributes("MCServer", "Fetches Minecraft server info.", MinecraftServerQuery.class, new String[] {"MinecraftServer", "MinecraftQuery", "MinecraftServerStatus"}, UTILITY, true));
+
+			register.addAll(new ModuleManager().loadModules());			//Load mods
+
 			/*
 					Sort the commands into alphabetical order based on their keys
 			 */
@@ -200,11 +206,10 @@ public class CommandRegister
 			for (CommandAttributes commandAttributes : register)
 			{
 				min = 0;
-				max = commandAttributes.getAliases().length;
+				max = commandAttributes.getAliases().length-1;
 				while (min <= max)
 				{
 					int mid = (max+min)/2;
-
 					if (commandAttributes.getAliases()[mid].compareToIgnoreCase(alias) < 0)
 					{
 						min = mid+1;
@@ -266,7 +271,7 @@ public class CommandRegister
 	 */
 	public static Category getCommandCategory(String key)
 	{
-		return getCommand(key).getCategoryID();
+		return getCommand(key).getCategory();
 	}
 	/**
 	 * Converts a category ID into a category name.
@@ -341,16 +346,14 @@ public class CommandRegister
 
 	/**
 	 * Returns the Command Attributes all all commands in this category.
-	 * @param categoryID
+	 * @param category
 	 * @return CommandAttributes[] - Array of attributes.
 	 */
-	public static CommandAttributes[] getCommandsInCategory(Category categoryID)
+	public static CommandAttributes[] getCommandsInCategory(Category category)
 	{
 		ArrayList<CommandAttributes> categoryCommands;
-		switch (categoryID)
+		switch (category)
 		{
-			default:
-				return null;
 			case NOGROUP:
 				categoryCommands = noGroupCommands;
 				break;
@@ -369,14 +372,16 @@ public class CommandRegister
 			case ADMIN:
 				categoryCommands = adminCommands;
 				break;
+			default:
+				return null;
 		}
 		if (categoryCommands != null)
 		{
-			return adminCommands.toArray(new CommandAttributes[register.size()]);
+			return categoryCommands.toArray(new CommandAttributes[0]);
 		}
 		else
 		{
-			return generateCommandsInCategory(categoryID);
+			return generateCommandsInCategory(category);
 		}
 	}
 
@@ -391,17 +396,15 @@ public class CommandRegister
 		ArrayList<CommandAttributes> categoryCommands = new ArrayList<>();
 		for (CommandAttributes cmdAttributes : register)
 		{
-			if (cmdAttributes.getCategoryID() == categoryID)
+			if (cmdAttributes.getCategory().equals(categoryID))
 			{
 				categoryCommands.add(cmdAttributes);
 			}
 		}
 		switch (categoryID)
 		{
-			default:
-				return null;
 			case NOGROUP:
-				 noGroupCommands = categoryCommands;
+				noGroupCommands = categoryCommands;
 				break;
 			case GAMES:
 				gamesCommands = categoryCommands;
@@ -418,6 +421,8 @@ public class CommandRegister
 			case ADMIN:
 				adminCommands = categoryCommands;
 				break;
+			default:
+				return null;
 		}
 		return categoryCommands.toArray(new CommandAttributes[0]);
 	}

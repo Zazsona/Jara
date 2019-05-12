@@ -1,5 +1,6 @@
 package commands.utility;
 
+import commands.CmdUtil;
 import commands.Command;
 import jara.Core;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -29,7 +30,7 @@ public class Poll extends Command
 			EmbedBuilder embed = new EmbedBuilder();
 			embed.setTitle("====================");
 			embed.setDescription("**Poll**\n"+descBuilder.toString()+"====================");
-			embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+			embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
 			Message msg = msgEvent.getChannel().sendMessage(embed.build()).complete();
 			String[] reactions = {"🇦",  "🇧",  "🇨",  "🇩",  "🇪",   "🇫",   "🇬",   "🇭",   "🇮",  "🇯",   "🇰",   "🇱",   "🇲",   "🇳",   "🇴",  "🇵",  "🇶",  "🇷",  "🇸",  "🇹",  "🇺", "🇻", "🇼", "🇽", "🇾",  "🇿"};
 			for (int i = 1; i<parameters.length; i++)

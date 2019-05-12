@@ -1,5 +1,6 @@
 package commands.admin.config;
 
+import commands.CmdUtil;
 import commands.Command;
 import configuration.GuildSettings;
 import configuration.SettingsUtil;
@@ -65,6 +66,7 @@ public class ConfigMain extends Command
                         embed.setDescription("Unknown menu: "+selection+". To quit, enter \"quit\".");
                         channel.sendMessage(embed.build()).queue();
                         embed.setDescription(embedDescription);
+                        continue;
                     }
                     channel.sendMessage(embed.build()).queue();
                 }
@@ -81,7 +83,7 @@ public class ConfigMain extends Command
     public static EmbedBuilder getEmbedStyle(GuildMessageReceivedEvent msgEvent)
     {
         EmbedBuilder embed = new EmbedBuilder();
-        embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+        embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
         embed.setThumbnail("https://i.imgur.com/Hb8ET7G.png");
         embed.setTitle("= Config =");
         return embed;

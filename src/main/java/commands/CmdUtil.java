@@ -6,6 +6,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import configuration.SettingsUtil;
 import jara.Core;
+import net.dv8tion.jda.core.entities.Member;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -16,6 +17,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import javax.print.URIException;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -28,6 +30,9 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Don't remove items from this API, as it will break the modules that rely on them.
+ */
 public class CmdUtil
 {
     /**
@@ -35,7 +40,7 @@ public class CmdUtil
      */
     private static ArrayList<String> wordList;
     /**
-     * A list of radom topics
+     * A list of random topics
      */
     private static ArrayList<String> topicList;
     /**
@@ -255,6 +260,23 @@ public class CmdUtil
     public static String getRandomTopic() throws IOException
     {
         return getTopicList().get(new Random().nextInt(getTopicList().size()));
+    }
+
+    /**
+     * Gets the bot's themed colour. That is, Jara's default colour or, if available, the colour of its role.
+     * @param selfMember Jara's member object
+     * @return the colour to use
+     */
+    public static Color getHighlightColour(Member selfMember)
+    {
+        try
+        {
+            return selfMember.getRoles().get(0).getColor(); //Try to set it to the bot's primary role colour
+        }
+        catch (IndexOutOfBoundsException | NullPointerException e)	//If the bot has no role
+        {
+            return Color.decode("#5967cf"); //Use a default theme.
+        }
     }
 
 

@@ -3,6 +3,7 @@ package configuration;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import commands.CmdUtil;
 import commands.Command;
 import commands.CustomCommand;
 import jara.CommandAttributes;
@@ -117,7 +118,7 @@ public class GuildSettings extends GuildSettingsJson
 
                 EmbedBuilder embed = new EmbedBuilder();
                 embed.setDescription("The bot has been updated with new commands/settings added!\nUse /config to configure these, they have been disabled for now.");
-                embed.setColor(Core.getHighlightColour(null));
+                embed.setColor(CmdUtil.getHighlightColour(null));
                 Core.getShardManager().getGuildById(guildId).getOwner().getUser().openPrivateChannel().complete().sendMessage(embed.build());
             }
         }
@@ -231,6 +232,7 @@ public class GuildSettings extends GuildSettingsJson
         {
             roleIDs.add(role.getId());
         }
+        roleIDs.add(member.getGuild().getPublicRole().getId()); //everyone role is not included in getRoles()
         if (!Collections.disjoint(this.commandConfig.get(commandKey).permissions, roleIDs))
         {
             permissionGranted = true;

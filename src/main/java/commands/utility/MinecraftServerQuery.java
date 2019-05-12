@@ -1,6 +1,7 @@
 package commands.utility;
 
 import com.google.gson.Gson;
+import commands.CmdUtil;
 import commands.Command;
 import jara.Core;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -31,7 +32,7 @@ public class MinecraftServerQuery extends Command
             {
                 QueryResult queryResult = gson.fromJson(getDetails(connectionDetails[0], Integer.parseInt(connectionDetails[1])), QueryResult.class);
                 EmbedBuilder embedBuilder = new EmbedBuilder();
-                embedBuilder.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+                embedBuilder.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
                 embedBuilder.setTitle("==== MC Server Status ====");
                 embedBuilder.setDescription(buildOutput(connectionDetails[0], queryResult));
                 msgEvent.getChannel().sendMessage(embedBuilder.build()).queue();
@@ -40,7 +41,7 @@ public class MinecraftServerQuery extends Command
         catch (UnknownHostException e)
         {
             EmbedBuilder embedBuilder = new EmbedBuilder();
-            embedBuilder.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+            embedBuilder.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
             embedBuilder.setTitle("==== MC Server Status ====");
             embedBuilder.setDescription("**Server**: "+parameters[1]+"\n**Status:** Unavailable");
             msgEvent.getChannel().sendMessage(embedBuilder.build()).queue();

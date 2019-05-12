@@ -1,6 +1,7 @@
 package commands.utility;
 import java.awt.Color;
 
+import commands.CmdUtil;
 import commands.Command;
 import jara.Core;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -18,7 +19,7 @@ public class About extends Command
 				+ "Zazsona\n"										//If forking, I ask that you retain the contributor list here in some capacity.
 				+ "\nSource code available here:\n"				
 				+ "https://github.com/Zazsona/Jara");
-		embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+		embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
 		msgEvent.getChannel().sendMessage(embed.build()).queue();	
 	}
 }

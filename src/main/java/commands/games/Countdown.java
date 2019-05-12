@@ -38,7 +38,7 @@ public class Countdown extends GameCommand
 		channel = super.createGameChannel(msgEvent, msgEvent.getMember().getEffectiveName()+"s-countdown");
 		EmbedBuilder embed = new EmbedBuilder();
 		embed.setDescription(("**Welcome to Countdown!**\nTo get started, type 'c' or 'v' into chat to select either a consonant(s) or vowel(s)."));
-		embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+		embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
 		embed.setThumbnail("https://i.imgur.com/KwjqNkH.png");
 		channel.sendMessage(embed.build()).queue();
 		generateLetters(parameters);
@@ -112,7 +112,7 @@ public class Countdown extends GameCommand
 			}
 			EmbedBuilder embed = new EmbedBuilder();
 			embed.setDescription(createBoard());
-			embed.setColor(Core.getHighlightColour(channel.getGuild().getSelfMember()));
+			embed.setColor(CmdUtil.getHighlightColour(channel.getGuild().getSelfMember()));
 			channel.sendMessage(embed.build()).queue();
 		}
 		return generateLetters(new MessageManager().getNextMessage(channel).getContentDisplay()); //If there are still selections missing, get 'em.
@@ -126,7 +126,7 @@ public class Countdown extends GameCommand
 	private Message[] getAnswers(GuildMessageReceivedEvent msgEvent)
 	{
 		EmbedBuilder embed = new EmbedBuilder();
-		embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+		embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
 		embed.setDescription("You've got 30 seconds - On your marks, get set, go!\n\n**"+createBoard()+"**");
 		embed.setThumbnail("https://i.imgur.com/0uNRZWG.png");
 		Message embedMsg = channel.sendMessage(embed.build()).complete();
@@ -193,7 +193,7 @@ public class Countdown extends GameCommand
 			if (!winnerData[0].equals(""))
 			{
 				EmbedBuilder embed = new EmbedBuilder();
-				embed.setColor(Core.getHighlightColour(answers[0].getGuild().getSelfMember()));
+				embed.setColor(CmdUtil.getHighlightColour(answers[0].getGuild().getSelfMember()));
 				winnerData[1] = winnerData[1].toLowerCase();
 				if (isRude(winnerData[1]))
 				{
@@ -256,7 +256,7 @@ public class Countdown extends GameCommand
 				}
 
 				embed = new EmbedBuilder();
-				embed.setColor(Core.getHighlightColour(channel.getGuild().getSelfMember()));
+				embed.setColor(CmdUtil.getHighlightColour(channel.getGuild().getSelfMember()));
 				embed.setThumbnail("https://i.imgur.com/3SUuzD1.png");
 				embed.setDescription("Time's up! You've got 5 seconds to state your word!");
 				channel.sendMessage(embed.build()).queue();

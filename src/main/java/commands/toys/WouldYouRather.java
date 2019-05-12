@@ -28,7 +28,7 @@ public class WouldYouRather extends Command
         }
 
         EmbedBuilder embed = new EmbedBuilder();
-        embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+        embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
         embed.setTitle(json.title);
         embed.setDescription("A. "+json.choicea+"\nB. "+json.choiceb);
         channel.sendMessage(embed.build()).queue();

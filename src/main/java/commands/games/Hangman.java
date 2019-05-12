@@ -176,7 +176,7 @@ public class Hangman extends GameCommand
     {
         EmbedBuilder embed = new EmbedBuilder();
         embed.setTitle("Hangman");
-        embed.setColor(Core.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+        embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
         return embed;
     }
 }
