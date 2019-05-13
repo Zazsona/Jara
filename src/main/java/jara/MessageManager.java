@@ -131,22 +131,28 @@ public class MessageManager
 				}
 			}
 			channel.getJDA().removeEventListener(messageListener);
-			int msgArraySize = messageCount;
-			if (messageLog.size() < messageCount)	//Sets how big to declare the array.
-			{
-				msgArraySize = messageLog.size();	//This allows us to set a message count of Integer.MAX_VALUE without concern of how much space the array will reserve.
-			}
-			Message[] messages = new Message[msgArraySize];
-			for (int i = 0; i<messages.length; i++)
-			{
-				messages[i] = messageLog.get(messageLog.size()-msgArraySize+i);
-			}
 			channelToListen = null;
-			return messages;
+			if (messageLogSize != messageLog.size())
+			{
+				int msgArraySize = messageCount;
+				if (messageLog.size() < messageCount)	//Sets how big to declare the array.
+				{
+					msgArraySize = messageLog.size();	//This allows us to set a message count of Integer.MAX_VALUE without concern of how much space the array will reserve.
+				}
+				Message[] messages = new Message[msgArraySize];
+				for (int i = 0; i<messages.length; i++)
+				{
+					messages[i] = messageLog.get(messageLog.size()-msgArraySize+i);
+				}
+				return messages;
+			}
+			else
+			{
+				return null;	//No messages were received
+			}
 		} 
 		catch (InterruptedException e) 
 		{
-			e.printStackTrace();
 			channel.getJDA().removeEventListener(messageListener);
 			channelToListen = null;
 			return null; //Let the calling method handle this.
@@ -168,7 +174,7 @@ public class MessageManager
 			Message message = futureGuildMessageCollector(guild, 0, 1)[0];
 			return message;
 		}
-		catch (ArrayIndexOutOfBoundsException e)
+		catch (ArrayIndexOutOfBoundsException | NullPointerException e)
 		{
 			return null;
 		}
@@ -188,7 +194,7 @@ public class MessageManager
 			Message message = futureChannelMessageCollector(channel, 0, 1)[0];
 			return message;
 		}
-		catch (ArrayIndexOutOfBoundsException e)
+		catch (ArrayIndexOutOfBoundsException | NullPointerException e)
 		{
 			return null;
 		}
@@ -209,7 +215,7 @@ public class MessageManager
 			Message message = futureGuildMessageCollector(guild, timeout, 1)[0];
 			return message;
 		}
-		catch (ArrayIndexOutOfBoundsException e)
+		catch (ArrayIndexOutOfBoundsException | NullPointerException e)
 		{
 			return null;
 		}
@@ -230,7 +236,7 @@ public class MessageManager
 			Message message = futureChannelMessageCollector(channel, timeout, 1)[0];
 			return message;
 		}
-		catch (ArrayIndexOutOfBoundsException e)
+		catch (ArrayIndexOutOfBoundsException | NullPointerException e)
 		{
 			return null; //No messages
 		}
