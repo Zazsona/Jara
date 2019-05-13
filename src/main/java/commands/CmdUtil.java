@@ -5,8 +5,10 @@ import audio.Audio;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import configuration.SettingsUtil;
+import jara.CommandRegister;
 import jara.Core;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -277,6 +279,21 @@ public class CmdUtil
         {
             return Color.decode("#5967cf"); //Use a default theme.
         }
+    }
+
+    /**
+     * Opens the help page to for the specified command.
+     *
+     * @param msgEvent
+     * @param clazz
+     */
+    public static void sendHelpInfo(GuildMessageReceivedEvent msgEvent, Class<? extends Command> clazz)
+    {
+        new NewHelp().run(msgEvent, "/?", CommandRegister.getCommand(clazz).getCommandKey());
+        /*
+         * So, technically this is fine, as help is *always* enabled and cannot be disabled. But generally calling commands like this is a bad idea, as they may be disabled.
+         * This also saves us having to copy command usage info for each command, which could be a problem as commands change.
+         */
     }
 
 
