@@ -10,6 +10,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 public class CommandLauncher
 {
+	private static Logger logger = LoggerFactory.getLogger(CommandLauncher.class);
 	protected final boolean enabledState; //Whether the config allows this command to be used
 	protected final CommandAttributes attributes;
 	
@@ -28,48 +29,53 @@ public class CommandLauncher
 	 */
 	public void execute(GuildMessageReceivedEvent msgEvent, String...parameters)
 	{
-		if (isEnabled() || !attributes.isDisableable()) //If it can't be disabled, run it anyway even if it is disabled. Stops people fucking with settings to the point the bot is unusable.
+		try
 		{
-			GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
-			if (guildSettings.isCommandEnabled(attributes.getCommandKey()))
+			if (isEnabled() || !attributes.isDisableable()) //If it can't be disabled, run it anyway even if it is disabled. Stops people fucking with settings to the point the bot is unusable.
 			{
-				if (guildSettings.isPermitted(msgEvent.getMember(), attributes.getCommandClass()))
+				GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
+				if (guildSettings.isCommandEnabled(attributes.getCommandKey()))
 				{
-					Runnable commandRunnable = () -> {
-						try
-						{
-							attributes.getCommandClass().newInstance().run(msgEvent, parameters);
-						}
-						catch (InstantiationException | IllegalAccessException e)
-						{
-							msgEvent.getChannel().sendMessage("Sorry, I was unable to run the command.").queue();
-							Logger logger = LoggerFactory.getLogger(CommandLauncher.class);
-							logger.error("A command request was sent but could not be fulfilled.\nCommand: "+parameters.toString()+"\nGuild: "+msgEvent.getGuild().getId()+" ("+msgEvent.getGuild().getName()+")\nUser: "+msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+"Channel: "+msgEvent.getChannel().getId()+" ("+msgEvent.getChannel().getName()+")\nDate/Time: "+LocalDateTime.now().toString());
-							e.printStackTrace();
-						}
-					};
-					Thread commandThread = new Thread(commandRunnable);
-					commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getCommandKey()+"-Thread");
-					commandThread.start();
-					return;
+					if (guildSettings.isPermitted(msgEvent.getMember(), attributes.getCommandClass()))
+					{
+						Runnable commandRunnable = () -> {
+							try
+							{
+								attributes.getCommandClass().newInstance().run(msgEvent, parameters);
+							}
+							catch (InstantiationException | IllegalAccessException e)
+							{
+								msgEvent.getChannel().sendMessage("Sorry, I was unable to run the command.").queue();
+								Logger logger = LoggerFactory.getLogger(CommandLauncher.class);
+								logger.error("A command request was sent but could not be fulfilled.\nCommand: "+parameters.toString()+"\nGuild: "+msgEvent.getGuild().getId()+" ("+msgEvent.getGuild().getName()+")\nUser: "+msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+"Channel: "+msgEvent.getChannel().getId()+" ("+msgEvent.getChannel().getName()+")\nDate/Time: "+LocalDateTime.now().toString());
+								e.printStackTrace();
+							}
+						};
+						Thread commandThread = new Thread(commandRunnable);
+						commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getCommandKey()+"-Thread");
+						commandThread.start();
+						return;
+					}
+					else
+					{
+						msgEvent.getChannel().sendMessage("You do not have permission to use this command.").queue();
+					}
 				}
 				else
 				{
-					msgEvent.getChannel().sendMessage("You do not have permission to use this command.").queue();
+					msgEvent.getChannel().sendMessage("This command is disabled.").queue();
 				}
+
 			}
 			else
 			{
-				msgEvent.getChannel().sendMessage("This command is disabled.").queue();
+				logger.info(msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+" attempted to use the command "+parameters[0]+", however it's disabled. Please enable it in the config.");
 			}
-			
 		}
-		else
+		catch (NoSuchMethodError e)
 		{
-			Logger logger = LoggerFactory.getLogger(CommandLauncher.class);
-			logger.info(msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+" attempted to use the command "+parameters[0]+", however it's disabled. Please enable it in the config.");
+			logger.error("Command "+parameters[0]+ "is using an older API version, and is not supported.");
 		}
-
 	}
 
 	/**
