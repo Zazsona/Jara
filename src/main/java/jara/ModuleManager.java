@@ -54,11 +54,20 @@ public class ModuleManager
      * @return the list of {@link CommandAttributes}
      * @throws InvalidModuleException one or more fatal errors occurred during module loading
      */
-    public static LinkedList<CommandAttributes> loadModules() throws InvalidModuleException
+    public static LinkedList<CommandAttributes> loadModules(ArrayList<CommandAttributes> register) throws InvalidModuleException
     {
         onLoadClasses = new HashMap<>();
-        reservedAliases = new HashSet<>(); //TODO: Add in-built commands.
+        reservedAliases = new HashSet<>();
         LinkedList<CommandAttributes> cas = new LinkedList<>();
+
+        for (CommandAttributes inBuiltCA : register)
+        {
+            for (String alias : inBuiltCA.getAliases())     //Adds all in-built aliases so modules can't try and claim these.
+            {
+                reservedAliases.add(alias);
+            }
+        }
+
         File moduleDir = new File(SettingsUtil.getDirectory() + "/modules/");
         if (!moduleDir.exists())
             moduleDir.mkdirs();
