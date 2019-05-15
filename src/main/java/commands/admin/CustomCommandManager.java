@@ -12,6 +12,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,7 +39,12 @@ public class CustomCommandManager extends Command
         while (true) //This is here so that, if someone without permission tries to use the menu, it will just ignore their response.
         {
             EmbedBuilder embed = getEmbedStyle(msgEvent);
-            embed.setDescription("Please select an option, followed by the command. E.g: `Edit PartyTime`.\nYour commands: "+commandListBuilder.toString().substring(0, commandListBuilder.length()-2)+"\n\n**Add** - Add a new command.\n**Edit** - Modify a command.\n**Delete** - Delete a command.\n**Quit** - Close menu");
+            StringBuilder descBuilder = new StringBuilder();
+            descBuilder.append("Please select an option, followed by the command. E.g: `Edit PartyTime`.\n");
+            if (commandListBuilder.toString().length() > 0)
+                descBuilder.append("Your commands:\n").append(commandListBuilder.toString().substring(0, commandListBuilder.length()-2)).append("\n\n");
+            descBuilder.append("**Add** - Add a new command.\n**Edit** - Modify a command.\n**Delete** - Delete a command.\n**Quit** - Close menu");
+            embed.setDescription(descBuilder.toString());
             msgEvent.getChannel().sendMessage(embed.build()).queue();
             try
             {
@@ -46,10 +52,12 @@ public class CustomCommandManager extends Command
 
                 if (guildSettings.isPermitted(message.getMember(), getClass()))
                 {
+                    GuildSettingsJson.CustomCommandConfig customCommand = null;
                     String[] selection = message.getContentDisplay().toLowerCase().split(" ");
-                    GuildSettingsJson.CustomCommandConfig customCommand = guildSettings.getCustomCommand(selection[1]);
+                    if (!selection[0].equals("quit"))
+                        customCommand = guildSettings.getCustomCommand(selection[1]);
 
-                    switch (selection[0])
+                    switch (selection[0].trim())
                     {
                         case "add":
                             if (customCommand != null)
@@ -70,9 +78,11 @@ public class CustomCommandManager extends Command
                         case "delete":
                             guildSettings.removeCustomCommand(selection[1]);
                             guildSettings.save();
+                            embed.setDescription("Command "+selection[1]+" successfully removed.");
+                            msgEvent.getChannel().sendMessage(embed.build()).queue();
                             return;
                         case "quit":
-                            embed.setDescription("Closing menu.");
+                            embed.setDescription("Custom Command Manager closed.");
                             msgEvent.getChannel().sendMessage(embed.build()).queue();
                             return;
                         default:
@@ -133,7 +143,7 @@ public class CustomCommandManager extends Command
                             setUseFeatures(msgEvent, customCommand, 3);
                             break;
                         case "quit":
-                            embed.setDescription("Saving & Closing menu.");
+                            embed.setDescription("Saved & Exited.");
                             msgEvent.getChannel().sendMessage(embed.build()).queue();
                             return;
                         default:

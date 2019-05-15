@@ -42,7 +42,7 @@ public class NewHelp extends Command
         /**
          * A detailed description about what the command does, and how to use it.
          */
-        final String description = "No information has been provided for this command.";
+        String description = "No information has been provided for this command.";
     }
 
     /**
@@ -55,7 +55,7 @@ public class NewHelp extends Command
     {
         if (pageMap.put(alias, hp) != null)
         {
-            throw new IllegalArgumentException("That key has already been set.");
+            throw new IllegalArgumentException("Key "+alias+" has already been set.");
         }
     }
 
@@ -177,7 +177,7 @@ public class NewHelp extends Command
         {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("__Aliases__\n");
-            for (String otherAlias : CommandRegister.getCommand(alias).getAliases())
+            for (String otherAlias : CommandRegister.getCommand(alias).getAliases())    //TODO: Some aliases don't register, could it be the last one?
             {
                 stringBuilder.append(otherAlias).append(", ");
             }
@@ -204,6 +204,7 @@ public class NewHelp extends Command
             CommandAttributes ca = guildSettings.getCustomCommandAttributes(alias);
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("__Aliases__\n");
+            stringBuilder.append(ca.getCommandKey()).append(", ");
             for (String otherAlias : guildSettings.getCustomCommand(alias).getAliases())
             {
                 stringBuilder.append(otherAlias).append(", ");

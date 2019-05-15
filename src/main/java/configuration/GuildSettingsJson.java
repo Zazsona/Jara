@@ -181,14 +181,14 @@ public abstract class GuildSettingsJson
             {
                 if (aliasesList.contains(alias))
                 {
-                    aliasesList.remove(alias);
+                    aliasesList.remove(alias.toLowerCase());
                 }
                 else
                 {
-                    aliasesList.add(alias);
+                    aliasesList.add(alias.toLowerCase());
                 }
             }
-            this.aliases = aliasesList.toArray(aliases);
+            this.aliases = aliasesList.toArray(new String[0]);
         }
 
         public void setDescription(String description)

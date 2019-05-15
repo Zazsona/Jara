@@ -32,7 +32,7 @@ public class CommandHandler extends ListenerAdapter
 					String key = command[0].replaceFirst(commandPrefix, "").toLowerCase();
 
 					CommandLauncher cl = commandLaunchers.get(key);
-					if (cl == null)
+					if (cl == null || SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommand(key) != null) //This second check ensures that, if the key also matches a custom command, that gets precedence. This is because the custom command key is stored as a regular command for compatibility.
 					{
 						cl = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandLauncher(key.toLowerCase());
 
