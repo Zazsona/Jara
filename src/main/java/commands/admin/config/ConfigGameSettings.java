@@ -110,13 +110,13 @@ public class ConfigGameSettings
             modifyGameCategory(msgEvent);
         }
     }
-    private void modifyGameCategory(GuildMessageReceivedEvent msgEvent) throws IOException
+    private void modifyGameCategory(GuildMessageReceivedEvent msgEvent) throws IOException //TODO: Completely fucked. Repeats messages and won't accept IDs
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
         StringBuilder descBuilder = new StringBuilder();
         if (!guildSettings.getGameCategoryId().equals(""))
         {
-            descBuilder.append("Current value: **").append(guildSettings.getGameCategoryId()).append("**\n\n");
+            descBuilder.append("Current value: **").append(msgEvent.getGuild().getCategoryById(guildSettings.getGameCategoryId()).getName()).append("**\n\n");
         }
         descBuilder.append("This setting will allow you to select which channel category the bot will create game channels in.\n\nPlease enter a channel category name or ID below.");
         embed.setDescription(descBuilder.toString());
@@ -127,20 +127,21 @@ public class ConfigGameSettings
             Message msg = new MessageManager().getNextMessage(channel);
             if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
             {
-                String id = msg.getContentDisplay();
-                if (Pattern.matches(id, "[0-9]*"))
+                String id = msg.getContentDisplay().trim();
+                if (Pattern.matches("^[0-9]+$", id))
                 {
                     if (channel.getGuild().getCategoryById(id) == null)
                     {
-                        embed.setDescription("Category does not exist: "+id);
+                        embed.setDescription("Category ID does not exist: "+id);
                         channel.sendMessage(embed.build()).queue();
                     }
                     else
                     {
                         guildSettings.setGameCategoryId(id);
                         guildSettings.save();
-                        embed.setDescription("Game Category Id set to: "+id);
+                        embed.setDescription("Game Category set to "+msgEvent.getGuild().getCategoryById(id).getName());
                         channel.sendMessage(embed.build()).queue();
+                        break;
                     }
                 }
                 else
@@ -155,6 +156,7 @@ public class ConfigGameSettings
                         id = channel.getGuild().getCategoriesByName(id, true).get(0).getId();
                         guildSettings.setGameCategoryId(id);
                         guildSettings.save();
+                        embed.setDescription("Game Category set to "+msgEvent.getGuild().getCategoryById(id).getName());
                         channel.sendMessage(embed.build()).queue();
                         break;
                     }
