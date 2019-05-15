@@ -10,6 +10,7 @@ import jara.CommandAttributes;
 import jara.CommandRegister;
 import jara.Core;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.util.*;
 
 public class GuildSettings extends GuildSettingsJson
@@ -97,35 +99,46 @@ public class GuildSettings extends GuildSettingsJson
      */
     public void restore() throws IOException, NullPointerException
     {
-        String JSON = new String(Files.readAllBytes(SettingsUtil.getGuildSettingsFile(guildId).toPath()));
-        if (JSON.length() > 0)
+        try
         {
-            Gson gson = new Gson();
-            GuildSettingsJson settingsFromFile = gson.fromJson(JSON, getClass());
-
-            this.commandPrefix = settingsFromFile.commandPrefix;
-            this.customCommandsConfig = settingsFromFile.customCommandsConfig;
-            this.audioConfig.skipVotePercent = settingsFromFile.audioConfig.skipVotePercent;
-            this.audioConfig.useVoiceLeaving = settingsFromFile.audioConfig.useVoiceLeaving;
-            this.gameConfig.useGameChannels = settingsFromFile.gameConfig.useGameChannels;
-            this.gameConfig.gameCategoryId = settingsFromFile.gameConfig.gameCategoryId;
-            this.gameConfig.gameChannelTimeout = settingsFromFile.gameConfig.gameChannelTimeout;
-            this.gameConfig.concurrentGameInChannelAllowed = settingsFromFile.gameConfig.concurrentGameInChannelAllowed;
-            this.commandConfig = new HashMap<>(settingsFromFile.commandConfig);
-            if (!commandConfig.keySet().containsAll(Arrays.asList(CommandRegister.getAllCommandKeys())))
+            String JSON = new String(Files.readAllBytes(SettingsUtil.getGuildSettingsFile(guildId).toPath()));
+            if (JSON.length() > 0)
             {
-                save(); //This will add the missing commands, and save the config.
+                Gson gson = new Gson();
+                GuildSettingsJson settingsFromFile = gson.fromJson(JSON, getClass());
 
-                EmbedBuilder embed = new EmbedBuilder();
-                embed.setDescription("The bot has been updated with new commands/settings added!\nUse /config to configure these, they have been disabled for now.");
-                embed.setColor(CmdUtil.getHighlightColour(null));
-                Core.getShardManager().getGuildById(guildId).getOwner().getUser().openPrivateChannel().complete().sendMessage(embed.build());
+                this.commandPrefix = settingsFromFile.commandPrefix;
+                this.customCommandsConfig = settingsFromFile.customCommandsConfig;
+                this.audioConfig.skipVotePercent = settingsFromFile.audioConfig.skipVotePercent;
+                this.audioConfig.useVoiceLeaving = settingsFromFile.audioConfig.useVoiceLeaving;
+                this.gameConfig.useGameChannels = settingsFromFile.gameConfig.useGameChannels;
+                this.gameConfig.gameCategoryId = settingsFromFile.gameConfig.gameCategoryId;
+                this.gameConfig.gameChannelTimeout = settingsFromFile.gameConfig.gameChannelTimeout;
+                this.gameConfig.concurrentGameInChannelAllowed = settingsFromFile.gameConfig.concurrentGameInChannelAllowed;
+                this.commandConfig = new HashMap<>(settingsFromFile.commandConfig);
+                if (!commandConfig.keySet().containsAll(Arrays.asList(CommandRegister.getAllCommandKeys())))
+                {
+                    save(); //This will add the missing commands, and save the config.
+
+                    EmbedBuilder embed = new EmbedBuilder();
+                    embed.setDescription("The bot has been updated with new commands/settings added!\nUse /config to configure these, they have been disabled for now.");
+                    embed.setColor(CmdUtil.getHighlightColour(null));
+                    Core.getShardManager().getGuildById(guildId).getOwner().getUser().openPrivateChannel().complete().sendMessage(embed.build());
+                }
+            }
+            else
+            {
+                logger.error("Guild settings are empty for "+guildId);
+                throw new NullPointerException(); //There is no data
             }
         }
-        else
+        catch (NoSuchFileException e)
         {
-            logger.error("Guild settings are empty for "+guildId);
-            throw new NullPointerException(); //There is no data
+            Guild guild = Core.getShardManager().getGuildById(guildId);
+            guild.getOwner().getUser().openPrivateChannel().complete().sendMessage("The config for your guild, "+guild.getName()+", has become corrupted or is no longer available and has been reset. Please contact your host for further details.").queue();
+            logger.error("Guild settings are missing or corrupted for guild "+guildId+" ("+guild.getName()+"). Resetting.");
+            setDefaultSettings();
+            save();
         }
     }
     /**
