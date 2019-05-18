@@ -3,6 +3,7 @@ package commands.audio;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import commands.CmdUtil;
 import commands.Command;
+import configuration.SettingsUtil;
 import jara.Core;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -15,7 +16,7 @@ public class Replay extends Command
         AudioPlayer player = CmdUtil.getGuildAudio(msgEvent.getGuild().getId()).getPlayer();
         if (player.getPlayingTrack() != null)
         {
-            new Play().run(msgEvent, "/play", player.getPlayingTrack().getInfo().uri);
+            new Play().run(msgEvent, SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId())+"play", player.getPlayingTrack().getInfo().uri);
         }
         else
         {

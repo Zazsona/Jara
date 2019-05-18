@@ -37,6 +37,7 @@ public class ScheduleHandler extends AudioEventAdapter
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason reason)
     {
+        audio.resetSkipVotes();
         audio.getTrackQueue().remove(0); //Remove the track we just played
         if (audio.getTrackQueue().size() > 0)
         {
@@ -54,6 +55,7 @@ public class ScheduleHandler extends AudioEventAdapter
         Logger logger = LoggerFactory.getLogger(getClass());
         logger.info("AudioTrack "+track.getInfo().uri + "("+track.getInfo().title+") has become stuck. Starting next track.");
         audio.getTrackQueue().remove(0); //Remove the track we just tried to play
+        audio.resetSkipVotes();
         if (audio.getTrackQueue().size() > 0)
         {
             audio.getPlayer().playTrack(audio.getTrackQueue().get(0));
