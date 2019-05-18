@@ -4,7 +4,6 @@ package commands;
 import audio.Audio;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import configuration.SettingsUtil;
 import jara.CommandRegister;
 import jara.Core;
 import net.dv8tion.jda.core.entities.Member;
@@ -18,19 +17,14 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
-import javax.print.URIException;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Don't remove items from this API, as it will break the modules that rely on them.
@@ -289,7 +283,7 @@ public class CmdUtil
      */
     public static void sendHelpInfo(GuildMessageReceivedEvent msgEvent, Class<? extends Command> clazz)
     {
-        new NewHelp().run(msgEvent, "/?", CommandRegister.getCommand(clazz).getCommandKey());
+        new Help().run(msgEvent, "/?", CommandRegister.getCommand(clazz).getCommandKey());
         /*
          * So, technically this is fine, as help is *always* enabled and cannot be disabled. But generally calling commands like this is a bad idea, as they may be disabled.
          * This also saves us having to copy command usage info for each command, which could be a problem as commands change.

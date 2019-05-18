@@ -3,7 +3,7 @@ package jara;
 import com.google.gson.Gson;
 import commands.Command;
 import commands.Load;
-import commands.NewHelp;
+import commands.Help;
 import configuration.SettingsUtil;
 import exceptions.ConflictException;
 import exceptions.InvalidModuleException;
@@ -14,10 +14,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.*;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -186,14 +184,14 @@ public class ModuleManager
             {
                 for (String alias : ca.getAliases())
                 {
-                    NewHelp.addPage(alias.toLowerCase(), getHelpPage(jarFile, jarHelp));
+                    Help.addPage(alias.toLowerCase(), getHelpPage(jarFile, jarHelp));
                 }
             }
             else
             {
                 for (String alias : ca.getAliases())
                 {
-                    NewHelp.addPage(alias.toLowerCase(), new NewHelp.HelpPage()); //Default values
+                    Help.addPage(alias.toLowerCase(), new Help.HelpPage()); //Default values
                 }
                 logger.info(jarFile.getName()+" has no help page.");
                 warnings++;
@@ -225,13 +223,13 @@ public class ModuleManager
      * Gets the help page for the module
      * @param jarFile the jar of the module
      * @param jarHelp the help file
-     * @return the {@link commands.NewHelp.HelpPage} from the file
+     * @return the {@link Help.HelpPage} from the file
      * @throws IOException unable to access file
      */
-    private static NewHelp.HelpPage getHelpPage(JarFile jarFile, JarEntry jarHelp) throws IOException
+    private static Help.HelpPage getHelpPage(JarFile jarFile, JarEntry jarHelp) throws IOException
     {
         Gson gson = new Gson();
-        return gson.fromJson(getJson(jarFile, jarHelp), NewHelp.HelpPage.class);
+        return gson.fromJson(getJson(jarFile, jarHelp), Help.HelpPage.class);
     }
 
     /**

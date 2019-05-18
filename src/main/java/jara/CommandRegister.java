@@ -7,15 +7,9 @@ import java.util.Comparator;
 import commands.Command;
 import commands.CustomCommand;
 import commands.Help;
-import commands.NewHelp;
-import commands.utility.Poll;
 import commands.admin.CustomCommandManager;
 import commands.admin.config.ConfigMain;
-import commands.audio.*;
-import commands.games.*;
-import commands.toys.*;
 import commands.utility.*;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 import static jara.CommandRegister.Category.*;
 
@@ -52,56 +46,65 @@ public class CommandRegister
 		if (register == null)
 		{
 			register = new ArrayList<>();
-			/*============================================
-			 * 
-			 * The layout for adding a new class should be quite simple.
-			 * Simply create a new CommandAttributes class in the list, and pass the Command properties.
-			 * All other operations (Adding them to settings, indexing them at boot, etc.) will be done automatically.
-			 * 
-			 * I also highly recommend you include details about the command in Help, such as parameters and what it does. Aliases and category will be done automatically.
-			 * ===========================================
-			 */
-
-			//TODO: Move (most) of these to modules.
-			register.add(new CommandAttributes("Ping", "Tests the connection.", Ping.class, new String[] {"Pong", "Test"}, UTILITY, true));
-			register.add(new CommandAttributes("Report", "Displays Bot stats.", Report.class, new String[] {"Status", "Stats"}, UTILITY, true));
 			register.add(new CommandAttributes("About", "Shows Bot credits.", About.class, new String[] {"Credits", "Authors"}, UTILITY, false));
-			register.add(new CommandAttributes("EightBall", "Tells your fortune.", EightBall.class, new String[] {"8ball", "helix", "fortune"}, TOYS, true));
-			register.add(new CommandAttributes("Jokes", "This command is a joke.", Jokes.class, new String[] {"Joke", "Comedy"}, TOYS, true));
-			register.add(new CommandAttributes("CoinFlip", "Flips a coin.", CoinFlip.class, new String[] {"FlipCoin", "Toss", "cf", "fc", "fiftyfifty", "flipacoin"}, UTILITY, true));
 			register.add(new CommandAttributes("Config", "Modify Bot settings.", ConfigMain.class, new String[] {"Settings"}, ADMIN, false));
-			register.add(new CommandAttributes("Countdown", "The classic word making game.", Countdown.class, new String[] {"cd"}, GAMES, true));
-			register.add(new CommandAttributes("Help", "Shows command details.", NewHelp.class, new String[] {"?", "commands"}, NOGROUP, false)); //Does help REALLY need to be indexed in help?
-            register.add(new CommandAttributes("Randomizer", "Randomises numbers.", Randomizer.class, new String[] {"Randomise", "Randomize", "Randomiser", "Roulette", "Picker", "Selector"}, UTILITY, true));
-			register.add(new CommandAttributes("Say", "Make the bot echo.", Say.class, new String[] {"Speak", "Talk"}, TOYS, true));
-			register.add(new CommandAttributes("Timecard", "Spongebob Timecards.", Timecard.class, new String[] {"SpongebobCard", "Timescreen"}, TOYS, true));
-			register.add(new CommandAttributes("CountdownConundrum", "Solve the anagram.", CountdownConundrum.class, new String[] {"CC", "Anagram"}, GAMES, true));
-			register.add(new CommandAttributes("IsItWednesdayMyDudes", "Well? Is it?", IsItWednesdayMyDudes.class, new String[] {"ItIsWednesdayMyDudes", "ItIsNotWednesdayMyDudes", "Wednesday", "IIWMD", "IINWMD", "WednesdayFrog", "IsItWednesdayMyDudes", "ItIsWeds", "ItIsNotWeds"}, TOYS, true));
-			register.add(new CommandAttributes("WouldYouRather", "Find out who your mates really are.", WouldYouRather.class, new String[] {"WouldYouRather?", "WYR", "WYR?"}, TOYS, true));
-			register.add(new CommandAttributes("Hangman", "Guess the word.", Hangman.class, new String[] {"hang"}, GAMES, true));
-			register.add(new CommandAttributes("Play", "Plays music.", Play.class, new String[] {"PlayAudio", "Music", "Track", "Radio", "Stream", "DJ"}, AUDIO, true));
-			register.add(new CommandAttributes("Skip", "Votes to skip the track", Skip.class, new String[] {"Stop", "Pass", "Next"}, AUDIO, true));
-			register.add(new CommandAttributes("ForceSkip", "Forces the track to skip.", ForceSkip.class, new String[] {"AdminSkip", "InstaSkip", "FireTheDJ", "ForceNext"}, AUDIO, true));
-			register.add(new CommandAttributes("NowPlaying", "Current track details.", NowPlaying.class, new String[] {"NP", "CP", "CurrentlyPlaying", "TrackInfo", "SongInfo", "MusicInfo", "AudioInfo"}, AUDIO, true));
-			register.add(new CommandAttributes("Pause", "Pauses current track.", Pause.class, new String[] {"Resume"}, AUDIO, true));
-			register.add(new CommandAttributes("Replay", "Adds current track to queue again.", Replay.class, new String[] {"Repeat"}, AUDIO, true));
+			register.add(new CommandAttributes("Help", "Shows command details.", Help.class, new String[] {"?", "commands"}, NOGROUP, false));
 			register.add(new CommandAttributes("CustomCommandManager", "Manage custom commands.", CustomCommandManager.class, new String[] {"AddCustomCommand", "EditCustomCommand", "RemoveCustomCommand", "DeleteCustomCommand", "CustomCommands", "CCM"}, ADMIN, true));
-			register.add(new CommandAttributes("CustomCommand", "Custom Command Template.", CustomCommand.class, new String[0], NOGROUP, false)); //TODO: Make this disableable
-			register.add(new CommandAttributes("LastWord", "Get the last word in.", LastWord.class, new String[] {"TheLastWord", "Scattergories", "Topics"}, GAMES, true));
-			register.add(new CommandAttributes("PassTheBomb", "Quick! Pass the bomb!", PassTheBomb.class, new String[] {"HotPotato", "BombPass"}, GAMES, true));
-			register.add(new CommandAttributes("Poll", "Get a democratic vote.", Poll.class, new String[] {"Strawpoll"}, UTILITY, true));
-			register.add(new CommandAttributes("Connect4", "Get four in a row to win.", Connect4.class, new String[] {"ConnectFour", "FourInARow", "4InARow"}, GAMES, true));
-			register.add(new CommandAttributes("WordSearch", "Find the words.", WordSearch.class, new String[] {"WordHunt", "WordFinder", "SearchWords"}, GAMES, true));
-			register.add(new CommandAttributes("MCServer", "Fetches Minecraft server info.", MinecraftServerQuery.class, new String[] {"MinecraftServer", "MinecraftQuery", "MinecraftServerStatus"}, UTILITY, true));
-
-			register.addAll(new ModuleManager().loadModules());			//Load mods
-
-			/*
-					Sort the commands into alphabetical order based on their keys
-			 */
-			register.sort(Comparator.comparing(CommandAttributes::getCommandKey));
+			register.add(new CommandAttributes("CustomCommand", "Custom Command Template.", CustomCommand.class, new String[0], NOGROUP, false)); //This is the interface for converting custom commands to actual commands.
+			addDefaultHelpPages(register);
+			register.addAll(new ModuleManager().loadModules(register));			//Load mods
+			register.sort(Comparator.comparing(CommandAttributes::getCommandKey)); //Sort the commands into alphabetical order based on their keys
 		}
 		return register.toArray(new CommandAttributes[0]);
+	}
+
+	/**
+	 * Adds help pages for all the in-built (i.e not module) commands.
+	 * @param partialRegister the register before adding modules.
+	 */
+	private static void addDefaultHelpPages(ArrayList<CommandAttributes> partialRegister)
+	{
+		for (int i = 0; i<partialRegister.size(); i++)
+		{
+			switch (partialRegister.get(i).getCommandKey())
+			{
+				case "About":
+					Help.HelpPage AboutHelp = new Help.HelpPage("Shows the details about this bot.", new String[0]);
+					for (String alias : register.get(i).getAliases())
+					{
+						Help.addPage(alias, AboutHelp);
+					}
+					break;
+				case "Config":
+					Help.HelpPage ConfigHelp = new Help.HelpPage("Modify bot settings. Instructions provided on the config menu.", new String[0]);
+					for (String alias : register.get(i).getAliases())
+					{
+						Help.addPage(alias, ConfigHelp);
+					}
+					break;
+				case "Help":
+					Help.HelpPage HelpHelp = new Help.HelpPage("List categories by using Help\n List commands in a category with Help (Category). Adding 'all' lists commands you don't have permission to use.\nUse Help (Command) to find out how to use a command.\n", new String[] {"Help", "Help (Command)", "Help (Category) (all)"});
+					for (String alias : register.get(i).getAliases())
+					{
+						Help.addPage(alias, HelpHelp);
+					}
+					break;
+				case "CustomCommandManager":
+					Help.HelpPage CCMHelp = new Help.HelpPage("Configure custom commands. Instructions provided on manager menu.", new String[0]);
+					for (String alias : register.get(i).getAliases())
+					{
+						Help.addPage(alias, CCMHelp);
+					}
+					break;
+				default:
+					Help.HelpPage defaultHelp = new Help.HelpPage();
+					for (String alias : register.get(i).getAliases())
+					{
+						Help.addPage(alias, defaultHelp);
+					}
+					break;
+			}
+		}
 	}
 	/**
 	 * Returns all strings which can be used to trigger commands. 
@@ -425,21 +428,6 @@ public class CommandRegister
 				return null;
 		}
 		return categoryCommands.toArray(new CommandAttributes[0]);
-	}
-
-	/**
-	 * Opens the help page to for the specified command.
-	 *
-	 * @param msgEvent
-	 * @param clazz
-	 */
-	public static void sendHelpInfo(GuildMessageReceivedEvent msgEvent, Class<? extends Command> clazz)
-	{
-		new Help().run(msgEvent, "/?", CommandRegister.getCommand(clazz).getCommandKey());
-		/*
-		 * So, technically this is fine, as help is *always* enabled and cannot be disabled. But generally calling commands like this is a bad idea, as they may be disabled.
-		 * This also saves us having to copy command usage info for each command, which could be a problem as commands change.
-		 */
 	}
 	
 }
