@@ -13,6 +13,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.soap.Text;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -22,9 +23,23 @@ import java.util.TimerTask;
 
 public abstract class GameCommand extends Command //A base class to build commands from.
 {
-	private static HashMap<String, TextChannel> gameChannelMap;
-	private static GameReactionListener gameReactionListener;
+	/**
+	 * The game channel. If game channels are disabled, this is the same channel the command was used in.
+	 */
+	private TextChannel gameChannel;
+	/**
+	 * the message users react to in order to join the game channel. null if game channels are disabled.
+	 */
 	private Message gameMsg;
+
+	/**
+	 * A map containing the game channels, indexed by gameMsg id.
+	 */
+	private static HashMap<String, TextChannel> gameChannelMap;
+	/**
+	 * The listener for reactions to gameMsgs.
+	 */
+	private static GameReactionListener gameReactionListener;
 
 	/**
 	 * A timer of configurable length. It counts the time since the last user interaction in the game channel. If it expires, the channel is deleted.
@@ -44,35 +59,38 @@ public abstract class GameCommand extends Command //A base class to build comman
 	/**
 	 * Returns a valid channel in which to run the game. If no valid channel is available, the thread is interrupted.
 	 * This is because, without a valid channel that complies with the user's config, we cannot run the game.
-	 * @param msgEvent context
+	 * @param currentChannel context
 	 * @param channelName the channel to create
+	 * @param players the players to add to the channel on creation
 	 * @return the channel to run the game in
 	 */
-	protected TextChannel createGameChannel(GuildMessageReceivedEvent msgEvent, String channelName, Member... players)
+	protected TextChannel createGameChannel(TextChannel currentChannel, String channelName, Member... players)
 	{
+		Guild guild = currentChannel.getGuild();
 		Logger logger = LoggerFactory.getLogger(GameCommand.class);
-		GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
+		GuildSettings guildSettings = SettingsUtil.getGuildSettings(guild.getId());
 		String gameCategoryID = guildSettings.getGameCategoryId();
 		EmbedBuilder embed = new EmbedBuilder();
-		embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+		embed.setColor(CmdUtil.getHighlightColour(guild.getSelfMember()));
 		if (!guildSettings.isGameChannelsEnabled())
 		{
 			if (guildSettings.isConcurrentGameInChannelAllowed())
 			{
-				channelsRunningGames.putIfAbsent(msgEvent.getGuild().getId(), new ArrayList<>());
-				if (channelsRunningGames.get(msgEvent.getGuild().getId()).contains(msgEvent.getChannel().getId()))
+				channelsRunningGames.putIfAbsent(guild.getId(), new ArrayList<>());
+				if (channelsRunningGames.get(guild.getId()).contains(currentChannel.getId()))
 				{
 					embed.setDescription("There's already a game running in this channel.");
-					msgEvent.getChannel().sendMessage(embed.build()).queue();
+					currentChannel.sendMessage(embed.build()).queue();
 					Thread.currentThread().interrupt();
 					return null;
 				}
 				else
 				{
-					channelsRunningGames.get(msgEvent.getGuild().getId()).add(msgEvent.getChannel().getId());
+					channelsRunningGames.get(guild.getId()).add(guild.getId());
 				}
 			}
-			return msgEvent.getChannel();
+			gameChannel = currentChannel;
+			return currentChannel;
 		}
 		else
 		{
@@ -80,15 +98,15 @@ public abstract class GameCommand extends Command //A base class to build comman
 			{
 				gameChannelMap = new HashMap<>();
 				gameReactionListener = new GameReactionListener();
-				msgEvent.getJDA().addEventListener(gameReactionListener);
+				currentChannel.getJDA().addEventListener(gameReactionListener);
 			}
-			Category gameCategory = msgEvent.getGuild().getCategoryById(gameCategoryID);
+			Category gameCategory = guild.getCategoryById(gameCategoryID);
 			if (gameCategory != null)
 			{
 				try
 				{
 					TextChannel channel = (TextChannel) gameCategory.createTextChannel(channelName).complete();
-					int channelTimeout = Integer.parseInt(SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getGameChannelTimeout());
+					int channelTimeout = Integer.parseInt(SettingsUtil.getGuildSettings(guild.getId()).getGameChannelTimeout());
 					if (channelTimeout != 0)
 					{
 						channelTimeoutTimer = new Timer();
@@ -103,7 +121,7 @@ public abstract class GameCommand extends Command //A base class to build comman
 									OffsetDateTime timeToDelete = lastMessage.getCreationTime().plusSeconds(channelTimeout/1000);
 									if (!lastMessage.getCreationTime().isBefore(timeToDelete))
 									{
-										deleteGameChannel(msgEvent, channel);
+										deleteGameChannel();
 									}
 								}
 							}
@@ -114,22 +132,23 @@ public abstract class GameCommand extends Command //A base class to build comman
 					{
 						channel.createPermissionOverride(player).setAllow(Permission.MESSAGE_READ).queue();
 					}
-					embed.setDescription(msgEvent.getMember().getEffectiveName()+" has started "+channel.getAsMention()+".\nReact with :game_die: to join.");
-					gameMsg = msgEvent.getChannel().sendMessage(embed.build()).complete();
+					embed.setDescription(channel.getAsMention()+" has begun!\nReact with :game_die: to join.");
+					gameMsg = currentChannel.sendMessage(embed.build()).complete();
 					gameMsg.addReaction("\uD83C\uDFB2").queue();
 					gameChannelMap.put(gameMsg.getId(), channel);
+					gameChannel = channel;
 					return channel;
 				}
 				catch (InsufficientPermissionException e)
 				{
 					embed.setDescription("A game category has been set up and exists, but I don't have permission to create channels and add players there!");
-					msgEvent.getChannel().sendMessage(embed.build()).queue();
+					currentChannel.sendMessage(embed.build()).queue();
 					Thread.currentThread().interrupt();
 					return null;
 				}
 				catch (GuildUnavailableException e)
 				{
-					logger.error("Guild "+msgEvent.getGuild().getId()+" became unavailable while trying to perform an action. Has Discord gone down?");
+					logger.error("Guild "+guild.getId()+" became unavailable while trying to perform an action. Has Discord gone down?");
 					e.printStackTrace();
 					try
 					{
@@ -139,7 +158,7 @@ public abstract class GameCommand extends Command //A base class to build comman
 					{
 						e.printStackTrace(); 
 					}
-					return createGameChannel(msgEvent, channelName);
+					return createGameChannel(currentChannel, channelName);
 				}
 			}
 			else
@@ -147,8 +166,8 @@ public abstract class GameCommand extends Command //A base class to build comman
 				try
 				{
 					embed.setDescription("The game category has disappeared. Disabling game channels. You can re-enable these in the config.");
-					msgEvent.getChannel().sendMessage(embed.build()).queue();
-					logger.info("Guild "+msgEvent.getGuild().getId()+"'s game category for the saved id doesn't exist. Removing from config...");
+					currentChannel.sendMessage(embed.build()).queue();
+					logger.info("Guild "+guild.getId()+"'s game category for the saved id doesn't exist. Removing from config...");
 					guildSettings.setGameCategoryId("");
 					guildSettings.setUseGameChannels(false);
 					guildSettings.save();
@@ -158,24 +177,22 @@ public abstract class GameCommand extends Command //A base class to build comman
 					e.printStackTrace();
 				}
 
-				return createGameChannel(msgEvent, channelName);
+				return createGameChannel(currentChannel, channelName);
 			}
 		}
 	}
 
 	/**
 	 * If a unique game channel is in use, this deletes the channel. Otherwise, it unmarks the channel as having a game running.
-	 * @param msgEvent context
-	 * @param channel the channel to delete/unmark
 	 */
-	protected void deleteGameChannel(GuildMessageReceivedEvent msgEvent, TextChannel channel)
+	protected void deleteGameChannel()
 	{
-		if (!channel.equals(msgEvent.getChannel())) //Basically, if this is a game channel...
+		if (gameMsg != null && gameChannelMap.get(gameMsg.getId()) != null) //Basically, if this is a game channel...
 		{
 			if (channelTimeoutTimer != null)
 				channelTimeoutTimer.cancel();
 
-			channel.sendMessage("Well played! This channel will be deleted in 30 seconds.").queue();
+			gameChannel.sendMessage("Well played! This channel will be deleted in 30 seconds.").queue();
 			try
 			{
 				Thread.sleep(30*1000);
@@ -184,15 +201,15 @@ public abstract class GameCommand extends Command //A base class to build comman
 			{
 				e.printStackTrace();
 			}
-			channel.delete().queue();
+			gameChannel.delete().queue();
 			gameChannelMap.remove(gameMsg.getId());
 			gameMsg.delete().queue();
 		}
 		else
 		{
-			if (channelsRunningGames.containsKey(msgEvent.getGuild().getId()))
+			if (channelsRunningGames.containsKey(gameChannel.getGuild().getId()))
 			{
-				channelsRunningGames.get(msgEvent.getGuild().getId()).remove(channel.getId());
+				channelsRunningGames.get(gameChannel.getGuild().getId()).remove(gameChannel.getId());
 			}
 		}
 		return;
