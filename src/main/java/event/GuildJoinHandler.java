@@ -28,7 +28,7 @@ public class GuildJoinHandler extends ListenerAdapter
 									 "\nTo get started, use `/config` in your guild with a channel I have access to, there you will be able to enable commands and features!\n\n" +
 									 "**Quick Links to get you started:**\n" +
 									 "[Source Code](https://github.com/Zazsona/Jara)\n" +
-									 "[Command List](https://dothis.com)\n" +
+									 "[Modules](https://github.com/Zazsona/JaraModules)\n" +
 									 "[Tutorial](https://dothis.com)\n"); //TODO
 		owner.openPrivateChannel().complete().sendMessage(embed.build()).queue();
 		return;

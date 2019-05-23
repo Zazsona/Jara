@@ -1,9 +1,7 @@
 package commands;
 
-import commands.audio.Play;
 import configuration.GuildSettingsJson;
 import configuration.SettingsUtil;
-import jara.Core;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -41,7 +39,7 @@ public class CustomCommand extends Command
             }
             if (!customCommand.getAudioLink().equals(""))
             {
-                new Play().run(msgEvent, SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId())+"play", customCommand.getAudioLink());
+                CmdUtil.getGuildAudio(msgEvent.getGuild().getId()).playWithFeedback(msgEvent.getMember(), customCommand.getAudioLink(), msgEvent.getChannel());
             }
         }
         catch (NullPointerException e)
