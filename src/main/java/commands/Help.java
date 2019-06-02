@@ -190,7 +190,7 @@ public class Help extends Command
         {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("__Aliases__\n");
-            for (String otherAlias : CommandRegister.getCommand(alias).getAliases())    //TODO: Some aliases don't register, could it be the last one?
+            for (String otherAlias : CommandRegister.getCommand(alias).getAliases())
             {
                 stringBuilder.append(otherAlias).append(", ");
             }

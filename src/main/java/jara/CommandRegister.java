@@ -209,7 +209,7 @@ public class CommandRegister
 			for (CommandAttributes commandAttributes : register)
 			{
 				min = 0;
-				max = commandAttributes.getAliases().length-1;
+				max = commandAttributes.getAliases().length;
 				while (min <= max)
 				{
 					int mid = (max+min)/2;
