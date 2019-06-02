@@ -92,16 +92,19 @@ public class ModuleManager
         }
         for (Class<? extends Load> c : onLoadClasses.keySet())
         {
-            try
-            {
-                c.newInstance().load();
-            }
-            catch (InstantiationException | IllegalAccessException e)
-            {
-                logger.error("Unable to instantiate "+onLoadClasses.get(c).getName()+"'s load class. There is a high risk this module will not perform correctly, if at all.");
-                errors++;
-            }
-
+            new Thread(() ->
+                       {
+                           try
+                           {
+                               c.newInstance().load();
+                           }
+                           catch (InstantiationException | IllegalAccessException e)
+                           {
+                               logger.error("Unable to instantiate "+onLoadClasses.get(c).getName()+"'s load class. There is a high risk this module will not perform correctly, if at all.");
+                               errors++;
+                           }
+                       }).start();
+            //Without creating a new thread, if the load class is infinitely running, Jara will shit the bed and prompt the user to restart setup.
         }
         if (errors <= 0)
         {

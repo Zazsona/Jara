@@ -69,19 +69,10 @@ public class BotUpdateConfiguration extends Application
 
         nextButton.setOnMouseClicked((event) ->
                                      {
-                                         try
-                                         {
-                                             SettingsUtil.getGlobalSettings().setCommandConfigMap(getCommandConfig());
-                                             SettingsUtil.getGlobalSettings().save();
-                                             HeadedGUIUtil.setSetupComplete(true);
-                                             botUpdateConfigurationScreen.getScene().getWindow().hide();
-                                         }
-                                         catch (IOException e)
-                                         {
-                                             HeadedGUI.showError("Unable to save settings.");
-                                             e.printStackTrace();
-                                         }
-
+                                         SettingsUtil.getGlobalSettings().setCommandConfigMap(getCommandConfig());
+                                         SettingsUtil.getGlobalSettings().save();
+                                         HeadedGUIUtil.setSetupComplete(true);
+                                         botUpdateConfigurationScreen.getScene().getWindow().hide();
                                      });
         nextButton.setOnMouseEntered((event) -> HeadedGUIUtil.nextButtonHover(nextRect));
         nextButton.setOnMouseExited((event) -> HeadedGUIUtil.nextButtonHover(nextRect));
@@ -154,7 +145,6 @@ public class BotUpdateConfiguration extends Application
             }
             catch (NullPointerException e) //New command
             {
-                checkBox.setSelected(false);
                 bp.setStyle("-fx-background-color: #51555e;");
             }
         }

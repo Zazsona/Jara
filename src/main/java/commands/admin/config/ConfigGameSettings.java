@@ -110,7 +110,7 @@ public class ConfigGameSettings
             modifyGameCategory(msgEvent);
         }
     }
-    private void modifyGameCategory(GuildMessageReceivedEvent msgEvent) throws IOException //TODO: Completely fucked. Repeats messages and won't accept IDs
+    private void modifyGameCategory(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
         StringBuilder descBuilder = new StringBuilder();
@@ -172,7 +172,7 @@ public class ConfigGameSettings
         StringBuilder descBuilder = new StringBuilder();
         if (guildSettings.getGameChannelTimeout().equals("0"))
         {
-            descBuilder.append("Current value: **Disabled**");
+            descBuilder.append("Current value: **Disabled**\n\n");
         }
         else
         {

@@ -44,7 +44,7 @@ public class Audio
 	/**
 	 * The result of a play Request.
 	 */
-	public enum RequestResult
+	public static enum RequestResult
 	{
 		REQUEST_PENDING,
 		REQUEST_NOW_PLAYING,

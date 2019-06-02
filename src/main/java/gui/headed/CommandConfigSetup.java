@@ -150,8 +150,6 @@ public class CommandConfigSetup
             }
             catch (NullPointerException e) //New command
             {
-                checkBox.setSelected(false);
-                //bp.setStyle("-fx-background-color: #7289da;");
                 bp.setStyle("-fx-background-color: #51555e;");
             }
         }
