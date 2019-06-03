@@ -5,15 +5,12 @@ import configuration.SettingsUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.core.exceptions.GuildUnavailableException;
 import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.xml.soap.Text;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -98,7 +95,6 @@ public abstract class GameCommand extends Command //A base class to build comman
 					logger.info("Guild "+guild.getId()+"'s game category for the saved id doesn't exist. Removing from config...");
 					guildSettings.setGameCategoryId("");
 					guildSettings.setUseGameChannels(false);
-					guildSettings.save();
 				}
 				catch (IOException e)
 				{

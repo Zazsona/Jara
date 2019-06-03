@@ -86,7 +86,6 @@ public class ConfigAudioSettings
                     else
                     {
                         guildSettings.setTrackSkipPercent(Integer.parseInt(response));
-                        guildSettings.save();
                         embed.setDescription("Skip percentage has been set to "+response+"%.");
                         channel.sendMessage(embed.build()).queue();
                         break;
@@ -118,7 +117,6 @@ public class ConfigAudioSettings
                 if (response.startsWith("y"))
                 {
                     guildSettings.setVoiceLeaving(true);
-                    guildSettings.save();
                     embed.setDescription("Voice Leaving has been enabled.");
                     channel.sendMessage(embed.build()).queue();
                     break;
@@ -126,7 +124,6 @@ public class ConfigAudioSettings
                 else if (response.startsWith("n"))
                 {
                     guildSettings.setVoiceLeaving(false);
-                    guildSettings.save();
                     embed.setDescription("Voice Leaving has been disabled.");
                     channel.sendMessage(embed.build()).queue();
                     break;

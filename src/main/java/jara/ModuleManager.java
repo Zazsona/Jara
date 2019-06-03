@@ -66,7 +66,7 @@ public class ModuleManager
             }
         }
 
-        File moduleDir = new File(SettingsUtil.getDirectory() + "/modules/");
+        File moduleDir = new File(SettingsUtil.getDirectory() + "/Modules/");
         if (!moduleDir.exists())
             moduleDir.mkdirs();
 

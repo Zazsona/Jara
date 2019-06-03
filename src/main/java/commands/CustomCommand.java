@@ -1,7 +1,7 @@
 package commands;
 
-import configuration.GuildSettingsJson;
 import configuration.SettingsUtil;
+import configuration.guild.CustomCommandConfig;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -18,7 +18,7 @@ public class CustomCommand extends Command
         try
         {
             String key = getKey(msgEvent.getGuild().getId(), parameters[0]);
-            GuildSettingsJson.CustomCommandConfig customCommand = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommand(key);
+            CustomCommandConfig customCommand = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommand(key);
 
             if (!customCommand.getMessage().equals(""))
             {

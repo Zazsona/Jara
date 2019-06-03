@@ -29,34 +29,25 @@ public class SettingsUtil
         try
         {
             globalSettings = new GlobalSettings();
-            globalSettings.restore();
-        }
-        catch (IOException | NullPointerException e) //This fires if settings do not exist.
-        {
-            if (GraphicsEnvironment.isHeadless())
-            {
-                //TODO: Terminal ver.
-            }
-            else
+            boolean success = globalSettings.restore();
+            if (!success)
             {
                 HeadedGUI.performFirstTimeSetup();
             }
-            if (!HeadedGUIUtil.isSetupComplete())
+            Timer guildCleanTimer = new Timer();
+            guildCleanTimer.schedule(new TimerTask()
             {
-                logger.info("User has cancelled setup. Aborting...");
-                System.exit(0);
-            }
+                @Override
+                public void run()
+                {
+                    cleanInactiveGuilds();
+                }
+            }, 1000*60*30, 1000*60*30);
         }
-        Timer guildCleanTimer = new Timer();
-        guildCleanTimer.schedule(new TimerTask()
+        catch (IOException e)
         {
-            @Override
-            public void run()
-            {
-                cleanInactiveGuilds();
-            }
-        }, 1000*60*30, 1000*60*30);
-
+            logger.error("Unable to access file system to establish settings.");
+        }
     }
 
     /**
@@ -101,77 +92,16 @@ public class SettingsUtil
         }
         return directory;
     }
-    /**
-     * Returns the directory which stores guild settings files.
-     * @return
-     * File - Guild Settings directory
-     */
-    public static File getGuildSettingsDirectory()
-    {
-        File guildSettingsFolder;
-        guildSettingsFolder = new File(getDirectory().getAbsolutePath()+"/guilds/");
-        if (!guildSettingsFolder.exists())
-        {
-            guildSettingsFolder.mkdirs();
-        }
-        return guildSettingsFolder;
-    }
-    /**
-     * Returns the file where global settings are stored.
-     * @return
-     * File - Global settings file
-     */
-    public static File getGlobalSettingsFile()
-    {
-        File settingsFile = new File(getDirectory().getAbsolutePath()+"/settings.json");
-        if (!settingsFile.exists())
-        {
-            logger.info("Settings file does not exist. Creating it...");
-            try
-            {
-                settingsFile.createNewFile();
-                return settingsFile;
-            }
-            catch (IOException e)
-            {
-                logger.error("Could not create settings file.");
-                return null;
-            }
-        }
-        else
-        {
-            return settingsFile;
-        }
-    }
 
     /**
-     * @param guildID
+     * Gets the directory to save module configs, saves, etc in.
      * @return
      */
-    public static File getGuildSettingsFile(String guildID)
+    public static File getModuleDataDirectory()
     {
-        return new File(getGuildSettingsDirectory().getPath()+"/"+guildID+".json");
+        return new File(getDirectory().getPath()+"/ModuleData/");
     }
 
-    public static void addNewGuild(String guildId)
-    {
-        try
-        {
-            File guildFile = getGuildSettingsFile(guildId);
-            if (guildFile.exists())
-            {
-                guildFile.delete();
-            }
-            guildFile.createNewFile();
-            GuildSettings guildSettings = getGuildSettings(guildId);
-            guildSettings.setDefaultSettings();
-            guildSettings.save();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
     public static GuildSettings getGuildSettings(String guildID)
     {
         if (guildSettingsMap.containsKey(guildID))
@@ -181,22 +111,19 @@ public class SettingsUtil
         }
         else
         {
-            GuildSettings guildSettings = new GuildSettings(guildID);
+            GuildSettings guildSettings;
             try
             {
-                guildSettings.restore();
+                guildSettings = new GuildSettings(guildID);
+                guildSettingsMap.put(guildID, guildSettings);
+                guildSettingsLastCall.put(guildID, Instant.now().toEpochMilli());
+                return guildSettings;
             }
             catch (IOException e)
             {
                 e.printStackTrace();
+                return null; //TODO: Something proper.
             }
-            catch (NullPointerException e) //In theory this will never occur, but better safe than sorry.
-            {
-                guildSettings.setDefaultSettings();
-            }
-            guildSettingsMap.put(guildID, guildSettings);
-            guildSettingsLastCall.put(guildID, Instant.now().toEpochMilli());
-            return guildSettings;
         }
     }
 

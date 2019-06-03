@@ -21,7 +21,7 @@ public class GuildJoinHandler extends ListenerAdapter
 		User owner = joinEvent.getGuild().getOwner().getUser();
 		Logger logger = LoggerFactory.getLogger(getClass());
 		logger.info("Joined guild "+joinEvent.getGuild().getId());
-		SettingsUtil.addNewGuild(joinEvent.getGuild().getId());
+		SettingsUtil.getGuildSettings(joinEvent.getGuild().getId()); //This creates the guild settings.
 		EmbedBuilder embed = new EmbedBuilder();
 		embed.setColor(CmdUtil.getHighlightColour(joinEvent.getGuild().getSelfMember()));
 		embed.setDescription("Hey there, "+owner.getName()+"!\nI'm just sending you this to tell you I'm all ready to go in "+guild.getName()+".\n" +

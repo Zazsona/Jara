@@ -46,7 +46,6 @@ public class ConfigMainSettings
                 {
                     GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
                     guildSettings.setCommandPrefix(prefix.charAt(0));
-                    guildSettings.save();
                     SettingsUtil.refreshGuildCommandPrefix(msgEvent.getGuild().getId());
                     embed.setDescription("Prefix set to "+prefix);
                     channel.sendMessage(embed.build()).queue();

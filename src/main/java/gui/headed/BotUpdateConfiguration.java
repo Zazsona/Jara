@@ -5,6 +5,7 @@ import gui.HeadedGUI;
 import jara.CommandAttributes;
 import jara.CommandRegister;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -18,6 +19,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -69,10 +71,18 @@ public class BotUpdateConfiguration extends Application
 
         nextButton.setOnMouseClicked((event) ->
                                      {
-                                         SettingsUtil.getGlobalSettings().setCommandConfigMap(getCommandConfig());
-                                         SettingsUtil.getGlobalSettings().save();
-                                         HeadedGUIUtil.setSetupComplete(true);
-                                         botUpdateConfigurationScreen.getScene().getWindow().hide();
+                                         try
+                                         {
+                                             SettingsUtil.getGlobalSettings().setCommandConfigMap(getCommandConfig());
+                                             HeadedGUIUtil.setSetupComplete(true);
+                                             botUpdateConfigurationScreen.getScene().getWindow().hide();
+                                         }
+                                         catch (IOException e)
+                                         {
+                                             LoggerFactory.getLogger("Command Update").error("Unable to save to config. Please try again.");
+                                             Platform.exit();
+                                             System.exit(1);
+                                         }
                                      });
         nextButton.setOnMouseEntered((event) -> HeadedGUIUtil.nextButtonHover(nextRect));
         nextButton.setOnMouseExited((event) -> HeadedGUIUtil.nextButtonHover(nextRect));

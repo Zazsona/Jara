@@ -94,7 +94,6 @@ public class ConfigCommandSettings
         guildSettings.setCommandConfiguration(newState, null, ca.getCommandKey());
         embed.setDescription((newState) ? ca.getCommandKey()+" is now enabled." : ca.getCommandKey()+" is now disabled.");
         channel.sendMessage(embed.build()).queue();
-        guildSettings.save();
     }
 
     private void modifyRoles(EmbedBuilder embed, CommandAttributes ca, String request) throws IOException
@@ -135,7 +134,6 @@ public class ConfigCommandSettings
 
         embed.setDescription("**"+permissionsChanged+"** roles have been updated for "+ca.getCommandKey()+".");
         channel.sendMessage(embed.build()).queue();
-        guildSettings.save();
     }
 
     private String getCommandProfile(CommandAttributes ca)

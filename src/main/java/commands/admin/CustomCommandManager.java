@@ -3,16 +3,14 @@ package commands.admin;
 import commands.CmdUtil;
 import commands.Command;
 import configuration.GuildSettings;
-import configuration.GuildSettingsJson;
 import configuration.SettingsUtil;
+import configuration.guild.CustomCommandConfig;
 import jara.CommandRegister;
-import jara.Core;
 import jara.MessageManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,7 +50,7 @@ public class CustomCommandManager extends Command
 
                 if (guildSettings.isPermitted(message.getMember(), getClass()))
                 {
-                    GuildSettingsJson.CustomCommandConfig customCommand = null;
+                    CustomCommandConfig customCommand = null;
                     String[] selection = message.getContentDisplay().toLowerCase().split(" ");
                     if (!selection[0].equals("quit"))
                         customCommand = guildSettings.getCustomCommand(selection[1]);
@@ -77,7 +75,6 @@ public class CustomCommandManager extends Command
                             return;
                         case "delete":
                             guildSettings.removeCustomCommand(selection[1]);
-                            guildSettings.save();
                             embed.setDescription("Command "+selection[1]+" successfully removed.");
                             msgEvent.getChannel().sendMessage(embed.build()).queue();
                             return;
@@ -107,63 +104,53 @@ public class CustomCommandManager extends Command
 
     }
 
-    private void editCommand(GuildMessageReceivedEvent msgEvent, GuildSettingsJson.CustomCommandConfig customCommand)
+    private void editCommand(GuildMessageReceivedEvent msgEvent, CustomCommandConfig customCommand)
     {
-        try
+        while (true)
         {
-            while (true)
+            EmbedBuilder embed = getEmbedStyle(msgEvent);
+            embed.setDescription("What would you like to modify?\n**Aliases**\n**Description**\n**Category**\n\n**Message**\n**Audio**\n**Roles**\n\n**Quit**");
+            msgEvent.getChannel().sendMessage(embed.build()).queue();
+
+            Message message = mm.getNextMessage(msgEvent.getChannel());
+            String selection = message.getContentDisplay().toLowerCase();
+
+            if (guildSettings.isPermitted(message.getMember(), getClass()))
             {
-                EmbedBuilder embed = getEmbedStyle(msgEvent);
-                embed.setDescription("What would you like to modify?\n**Aliases**\n**Description**\n**Category**\n\n**Message**\n**Audio**\n**Roles**\n\n**Quit**");
-                msgEvent.getChannel().sendMessage(embed.build()).queue();
-
-                Message message = mm.getNextMessage(msgEvent.getChannel());
-                String selection = message.getContentDisplay().toLowerCase();
-
-                if (guildSettings.isPermitted(message.getMember(), getClass()))
+                switch (selection)
                 {
-                    switch (selection)
-                    {
-                        case "aliases":
-                            modifyAliases(msgEvent, customCommand);
-                            break;
-                        case "description":
-                            modifyDescription(msgEvent, customCommand);
-                            break;
-                        case "category":
-                            modifyCategory(msgEvent, customCommand);
-                            break;
-                        case "message":
-                            setUseFeatures(msgEvent, customCommand, 1);
-                            break;
-                        case "roles":
-                            setUseFeatures(msgEvent, customCommand, 2);
-                            break;
-                        case "audio":
-                            setUseFeatures(msgEvent, customCommand, 3);
-                            break;
-                        case "quit":
-                            embed.setDescription("Saved & Exited.");
-                            msgEvent.getChannel().sendMessage(embed.build()).queue();
-                            return;
-                        default:
-                            embed.setDescription("Invalid selection. Please try again.");
-                            msgEvent.getChannel().sendMessage(embed.build()).queue();
-                            break;
-                    }
-                    guildSettings.save();
+                    case "aliases":
+                        modifyAliases(msgEvent, customCommand);
+                        break;
+                    case "description":
+                        modifyDescription(msgEvent, customCommand);
+                        break;
+                    case "category":
+                        modifyCategory(msgEvent, customCommand);
+                        break;
+                    case "message":
+                        setUseFeatures(msgEvent, customCommand, 1);
+                        break;
+                    case "roles":
+                        setUseFeatures(msgEvent, customCommand, 2);
+                        break;
+                    case "audio":
+                        setUseFeatures(msgEvent, customCommand, 3);
+                        break;
+                    case "quit":
+                        embed.setDescription("Saved & Exited.");
+                        msgEvent.getChannel().sendMessage(embed.build()).queue();
+                        return;
+                    default:
+                        embed.setDescription("Invalid selection. Please try again.");
+                        msgEvent.getChannel().sendMessage(embed.build()).queue();
+                        break;
                 }
             }
         }
-        catch (IOException e)
-        {
-            EmbedBuilder embed = getEmbedStyle(msgEvent);
-            embed.setDescription("An error occurred when saving settings.");
-            msgEvent.getChannel().sendMessage(embed.build()).queue();
-        }
     }
 
-    private void modifyAliases(GuildMessageReceivedEvent msgEvent, GuildSettingsJson.CustomCommandConfig customCommand)
+    private void modifyAliases(GuildMessageReceivedEvent msgEvent, CustomCommandConfig customCommand)
     {
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         StringBuilder descBuilder = new StringBuilder();
@@ -193,7 +180,7 @@ public class CustomCommandManager extends Command
 
     }
 
-    private void modifyDescription(GuildMessageReceivedEvent msgEvent, GuildSettingsJson.CustomCommandConfig customCommand)
+    private void modifyDescription(GuildMessageReceivedEvent msgEvent, CustomCommandConfig customCommand)
     {
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         embed.setDescription("Please enter the new description.\n\nExisting description: " + customCommand.getDescription());
@@ -213,7 +200,7 @@ public class CustomCommandManager extends Command
 
     }
 
-    private void modifyCategory(GuildMessageReceivedEvent msgEvent, GuildSettingsJson.CustomCommandConfig customCommand)
+    private void modifyCategory(GuildMessageReceivedEvent msgEvent, CustomCommandConfig customCommand)
     {
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         embed.setDescription("Please enter the new category out of:\n**Admin**\n**Audio**\n**Games**\n**Toys**\n**Utility**\n\nCurrent Category: "+CommandRegister.getCategoryName(customCommand.getCategory()));
@@ -239,7 +226,7 @@ public class CustomCommandManager extends Command
         }
     }
 
-    private void setUseFeatures(GuildMessageReceivedEvent msgEvent, GuildSettingsJson.CustomCommandConfig customCommand, int feature)
+    private void setUseFeatures(GuildMessageReceivedEvent msgEvent, CustomCommandConfig customCommand, int feature)
     {
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         switch (feature)
@@ -307,7 +294,7 @@ public class CustomCommandManager extends Command
             }
         }
     }
-    private void setNewMessage(GuildMessageReceivedEvent msgEvent, GuildSettingsJson.CustomCommandConfig customCommand)
+    private void setNewMessage(GuildMessageReceivedEvent msgEvent, CustomCommandConfig customCommand)
     {
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         embed.setDescription("Please enter the new message.\n\nExisting message: " + customCommand.getMessage());
@@ -327,7 +314,7 @@ public class CustomCommandManager extends Command
 
     }
 
-    private void setNewRolesToggle(GuildMessageReceivedEvent msgEvent, GuildSettingsJson.CustomCommandConfig customCommand)
+    private void setNewRolesToggle(GuildMessageReceivedEvent msgEvent, CustomCommandConfig customCommand)
     {
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         StringBuilder descBuilder = new StringBuilder();
@@ -362,7 +349,7 @@ public class CustomCommandManager extends Command
 
     }
 
-    private void setNewAudioLink(GuildMessageReceivedEvent msgEvent, GuildSettingsJson.CustomCommandConfig customCommand)
+    private void setNewAudioLink(GuildMessageReceivedEvent msgEvent, CustomCommandConfig customCommand)
     {
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         embed.setDescription("Please enter the new audio track link.\n\nExisting link: " + customCommand.getAudioLink());

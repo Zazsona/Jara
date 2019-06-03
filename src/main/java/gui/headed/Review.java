@@ -148,14 +148,14 @@ public class Review
      */
     private void completeSetup()
     {
-        String token = HeadedGUIUtil.getDiscordSetupController().getToken();
-        if (!HeadedGUIUtil.getDiscordSetupController().isValidToken())
+        try
         {
-            HeadedGUI.showError("The token is blank or invalid.");
-        }
-        else
-        {
-            try
+            String token = HeadedGUIUtil.getDiscordSetupController().getToken();
+            if (!HeadedGUIUtil.getDiscordSetupController().isValidToken())
+            {
+                HeadedGUI.showError("The token is blank or invalid.");
+            }
+            else
             {
                 SettingsUtil.getGlobalSettings().setToken(token);
                 SettingsUtil.getGlobalSettings().setCommandConfigMap(HeadedGUIUtil.getCcSetupController().getCommandConfig());
@@ -178,11 +178,14 @@ public class Review
                 HeadedGUIUtil.setSetupComplete(true);
                 Platform.exit();
             }
-            catch (IOException e)
-            {
-                HeadedGUI.showError("Could not save settings.");
-            }
         }
+        catch (IOException e)
+        {
+            HeadedGUIUtil.showErrorPane("Could not save settings. Please restart the application.");
+            Platform.exit();
+            System.exit(0);
+        }
+
     }
 
 }

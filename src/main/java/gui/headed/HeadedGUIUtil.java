@@ -74,6 +74,16 @@ public class HeadedGUIUtil extends Application
         }
     }
 
+    @Override
+    public void stop()
+    {
+        if (!isSetupComplete())
+        {
+            logger.info("User has cancelled setup. Aborting...");
+            System.exit(0);
+        }
+    }
+
     public static void manageTitleSelection(Text selection)
     {
         String selectionID = selection.getId();

@@ -85,7 +85,6 @@ public class ConfigGameSettings
                 if (response.startsWith("y"))
                 {
                     guildSettings.setUseGameChannels(true);
-                    guildSettings.save();
                     embed.setDescription("Game Channels has been enabled.");
                     channel.sendMessage(embed.build()).queue();
                     break;
@@ -93,7 +92,6 @@ public class ConfigGameSettings
                 else if (response.startsWith("n"))
                 {
                     guildSettings.setUseGameChannels(false);
-                    guildSettings.save();
                     embed.setDescription("Game Channels has been disabled.");
                     channel.sendMessage(embed.build()).queue();
                     break;
@@ -138,7 +136,6 @@ public class ConfigGameSettings
                     else
                     {
                         guildSettings.setGameCategoryId(id);
-                        guildSettings.save();
                         embed.setDescription("Game Category set to "+msgEvent.getGuild().getCategoryById(id).getName());
                         channel.sendMessage(embed.build()).queue();
                         break;
@@ -155,7 +152,6 @@ public class ConfigGameSettings
                     {
                         id = channel.getGuild().getCategoriesByName(id, true).get(0).getId();
                         guildSettings.setGameCategoryId(id);
-                        guildSettings.save();
                         embed.setDescription("Game Category set to "+msgEvent.getGuild().getCategoryById(id).getName());
                         channel.sendMessage(embed.build()).queue();
                         break;
@@ -191,7 +187,6 @@ public class ConfigGameSettings
                 if (Pattern.matches(timeout, "[0-9]*"))
                 {
                     guildSettings.setGameChannelTimeout(timeout);
-                    guildSettings.save();
                     if (timeout.length() >= 10)
                     {
                         embed.setDescription("Game Channel Timeout set to a whopping "+timeout+"\n\nRemember, this feature can be disabled by setting minutes to 0.");
@@ -230,7 +225,6 @@ public class ConfigGameSettings
                 if (response.startsWith("y"))
                 {
                     guildSettings.setConcurrentGameInChannelAllowed(true);
-                    guildSettings.save();
                     embed.setDescription("Concurrent games have been enabled.");
                     channel.sendMessage(embed.build()).queue();
                     break;
@@ -238,7 +232,6 @@ public class ConfigGameSettings
                 else if (response.startsWith("n"))
                 {
                     guildSettings.setConcurrentGameInChannelAllowed(false);
-                    guildSettings.save();
                     embed.setDescription("Concurrent games have been disabled.");
                     channel.sendMessage(embed.build()).queue();
                     break;
