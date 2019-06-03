@@ -6,6 +6,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import jara.CommandRegister;
 import jara.Core;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import org.apache.commons.text.StringEscapeUtils;
@@ -21,6 +22,10 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -31,6 +36,14 @@ import java.util.Scanner;
  */
 public class CmdUtil
 {
+    /**
+     * Gets JDA
+     * @return
+     */
+    public static JDA getJDA()
+    {
+        return Core.getShardManager().getApplicationInfo().getJDA();
+    }
     /**
      * A list of almost every english word
      */
@@ -94,7 +107,7 @@ public class CmdUtil
             };
             String pageData = httpClient.execute(httpGet, responseHandler);
             httpClient.close();
-            return StringEscapeUtils.unescapeHtml4(pageData);
+            return pageData; //We could escape HTML encoding here, but that'd cause issues with Json and such. So don't.
         }
         catch (ClientProtocolException e)
         {
@@ -288,6 +301,46 @@ public class CmdUtil
          * So, technically this is fine, as help is *always* enabled and cannot be disabled. But generally calling commands like this is a bad idea, as they may be disabled.
          * This also saves us having to copy command usage info for each command, which could be a problem as commands change.
          */
+    }
+
+    /**
+     * The yearly seasons.
+     */
+    public static enum Season
+    {
+        SPRING,
+        SUMMER,
+        AUTUMN,
+        WINTER
+    }
+
+    /**
+     * Gets the current season.
+     * @return the {@link Season}
+     */
+    public static Season getSeason()
+    {
+        OffsetDateTime utc = OffsetDateTime.now(ZoneOffset.UTC);
+        OffsetDateTime spring = OffsetDateTime.of(LocalDateTime.of(LocalDate.now().getYear(), 3, 20, 0, 0), ZoneOffset.UTC);
+        OffsetDateTime summer = OffsetDateTime.of(LocalDateTime.of(LocalDate.now().getYear(), 6, 20, 0, 0), ZoneOffset.UTC);
+        OffsetDateTime autumn = OffsetDateTime.of(LocalDateTime.of(LocalDate.now().getYear(), 9, 22, 0, 0), ZoneOffset.UTC);
+        OffsetDateTime winter = OffsetDateTime.of(LocalDateTime.of(LocalDate.now().getYear(), 12, 21, 0, 0), ZoneOffset.UTC);
+        if (utc.isAfter(spring) && utc.isBefore(summer))
+        {
+            return Season.SPRING;
+        }
+        else if (utc.isAfter(summer) && utc.isBefore(autumn))
+        {
+            return Season.SUMMER;
+        }
+        else if (utc.isAfter(autumn) && utc.isBefore(winter))
+        {
+            return Season.AUTUMN;
+        }
+        else
+        {
+            return Season.WINTER;
+        }
     }
 
 

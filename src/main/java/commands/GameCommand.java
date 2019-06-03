@@ -74,23 +74,7 @@ public abstract class GameCommand extends Command //A base class to build comman
 		embed.setColor(CmdUtil.getHighlightColour(guild.getSelfMember()));
 		if (!guildSettings.isGameChannelsEnabled())
 		{
-			if (guildSettings.isConcurrentGameInChannelAllowed())
-			{
-				channelsRunningGames.putIfAbsent(guild.getId(), new ArrayList<>());
-				if (channelsRunningGames.get(guild.getId()).contains(currentChannel.getId()))
-				{
-					embed.setDescription("There's already a game running in this channel.");
-					currentChannel.sendMessage(embed.build()).queue();
-					Thread.currentThread().interrupt();
-					return null;
-				}
-				else
-				{
-					channelsRunningGames.get(guild.getId()).add(guild.getId());
-				}
-			}
-			gameChannel = currentChannel;
-			return currentChannel;
+			return utiliseCurrentChannel(currentChannel, guild, guildSettings, embed);
 		}
 		else
 		{
@@ -103,63 +87,7 @@ public abstract class GameCommand extends Command //A base class to build comman
 			Category gameCategory = guild.getCategoryById(gameCategoryID);
 			if (gameCategory != null)
 			{
-				try
-				{
-					TextChannel channel = (TextChannel) gameCategory.createTextChannel(channelName).complete();
-					int channelTimeout = Integer.parseInt(SettingsUtil.getGuildSettings(guild.getId()).getGameChannelTimeout());
-					if (channelTimeout != 0)
-					{
-						channelTimeoutTimer = new Timer();
-						channelTimeoutTimer.schedule(new TimerTask()
-						{
-							@Override
-							public void run()
-							{
-								if (channel.hasLatestMessage())
-								{
-									Message lastMessage = channel.getMessageById(channel.getLatestMessageIdLong()).complete();
-									OffsetDateTime timeToDelete = lastMessage.getCreationTime().plusSeconds(channelTimeout/1000);
-									if (!lastMessage.getCreationTime().isBefore(timeToDelete))
-									{
-										deleteGameChannel();
-									}
-								}
-							}
-						}, channelTimeout/2, channelTimeout/2);
-					}
-					channel.putPermissionOverride(channel.getGuild().getPublicRole()).setDeny(Permission.MESSAGE_READ).queue();
-					for (Member player : players)
-					{
-						channel.createPermissionOverride(player).setAllow(Permission.MESSAGE_READ).queue();
-					}
-					embed.setDescription(channel.getAsMention()+" has begun!\nReact with :game_die: to join.");
-					gameMsg = currentChannel.sendMessage(embed.build()).complete();
-					gameMsg.addReaction("\uD83C\uDFB2").queue();
-					gameChannelMap.put(gameMsg.getId(), channel);
-					gameChannel = channel;
-					return channel;
-				}
-				catch (InsufficientPermissionException e)
-				{
-					embed.setDescription("A game category has been set up and exists, but I don't have permission to create channels and add players there!");
-					currentChannel.sendMessage(embed.build()).queue();
-					Thread.currentThread().interrupt();
-					return null;
-				}
-				catch (GuildUnavailableException e)
-				{
-					logger.error("Guild "+guild.getId()+" became unavailable while trying to perform an action. Has Discord gone down?");
-					e.printStackTrace();
-					try
-					{
-						Thread.sleep(1000);
-					} 
-					catch (InterruptedException e1)
-					{
-						e.printStackTrace(); 
-					}
-					return createGameChannel(currentChannel, channelName);
-				}
+				return utiliseGameChannel(currentChannel, channelName, guild, logger, embed, gameCategory, players);
 			}
 			else
 			{
@@ -213,6 +141,130 @@ public abstract class GameCommand extends Command //A base class to build comman
 			}
 		}
 		return;
+	}
+
+	/**
+	 * Creates a game channel
+	 * @param currentChannel
+	 * @param channelName
+	 * @param guild
+	 * @param logger
+	 * @param embed
+	 * @param gameCategory
+	 * @param players
+	 * @return
+	 */
+	private TextChannel utiliseGameChannel(TextChannel currentChannel, String channelName, Guild guild, Logger logger, EmbedBuilder embed, Category gameCategory, Member[] players)
+	{
+		try
+		{
+			TextChannel channel = (TextChannel) gameCategory.createTextChannel(channelName).complete();
+			enableChannelTimeout(guild, channel);
+			channel.putPermissionOverride(channel.getGuild().getPublicRole()).setDeny(Permission.MESSAGE_READ).queue();
+			for (Member player : players)
+			{
+				channel.createPermissionOverride(player).setAllow(Permission.MESSAGE_READ).queue();
+			}
+			sendGameMsg(currentChannel, channel);
+			return channel;
+		}
+		catch (InsufficientPermissionException e)
+		{
+			embed.setDescription("A game category has been set up and exists, but I don't have permission to create channels and add players there!");
+			currentChannel.sendMessage(embed.build()).queue();
+			Thread.currentThread().interrupt();
+			return null;
+		}
+		catch (GuildUnavailableException e)
+		{
+			logger.error("Guild "+guild.getId()+" became unavailable while trying to perform an action. Has Discord gone down?");
+			e.printStackTrace();
+			try
+			{
+				Thread.sleep(1000);
+			}
+			catch (InterruptedException e1)
+			{
+				e.printStackTrace();
+			}
+			return createGameChannel(currentChannel, channelName);
+		}
+	}
+
+	/**
+	 * Starts a timer to delete the game channel after the guild's set timeout
+	 * @param guild
+	 * @param channel
+	 */
+	private void enableChannelTimeout(Guild guild, TextChannel channel)
+	{
+		int channelTimeout = Integer.parseInt(SettingsUtil.getGuildSettings(guild.getId()).getGameChannelTimeout());
+		if (channelTimeout != 0)
+		{
+			channelTimeoutTimer = new Timer();
+			channelTimeoutTimer.schedule(new TimerTask()
+			{
+				@Override
+				public void run()
+				{
+					if (channel.hasLatestMessage())
+					{
+						Message lastMessage = channel.getMessageById(channel.getLatestMessageIdLong()).complete();
+						OffsetDateTime timeToDelete = lastMessage.getCreationTime().plusSeconds(channelTimeout/1000);
+						if (!lastMessage.getCreationTime().isBefore(timeToDelete))
+						{
+							deleteGameChannel();
+						}
+					}
+				}
+			}, channelTimeout/2, channelTimeout/2);
+		}
+	}
+
+	/**
+	 * Sends a message allowing players to add a reaction to join the channel
+	 * @param currentChannel
+	 * @param channel
+	 */
+	private void sendGameMsg(TextChannel currentChannel, TextChannel channel)
+	{
+		EmbedBuilder embed = new EmbedBuilder();
+		embed.setColor(CmdUtil.getHighlightColour(currentChannel.getGuild().getSelfMember()));
+		embed.setDescription(channel.getAsMention()+" has begun!\nReact with :game_die: to join.");
+		gameMsg = currentChannel.sendMessage(embed.build()).complete();
+		gameMsg.addReaction("\uD83C\uDFB2").queue();
+		gameChannelMap.put(gameMsg.getId(), channel);
+		gameChannel = channel;
+	}
+
+	/**
+	 * Prepares the current channel for a game, and registers it as running a game.<br>
+	 *     Kills the thread if multiple games in a channel is disabled and one is already running
+	 * @param currentChannel
+	 * @param guild
+	 * @param guildSettings
+	 * @param embed
+	 * @return
+	 */
+	private TextChannel utiliseCurrentChannel(TextChannel currentChannel, Guild guild, GuildSettings guildSettings, EmbedBuilder embed)
+	{
+		if (guildSettings.isConcurrentGameInChannelAllowed())
+		{
+			channelsRunningGames.putIfAbsent(guild.getId(), new ArrayList<>());
+			if (channelsRunningGames.get(guild.getId()).contains(currentChannel.getId()))
+			{
+				embed.setDescription("There's already a game running in this channel.");
+				currentChannel.sendMessage(embed.build()).queue();
+				Thread.currentThread().interrupt();
+				return null;
+			}
+			else
+			{
+				channelsRunningGames.get(guild.getId()).add(guild.getId());
+			}
+		}
+		gameChannel = currentChannel;
+		return currentChannel;
 	}
 
 	private class GameReactionListener extends ListenerAdapter
