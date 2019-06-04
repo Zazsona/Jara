@@ -22,7 +22,8 @@ public class CommandRegister
 		UTILITY,
 		TOYS,
 		AUDIO,
-		ADMIN
+		ADMIN,
+		SEASONAL
 	}
 	private static ArrayList<CommandAttributes> register;
 
@@ -31,6 +32,7 @@ public class CommandRegister
 	private static ArrayList<CommandAttributes> gamesCommands;
 	private static ArrayList<CommandAttributes> toysCommands;
 	private static ArrayList<CommandAttributes> utilityCommands;
+	private static ArrayList<CommandAttributes> seasonalCommands;
 	private static ArrayList<CommandAttributes> noGroupCommands;
 	/*
 	 * When implementing a new command, is is essential to add it to the getRegister() method. Otherwise, it will be ignored at run time.
@@ -209,7 +211,7 @@ public class CommandRegister
 			for (CommandAttributes commandAttributes : register)
 			{
 				min = 0;
-				max = commandAttributes.getAliases().length;
+				max = commandAttributes.getAliases().length-1;
 				while (min <= max)
 				{
 					int mid = (max+min)/2;
@@ -299,6 +301,8 @@ public class CommandRegister
 				return "Audio";
 			case ADMIN:
 				return "Admin";
+			case SEASONAL:
+				return "Seasonal";
 		}
 		return null; //Invalid id.
 	}
@@ -328,6 +332,8 @@ public class CommandRegister
 				return AUDIO;
 			case "admin":
 				return ADMIN;
+			case "seasonal":
+				return SEASONAL;
 		}
 		return null; //Invalid name.
 	}
@@ -374,6 +380,9 @@ public class CommandRegister
 				break;
 			case ADMIN:
 				categoryCommands = adminCommands;
+				break;
+			case SEASONAL:
+				categoryCommands = seasonalCommands;
 				break;
 			default:
 				return null;
@@ -423,6 +432,9 @@ public class CommandRegister
 				break;
 			case ADMIN:
 				adminCommands = categoryCommands;
+				break;
+			case SEASONAL:
+				seasonalCommands = categoryCommands;
 				break;
 			default:
 				return null;

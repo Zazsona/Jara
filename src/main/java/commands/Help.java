@@ -89,6 +89,7 @@ public class Help extends Command
                             + "**Toys** - Quick fun commands.\n"
                             + "**Utility** - Small commands for basic applications.\n"
                             + "**Audio** - Commands for Voice Channels.\n"
+                            + "**Seasonal** - Seasonal celebrations.\n"
                             + "**Admin** - Tools to modify the bot.";
 
             embed.addField("Topics",topics, true);

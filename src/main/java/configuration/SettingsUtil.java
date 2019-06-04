@@ -99,7 +99,12 @@ public class SettingsUtil
      */
     public static File getModuleDataDirectory()
     {
-        return new File(getDirectory().getPath()+"/ModuleData/");
+        File dir = new File(getDirectory().getPath()+"/ModuleData/");
+        if (!dir.exists())
+        {
+            dir.mkdirs();
+        }
+        return dir;
     }
 
     public static GuildSettings getGuildSettings(String guildID)
