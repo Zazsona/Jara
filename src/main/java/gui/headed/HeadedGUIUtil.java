@@ -64,7 +64,7 @@ public class HeadedGUIUtil extends Application
 
             stage = new Stage();
             stage.setTitle("Jara Setup");
-            stage.setScene(new Scene(welcomeRoot, 1280, 800));
+            stage.setScene(new Scene(welcomeRoot, 1400, 800));
             stage.getIcons().add(new Image(HeadedGUIUtil.class.getClassLoader().getResourceAsStream("jara.png")));
             stage.show();
         }

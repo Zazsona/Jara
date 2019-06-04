@@ -113,12 +113,12 @@
                   <Font name="System Bold" size="12.0" />
                </font>
             </Text>
-            <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="541.0" prefWidth="1280.0" style="-fx-background: #36393F; -fx-border-color: #36393F;">
+            <ScrollPane fx:id="categoryScrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" pannable="true" prefHeight="541.0" prefWidth="1280.0" style="-fx-background: #36393F; -fx-border-color: #36393F;" vbarPolicy="NEVER" vmax="0.0">
                <content>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                      <children>
                         <Pane prefHeight="80.0" prefWidth="1276.0" />
-                        <HBox alignment="CENTER" fillHeight="false" maxHeight="1.7976931348623157E308" prefHeight="555.0" prefWidth="1280.0" style="-fx-background: #36393F;">
+                        <HBox fx:id="categoryBox" alignment="CENTER" fillHeight="false" maxHeight="1.7976931348623157E308" prefHeight="555.0" prefWidth="1280.0" style="-fx-background: #36393F;">
                            <children>
                               <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" prefHeight="555.0" prefWidth="225.0" style="-fx-background-color: #23272A;">
                                  <children>
@@ -175,7 +175,7 @@
                                     </BorderPane>
                                     <BorderPane prefHeight="369.0" prefWidth="285.0">
                                        <center>
-                                          <ScrollPane fitToWidth="true" maxHeight="1.7976931348623157E308" prefHeight="331.0" prefWidth="114.0" style="-fx-background: #191c1e; -fx-border-color: #191c1e;" BorderPane.alignment="CENTER">
+                                          <ScrollPane fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" pannable="true" prefHeight="331.0" prefWidth="114.0" style="-fx-background: #191c1e; -fx-border-color: #191c1e;" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
                                              <content>
                                                 <VBox fx:id="adminList" alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" prefHeight="139.0" prefWidth="190.0" />
                                              </content>
@@ -200,7 +200,7 @@
                                     <DropShadow />
                                  </effect>
                               </VBox>
-                              <Pane prefHeight="200.0" prefWidth="36.0" />
+                              <Pane minWidth="10.0" prefHeight="200.0" prefWidth="36.0" />
                               <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" prefHeight="555.0" prefWidth="225.0" style="-fx-background-color: #23272A;">
                                  <children>
                                     <Pane prefHeight="8.0" prefWidth="100.0" />
@@ -256,7 +256,7 @@
                                     </BorderPane>
                                     <BorderPane prefHeight="369.0" prefWidth="285.0">
                                        <center>
-                                          <ScrollPane fitToWidth="true" maxHeight="1.7976931348623157E308" prefHeight="331.0" prefWidth="114.0" style="-fx-background: #191c1e; -fx-border-color: #191c1e;" BorderPane.alignment="CENTER">
+                                          <ScrollPane fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" pannable="true" prefHeight="331.0" prefWidth="114.0" style="-fx-background: #191c1e; -fx-border-color: #191c1e;" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
                                              <content>
                                                 <VBox fx:id="audioList" alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" prefHeight="139.0" prefWidth="190.0" />
                                              </content>
@@ -281,7 +281,7 @@
                                     <DropShadow />
                                  </effect>
                               </VBox>
-                              <Pane prefHeight="200.0" prefWidth="36.0" />
+                              <Pane minWidth="10.0" prefHeight="200.0" prefWidth="36.0" />
                               <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" prefHeight="555.0" prefWidth="225.0" style="-fx-background-color: #23272A;">
                                  <children>
                                     <Pane prefHeight="8.0" prefWidth="100.0" />
@@ -337,7 +337,7 @@
                                     </BorderPane>
                                     <BorderPane prefHeight="369.0" prefWidth="285.0">
                                        <center>
-                                          <ScrollPane fitToWidth="true" maxHeight="1.7976931348623157E308" prefHeight="331.0" prefWidth="114.0" style="-fx-background: #191c1e; -fx-border-color: #191c1e;" BorderPane.alignment="CENTER">
+                                          <ScrollPane fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" pannable="true" prefHeight="331.0" prefWidth="114.0" style="-fx-background: #191c1e; -fx-border-color: #191c1e;" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
                                              <content>
                                                 <VBox fx:id="gamesList" alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" prefHeight="139.0" prefWidth="190.0" />
                                              </content>
@@ -362,7 +362,7 @@
                                     <DropShadow />
                                  </effect>
                               </VBox>
-                              <Pane prefHeight="200.0" prefWidth="36.0" />
+                              <Pane minWidth="10.0" prefHeight="200.0" prefWidth="36.0" />
                               <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" prefHeight="555.0" prefWidth="225.0" style="-fx-background-color: #23272A;">
                                  <children>
                                     <Pane prefHeight="8.0" prefWidth="100.0" />
@@ -418,7 +418,7 @@
                                     </BorderPane>
                                     <BorderPane prefHeight="369.0" prefWidth="285.0">
                                        <center>
-                                          <ScrollPane fitToWidth="true" maxHeight="1.7976931348623157E308" prefHeight="331.0" prefWidth="114.0" style="-fx-background: #191c1e; -fx-border-color: #191c1e;" BorderPane.alignment="CENTER">
+                                          <ScrollPane fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" pannable="true" prefHeight="331.0" prefWidth="114.0" style="-fx-background: #191c1e; -fx-border-color: #191c1e;" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
                                              <content>
                                                 <VBox fx:id="toysList" alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" prefHeight="139.0" prefWidth="190.0" />
                                              </content>
@@ -443,7 +443,7 @@
                                     <DropShadow />
                                  </effect>
                               </VBox>
-                              <Pane prefHeight="200.0" prefWidth="36.0" />
+                              <Pane minWidth="10.0" prefHeight="200.0" prefWidth="36.0" />
                               <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" prefHeight="555.0" prefWidth="225.0" style="-fx-background-color: #23272A;">
                                  <children>
                                     <Pane prefHeight="8.0" prefWidth="100.0" />
@@ -499,9 +499,90 @@
                                     </BorderPane>
                                     <BorderPane prefHeight="369.0" prefWidth="285.0">
                                        <center>
-                                          <ScrollPane fitToWidth="true" maxHeight="1.7976931348623157E308" prefHeight="331.0" prefWidth="114.0" style="-fx-background: #191c1e; -fx-border-color: #191c1e;" BorderPane.alignment="CENTER">
+                                          <ScrollPane fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" pannable="true" prefHeight="331.0" prefWidth="114.0" style="-fx-background: #191c1e; -fx-border-color: #191c1e;" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
                                              <content>
                                                 <VBox fx:id="utilityList" alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" prefHeight="139.0" prefWidth="190.0" />
+                                             </content>
+                                             <effect>
+                                                <DropShadow />
+                                             </effect>
+                                          </ScrollPane>
+                                       </center>
+                                       <left>
+                                          <Pane prefHeight="184.0" prefWidth="6.0" BorderPane.alignment="CENTER" />
+                                       </left>
+                                       <right>
+                                          <Pane prefHeight="184.0" prefWidth="4.0" BorderPane.alignment="CENTER" />
+                                       </right>
+                                       <top>
+                                          <Pane prefHeight="11.0" prefWidth="285.0" BorderPane.alignment="CENTER" />
+                                       </top>
+                                    </BorderPane>
+                                    <Pane minHeight="10.0" prefHeight="41.0" prefWidth="225.0" />
+                                 </children>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </VBox>
+                              <Pane minWidth="10.0" prefHeight="200.0" prefWidth="36.0" />
+                              <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" prefHeight="555.0" prefWidth="225.0" style="-fx-background-color: #23272A;">
+                                 <children>
+                                    <Pane prefHeight="8.0" prefWidth="100.0" />
+                                    <ImageView fitHeight="126.0" fitWidth="116.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../categories/seasonal_circle.png" />
+                                       </image>
+                                    </ImageView>
+                                    <Pane prefHeight="18.0" prefWidth="143.0" />
+                                    <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Seasonal">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Text>
+                                    <Pane prefHeight="11.0" prefWidth="100.0" />
+                                    <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Seasonal celebrations" />
+                                    <Pane prefHeight="84.0" prefWidth="225.0" />
+                                    <BorderPane prefHeight="36.0" prefWidth="285.0">
+                                       <center>
+                                          <BorderPane style="-fx-background-color: #191c1e;" BorderPane.alignment="CENTER">
+                                             <bottom>
+                                                <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                             </bottom>
+                                             <center>
+                                                <VBox prefHeight="32.0" prefWidth="181.0" BorderPane.alignment="CENTER">
+                                                   <children>
+                                                      <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggle All">
+                                                         <font>
+                                                            <Font name="System Bold" size="12.0" />
+                                                         </font>
+                                                      </Text>
+                                                      <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggles all modifiable commands" />
+                                                   </children>
+                                                </VBox>
+                                             </center>
+                                             <effect>
+                                                <DropShadow />
+                                             </effect>
+                                             <right>
+                                                <CheckBox fx:id="seasonalCategoryCheckBox" mnemonicParsing="false" selected="true" BorderPane.alignment="CENTER" />
+                                             </right>
+                                             <top>
+                                                <Pane maxHeight="2.0" minHeight="2.0" prefHeight="2.0" prefWidth="270.0" style="-fx-background-color: #36393F;" BorderPane.alignment="CENTER" />
+                                             </top>
+                                          </BorderPane>
+                                       </center>
+                                       <left>
+                                          <Pane prefHeight="184.0" prefWidth="6.0" BorderPane.alignment="CENTER" />
+                                       </left>
+                                       <right>
+                                          <Pane prefHeight="184.0" prefWidth="6.0" BorderPane.alignment="CENTER" />
+                                       </right>
+                                    </BorderPane>
+                                    <BorderPane prefHeight="369.0" prefWidth="285.0">
+                                       <center>
+                                          <ScrollPane fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" pannable="true" prefHeight="331.0" prefWidth="114.0" style="-fx-background: #191c1e; -fx-border-color: #191c1e;" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
+                                             <content>
+                                                <VBox fx:id="seasonalList" alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" prefHeight="139.0" prefWidth="190.0" />
                                              </content>
                                              <effect>
                                                 <DropShadow />

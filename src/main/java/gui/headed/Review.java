@@ -159,7 +159,6 @@ public class Review
             {
                 SettingsUtil.getGlobalSettings().setToken(token);
                 SettingsUtil.getGlobalSettings().setCommandConfigMap(HeadedGUIUtil.getCcSetupController().getCommandConfig());
-                SettingsUtil.getGlobalSettings().save();
                 if (!invitePressed) //Just so we don't have a useless bot running...
                 {
                     while (generateInviteLink(false).equals(""));

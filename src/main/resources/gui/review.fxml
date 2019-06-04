@@ -148,7 +148,10 @@
                                     <Font name="System Bold" size="13.0" />
                                  </font>
                               </Text>
-                              <Label fx:id="supportListLbl" prefHeight="92.0" prefWidth="53.0" text="Admin Audio Games Toys Utilities" textFill="WHITE" wrapText="true" />
+                              <Label fx:id="supportListLbl" prefHeight="115.0" prefWidth="53.0" text="Admin Audio Games Toys Utilities Seasonal" textFill="WHITE" wrapText="true">
+                                 <font>
+                                    <Font size="11.0" />
+                                 </font></Label>
                            </children>
                         </VBox>
                      </right>

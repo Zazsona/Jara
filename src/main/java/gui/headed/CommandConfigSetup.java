@@ -1,17 +1,20 @@
 package gui.headed;
 
+import com.sun.media.jfxmediaimpl.platform.Platform;
 import configuration.SettingsUtil;
 import jara.CommandAttributes;
 import jara.CommandRegister;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
 import javafx.scene.control.CheckBox;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -38,6 +41,10 @@ public class CommandConfigSetup
     @FXML
     private Text navBar_review_text;
     @FXML
+    private HBox categoryBox;
+    @FXML
+    private ScrollPane categoryScrollPane;
+    @FXML
     private VBox adminList;
     @FXML
     private VBox gamesList;
@@ -45,6 +52,8 @@ public class CommandConfigSetup
     private VBox toysList;
     @FXML
     private VBox utilityList;
+    @FXML
+    private VBox seasonalList;
     @FXML
     private VBox audioList;
     @FXML
@@ -57,6 +66,8 @@ public class CommandConfigSetup
     private CheckBox toysCategoryCheckBox;
     @FXML
     private CheckBox utilityCategoryCheckBox;
+    @FXML
+    private CheckBox seasonalCategoryCheckBox;
 
     public void initialize()
     {
@@ -74,11 +85,19 @@ public class CommandConfigSetup
 
         navBar_review_text.setOnMouseClicked((event) -> HeadedGUIUtil.manageTitleSelection(navBar_review_text));
 
+        categoryBox.setOnScroll(event -> //Set scrolling to be "set" - That is, no matter how many elements are in the list, the moved pixels is the same.
+                                         {
+                                             double change = categoryScrollPane.getWidth()/categoryScrollPane.getPrefWidth();
+                                             double scrollAmount = (event.getDeltaY() < 0) ? -0.2f : 0.2f;
+                                             categoryScrollPane.setHvalue(categoryScrollPane.getHvalue() + (scrollAmount*change));
+                                         });
+
         adminCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(adminCategoryCheckBox, ADMIN));
         audioCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(audioCategoryCheckBox, AUDIO));
         gamesCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(gamesCategoryCheckBox, GAMES));
         toysCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(toysCategoryCheckBox, TOYS));
         utilityCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(utilityCategoryCheckBox, UTILITY));
+        seasonalCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(seasonalCategoryCheckBox, SEASONAL));
 
         for (CommandAttributes ca : CommandRegister.getRegister())
         {
@@ -107,6 +126,9 @@ public class CommandConfigSetup
                     break;
                 case ADMIN:
                     adminList.getChildren().addAll(topSpacePane, generateCommandListElement(ca), bottomSpacePane);
+                    break;
+                case SEASONAL:
+                    seasonalList.getChildren().addAll(topSpacePane, generateCommandListElement(ca), bottomSpacePane);
                     break;
             }
         }
@@ -162,8 +184,10 @@ public class CommandConfigSetup
         bp.setRight(checkBox);
         bp.setAlignment(checkBox, Pos.CENTER);
         VBox vbox = new VBox();
-        Text nameText = new Text(commandAttributes.getCommandKey());
-        Text descText = new Text(commandAttributes.getDescription());
+        String key = (commandAttributes.getCommandKey().length() > 22) ? commandAttributes.getCommandKey().substring(0, 19)+"..." : commandAttributes.getCommandKey();
+        Text nameText = new Text(key);
+        String description = (commandAttributes.getDescription().length() > 30) ? commandAttributes.getDescription().substring(0, 27)+"..." : commandAttributes.getDescription();
+        Text descText = new Text(description);
         nameText.setFont(new Font("System", 12));
         nameText.setStyle("-fx-font-weight: bold;");
         nameText.setFill(Paint.valueOf("#FFFFFF"));

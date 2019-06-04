@@ -218,6 +218,28 @@
                         <DropShadow />
                      </effect>
                   </VBox>
+                  <Pane minWidth="10.0" prefHeight="284.0" prefWidth="50.0" />
+                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #23272A;">
+                     <children>
+                        <Pane prefHeight="8.0" prefWidth="100.0" />
+                        <ImageView fitHeight="126.0" fitWidth="116.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../categories/seasonal_circle.png" />
+                           </image>
+                        </ImageView>
+                        <Pane prefHeight="18.0" prefWidth="143.0" />
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Seasonal">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Text>
+                        <Pane prefHeight="11.0" prefWidth="100.0" />
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Seasonal celebrations" />
+                     </children>
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                  </VBox>
                </children>
             </HBox>
             <Pane minHeight="20.0" prefHeight="51.0" prefWidth="1280.0" />
