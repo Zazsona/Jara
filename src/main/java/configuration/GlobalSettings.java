@@ -1,6 +1,4 @@
 package configuration;
-
-import gui.HeadedGUI;
 import jara.CommandRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,8 +77,14 @@ public class GlobalSettings implements Serializable
                 fis.close();
                 if (!commandConfig.keySet().containsAll(Arrays.asList(CommandRegister.getAllCommandKeys())))
                 {
-                    logger.info("Commands are missing from the config. Launching config.");
-                    HeadedGUI.showUpdateConfig();
+                    logger.info("Found new commands. Adding them to the config.");
+                    for (String key : CommandRegister.getAllCommandKeys())
+                    {
+                        if (!commandConfig.keySet().contains(key))
+                        {
+                            commandConfig.put(key, true);
+                        }
+                    }
                 }
                 return true;
             }
