@@ -28,6 +28,66 @@ public class ConfigCommandSettings
         msgManager = new MessageManager();
     }
 
+    public void parseAsParameters(GuildMessageReceivedEvent msgEvent, String[] parameters) throws IOException
+    {
+        if (parameters.length > 2)
+        {
+            EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
+            CommandAttributes ca = CommandRegister.getCommand(parameters[2]);
+            if (ca == null)
+            {
+                embed.setDescription("Command "+parameters[2]+" not found.");
+                channel.sendMessage(embed.build()).queue();
+                return;
+            }
+            else
+            {
+                if (parameters.length > 3)
+                {
+                    String commandTask = parameters[3].toLowerCase();
+                    if (commandTask.startsWith("addroles") || commandTask.startsWith("removeroles"))
+                    {
+                        StringBuilder roles = new StringBuilder();
+                        if (parameters.length > 4)
+                        {
+                            for (int i = 4; i<parameters.length; i++)
+                            {
+                                roles.append(parameters[i]).append(" ");
+                            }
+                            modifyRoles(embed, ca, roles.toString());
+                        }
+                        else
+                        {
+                            embed.setDescription("You haven't specified any roles!");
+                            channel.sendMessage(embed.build()).queue();
+                        }
+                    }
+                    else if (commandTask.equals("enable"))
+                    {
+                        modifyState(embed, ca, true);
+                    }
+                    else if (commandTask.equals("disable"))
+                    {
+                        modifyState(embed, ca, false);
+                    }
+                    else
+                    {
+                        embed.setDescription("Unrecognised command config option.");
+                        channel.sendMessage(embed.build()).queue();
+                    }
+                }
+                else
+                {
+                    showMenu(ca, embed);
+                }
+            }
+        }
+        else
+        {
+            getCommand(msgEvent);
+        }
+    }
+
     public void getCommand(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         CommandAttributes ca;

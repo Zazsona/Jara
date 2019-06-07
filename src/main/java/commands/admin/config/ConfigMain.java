@@ -19,57 +19,60 @@ public class ConfigMain extends Command
     public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
     {
         TextChannel channel = msgEvent.getChannel();
-        MessageManager mm = new MessageManager();
         EmbedBuilder embed = getEmbedStyle(msgEvent);
-        String embedDescription = "Welcome to the Config\nPlease select a menu, or say `quit` to cancel.";
-        embed.setDescription(embedDescription);
-        embed.addField("Menus", "**Prefix**\n**Audio**\n**Games**\n**Commands**\n**Setup**", true);
-        channel.sendMessage(embed.build()).queue();
         try
         {
-            while (true)
+            if (!parseAsParameters(msgEvent, channel, embed, parameters))
             {
-                Message msg = mm.getNextMessage(channel);
-                if (SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+                MessageManager mm = new MessageManager();
+                String embedDescription = "Welcome to the Config\nPlease select a menu, or say `quit` to cancel.";
+                embed.setDescription(embedDescription);
+                embed.addField("Menus", "**Prefix**\n**Audio**\n**Games**\n**Commands**\n**Setup**", true);
+                channel.sendMessage(embed.build()).queue();
+                while (true)
                 {
-                    String selection = msg.getContentDisplay();
-                    final GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
-                    if (selection.equalsIgnoreCase("prefix"))
+                    Message msg = mm.getNextMessage(channel);
+                    if (SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
                     {
-                        new ConfigMainSettings(guildSettings, channel).modifyPrefix(msgEvent);
-                    }
-                    else if (selection.equalsIgnoreCase("audio"))
-                    {
-                        new ConfigAudioSettings(guildSettings, channel).showMenu(msgEvent);
-                    }
-                    else if (selection.equalsIgnoreCase("games"))
-                    {
-                        new ConfigGameSettings(guildSettings, channel).showMenu(msgEvent);
-                    }
-                    else if (selection.equalsIgnoreCase("commands"))
-                    {
-                        new ConfigCommandSettings(guildSettings, channel).getCommand(msgEvent);
-                    }
-                    else if (selection.equalsIgnoreCase("setup"))
-                    {
-                        new ConfigWizard(msgEvent, guildSettings, channel);
-                        return;
-                    }
-                    else if (selection.equalsIgnoreCase("quit"))
-                    {
-                        embed.setDescription("Config closed.");
-                        embed.clearFields();
+                        String selection = msg.getContentDisplay();
+                        final GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
+                        if (selection.equalsIgnoreCase("prefix"))
+                        {
+                            new ConfigMainSettings(guildSettings, channel).modifyPrefix(msgEvent);
+                        }
+                        else if (selection.equalsIgnoreCase("audio"))
+                        {
+                            new ConfigAudioSettings(guildSettings, channel).showMenu(msgEvent);
+                        }
+                        else if (selection.equalsIgnoreCase("games"))
+                        {
+                            new ConfigGameSettings(guildSettings, channel).showMenu(msgEvent);
+                        }
+                        else if (selection.equalsIgnoreCase("commands"))
+                        {
+                            new ConfigCommandSettings(guildSettings, channel).getCommand(msgEvent);
+                        }
+                        else if (selection.equalsIgnoreCase("setup"))
+                        {
+                            new ConfigWizard(msgEvent, guildSettings, channel);
+                            return;
+                        }
+                        else if (selection.equalsIgnoreCase("quit"))
+                        {
+                            embed.setDescription("Config closed.");
+                            embed.clearFields();
+                            channel.sendMessage(embed.build()).queue();
+                            break;
+                        }
+                        else
+                        {
+                            embed.setDescription("Unknown menu: "+selection+". To quit, enter \"quit\".");
+                            channel.sendMessage(embed.build()).queue();
+                            embed.setDescription(embedDescription);
+                            continue;
+                        }
                         channel.sendMessage(embed.build()).queue();
-                        break;
                     }
-                    else
-                    {
-                        embed.setDescription("Unknown menu: "+selection+". To quit, enter \"quit\".");
-                        channel.sendMessage(embed.build()).queue();
-                        embed.setDescription(embedDescription);
-                        continue;
-                    }
-                    channel.sendMessage(embed.build()).queue();
                 }
             }
         }
@@ -81,11 +84,11 @@ public class ConfigMain extends Command
         }
     }
 
-    /*private boolean parseAsParameters(GuildMessageReceivedEvent msgEvent, TextChannel channel, EmbedBuilder embed, String[] parameters) throws IOException
+    private boolean parseAsParameters(GuildMessageReceivedEvent msgEvent, TextChannel channel, EmbedBuilder embed, String[] parameters) throws IOException
     {
         if (parameters.length > 1)
         {
-            String selection = parameters[1];
+            String selection = parameters[1].toLowerCase();
             final GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
             if (selection.equalsIgnoreCase("prefix"))
             {
@@ -93,15 +96,15 @@ public class ConfigMain extends Command
             }
             else if (selection.equalsIgnoreCase("audio"))
             {
-                new ConfigAudioSettings(guildSettings, channel).showMenu(msgEvent);
+                new ConfigAudioSettings(guildSettings, channel).parseAsParameter(msgEvent, parameters);
             }
             else if (selection.equalsIgnoreCase("games"))
             {
-                new ConfigGameSettings(guildSettings, channel).showMenu(msgEvent);
+                new ConfigGameSettings(guildSettings, channel).parseAsParameter(msgEvent, parameters);
             }
             else if (selection.equalsIgnoreCase("commands"))
             {
-                new ConfigCommandSettings(guildSettings, channel).getCommand(msgEvent);
+                new ConfigCommandSettings(guildSettings, channel).parseAsParameters(msgEvent, parameters);
             }
             else if (selection.equalsIgnoreCase("setup"))
             {
@@ -115,7 +118,7 @@ public class ConfigMain extends Command
             return true;
         }
         return false;
-    }*/
+    }
 
     public static EmbedBuilder getEmbedStyle(GuildMessageReceivedEvent msgEvent)
     {

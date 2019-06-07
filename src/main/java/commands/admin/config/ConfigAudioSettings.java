@@ -20,6 +20,32 @@ public class ConfigAudioSettings
         this.channel = channel;
     }
 
+    public void parseAsParameter(GuildMessageReceivedEvent msgEvent, String[] parameters) throws IOException
+    {
+        if (parameters.length > 2)
+        {
+            String request = parameters[2].toLowerCase();
+            if (request.equalsIgnoreCase("skipvotes"))
+            {
+                modifySkipVotes(msgEvent);
+            }
+            else if (request.equalsIgnoreCase("voiceleaving"))
+            {
+                modifyVoiceLeaving(msgEvent);
+            }
+            else
+            {
+                EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
+                embed.setDescription("Unrecognised audio category.");
+                channel.sendMessage(embed.build()).queue();
+            }
+        }
+        else
+        {
+            showMenu(msgEvent);
+        }
+    }
+
     public void showMenu(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);

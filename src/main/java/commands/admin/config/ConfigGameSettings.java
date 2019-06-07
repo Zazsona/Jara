@@ -20,6 +20,40 @@ public class ConfigGameSettings
         this.channel = channel;
     }
 
+    public void parseAsParameter(GuildMessageReceivedEvent msgEvent, String[] parameters) throws IOException
+    {
+        if (parameters.length > 2)
+        {
+            String request = parameters[2].toLowerCase();
+            if (request.equalsIgnoreCase("gamecategory"))
+            {
+                modifyGameCategory(msgEvent);
+            }
+            else if (request.equalsIgnoreCase("channeltimeout"))
+            {
+                modifyChannelTimeout(msgEvent);
+            }
+            else if (request.equalsIgnoreCase("gamechannels"))
+            {
+                modifyGameChannels(msgEvent);
+            }
+            else if (request.equalsIgnoreCase("concurrentgames"))
+            {
+                modifyConcurrentGameInChannel(msgEvent);
+            }
+            else
+            {
+                EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
+                embed.setDescription("Unrecognised game category.");
+                channel.sendMessage(embed.build()).queue();
+            }
+        }
+        else
+        {
+            showMenu(msgEvent);
+        }
+    }
+
     public void showMenu(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
