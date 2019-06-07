@@ -23,7 +23,7 @@ public class ConfigMain extends Command
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         String embedDescription = "Welcome to the Config\nPlease select a menu, or say `quit` to cancel.";
         embed.setDescription(embedDescription);
-        embed.addField("Menus", "**Prefix**\n**AudioSettings**\n**GameSettings**\n**CommandSettings**\n**Reset**", true);
+        embed.addField("Menus", "**Prefix**\n**Audio**\n**Games**\n**Commands**\n**Setup**", true);
         channel.sendMessage(embed.build()).queue();
         try
         {
@@ -38,21 +38,22 @@ public class ConfigMain extends Command
                     {
                         new ConfigMainSettings(guildSettings, channel).modifyPrefix(msgEvent);
                     }
-                    else if (selection.equalsIgnoreCase("audiosettings"))
+                    else if (selection.equalsIgnoreCase("audio"))
                     {
                         new ConfigAudioSettings(guildSettings, channel).showMenu(msgEvent);
                     }
-                    else if (selection.equalsIgnoreCase("gamesettings"))
+                    else if (selection.equalsIgnoreCase("games"))
                     {
                         new ConfigGameSettings(guildSettings, channel).showMenu(msgEvent);
                     }
-                    else if (selection.equalsIgnoreCase("commandsettings"))
+                    else if (selection.equalsIgnoreCase("commands"))
                     {
-                        new ConfigCommandSettings(guildSettings, channel).showMenu(msgEvent);
+                        new ConfigCommandSettings(guildSettings, channel).getCommand(msgEvent);
                     }
-                    else if (selection.equalsIgnoreCase("reset"))
+                    else if (selection.equalsIgnoreCase("setup"))
                     {
-                        //TODO: Make a guild setup wizard and link to it here.
+                        new ConfigWizard(msgEvent, guildSettings, channel);
+                        return;
                     }
                     else if (selection.equalsIgnoreCase("quit"))
                     {
@@ -79,6 +80,42 @@ public class ConfigMain extends Command
             channel.sendMessage(embed.build()).queue();
         }
     }
+
+    /*private boolean parseAsParameters(GuildMessageReceivedEvent msgEvent, TextChannel channel, EmbedBuilder embed, String[] parameters) throws IOException
+    {
+        if (parameters.length > 1)
+        {
+            String selection = parameters[1];
+            final GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
+            if (selection.equalsIgnoreCase("prefix"))
+            {
+                new ConfigMainSettings(guildSettings, channel).modifyPrefix(msgEvent);
+            }
+            else if (selection.equalsIgnoreCase("audio"))
+            {
+                new ConfigAudioSettings(guildSettings, channel).showMenu(msgEvent);
+            }
+            else if (selection.equalsIgnoreCase("games"))
+            {
+                new ConfigGameSettings(guildSettings, channel).showMenu(msgEvent);
+            }
+            else if (selection.equalsIgnoreCase("commands"))
+            {
+                new ConfigCommandSettings(guildSettings, channel).getCommand(msgEvent);
+            }
+            else if (selection.equalsIgnoreCase("setup"))
+            {
+                new ConfigWizard(msgEvent, guildSettings, channel);
+            }
+            else
+            {
+                embed.setDescription("Unknown menu: "+selection+".");
+                channel.sendMessage(embed.build()).queue();
+            }
+            return true;
+        }
+        return false;
+    }*/
 
     public static EmbedBuilder getEmbedStyle(GuildMessageReceivedEvent msgEvent)
     {

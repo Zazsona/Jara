@@ -64,7 +64,7 @@ public class ConfigGameSettings
         }
     }
 
-    private void modifyGameChannels(GuildMessageReceivedEvent msgEvent) throws IOException
+    public void modifyGameChannels(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
         StringBuilder descBuilder = new StringBuilder();
@@ -108,7 +108,7 @@ public class ConfigGameSettings
             modifyGameCategory(msgEvent);
         }
     }
-    private void modifyGameCategory(GuildMessageReceivedEvent msgEvent) throws IOException
+    public void modifyGameCategory(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
         StringBuilder descBuilder = new StringBuilder();
@@ -162,7 +162,7 @@ public class ConfigGameSettings
 
 
     }
-    private void modifyChannelTimeout(GuildMessageReceivedEvent msgEvent) throws IOException
+    public void modifyChannelTimeout(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
         StringBuilder descBuilder = new StringBuilder();
@@ -184,7 +184,7 @@ public class ConfigGameSettings
             if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
             {
                 String timeout = msg.getContentDisplay();
-                if (Pattern.matches(timeout, "[0-9]*"))
+                if (Pattern.matches("[0-9]*", timeout))
                 {
                     guildSettings.setGameChannelTimeout(timeout);
                     if (timeout.length() >= 10)
@@ -208,7 +208,7 @@ public class ConfigGameSettings
         }
     }
 
-    private void modifyConcurrentGameInChannel(GuildMessageReceivedEvent msgEvent) throws IOException
+    public void modifyConcurrentGameInChannel(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
         String descBuilder = "Current value: **" + guildSettings.isConcurrentGameInChannelAllowed() + "**\n\n" +

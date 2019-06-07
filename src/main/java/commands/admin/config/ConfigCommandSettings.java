@@ -28,7 +28,7 @@ public class ConfigCommandSettings
         msgManager = new MessageManager();
     }
 
-    public void showMenu(GuildMessageReceivedEvent msgEvent) throws IOException
+    public void getCommand(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         CommandAttributes ca;
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
@@ -42,38 +42,7 @@ public class ConfigCommandSettings
             {
                 if (!(((ca = CommandRegister.getCommand(msg.getContentDisplay())) == null) && ((ca = guildSettings.getCustomCommandAttributes(msg.getContentDisplay())) == null))) //Ensure CommandAttributes is not null
                 {
-                    while (true)
-                    {
-                        embed.setDescription(getCommandProfile(ca));
-                        channel.sendMessage(embed.build()).queue();
-
-                        msg = msgManager.getNextMessage(channel);
-                        if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
-                        {
-                            String request = msg.getContentDisplay().toLowerCase();
-                            if (request.startsWith("addroles") || request.startsWith("removeroles"))
-                            {
-                                modifyRoles(embed, ca, request);
-                            }
-                            else if (request.equals("enable"))
-                            {
-                                modifyState(embed, ca, true);
-                            }
-                            else if (request.equals("disable"))
-                            {
-                                modifyState(embed, ca, false);
-                            }
-                            else if (request.startsWith("quit"))
-                            {
-                                break;
-                            }
-                            else
-                            {
-                                embed.setDescription("Unrecognised option. Please try again.");
-                                channel.sendMessage(embed.build()).queue();
-                            }
-                        }
-                    }
+                    showMenu(ca, embed);
                     break;
                 }
                 else if (msg.getContentDisplay().equalsIgnoreCase("quit"))
@@ -83,6 +52,42 @@ public class ConfigCommandSettings
                 else
                 {
                     embed.setDescription("Unrecognised command. Please try again.");
+                    channel.sendMessage(embed.build()).queue();
+                }
+            }
+        }
+    }
+
+    public void showMenu(CommandAttributes ca, EmbedBuilder embed) throws IOException
+    {
+        while (true)
+        {
+            embed.setDescription(getCommandProfile(ca));
+            channel.sendMessage(embed.build()).queue();
+
+            Message msg = msgManager.getNextMessage(channel);
+            if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+            {
+                String request = msg.getContentDisplay().toLowerCase();
+                if (request.startsWith("addroles") || request.startsWith("removeroles"))
+                {
+                    modifyRoles(embed, ca, request);
+                }
+                else if (request.equals("enable"))
+                {
+                    modifyState(embed, ca, true);
+                }
+                else if (request.equals("disable"))
+                {
+                    modifyState(embed, ca, false);
+                }
+                else if (request.startsWith("quit"))
+                {
+                    break;
+                }
+                else
+                {
+                    embed.setDescription("Unrecognised option. Please try again.");
                     channel.sendMessage(embed.build()).queue();
                 }
             }

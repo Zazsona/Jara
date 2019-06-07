@@ -56,7 +56,7 @@ public class ConfigAudioSettings
         }
     }
 
-    private void modifySkipVotes(GuildMessageReceivedEvent msgEvent) throws IOException
+    public void modifySkipVotes(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
         StringBuilder descBuilder = new StringBuilder();
@@ -100,7 +100,7 @@ public class ConfigAudioSettings
         }
     }
 
-    private void modifyVoiceLeaving(GuildMessageReceivedEvent msgEvent) throws IOException
+    public void modifyVoiceLeaving(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
         String descBuilder = "Current value: **" + guildSettings.isVoiceLeavingEnabled() + "**\n\n" +
