@@ -146,15 +146,15 @@ public class ModuleManager
             //TODO: It's possible to load in files from a module's resources using Java 7's FileSystem, however, this will require an external process.
 
         }
-        if (jarPact == null)
+        if (ca != null && jarPact == null)
         {
             warnings++;
             throw new ClassNotFoundException(jarFile.getName() + " has no pact.");
         }
-        if (ca == null) //If no Command class is found...
+        else if (ca == null && jarPact != null) //If no Command class is found...
         {
             warnings++;
-            throw new ClassNotFoundException(jarFile.getName()+" has no entry point. (That is, a class that extends Command)");
+            throw new ClassNotFoundException(jarFile.getName()+" has no entry point associated with the pact. (That is, a class that extends Command)");
         }
         return ca;
     }
