@@ -85,6 +85,7 @@ public class GlobalSettings implements Serializable
                             commandConfig.put(key, true);
                         }
                     }
+                    save();
                 }
                 return true;
             }
