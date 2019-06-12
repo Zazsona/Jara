@@ -36,9 +36,13 @@ public class ConfigCommandSettings
             CommandAttributes ca = CommandRegister.getCommand(parameters[2]);
             if (ca == null)
             {
-                embed.setDescription("Command "+parameters[2]+" not found.");
-                channel.sendMessage(embed.build()).queue();
-                return;
+                ca = guildSettings.getCustomCommandAttributes(parameters[2].toLowerCase());
+                if (ca == null)
+                {
+                    embed.setDescription("Command "+parameters[2]+" not found.");
+                    channel.sendMessage(embed.build()).queue();
+                    return;
+                }
             }
             else
             {
@@ -50,11 +54,15 @@ public class ConfigCommandSettings
                         StringBuilder roles = new StringBuilder();
                         if (parameters.length > 4)
                         {
+                            if (commandTask.startsWith("add"))
+                                roles.append("addroles ");
+                            else
+                                roles.append("removeroles ");
                             for (int i = 4; i<parameters.length; i++)
                             {
                                 roles.append(parameters[i]).append(" ");
                             }
-                            modifyRoles(embed, ca, roles.toString());
+                            modifyRoles(embed, ca, roles.toString().trim());
                         }
                         else
                         {
@@ -169,11 +177,12 @@ public class ConfigCommandSettings
 
         for (String roleName : params)
         {
-            if (roleName.equalsIgnoreCase("everyone"))
-            {
-                roleName = "@everyone";
-            }
             List<Role> rolesWithName = channel.getGuild().getRolesByName(roleName, true);
+            if (roleName.equalsIgnoreCase("everyone") && rolesWithName.size() == 0)
+            {
+                rolesWithName.add(channel.getGuild().getPublicRole());
+            }
+
             if (rolesWithName.size() > 0)
             {
                 rolesWithName.forEach((role) -> roleIDs.add(role.getId()));

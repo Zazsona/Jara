@@ -44,12 +44,19 @@ public class ConfigMainSettings
                 String prefix = msg.getContentDisplay();
                 if (prefix.length() == 1)
                 {
-                    GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
-                    guildSettings.setCommandPrefix(prefix.charAt(0));
-                    SettingsUtil.refreshGuildCommandPrefix(msgEvent.getGuild().getId());
-                    embed.setDescription("Prefix set to "+prefix);
-                    channel.sendMessage(embed.build()).queue();
-                    break;
+                    if (prefix.equals("\\"))
+                    {
+                        channel.sendMessage("Sorry, that prefix is not supported.").queue();
+                    }
+                    else
+                    {
+                        GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
+                        guildSettings.setCommandPrefix(prefix.charAt(0));
+                        SettingsUtil.refreshGuildCommandPrefix(msgEvent.getGuild().getId());
+                        embed.setDescription("Prefix set to "+prefix);
+                        channel.sendMessage(embed.build()).queue();
+                        break;
+                    }
                 }
                 else
                 {
