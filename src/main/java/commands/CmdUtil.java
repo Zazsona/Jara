@@ -37,12 +37,37 @@ import java.util.Scanner;
 public class CmdUtil
 {
     /**
-     * Gets JDA
+     * Gets JDA.<br>
+     *     Don't rely on this being a fast operation. It will not work until the bot is launched,
+     *     and as such, will hold the thread until that happens.
      * @return
      */
-    public static JDA getJDA()
+    public synchronized static JDA getJDA()
     {
-        return Core.getShardManager().getApplicationInfo().getJDA();
+        try
+        {
+            return Core.getShardManager().getApplicationInfo().getJDA();
+        }
+        catch (NullPointerException e)
+        {
+            try
+            {
+                while (Core.getShardManager() == null)
+                {
+                    Thread.sleep(10);
+                }
+                while (!Core.getShardManager().getApplicationInfo().getJDA().getStatus().equals(JDA.Status.CONNECTED))
+                {
+                    Thread.sleep(10);
+                }
+                return Core.getShardManager().getApplicationInfo().getJDA();
+            }
+            catch (InterruptedException e1)
+            {
+                //Do nothing.
+            }
+        }
+        return null;
     }
     /**
      * A list of almost every english word
@@ -126,28 +151,20 @@ public class CmdUtil
      * @return a list of almost every english word
      * @throws IOException
      */
-    public static ArrayList<String> getWordList() throws IOException
+    public synchronized static ArrayList<String> getWordList() throws IOException
     {
-        try
+        if (wordList == null)
         {
-            if (wordList == null)
+            wordList = new ArrayList<>();
+            Scanner scanner = new Scanner(CmdUtil.class.getResourceAsStream("/wordList.txt"));
+            while (scanner.hasNext())
             {
-                File wordFile = new File(CmdUtil.class.getResource("/wordList.txt").toURI());
-                wordList = new ArrayList<>();
-                Scanner scanner = new Scanner(wordFile);
-                while (scanner.hasNext())
-                {
-                    String word = scanner.nextLine();
-                    wordList.add(word);
-                }
-                scanner.close();
+                String word = scanner.nextLine();
+                wordList.add(word);
             }
-            return wordList;
+            scanner.close();
         }
-        catch (URISyntaxException e)
-        {
-            throw new IOException(); //URI is hard coded, something else went wrong.
-        }
+        return wordList;
     }
 
     /**
@@ -236,28 +253,19 @@ public class CmdUtil
      * @return the topic list
      * @throws IOException
      */
-    public static ArrayList<String> getTopicList() throws IOException
+    public synchronized static ArrayList<String> getTopicList() throws IOException
     {
-        try
+        if (topicList == null)
         {
-            if (topicList == null)
+            topicList = new ArrayList<>();
+            Scanner scanner = new Scanner(CmdUtil.class.getResourceAsStream("/game/topics.txt"));
+            while (scanner.hasNextLine())
             {
-                topicList = new ArrayList<>();
-                File topicsFile = new File(CmdUtil.class.getResource("/game/topics.txt").toURI());
-                Scanner scanner = new Scanner(topicsFile);
-                while (scanner.hasNextLine())
-                {
-                    topicList.add(scanner.nextLine());
-                }
-                scanner.close();
+                topicList.add(scanner.nextLine());
             }
-            return topicList;
+            scanner.close();
         }
-        catch (URISyntaxException e)
-        {
-            e.printStackTrace();
-            throw new IOException(); //URI is hardcoded, so something else has gone fucky here.
-        }
+        return topicList;
 
     }
 
