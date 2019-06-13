@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class AudioConfig implements Serializable
 {
+    private static final long serialVersionUID = 1L;
     /**
      * The percentage of total members in a voice channel (excluding the bot) who need to vote for a track to be skipped.
      */

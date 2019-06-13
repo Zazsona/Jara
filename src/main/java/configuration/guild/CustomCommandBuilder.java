@@ -6,8 +6,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class CustomCommandConfig implements Serializable
+public class CustomCommandBuilder implements Serializable
 {
+    private static final long serialVersionUID = 1L;
     /**
      * The command key
      */
@@ -40,7 +41,7 @@ public class CustomCommandConfig implements Serializable
     /**
      * Constructor
      */
-    public CustomCommandConfig(String key, String[] aliases, String description, CommandRegister.Category category, ArrayList<String> roleIDs, String audioLink, String message)
+    public CustomCommandBuilder(String key, String[] aliases, String description, CommandRegister.Category category, ArrayList<String> roleIDs, String audioLink, String message)
     {
         this.key = key;
         this.aliases = aliases;

@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class GameConfig implements Serializable
 {
+    private static final long serialVersionUID = 1L;
     /**
      * Defines whether to use individual channels for each game.
      */

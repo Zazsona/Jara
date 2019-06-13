@@ -23,13 +23,7 @@ public class CustomCommandLauncher extends CommandLauncher
         GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
         if (guildSettings.isCommandEnabled(attributes.getCommandKey()))
         {
-            ArrayList<String> memberRoleIDs = new ArrayList<>();
-            for (Role role : msgEvent.getMember().getRoles())
-            {
-                memberRoleIDs.add(role.getId());
-            }
-
-            if (msgEvent.getMember().isOwner() || !Collections.disjoint(guildSettings.getPermissions(parameters[0].replaceFirst(SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId()).toString(), "")), memberRoleIDs))
+            if (guildSettings.isPermitted(msgEvent.getMember(), parameters[0].replace(SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId()).toString(), "").toLowerCase()))
             {
                 Runnable commandRunnable = () -> {
                     try

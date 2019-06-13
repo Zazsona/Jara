@@ -2,9 +2,10 @@ package commands.admin;
 
 import commands.CmdUtil;
 import commands.Command;
+import commands.CustomCommand;
 import configuration.GuildSettings;
 import configuration.SettingsUtil;
-import configuration.guild.CustomCommandConfig;
+import configuration.guild.CustomCommandBuilder;
 import jara.CommandRegister;
 import jara.MessageManager;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -50,7 +51,7 @@ public class CustomCommandManager extends Command
 
                 if (guildSettings.isPermitted(message.getMember(), getClass()))
                 {
-                    CustomCommandConfig customCommand = null;
+                    CustomCommandBuilder customCommand = null;
                     String[] selection = message.getContentDisplay().toLowerCase().split(" ");
                     if (!selection[0].equals("quit"))
                         customCommand = guildSettings.getCustomCommand(selection[1]);
@@ -65,9 +66,11 @@ public class CustomCommandManager extends Command
                             }
                             else
                             {
+                                ArrayList<String> everyoneRole = new ArrayList<>();
+                                everyoneRole.add(msgEvent.getGuild().getPublicRole().getId());
                                 customCommand = guildSettings.addCustomCommand(selection[1], new String[0], "A custom command.", CommandRegister.Category.UTILITY, new ArrayList<>(), "", "");
+                                guildSettings.addPermissions(everyoneRole, selection[1]);
                                 editCommand(msgEvent, customCommand);
-
                             }
                             return;
                         case "edit":
@@ -104,7 +107,7 @@ public class CustomCommandManager extends Command
 
     }
 
-    private void editCommand(GuildMessageReceivedEvent msgEvent, CustomCommandConfig customCommand)
+    private void editCommand(GuildMessageReceivedEvent msgEvent, CustomCommandBuilder customCommand)
     {
         while (true)
         {
@@ -138,7 +141,8 @@ public class CustomCommandManager extends Command
                         setUseFeatures(msgEvent, customCommand, 3);
                         break;
                     case "quit":
-                        embed.setDescription("Saved & Exited.");
+                        String quitMessage = save(customCommand);
+                        embed.setDescription(quitMessage);
                         msgEvent.getChannel().sendMessage(embed.build()).queue();
                         return;
                     default:
@@ -150,7 +154,20 @@ public class CustomCommandManager extends Command
         }
     }
 
-    private void modifyAliases(GuildMessageReceivedEvent msgEvent, CustomCommandConfig customCommand)
+    private String save(CustomCommandBuilder customCommand)
+    {
+        try
+        {
+            guildSettings.editCustomCommand(customCommand.getKey(), customCommand);
+            return "Saved & exited.";
+        }
+        catch (IOException e)
+        {
+            return "An error occurred when saving the command.";
+        }
+    }
+
+    private void modifyAliases(GuildMessageReceivedEvent msgEvent, CustomCommandBuilder customCommand)
     {
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         StringBuilder descBuilder = new StringBuilder();
@@ -180,7 +197,7 @@ public class CustomCommandManager extends Command
 
     }
 
-    private void modifyDescription(GuildMessageReceivedEvent msgEvent, CustomCommandConfig customCommand)
+    private void modifyDescription(GuildMessageReceivedEvent msgEvent, CustomCommandBuilder customCommand)
     {
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         embed.setDescription("Please enter the new description.\n\nExisting description: " + customCommand.getDescription());
@@ -200,7 +217,7 @@ public class CustomCommandManager extends Command
 
     }
 
-    private void modifyCategory(GuildMessageReceivedEvent msgEvent, CustomCommandConfig customCommand)
+    private void modifyCategory(GuildMessageReceivedEvent msgEvent, CustomCommandBuilder customCommand)
     {
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         embed.setDescription("Please enter the new category out of:\n**Admin**\n**Audio**\n**Games**\n**Toys**\n**Utility**\n\nCurrent Category: "+CommandRegister.getCategoryName(customCommand.getCategory()));
@@ -226,7 +243,7 @@ public class CustomCommandManager extends Command
         }
     }
 
-    private void setUseFeatures(GuildMessageReceivedEvent msgEvent, CustomCommandConfig customCommand, int feature)
+    private void setUseFeatures(GuildMessageReceivedEvent msgEvent, CustomCommandBuilder customCommand, int feature)
     {
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         switch (feature)
@@ -294,7 +311,7 @@ public class CustomCommandManager extends Command
             }
         }
     }
-    private void setNewMessage(GuildMessageReceivedEvent msgEvent, CustomCommandConfig customCommand)
+    private void setNewMessage(GuildMessageReceivedEvent msgEvent, CustomCommandBuilder customCommand)
     {
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         embed.setDescription("Please enter the new message.\n\nExisting message: " + customCommand.getMessage());
@@ -314,7 +331,7 @@ public class CustomCommandManager extends Command
 
     }
 
-    private void setNewRolesToggle(GuildMessageReceivedEvent msgEvent, CustomCommandConfig customCommand)
+    private void setNewRolesToggle(GuildMessageReceivedEvent msgEvent, CustomCommandBuilder customCommand)
     {
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         StringBuilder descBuilder = new StringBuilder();
@@ -349,7 +366,7 @@ public class CustomCommandManager extends Command
 
     }
 
-    private void setNewAudioLink(GuildMessageReceivedEvent msgEvent, CustomCommandConfig customCommand)
+    private void setNewAudioLink(GuildMessageReceivedEvent msgEvent, CustomCommandBuilder customCommand)
     {
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         embed.setDescription("Please enter the new audio track link.\n\nExisting link: " + customCommand.getAudioLink());

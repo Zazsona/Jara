@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class CommandConfig implements Serializable
 {
+    private static final long serialVersionUID = 1L;
     /**
      * Holds the role IDs of which roles can use this command.
      */

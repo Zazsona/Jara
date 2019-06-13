@@ -5,7 +5,7 @@ import commands.Command;
 import commands.CustomCommand;
 import configuration.guild.AudioConfig;
 import configuration.guild.CommandConfig;
-import configuration.guild.CustomCommandConfig;
+import configuration.guild.CustomCommandBuilder;
 import configuration.guild.GameConfig;
 import jara.CommandAttributes;
 import jara.CommandRegister;
@@ -52,7 +52,7 @@ public class GuildSettings implements Serializable
     /**
      * The user made custom commands for this guild.
      */
-    protected HashMap<String, CustomCommandConfig> customCommandsConfig;
+    protected HashMap<String, CustomCommandBuilder> customCommandsConfig;
 
     public GuildSettings(String guildID) throws IOException
     {
@@ -220,6 +220,11 @@ public class GuildSettings implements Serializable
         gameConfig.gameChannelTimeout = "0";
         gameConfig.gameCategoryId = "";
         gameConfig.concurrentGameInChannelAllowed = false;
+
+        Guild guild = Core.getShardManager().getGuildById(guildID);
+        ArrayList<String> everyoneRole = new ArrayList<>();
+        everyoneRole.add(guild.getPublicRole().getId());
+        addPermissions(everyoneRole, "Help");
         save();
     }
 
@@ -303,8 +308,17 @@ public class GuildSettings implements Serializable
         {
             roleIDs.add(role.getId());
         }
+        CommandConfig cc = commandConfig.get(commandKey);   //Yeah, this is a bit messy, but it checks every source for a possible match
+        if (cc == null)
+        {
+            cc = commandConfig.get(getCustomCommand(commandKey).getKey());
+            if (cc == null)
+            {
+                cc = commandConfig.get(CommandRegister.getCommand(commandKey).getCommandKey());
+            }
+        }
         roleIDs.add(member.getGuild().getPublicRole().getId()); //everyone role is not included in getRoles()
-        if (!Collections.disjoint(this.commandConfig.get(commandKey).permissions, roleIDs))
+        if (!Collections.disjoint(cc.permissions, roleIDs))
         {
             permissionGranted = true;
         }
@@ -549,17 +563,33 @@ public class GuildSettings implements Serializable
      * CustomCommandConfig - The new Command<br>
      * null - A command with that key already exists.
      */
-    public CustomCommandConfig addCustomCommand(String key, String[] aliases, String description, CommandRegister.Category category, ArrayList<String> roleIDs, String audioLink, String message) throws IOException
+    public CustomCommandBuilder addCustomCommand(String key, String[] aliases, String description, CommandRegister.Category category, ArrayList<String> roleIDs, String audioLink, String message) throws IOException
     {
         key = key.toLowerCase();
         if (customCommandsConfig.containsKey(key) || commandConfig.containsKey(key)) //TODO: Make sure command keys respect case
         {
             return null;
         }
-        customCommandsConfig.put(key, new CustomCommandConfig(key, aliases, description, category, roleIDs, audioLink, message));
+        customCommandsConfig.put(key, new CustomCommandBuilder(key, aliases, description, category, roleIDs, audioLink, message));
         commandConfig.put(key, new CommandConfig(true, new ArrayList<>()));
         save();
         return customCommandsConfig.get(key);
+    }
+
+    /**
+     * Updates a custom command stored in the config, if it exists.
+     * @param key the key of the command to edit
+     * @param ccb the command's new profile
+     * @throws IOException
+     */
+    public void editCustomCommand(String key, CustomCommandBuilder ccb) throws IOException
+    {
+        key = key.toLowerCase();
+        if (customCommandsConfig.containsKey(key) || commandConfig.containsKey(key))
+        {
+            customCommandsConfig.put(key, ccb);
+            save();
+        }
     }
 
     /**
@@ -579,7 +609,7 @@ public class GuildSettings implements Serializable
      * @return CustomCommandConfig - The custom guild command.
      * @return null - Invalid key/alias
      */
-    public CustomCommandConfig getCustomCommand(String key)
+    public CustomCommandBuilder getCustomCommand(String key)
     {
         key = key.toLowerCase();
         if (customCommandsConfig.containsKey(key))
@@ -588,7 +618,7 @@ public class GuildSettings implements Serializable
         }
         else
         {
-            for (Map.Entry<String, CustomCommandConfig> entry : customCommandsConfig.entrySet())
+            for (Map.Entry<String, CustomCommandBuilder> entry : customCommandsConfig.entrySet())
             {
                 for (String alias : entry.getValue().getAliases())
                 {
@@ -607,7 +637,7 @@ public class GuildSettings implements Serializable
      * The key is the command key, with the value being of type CustomCommandConfig.
      * @return
      */
-    public HashMap<String, CustomCommandConfig> getCustomCommandMap()
+    public HashMap<String, CustomCommandBuilder> getCustomCommandMap()
     {
         return customCommandsConfig;
     }
@@ -621,7 +651,7 @@ public class GuildSettings implements Serializable
     public CommandAttributes getCustomCommandAttributes(String key)
     {
         key = key.toLowerCase();
-        CustomCommandConfig ccc = getCustomCommand(key);
+        CustomCommandBuilder ccc = getCustomCommand(key);
         if (ccc == null)
         {
             return null;
