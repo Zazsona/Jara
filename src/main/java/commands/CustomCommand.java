@@ -1,7 +1,8 @@
 package commands;
 
+import audio.Audio;
 import configuration.SettingsUtil;
-import configuration.guild.CustomCommandConfig;
+import configuration.guild.CustomCommandBuilder;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -18,7 +19,7 @@ public class CustomCommand extends Command
         try
         {
             String key = getKey(msgEvent.getGuild().getId(), parameters[0]);
-            CustomCommandConfig customCommand = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommand(key);
+            CustomCommandBuilder customCommand = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommand(key);
 
             if (!customCommand.getMessage().equals(""))
             {
@@ -39,7 +40,10 @@ public class CustomCommand extends Command
             }
             if (!customCommand.getAudioLink().equals(""))
             {
-                CmdUtil.getGuildAudio(msgEvent.getGuild().getId()).playWithFeedback(msgEvent.getMember(), customCommand.getAudioLink(), msgEvent.getChannel());
+                if (customCommand.getMessage().equals("") || (!customCommand.getAliases().equals("") && msgEvent.getMessage().getMember().getVoiceState().inVoiceChannel()))
+                {
+                    CmdUtil.getGuildAudio(msgEvent.getGuild().getId()).playWithFeedback(msgEvent.getMember(), customCommand.getAudioLink(), msgEvent.getChannel());
+                }
             }
         }
         catch (NullPointerException e)
