@@ -320,7 +320,7 @@ public class CustomCommandManager extends Command
         while (true)
         {
             Message message = mm.getNextMessage(msgEvent.getChannel());
-            String newMessage = message.getContentDisplay();
+            String newMessage = message.getContentRaw();
 
             if (guildSettings.isPermitted(message.getMember(), getClass()))
             {

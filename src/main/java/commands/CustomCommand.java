@@ -25,7 +25,6 @@ public class CustomCommand extends Command
             {
                 EmbedBuilder embed = new EmbedBuilder();
                 embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
-                embed.setTitle(key);
                 embed.setDescription(customCommand.getMessage());
                 msgEvent.getChannel().sendMessage(embed.build()).queue();
             }
