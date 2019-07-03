@@ -73,6 +73,12 @@ public class CmdUtil
      * A list of almost every english word
      */
     private static ArrayList<String> wordList;
+
+    /**
+     * A list of top 10k english words.
+     */
+    private static ArrayList<String> topWordList;
+
     /**
      * A list of random topics
      */
@@ -136,7 +142,6 @@ public class CmdUtil
         }
         catch (ClientProtocolException e)
         {
-            e.printStackTrace();
             return "";
         }
         catch (IOException e)
@@ -147,7 +152,7 @@ public class CmdUtil
     }
 
     /**
-     * Loads the entire word list into memory.
+     * Loads the entire word list into memory. Ideal for checking words.
      * @return a list of almost every english word
      * @throws IOException
      */
@@ -168,22 +173,43 @@ public class CmdUtil
     }
 
     /**
+     * Loads the entire top word list into memory. Ideal for giving words.
+     * @return a list of roughly the top 10k most used English words. (Excluding curses)
+     * @throws IOException
+     */
+    public synchronized static ArrayList<String> getTopWordList() throws IOException
+    {
+        if (topWordList == null)
+        {
+            topWordList = new ArrayList<>();
+            Scanner scanner = new Scanner(CmdUtil.class.getResourceAsStream("/wordList - Common.txt"));
+            while (scanner.hasNext())
+            {
+                String word = scanner.nextLine();
+                topWordList.add(word);
+            }
+            scanner.close();
+        }
+        return topWordList;
+    }
+
+    /**
      * Gets a random word from the word list. If the word list is not loaded into memory, this will load it.
+     * @param topWords whether to only get words from the top 10k
+     * @throws IOException
      * @return a random word of any length
      */
-    public static String getRandomWord()
+    public static String getRandomWord(boolean topWords) throws IOException
     {
         Random r = new Random();
-        try
+        if (topWords)
+        {
+            return getTopWordList().get(r.nextInt(topWordList.size()));
+        }
+        else
         {
             return getWordList().get(r.nextInt(wordList.size()));
         }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-            return "";
-        }
-
     }
 
     /**
