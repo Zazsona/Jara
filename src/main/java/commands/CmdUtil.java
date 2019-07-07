@@ -26,10 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Don't remove items from this API, as it will break the modules that rely on them.
@@ -217,18 +214,57 @@ public class CmdUtil
      * @param guildID the guild to get the audio instance for
      * @return The audio instance
      */
-    public static Audio getGuildAudio(String guildID)
+    public synchronized static Audio getGuildAudio(String guildID)
     {
+        try
+        {
+            if (guildAudios.containsKey(guildID))
+            {
+                return guildAudios.get(guildID);
+            }
+            else
+            {
+                guildAudios.put(guildID, new Audio(Core.getShardManager().getGuildById(guildID)));
+                return guildAudios.get(guildID);
+            }
+        }
+        catch (ConcurrentModificationException e)
+        {
+            try
+            {
+                Thread.sleep(200);
+                getGuildAudio(guildID);
+            }
+            catch (InterruptedException e1)
+            {
+            }
+        }
+        return null;
+    }
 
-        if (guildAudios.containsKey(guildID))
+    /**
+     * Removes the current save for a guild's audio, including history.
+     * @param guildID
+     * @return
+     */
+    public synchronized static Audio clearGuildAudio(String guildID)
+    {
+        try
         {
-            return guildAudios.get(guildID);
+            return guildAudios.remove(guildID);
         }
-        else
+        catch (ConcurrentModificationException e)
         {
-            guildAudios.put(guildID, new Audio(Core.getShardManager().getGuildById(guildID)));
-            return guildAudios.get(guildID);
+            try
+            {
+                Thread.sleep(200);
+                clearGuildAudio(guildID);
+            }
+            catch (InterruptedException e1)
+            {
+            }
         }
+        return null;
     }
 
     /**

@@ -1,5 +1,6 @@
 package configuration;
 
+import commands.CmdUtil;
 import gui.HeadedGUI;
 import gui.headed.HeadedGUIUtil;
 import org.slf4j.Logger;
@@ -75,7 +76,7 @@ public class SettingsUtil
             }
             else
             {
-                directory = new File(System.getProperty("user.home")+"/.Jara/");
+                directory = new File("/usr/share/Jara/");
             }
             if (!directory.exists())
             {
@@ -168,11 +169,15 @@ public class SettingsUtil
         while (guildIterator.hasNext())
         {
             HashMap.Entry<String, Long> guildCall = (HashMap.Entry<String, Long>) guildIterator.next();
-            if ((Instant.now().toEpochMilli() - guildCall.getValue()) >= 1000*60)
+            if ((Instant.now().toEpochMilli() - guildCall.getValue()) >= 1000*60*60)
             {
                 guildsRemoved++;
                 guildSettingsMap.remove(guildCall.getKey());
                 guildSettingsLastCall.remove(guildCall.getKey());
+                if (CmdUtil.getGuildAudio(guildCall.getKey()).getTrackQueue().size() == 0)
+                {
+                    CmdUtil.clearGuildAudio(guildCall.getKey());
+                }
             }
         }
         logger.info("Cleared "+guildsRemoved+" guild settings from memory.");
