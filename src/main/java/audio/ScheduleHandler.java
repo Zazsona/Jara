@@ -22,7 +22,7 @@ public class ScheduleHandler extends AudioEventAdapter
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track)
     {
-
+        audio.getTrackHistory().add(track);
     }
     @Override
     public void onPlayerPause(AudioPlayer player)

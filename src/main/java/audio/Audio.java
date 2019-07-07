@@ -20,6 +20,10 @@ import java.util.ArrayList;
 
 public class Audio
 {
+    /**
+     * A history of played tracks.
+     */
+    private ArrayList<AudioTrack> trackHistory = new ArrayList<>();
 	/**
 	 * The list of tracks waiting to be played, including that currently playing
 	 */
@@ -305,6 +309,16 @@ public class Audio
 	{
 		return audioManager;
 	}
+
+    /**
+     * Gets the history of played tracks, including what is currently playing.<br>
+     *     Note: This does not include tracks that are currently queued.
+     * @return
+     */
+	public ArrayList<AudioTrack> getTrackHistory()
+    {
+        return trackHistory;
+    }
 
 
 
