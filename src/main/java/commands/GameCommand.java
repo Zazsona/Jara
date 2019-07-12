@@ -127,7 +127,12 @@ public abstract class GameCommand extends Command //A base class to build comman
 			}
 			gameChannel.delete().queue();
 			gameChannelMap.remove(gameMsg.getId());
-			gameMsg.delete().queue();
+
+			EmbedBuilder embed = new EmbedBuilder();
+			embed.setColor(CmdUtil.getHighlightColour(gameMsg.getGuild().getSelfMember()));
+			embed.setDescription("This game has ended.");
+			gameMsg.editMessage(embed.build()).queue();
+			gameMsg.clearReactions().queue();
 		}
 		else
 		{
