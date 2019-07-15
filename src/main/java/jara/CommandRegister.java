@@ -85,7 +85,7 @@ public class CommandRegister
 					}
 					break;
 				case "Help":
-					Help.HelpPage HelpHelp = new Help.HelpPage("List categories by using Help\n List commands in a category with Help (Category). Adding 'all' lists commands you don't have permission to use.\nUse Help (Command) to find out how to use a command.\n", new String[] {"Help", "Help (Command)", "Help (Category) (all)"});
+					Help.HelpPage HelpHelp = new Help.HelpPage("**General**\nList categories by using Help\n List commands in a category with Help (Category). Adding 'all' lists commands you don't have permission to use.\nUse Help (Command) to find out how to use a command.\n\n**Help Pages**\nAliases: Alternate ways to use the command\nParameters: Information to give to commands\nDescription: Detailed command information.", new String[] {"Help", "Help (Command)", "Help (Category) (all)"});
 					for (String alias : register.get(i).getAliases())
 					{
 						Help.addPage(alias, HelpHelp);
@@ -208,7 +208,7 @@ public class CommandRegister
 
 			================================================================*/
 
-			for (CommandAttributes commandAttributes : register)
+			for (CommandAttributes commandAttributes : register) //TODO: This is still wank. TextVoiceChannels has anything behind the key break.
 			{
 				min = 0;
 				max = commandAttributes.getAliases().length-1;
