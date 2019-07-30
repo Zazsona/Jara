@@ -58,11 +58,19 @@ public class ConfigCommandSettings
                                 roles.append("addroles ");
                             else
                                 roles.append("removeroles ");
-                            for (int i = 4; i<parameters.length; i++)
+
+                            if (msgEvent.getMessage().getMentionedRoles().size() > 0)
                             {
-                                roles.append(parameters[i]).append(" ");
+                                modifyRoles(embed, ca, roles.toString().trim(), msgEvent.getMessage().getMentionedRoles());
                             }
-                            modifyRoles(embed, ca, roles.toString().trim());
+                            else
+                            {
+                                for (int i = 4; i<parameters.length; i++)
+                                {
+                                    roles.append(parameters[i]).append(" ");
+                                }
+                                modifyRoles(embed, ca, roles.toString().trim());
+                            }
                         }
                         else
                         {
@@ -139,7 +147,14 @@ public class ConfigCommandSettings
                 String request = msg.getContentDisplay().toLowerCase();
                 if (request.startsWith("addroles") || request.startsWith("removeroles"))
                 {
-                    modifyRoles(embed, ca, request);
+                    if (msg.getMentionedRoles().size() > 0)
+                    {
+                        modifyRoles(embed, ca, request, msg.getMentionedRoles());
+                    }
+                    else
+                    {
+                        modifyRoles(embed, ca, request);
+                    }
                 }
                 else if (request.equals("enable"))
                 {
@@ -169,15 +184,36 @@ public class ConfigCommandSettings
         channel.sendMessage(embed.build()).queue();
     }
 
+    private void modifyRoles(EmbedBuilder embed, CommandAttributes ca, String request, List<Role> roles) throws IOException
+    {
+        request = request.toLowerCase();
+        ArrayList<String> roleIDs = new ArrayList<>();
+        for (Role role : roles)
+        {
+            roleIDs.add(role.getId());
+        }
+        boolean success = false;
+        if (request.startsWith("addroles"))
+        {
+            success = guildSettings.addPermissions(roleIDs, ca.getCommandKey());
+        }
+        else if (request.startsWith("removeroles"))
+        {
+            success = guildSettings.removePermissions(roleIDs, ca.getCommandKey());
+        }
+        embed.setDescription((success) ? "Roles have been updated for "+ca.getCommandKey()+"." : "No roles have been changed for "+ca.getCommandKey()+".");
+        channel.sendMessage(embed.build()).queue();
+    }
+
     private void modifyRoles(EmbedBuilder embed, CommandAttributes ca, String request) throws IOException
     {
-        int permissionsChanged = 0;
-        String[] params = request.split(" ");
+        request = request.toLowerCase();
+        String requestedRoles = request.replace("addroles ", "").replace("removeroles ", "");
+        String[] params = requestedRoles.split(",");
         ArrayList<String> roleIDs = new ArrayList<>();
-
         for (String roleName : params)
         {
-            List<Role> rolesWithName = channel.getGuild().getRolesByName(roleName, true);
+            List<Role> rolesWithName = channel.getGuild().getRolesByName(roleName.trim(), true);
             if (roleName.equalsIgnoreCase("everyone") && rolesWithName.size() == 0)
             {
                 rolesWithName.add(channel.getGuild().getPublicRole());
@@ -192,21 +228,17 @@ public class ConfigCommandSettings
                 roleIDs.add(roleName);
             }
         }
-        for (String roleID : roleIDs)
+        boolean success = false;
+        if (request.startsWith("addroles"))
         {
-            if (!guildSettings.getPermissions(ca.getCommandKey()).contains(roleID) && request.startsWith("addroles"))
-            {
-                guildSettings.addPermissions(roleIDs, ca.getCommandKey());
-                permissionsChanged++;
-            }
-            else if (guildSettings.getPermissions(ca.getCommandKey()).contains(roleID) && request.startsWith("removeroles"))
-            {
-                guildSettings.removePermissions(roleIDs, ca.getCommandKey());
-                permissionsChanged++;
-            }
+            success = guildSettings.addPermissions(roleIDs, ca.getCommandKey());
+        }
+        else if (request.startsWith("removeroles"))
+        {
+            success = guildSettings.removePermissions(roleIDs, ca.getCommandKey());
         }
 
-        embed.setDescription("**"+permissionsChanged+"** roles have been updated for "+ca.getCommandKey()+".");
+        embed.setDescription((success) ? "Roles have been updated for "+ca.getCommandKey()+"." : "No roles have been changed for "+ca.getCommandKey()+".");
         channel.sendMessage(embed.build()).queue();
     }
 
@@ -227,13 +259,13 @@ public class ConfigCommandSettings
         profileBuilder.append("**Roles:** ");
         for (String roleID : guildSettings.getPermissions(ca.getCommandKey()))
         {
-            profileBuilder.append(channel.getGuild().getRoleById(roleID).getName().replace("@", "")+", "); //removing "@" prevents pinging with the @everyone role.
+            profileBuilder.append(channel.getGuild().getRoleById(roleID).getName().replace("@", "")).append(", "); //removing "@" prevents pinging with the @everyone role.
         }
         profileBuilder.append("\n==========\n");
         profileBuilder.append("**Controls:**\n");
         profileBuilder.append("Enable/Disable\n");
-        profileBuilder.append("AddRoles [RoleName1 RoleName2 ...RoleNameN]\n");
-        profileBuilder.append("RemoveRoles [RoleName1 RoleName2 ...RoleNameN]\n");
+        profileBuilder.append("AddRoles [RoleName1], [RoleName2], ...[RoleNameN]\n");
+        profileBuilder.append("RemoveRoles [RoleName1], [RoleName2], ...[RoleNameN]\n");
         profileBuilder.append("Quit");
         return profileBuilder.toString();
     }
