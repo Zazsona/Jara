@@ -229,23 +229,43 @@ public class GuildSettings implements Serializable
     }
 
     /**
-     * Allows the role represented by the ID to use the command.
+     * Allows the roles represented by the IDs to use the command.
      * @param roleIDs
      * @param commandKeys
      */
-    public void addPermissions(ArrayList<String> roleIDs, String... commandKeys) throws IOException
+    public boolean addPermissions(ArrayList<String> roleIDs, String... commandKeys) throws IOException
     {
-        setPermissions(true, roleIDs, commandKeys);
+        return setPermissions(true, roleIDs, commandKeys);
+    }
+
+    /**
+     * Allows the role represented by the ID to use the command.
+     * @param roleID
+     * @param commandKeys
+     */
+    public boolean addPermissions(String roleID, String... commandKeys) throws IOException
+    {
+        return setPermissions(true, roleID, commandKeys);
+    }
+
+    /**
+     * Denies the roles represented by the IDs from using the command.
+     * @param roleIDs
+     * @param commandKeys
+     */
+    public boolean removePermissions(ArrayList<String> roleIDs, String... commandKeys) throws IOException
+    {
+        return setPermissions(false, roleIDs, commandKeys);
     }
 
     /**
      * Denies the role represented by the ID from using the command.
-     * @param roleIDs
+     * @param roleID
      * @param commandKeys
      */
-    public void removePermissions(ArrayList<String> roleIDs, String... commandKeys) throws IOException
+    public boolean removePermissions(String roleID, String... commandKeys) throws IOException
     {
-        setPermissions(false, roleIDs, commandKeys);
+        return setPermissions(false, roleID, commandKeys);
     }
 
     /**
@@ -351,30 +371,67 @@ public class GuildSettings implements Serializable
      * @param roleIDs the roles to permit
      * @param commandKeys the commands to affect
      */
-    private void setPermissions(boolean add, ArrayList<String> roleIDs, String... commandKeys) throws IOException
+    private boolean setPermissions(boolean add, ArrayList<String> roleIDs, String... commandKeys) throws IOException
     {
         boolean changed = false;
         for (String key : commandKeys)
         {
             boolean state = this.commandConfig.get(key).enabled;
             ArrayList<String> permissions = this.commandConfig.get(key).permissions;
-            for (String roleID : roleIDs)
+            if (add) //If add is true, add the roles.
             {
-                if (add) //If add it true, add the roles.
+                if (!permissions.containsAll(roleIDs))
                 {
-                    permissions.add(roleID);
+                    permissions.removeAll(roleIDs); //This ensures a roleID isn't listed twice.
+                    permissions.addAll(roleIDs);
                     changed = true;
                 }
-                else //If add is false, remove.
-                {
-                    permissions.remove(roleID);
-                    changed = true;
-                }
+            }
+            else //If add is false, remove.
+            {
+                changed = permissions.removeAll(roleIDs);
             }
             this.commandConfig.replace(key, new CommandConfig(state, permissions));
         }
         if (changed)
+        {
             save();
+        }
+        return changed;
+    }
+
+    /**
+     * Modifies the permissions for the specified commands by adding/removing the roles in the list.
+     * @param add whether to add/remove permissions
+     * @param roleID the role to permit
+     * @param commandKeys the commands to affect
+     */
+    private boolean setPermissions(boolean add, String roleID, String... commandKeys) throws IOException
+    {
+        boolean changed = false;
+        for (String key : commandKeys)
+        {
+            boolean state = this.commandConfig.get(key).enabled;
+            ArrayList<String> permissions = this.commandConfig.get(key).permissions;
+            if (add) //If add is true, add the roles.
+            {
+                if (!permissions.contains(roleID))
+                {
+                    permissions.add(roleID);
+                    changed = true;
+                }
+            }
+            else //If add is false, remove.
+            {
+                changed = permissions.remove(roleID);
+            }
+            this.commandConfig.replace(key, new CommandConfig(state, permissions));
+        }
+        if (changed)
+        {
+            save();
+        }
+        return changed;
     }
 
     /**
