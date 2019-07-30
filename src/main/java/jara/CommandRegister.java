@@ -54,7 +54,7 @@ public class CommandRegister
 			register.add(new CommandAttributes("CustomCommandManager", "Manage custom commands.", CustomCommandManager.class, new String[] {"AddCustomCommand", "EditCustomCommand", "RemoveCustomCommand", "DeleteCustomCommand", "CustomCommands", "CCM"}, ADMIN, true));
 			register.add(new CommandAttributes("CustomCommand", "Custom Command Template.", CustomCommand.class, new String[0], NOGROUP, false)); //This is the interface for converting custom commands to actual commands.
 			addDefaultHelpPages(register);
-			register.addAll(new ModuleManager().loadModules(register));			//Load mods
+			register.addAll(ModuleManager.loadModules(register));			//Load mods
 			register.sort(Comparator.comparing(CommandAttributes::getCommandKey)); //Sort the commands into alphabetical order based on their keys
 		}
 		return register.toArray(new CommandAttributes[0]);
@@ -71,28 +71,28 @@ public class CommandRegister
 			switch (partialRegister.get(i).getCommandKey())
 			{
 				case "About":
-					Help.HelpPage AboutHelp = new Help.HelpPage("Shows the details about this bot.", new String[0]);
+					Help.HelpPage AboutHelp = new Help.HelpPage("Shows the details about this bot.");
 					for (String alias : register.get(i).getAliases())
 					{
 						Help.addPage(alias, AboutHelp);
 					}
 					break;
 				case "Config":
-					Help.HelpPage ConfigHelp = new Help.HelpPage("Modify bot settings. Instructions provided on the config menu.", new String[0]);
+					Help.HelpPage ConfigHelp = new Help.HelpPage("Modify bot settings. Instructions provided on the config menu.");
 					for (String alias : register.get(i).getAliases())
 					{
 						Help.addPage(alias, ConfigHelp);
 					}
 					break;
 				case "Help":
-					Help.HelpPage HelpHelp = new Help.HelpPage("**General**\nList categories by using Help\n List commands in a category with Help (Category). Adding 'all' lists commands you don't have permission to use.\nUse Help (Command) to find out how to use a command.\n\n**Help Pages**\nAliases: Alternate ways to use the command\nParameters: Information to give to commands\nDescription: Detailed command information.", new String[] {"Help", "Help (Command)", "Help (Category) (all)"});
+					Help.HelpPage HelpHelp = new Help.HelpPage("**General**\nList categories by using Help\n List commands in a category with Help (Category). Adding 'all' lists commands you don't have permission to use.\nUse Help (Command) to find out how to use a command.\n\n**Help Pages**\nAliases: Alternate ways to use the command\nParameters: Information to give to commands\nDescription: Detailed command information.", "Help", "Help (Command)", "Help (Category) (all)");
 					for (String alias : register.get(i).getAliases())
 					{
 						Help.addPage(alias, HelpHelp);
 					}
 					break;
 				case "CustomCommandManager":
-					Help.HelpPage CCMHelp = new Help.HelpPage("Configure custom commands. Instructions provided on manager menu.", new String[0]);
+					Help.HelpPage CCMHelp = new Help.HelpPage("Configure custom commands. Instructions provided on manager menu.");
 					for (String alias : register.get(i).getAliases())
 					{
 						Help.addPage(alias, CCMHelp);
@@ -319,7 +319,6 @@ public class CommandRegister
 		switch (name)
 		{
 			case "nogroup":
-				return NOGROUP;
 			case "no group":
 				return NOGROUP;
 			case "games":

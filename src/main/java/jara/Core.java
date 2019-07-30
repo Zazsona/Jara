@@ -16,7 +16,6 @@ import event.GuildJoinHandler;
 import event.GuildLeaveHandler;
 import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.bot.sharding.ShardManager;
-import net.dv8tion.jda.core.entities.Member;
 
 public class Core //A class for covering the global manners of the bot.
 {

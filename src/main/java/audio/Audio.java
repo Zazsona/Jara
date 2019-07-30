@@ -23,11 +23,11 @@ public class Audio
     /**
      * A history of played tracks.
      */
-    private ArrayList<AudioTrack> trackHistory = new ArrayList<>();
+    private final ArrayList<AudioTrack> trackHistory = new ArrayList<>();
 	/**
 	 * The list of tracks waiting to be played, including that currently playing
 	 */
-	private ArrayList<AudioTrack> trackQueue = new ArrayList<>();
+	private final ArrayList<AudioTrack> trackQueue = new ArrayList<>();
 	/**
 	 * The guild's player manager
 	 */
@@ -48,7 +48,7 @@ public class Audio
 	/**
 	 * The result of a play Request.
 	 */
-	public static enum RequestResult
+	public enum RequestResult
 	{
 		REQUEST_PENDING,
 		REQUEST_NOW_PLAYING,
@@ -147,11 +147,6 @@ public class Audio
 	public void playWithFeedback(Member member, String query, TextChannel channel, String embedTitle, String embedImageURL)
 	{
 		RequestResult result;
-		EmbedBuilder embed = new EmbedBuilder();
-		embed.setColor(CmdUtil.getHighlightColour(channel.getGuild().getSelfMember()));
-		embed.setThumbnail(embedImageURL);
-		embed.setTitle(embedTitle);
-		StringBuilder descBuilder = new StringBuilder();
 		AudioTrackInfo requestedTrackInfo = null;
 
 		if (query != null && !query.equals(""))
@@ -165,6 +160,24 @@ public class Audio
 			result = RequestResult.REQUEST_NO_LINK;
 		}
 
+		sendAudioFeedback(channel, embedTitle, embedImageURL, result, requestedTrackInfo);
+	}
+
+	/**
+	 * Sends a standardised error/success message, based on the provided request result
+	 * @param channel the channel to send the error to
+	 * @param embedTitle the embed title
+	 * @param embedImageURL the embed thumbnail
+	 * @param result the result of the audio request
+	 * @param requestedTrackInfo the track info (can be null on error)
+	 */
+	public void sendAudioFeedback(TextChannel channel, String embedTitle, String embedImageURL, RequestResult result, AudioTrackInfo requestedTrackInfo)
+	{
+		StringBuilder descBuilder = new StringBuilder();
+		EmbedBuilder embed = new EmbedBuilder();
+		embed.setTitle(embedTitle);
+		embed.setColor(CmdUtil.getHighlightColour(channel.getGuild().getSelfMember()));
+		embed.setThumbnail(embedImageURL);
 		switch (result)
 		{
 			case REQUEST_NOW_PLAYING:
@@ -173,8 +186,8 @@ public class Audio
 
 			case REQUEST_ADDED_TO_QUEUE:
 				descBuilder.append("Your request has been added to the queue.\n");
-				descBuilder.append("Position: "+getTrackQueue().size()+"\n"); //So, index 1 is position 2, 2 is 3, etc. Should be more readable for non-programmers.
-				descBuilder.append("ETA: "+(((getTotalQueuePlayTime()-requestedTrackInfo.length)/1000)/60)+" Minutes\n"); //This ETA is really rough. It abstracts to minutes and ignores the progress of the current track.
+				descBuilder.append("Position: ").append(getTrackQueue().size()).append("\n"); //So, index 1 is position 2, 2 is 3, etc. Should be more readable for non-programmers.
+				descBuilder.append("ETA: ").append((((getTotalQueuePlayTime() - requestedTrackInfo.length) / 1000) / 60)).append(" Minutes\n"); //This ETA is really rough. It abstracts to minutes and ignores the progress of the current track.
 				descBuilder.append("=====\n");
 				descBuilder.append(CmdUtil.formatAudioTrackDetails(getTrackQueue().get(getTrackQueue().size()-1)));
 				embed.setDescription(descBuilder.toString());
@@ -299,7 +312,7 @@ public class Audio
 	 */
 	public void resetSkipVotes()
 	{
-		skipVotes = new ArrayList<>();
+		skipVotes.clear();
 	}
 
 	/**
@@ -313,7 +326,7 @@ public class Audio
     /**
      * Gets the history of played tracks, including what is currently playing.<br>
      *     Note: This does not include tracks that are currently queued.
-     * @return
+     * @return the track history
      */
 	public ArrayList<AudioTrack> getTrackHistory()
     {

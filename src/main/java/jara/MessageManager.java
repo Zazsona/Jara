@@ -2,7 +2,6 @@ package jara;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import net.dv8tion.jda.core.entities.Guild;
@@ -171,8 +170,7 @@ public class MessageManager
 	{
 		try
 		{
-			Message message = futureGuildMessageCollector(guild, 0, 1)[0];
-			return message;
+			return futureGuildMessageCollector(guild, 0, 1)[0];
 		}
 		catch (ArrayIndexOutOfBoundsException | NullPointerException e)
 		{
@@ -191,8 +189,7 @@ public class MessageManager
 	{
 		try
 		{
-			Message message = futureChannelMessageCollector(channel, 0, 1)[0];
-			return message;
+			return futureChannelMessageCollector(channel, 0, 1)[0];
 		}
 		catch (ArrayIndexOutOfBoundsException | NullPointerException e)
 		{
@@ -212,8 +209,7 @@ public class MessageManager
 	{
 		try
 		{
-			Message message = futureGuildMessageCollector(guild, timeout, 1)[0];
-			return message;
+			return futureGuildMessageCollector(guild, timeout, 1)[0];
 		}
 		catch (ArrayIndexOutOfBoundsException | NullPointerException e)
 		{
@@ -233,8 +229,7 @@ public class MessageManager
 	{
 		try
 		{
-			Message message = futureChannelMessageCollector(channel, timeout, 1)[0];
-			return message;
+			return futureChannelMessageCollector(channel, timeout, 1)[0];
 		}
 		catch (ArrayIndexOutOfBoundsException | NullPointerException e)
 		{
@@ -386,7 +381,7 @@ public class MessageManager
 		{
 			if (channelToListen == null)
 			{
-				messageLog = new ArrayList<Message>();
+				messageLog = new ArrayList<>();
 				return true;
 			}
 		}

@@ -1,14 +1,12 @@
 package configuration;
 
 import jara.CommandAttributes;
-import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 
 public class CustomCommandLauncher extends CommandLauncher
 {
@@ -34,7 +32,7 @@ public class CustomCommandLauncher extends CommandLauncher
                     {
                         msgEvent.getChannel().sendMessage("Sorry, I was unable to run the command.").queue();
                         Logger logger = LoggerFactory.getLogger(CommandLauncher.class);
-                        logger.error("A custom command request was sent but could not be fulfilled.\nCommand: "+parameters.toString()+"\nGuild: "+msgEvent.getGuild().getId()+" ("+msgEvent.getGuild().getName()+")\nUser: "+msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+"Channel: "+msgEvent.getChannel().getId()+" ("+msgEvent.getChannel().getName()+")\nDate/Time: "+ LocalDateTime.now().toString());
+                        logger.error("A custom command request was sent but could not be fulfilled.\nCommand: "+ Arrays.toString(parameters) +"\nGuild: "+msgEvent.getGuild().getId()+" ("+msgEvent.getGuild().getName()+")\nUser: "+msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+"Channel: "+msgEvent.getChannel().getId()+" ("+msgEvent.getChannel().getName()+")\nDate/Time: "+ LocalDateTime.now().toString());
                         e.printStackTrace();
                     }
                 };

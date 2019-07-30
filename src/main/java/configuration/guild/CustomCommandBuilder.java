@@ -109,8 +109,7 @@ public class CustomCommandBuilder implements Serializable
 
     public void modifyAliases(String... aliases)
     {
-        ArrayList<String> aliasesList = new ArrayList<>();
-        aliasesList.addAll(Arrays.asList(this.aliases));
+        ArrayList<String> aliasesList = new ArrayList<>(Arrays.asList(this.aliases));
         for (String alias : aliases)
         {
             if (aliasesList.contains(alias))

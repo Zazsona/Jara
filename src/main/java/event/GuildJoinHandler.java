@@ -5,7 +5,6 @@ import configuration.SettingsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jara.Core;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;

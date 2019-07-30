@@ -1,6 +1,5 @@
 package jara;
 
-import commands.GameCommand;
 import configuration.CommandLauncher;
 import configuration.SettingsUtil;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;

@@ -60,10 +60,8 @@ public class ModuleManager
 
         for (CommandAttributes inBuiltCA : register)
         {
-            for (String alias : inBuiltCA.getAliases())     //Adds all in-built aliases so modules can't try and claim these.
-            {
-                reservedAliases.add(alias);
-            }
+            //Adds all in-built aliases so modules can't try and claim these.
+            reservedAliases.addAll(Arrays.asList(inBuiltCA.getAliases()));
         }
 
         File moduleDir = new File(SettingsUtil.getDirectory() + "/Modules/");

@@ -192,6 +192,10 @@ public class HeadedGUIUtil extends Application
                 {
                     e.printStackTrace();
                 }
+                catch (UnsupportedOperationException e)
+                {
+                    logger.info("OS was reported as compatible but is not.\nPlease go to https://discordapp.com/developers/applications/ to set up your bot account.");
+                }
             }
             else
             {

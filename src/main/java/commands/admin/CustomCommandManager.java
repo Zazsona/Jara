@@ -2,14 +2,12 @@ package commands.admin;
 
 import commands.CmdUtil;
 import commands.Command;
-import commands.CustomCommand;
 import configuration.GuildSettings;
 import configuration.SettingsUtil;
 import configuration.guild.CustomCommandBuilder;
 import jara.CommandRegister;
 import jara.MessageManager;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
@@ -18,14 +16,12 @@ import java.util.ArrayList;
 
 public class CustomCommandManager extends Command
 {
-    private Member member;
     private MessageManager mm;
     private GuildSettings guildSettings;
 
     @Override
     public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
     {
-        member = msgEvent.getMember();
         mm = new MessageManager();
         guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
 

@@ -1,6 +1,5 @@
 package commands.admin.config;
 
-import commands.Command;
 import configuration.GuildSettings;
 import jara.CommandAttributes;
 import jara.CommandRegister;
@@ -15,7 +14,6 @@ import java.io.IOException;
 public class ConfigWizard
 {
     private GuildSettings guildSettings;
-    private TextChannel channel;
     private ConfigMainSettings cms;
     private ConfigAudioSettings cas;
     private ConfigGameSettings cgs;
@@ -27,7 +25,6 @@ public class ConfigWizard
         try
         {
             this.guildSettings = guildSettings;
-            this.channel = channel;
             this.msgEvent = msgEvent;
             cms = new ConfigMainSettings(guildSettings, channel);
             cas = new ConfigAudioSettings(guildSettings, channel);

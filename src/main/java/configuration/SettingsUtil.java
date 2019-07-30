@@ -2,11 +2,9 @@ package configuration;
 
 import commands.CmdUtil;
 import gui.HeadedGUI;
-import gui.headed.HeadedGUIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;

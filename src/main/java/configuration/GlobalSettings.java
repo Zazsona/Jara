@@ -119,8 +119,7 @@ public class GlobalSettings implements Serializable
 
     public HashMap<String, Boolean> getCommandConfigMap()
     {
-        HashMap<String, Boolean> clone = new HashMap<>(commandConfig);
-        return clone;
+        return commandConfig;
     }
 
     public void setCommandConfigMap(HashMap<String, Boolean> commandConfig) throws IOException

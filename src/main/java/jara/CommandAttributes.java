@@ -18,10 +18,7 @@ public class CommandAttributes
 		commandClass = commandClassArg;
 		aliases = new String[aliasesArg.length+1];
 		aliases[0] = commandKey;
-		for (int i = 1; i<aliases.length; i++)
-		{
-			aliases[i] = aliasesArg[i-1];
-		}
+		System.arraycopy(aliasesArg, 0, aliases, 1, aliases.length - 1);
 		category = categoryArg;
 		disableable = disableableArg;
 

@@ -1,6 +1,5 @@
 package gui.headed;
 
-import com.sun.media.jfxmediaimpl.platform.Platform;
 import configuration.SettingsUtil;
 import jara.CommandAttributes;
 import jara.CommandRegister;
@@ -14,7 +13,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
 import javafx.scene.control.CheckBox;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;

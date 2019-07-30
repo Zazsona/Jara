@@ -33,10 +33,6 @@ public abstract class GameCommand extends Command //A base class to build comman
 	 * A map containing the game channels, indexed by gameMsg id.
 	 */
 	private static HashMap<String, TextChannel> gameChannelMap;
-	/**
-	 * The listener for reactions to gameMsgs.
-	 */
-	private static GameReactionListener gameReactionListener;
 
 	/**
 	 * A timer of configurable length. It counts the time since the last user interaction in the game channel. If it expires, the channel is deleted.
@@ -78,7 +74,10 @@ public abstract class GameCommand extends Command //A base class to build comman
 			if (gameChannelMap == null)
 			{
 				gameChannelMap = new HashMap<>();
-				gameReactionListener = new GameReactionListener();
+				/*
+				 * The listener for reactions to gameMsgs.
+				 */
+				GameReactionListener gameReactionListener = new GameReactionListener();
 				currentChannel.getJDA().addEventListener(gameReactionListener);
 			}
 			Category gameCategory = guild.getCategoryById(gameCategoryID);

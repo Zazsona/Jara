@@ -1,6 +1,5 @@
 package commands;
 
-import audio.Audio;
 import configuration.SettingsUtil;
 import configuration.guild.CustomCommandBuilder;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -39,7 +38,7 @@ public class CustomCommand extends Command
             }
             if (!customCommand.getAudioLink().equals(""))
             {
-                if (customCommand.getMessage().equals("") || (!customCommand.getAliases().equals("") && msgEvent.getMessage().getMember().getVoiceState().inVoiceChannel()))
+                if (customCommand.getMessage().equals("") || msgEvent.getMessage().getMember().getVoiceState().inVoiceChannel())
                 {
                     CmdUtil.getGuildAudio(msgEvent.getGuild().getId()).playWithFeedback(msgEvent.getMember(), customCommand.getAudioLink(), msgEvent.getChannel());
                 }

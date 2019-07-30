@@ -4,7 +4,6 @@ import configuration.GuildSettings;
 import configuration.SettingsUtil;
 import jara.CommandAttributes;
 import jara.CommandRegister;
-import jara.Core;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
@@ -38,11 +37,11 @@ public class Help extends Command
          * [Param] indicates required<br>
          * (Param) indicates optional
          */
-        String[] params = new String[0];
+        String[] params;
         /**
          * A detailed description about what the command does, and how to use it.
          */
-        String description = "No information has been provided for this command.";
+        String description;
 
         public HelpPage(String description, String... params)
         {

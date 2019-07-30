@@ -9,7 +9,6 @@ import jara.Core;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import org.apache.commons.text.StringEscapeUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
@@ -19,9 +18,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -111,7 +108,7 @@ public class CmdUtil
             HttpGet httpGet = new HttpGet(URL);
             if (headers != null)
             {
-                headers.forEach((name, value) -> httpGet.addHeader(name, value));
+                headers.forEach(httpGet::addHeader);
             }
             ResponseHandler<String> responseHandler = response ->
             {
@@ -275,11 +272,10 @@ public class CmdUtil
     public static String formatAudioTrackDetails(AudioTrack track)
     {
         AudioTrackInfo requestedTrackInfo = track.getInfo();
-        StringBuilder infoBuilder = new StringBuilder();
-        infoBuilder.append("**"+requestedTrackInfo.title+"**\n");
-        infoBuilder.append(requestedTrackInfo.author+"\n");
-        infoBuilder.append(formatMillisecondsToHhMmSs(requestedTrackInfo.length));
-        return infoBuilder.toString();
+        String infoBuilder = "**" + requestedTrackInfo.title + "**\n" +
+                requestedTrackInfo.author + "\n" +
+                formatMillisecondsToHhMmSs(requestedTrackInfo.length);
+        return infoBuilder;
     }
 
     /**
@@ -376,7 +372,7 @@ public class CmdUtil
     /**
      * The yearly seasons.
      */
-    public static enum Season
+    public enum Season
     {
         SPRING,
         SUMMER,

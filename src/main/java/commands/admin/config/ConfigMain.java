@@ -4,7 +4,6 @@ import commands.CmdUtil;
 import commands.Command;
 import configuration.GuildSettings;
 import configuration.SettingsUtil;
-import jara.Core;
 import jara.MessageManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
