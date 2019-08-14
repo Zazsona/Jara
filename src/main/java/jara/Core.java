@@ -33,8 +33,7 @@ public class Core //A class for covering the global manners of the bot.
 		}
 	    catch (LoginException | IllegalArgumentException e)
 		{
-	    	logger.error("Failed to log in.");
-	    	e.printStackTrace();
+	    	logger.error(e.toString());
 	    	return false;
 		}
 	}
@@ -55,10 +54,10 @@ public class Core //A class for covering the global manners of the bot.
 		}
 		catch (InvalidModuleException e)
 		{
-			logger.error(e.getMessage()+"\nA log has been created.");
+			logger.error(e.toString()+"\nA log has been created.");
 			if (!GraphicsEnvironment.isHeadless())
 			{
-				HeadedGUI.showError(e.getMessage()+"\nA log has been created.");
+				HeadedGUI.showError(e.toString()+"\nA log has been created.");
 			}
 		}
 

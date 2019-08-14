@@ -84,7 +84,7 @@ public class ModuleManager
             }
             catch (IOException | ClassNotFoundException | ConflictException e)
             {
-                logger.error(e.getMessage());
+                logger.error(e.toString());
                 errors++;
             }
         }

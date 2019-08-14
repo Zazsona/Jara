@@ -9,6 +9,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -77,7 +78,7 @@ public class ConfigMain extends Command
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            LoggerFactory.getLogger(this.getClass()).error(e.toString());
             embed.setDescription("An error occurred when saving settings.");
             channel.sendMessage(embed.build()).queue();
         }

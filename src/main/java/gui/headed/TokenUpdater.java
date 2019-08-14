@@ -13,6 +13,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -56,7 +57,7 @@ public class TokenUpdater extends Application
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            LoggerFactory.getLogger(this.getClass()).error(e.toString());
         }
     }
 

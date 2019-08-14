@@ -14,6 +14,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.image.ImageView;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -169,7 +170,7 @@ public class Review
                         }
                         catch (InterruptedException e)
                         {
-                            e.printStackTrace();
+                            LoggerFactory.getLogger(this.getClass()).error(e.toString());
                         }
                     }
                     HeadedGUIUtil.openWebpage(generateInviteLink(false));

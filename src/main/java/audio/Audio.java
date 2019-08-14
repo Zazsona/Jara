@@ -3,6 +3,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
@@ -14,6 +15,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.core.managers.AudioManager;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
@@ -119,10 +121,10 @@ public class Audio
 			}
 			return RequestResult.REQUEST_USER_NOT_IN_VOICE;
 		}
-		catch (Exception e)
+		catch (FriendlyException | InterruptedException e)
 		{
 			//Error setting up audio
-			e.printStackTrace();
+			LoggerFactory.getLogger(this.getClass()).error(e.toString());
 			return RequestResult.REQUEST_RESULTED_IN_ERROR;
 		}
 	}
@@ -195,7 +197,7 @@ public class Audio
 
 			case REQUEST_RESULTED_IN_ERROR:
 				embed.setTitle("Error");
-				channel.sendMessage("An unexpected error occurred. Please try again. If the error persists, please notify your server owner.").queue();
+				embed.setDescription("An unexpected error occurred. Please try again. If the error persists, please notify your server owner.");
 				break;
 
 			case REQUEST_IS_BAD:
@@ -237,7 +239,7 @@ public class Audio
 	 * true - Audio playing<br>
 	 * false - Audio not playing
 	 */
-	public Boolean isAudioPlayingInGuild()
+	public boolean isAudioPlayingInGuild()
 	{
 		return (getPlayer().getPlayingTrack() != null);
 	}

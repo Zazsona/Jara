@@ -16,6 +16,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.IOException;
@@ -140,7 +141,7 @@ public class CmdUtil
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            LoggerFactory.getLogger(CmdUtil.class).error(e.toString());
             return "";
         }
     }

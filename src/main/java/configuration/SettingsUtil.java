@@ -84,8 +84,7 @@ public class SettingsUtil
                 }
                 catch (SecurityException e)
                 {
-                    logger.error("Jara has run into a file security error. Does it have permissions to read/write files & directories?");
-                    e.printStackTrace();
+                    logger.error(e.toString());
                 }
             }
         }
@@ -125,7 +124,7 @@ public class SettingsUtil
             }
             catch (IOException e)
             {
-                e.printStackTrace();
+                logger.error(e.toString());
                 return null; //TODO: Something proper.
             }
         }

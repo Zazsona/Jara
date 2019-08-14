@@ -12,6 +12,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -60,7 +61,7 @@ public class ErrorPane extends Application
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            LoggerFactory.getLogger(this.getClass()).error(e.toString());
         }
     }
 }

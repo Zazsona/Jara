@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import org.slf4j.LoggerFactory;
 
 public class AudioLoadHandler implements AudioLoadResultHandler
 {
@@ -77,6 +78,6 @@ public class AudioLoadHandler implements AudioLoadResultHandler
     {
         //Error
         result = Audio.RequestResult.REQUEST_RESULTED_IN_ERROR;
-        e.printStackTrace();
+        LoggerFactory.getLogger(this.getClass()).info(e.toString());
     }
 }

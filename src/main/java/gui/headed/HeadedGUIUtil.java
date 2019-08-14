@@ -70,7 +70,7 @@ public class HeadedGUIUtil extends Application
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            logger.error(e.toString());
         }
     }
 
@@ -190,7 +190,7 @@ public class HeadedGUIUtil extends Application
                 }
                 catch (URISyntaxException e)
                 {
-                    e.printStackTrace();
+                    logger.error(e.toString());
                 }
                 catch (UnsupportedOperationException e)
                 {
@@ -209,7 +209,7 @@ public class HeadedGUIUtil extends Application
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            logger.error(e.toString());
             HeadedGUI.showError("ERROR: Unable to locate default browser. Please go to https://discordapp.com/developers/applications/ to set up your bot account.");
         }
     }

@@ -97,7 +97,7 @@ public abstract class GameCommand extends Command //A base class to build comman
 				}
 				catch (IOException e)
 				{
-					e.printStackTrace();
+					logger.error(e.toString());
 				}
 
 				return createGameChannel(currentChannel, channelName);
@@ -122,7 +122,7 @@ public abstract class GameCommand extends Command //A base class to build comman
 			}
 			catch (InterruptedException e)
 			{
-				e.printStackTrace();
+				LoggerFactory.getLogger(this.getClass()).error(e.toString());
 			}
 			gameChannel.delete().queue();
 			gameChannelMap.remove(gameMsg.getId());
@@ -178,14 +178,13 @@ public abstract class GameCommand extends Command //A base class to build comman
 		catch (GuildUnavailableException e)
 		{
 			logger.error("Guild "+guild.getId()+" became unavailable while trying to perform an action. Has Discord gone down?");
-			e.printStackTrace();
 			try
 			{
 				Thread.sleep(1000);
 			}
 			catch (InterruptedException e1)
 			{
-				e.printStackTrace();
+				logger.error(e.toString());
 			}
 			return createGameChannel(currentChannel, channelName);
 		}

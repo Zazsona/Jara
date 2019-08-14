@@ -53,7 +53,7 @@ public class ConfigWizard
         catch (IOException e)
         {
             msgEvent.getChannel().sendMessage("An error occurred during setup.").queue();
-            LoggerFactory.getLogger(getClass()).error(e.getMessage());
+            LoggerFactory.getLogger(getClass()).error(e.toString());
         }
 
     }

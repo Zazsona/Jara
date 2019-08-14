@@ -98,7 +98,7 @@ public class GlobalSettings implements Serializable
         }
         catch (ClassNotFoundException e)
         {
-            logger.error(e.getMessage());
+            logger.error(e.toString());
             return false;
         }
     }

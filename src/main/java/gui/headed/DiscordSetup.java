@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import net.dv8tion.jda.core.entities.SelfUser;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -194,7 +195,7 @@ public class DiscordSetup extends ListenerAdapter
                               catch (IOException e)
                               {
                                   //We already have a placeholder data for this case
-                                  e.printStackTrace();
+                                  LoggerFactory.getLogger(this.getClass()).info(e.toString());
                               }
 
                           });
