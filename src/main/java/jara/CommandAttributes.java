@@ -9,9 +9,10 @@ public class CommandAttributes
 	private final String[] aliases; //Text strings that will call the command
 	private final CommandRegister.Category category;
 	private final boolean disableable;
+	private final String targetVersion;
 	private final String description;
 
-	public CommandAttributes(String commandKeyArg, String descriptionArg, Class<? extends Command> commandClassArg, String[] aliasesArg, CommandRegister.Category categoryArg, boolean disableableArg)
+	public CommandAttributes(String commandKeyArg, String descriptionArg, Class<? extends Command> commandClassArg, String[] aliasesArg, CommandRegister.Category categoryArg, String targetVersionArg, boolean disableableArg)
 	{
 		commandKey = commandKeyArg;
 		description = descriptionArg;
@@ -21,6 +22,7 @@ public class CommandAttributes
 		System.arraycopy(aliasesArg, 0, aliases, 1, aliases.length - 1);
 		category = categoryArg;
 		disableable = disableableArg;
+		targetVersion = targetVersionArg;
 
 		//Sort aliases alphabetically
 		for (int i = 1; i<getAliases().length; i++)
@@ -110,5 +112,14 @@ public class CommandAttributes
 	public String getDescription()
 	{
 		return description;
+	}
+
+	/**
+	 * Returns the Jara version this command was built for.
+	 * @return the target version
+	 */
+	public String getTargetVersion()
+	{
+		return this.targetVersion;
 	}
 }

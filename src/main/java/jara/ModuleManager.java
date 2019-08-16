@@ -47,6 +47,7 @@ public class ModuleManager
      */
     private static int errors = 0;
 
+
     /**
      * Parses through each jar within the modules folder and gathers its {@link CommandAttributes}.
      * @return the list of {@link CommandAttributes}
@@ -178,7 +179,13 @@ public class ModuleManager
         if (Command.class.isAssignableFrom(c) && jarPact != null)
         {
             CommandAttributes pactCA = getAttributesInPact(jarFile, jarPact);
-            ca = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), c, pactCA.getAliases(), pactCA.getCategory(), pactCA.isDisableable());
+            ca = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), c, pactCA.getAliases(), pactCA.getCategory(), pactCA.getTargetVersion(), pactCA.isDisableable());
+
+            if (!Core.getSupportedVersions().contains(ca.getTargetVersion()))
+            {
+                warnings++;
+                logger.info(ca.getCommandKey()+" is built for unsupported Jara version: "+ca.getTargetVersion()+". It may not function as intended, please update for full support with Jara "+Core.getVersion()+".");
+            }
 
             JarEntry jarHelp = jarFile.getJarEntry("help.json"); //We only load help after identifying it's a command
             if (jarHelp != null)
@@ -291,7 +298,7 @@ public class ModuleManager
                     errors++;
                     throw new ConflictException(jarFile.getName()+" has NO non-conflicting aliases. It cannot be run.");
                 }
-                pactCA = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), null, aliases.toArray(pactCA.getAliases()), pactCA.getCategory(), pactCA.isDisableable());
+                pactCA = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), null, aliases.toArray(pactCA.getAliases()), pactCA.getCategory(), pactCA.getTargetVersion(), pactCA.isDisableable());
             }
         }
         return pactCA;

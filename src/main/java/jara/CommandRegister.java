@@ -48,11 +48,11 @@ public class CommandRegister
 		if (register == null)
 		{
 			register = new ArrayList<>();
-			register.add(new CommandAttributes("About", "Shows Bot credits.", About.class, new String[] {"Credits", "Authors"}, UTILITY, false));
-			register.add(new CommandAttributes("Config", "Modify Bot settings.", ConfigMain.class, new String[] {"Settings"}, ADMIN, false));
-			register.add(new CommandAttributes("Help", "Shows command details.", Help.class, new String[] {"?", "commands"}, NOGROUP, false));
-			register.add(new CommandAttributes("CustomCommandManager", "Manage custom commands.", CustomCommandManager.class, new String[] {"AddCustomCommand", "EditCustomCommand", "RemoveCustomCommand", "DeleteCustomCommand", "CustomCommands", "CCM"}, ADMIN, true));
-			register.add(new CommandAttributes("CustomCommand", "Custom Command Template.", CustomCommand.class, new String[0], NOGROUP, false)); //This is the interface for converting custom commands to actual commands.
+			register.add(new CommandAttributes("About", "Shows Bot credits.", About.class, new String[] {"Credits", "Authors"}, UTILITY, Core.getVersion(), false));
+			register.add(new CommandAttributes("Config", "Modify Bot settings.", ConfigMain.class, new String[] {"Settings"}, ADMIN, Core.getVersion(), false));
+			register.add(new CommandAttributes("Help", "Shows command details.", Help.class, new String[] {"?", "commands"}, NOGROUP, Core.getVersion(), false));
+			register.add(new CommandAttributes("CustomCommandManager", "Manage custom commands.", CustomCommandManager.class, new String[] {"AddCustomCommand", "EditCustomCommand", "RemoveCustomCommand", "DeleteCustomCommand", "CustomCommands", "CCM"}, ADMIN, Core.getVersion(), true));
+			register.add(new CommandAttributes("CustomCommand", "Custom Command Template.", CustomCommand.class, new String[0], NOGROUP, Core.getVersion(), false)); //This is the interface for converting custom commands to actual commands.
 			addDefaultHelpPages(register);
 			register.addAll(ModuleManager.loadModules(register));			//Load mods
 			register.sort(Comparator.comparing(CommandAttributes::getCommandKey)); //Sort the commands into alphabetical order based on their keys

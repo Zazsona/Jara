@@ -715,7 +715,7 @@ public class GuildSettings implements Serializable
         }
         else
         {
-            return new CommandAttributes(ccc.getKey(), ccc.getDescription(), CustomCommand.class, ccc.getAliases(), ccc.getCategory(), true);
+            return new CommandAttributes(ccc.getKey(), ccc.getDescription(), CustomCommand.class, ccc.getAliases(), ccc.getCategory(), Core.getVersion(), true);
         }
     }
 
