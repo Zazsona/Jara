@@ -91,7 +91,7 @@ public class ModuleManager
         }
         for (Class<? extends Load> c : onLoadClasses.keySet())
         {
-            new Thread(() ->
+            Thread loadThread = new Thread(() ->
                        {
                            try
                            {
@@ -102,7 +102,9 @@ public class ModuleManager
                                logger.error("Unable to instantiate "+onLoadClasses.get(c).getName()+"'s load class. There is a high risk this module will not perform correctly, if at all.");
                                errors++;
                            }
-                       }).start();
+                       });
+            loadThread.setName(c.getSimpleName());
+            loadThread.start();
             //Without creating a new thread, if the load class is infinitely running, Jara will shit the bed and prompt the user to restart setup.
         }
         if (errors <= 0)
@@ -179,7 +181,7 @@ public class ModuleManager
         if (Command.class.isAssignableFrom(c) && jarPact != null)
         {
             CommandAttributes pactCA = getAttributesInPact(jarFile, jarPact);
-            ca = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), c, pactCA.getAliases(), pactCA.getCategory(), pactCA.getTargetVersion(), pactCA.isDisableable());
+            ca = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), c, pactCA.getAliases(), pactCA.getCategory(), pactCA.getTargetVersion(), true);
 
             if (!Core.getSupportedVersions().contains(ca.getTargetVersion()))
             {
@@ -298,7 +300,7 @@ public class ModuleManager
                     errors++;
                     throw new ConflictException(jarFile.getName()+" has NO non-conflicting aliases. It cannot be run.");
                 }
-                pactCA = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), null, aliases.toArray(pactCA.getAliases()), pactCA.getCategory(), pactCA.getTargetVersion(), pactCA.isDisableable());
+                pactCA = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), null, aliases.toArray(pactCA.getAliases()), pactCA.getCategory(), pactCA.getTargetVersion(), true);
             }
         }
         return pactCA;
