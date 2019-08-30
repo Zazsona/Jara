@@ -9,6 +9,7 @@ import jara.CommandRegister;
 import jara.MessageManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 import java.io.IOException;
@@ -331,10 +332,15 @@ public class CustomCommandManager extends Command
     {
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         StringBuilder descBuilder = new StringBuilder();
-        descBuilder.append("Please enter the roles (by name) you would like to add/remove, or \"Quit\" to quit. Separate them with spaces.\n\nExisting Roles:\n");
+        descBuilder.append("Please enter the roles (by name) you would like to add/remove, separated by commas, or \"Quit\" to quit.\n\nExisting Roles:\n");
         for (String roleID : customCommand.getRoles())
         {
-            descBuilder.append(msgEvent.getGuild().getRoleById(roleID).getName()).append(", ");
+            Role role = msgEvent.getGuild().getRoleById(roleID);
+            if (role != null)
+            {
+                descBuilder.append(role.getName()).append(", ");
+            }
+
         }
         embed.setDescription(descBuilder.toString().substring(0, descBuilder.length()-2));
         msgEvent.getChannel().sendMessage(embed.build()).queue();
@@ -342,7 +348,7 @@ public class CustomCommandManager extends Command
         while (true)
         {
             Message message = mm.getNextMessage(msgEvent.getChannel());
-            String[] newRoles = message.getContentDisplay().toLowerCase().split(" ");
+            String[] newRoles = message.getContentDisplay().toLowerCase().split(",");
 
             if (guildSettings.isPermitted(message.getMember(), getClass()))
             {

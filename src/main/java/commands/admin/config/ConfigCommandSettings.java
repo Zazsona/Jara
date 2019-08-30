@@ -259,7 +259,12 @@ public class ConfigCommandSettings
         profileBuilder.append("**Roles:** ");
         for (String roleID : guildSettings.getPermissions(ca.getCommandKey()))
         {
-            profileBuilder.append(channel.getGuild().getRoleById(roleID).getName().replace("@", "")).append(", "); //removing "@" prevents pinging with the @everyone role.
+            Role role = channel.getGuild().getRoleById(roleID);
+            if (role != null)
+            {
+                profileBuilder.append(role.getName().replace("@", "")).append(", "); //removing "@" prevents pinging with the @everyone role.
+            }
+
         }
         profileBuilder.append("\n==========\n");
         profileBuilder.append("**Controls:**\n");

@@ -32,7 +32,11 @@ public class CustomCommand extends Command
                 ArrayList<Role> roles = new ArrayList<>();
                 for (String roleID : customCommand.getRoles())
                 {
-                    roles.add(msgEvent.getGuild().getRoleById(roleID));
+                    Role role = msgEvent.getGuild().getRoleById(roleID);
+                    if (role != null)
+                    {
+                        roles.add(role);
+                    }
                 }
                 msgEvent.getGuild().getController().addRolesToMember(msgEvent.getMember(), roles).queue();
             }
