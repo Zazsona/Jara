@@ -38,10 +38,12 @@ public class ScheduleHandler extends AudioEventAdapter
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason reason)
     {
         audio.resetSkipVotes();
+        String userID = audio.getTrackQueue().get(0).getUserID();
+        audio.getUserQueueQuantity().replace(userID, audio.getUserQueueQuantity().get(userID)-1);
         audio.getTrackQueue().remove(0); //Remove the track we just played
         if (audio.getTrackQueue().size() > 0)
         {
-            audio.getPlayer().playTrack(audio.getTrackQueue().get(0));
+            audio.getPlayer().playTrack(audio.getTrackQueue().get(0).getAudioTrack());
         }
         else if (SettingsUtil.getGuildSettings(audio.getAudioManager().getGuild().getId()).isVoiceLeavingEnabled())
         {
@@ -54,11 +56,13 @@ public class ScheduleHandler extends AudioEventAdapter
     {
         Logger logger = LoggerFactory.getLogger(getClass());
         logger.info("AudioTrack "+track.getInfo().uri + "("+track.getInfo().title+") has become stuck. Starting next track.");
+        String userID = audio.getTrackQueue().get(0).getUserID();
+        audio.getUserQueueQuantity().replace(userID, audio.getUserQueueQuantity().get(userID)-1);
         audio.getTrackQueue().remove(0); //Remove the track we just tried to play
         audio.resetSkipVotes();
         if (audio.getTrackQueue().size() > 0)
         {
-            audio.getPlayer().playTrack(audio.getTrackQueue().get(0));
+            audio.getPlayer().playTrack(audio.getTrackQueue().get(0).getAudioTrack());
         }
         else if (SettingsUtil.getGuildSettings(audio.getAudioManager().getGuild().getId()).isVoiceLeavingEnabled())
         {

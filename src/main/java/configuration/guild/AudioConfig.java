@@ -1,6 +1,7 @@
 package configuration.guild;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
 public class AudioConfig implements Serializable
 {
@@ -14,4 +15,9 @@ public class AudioConfig implements Serializable
      * Whether or not to leave voice channels when no audio is playing
      */
     public boolean useVoiceLeaving;
+
+    /**
+     * The number of items each role can queue.
+     */
+    public HashMap<String, Integer> roleQueueLimit;
 }

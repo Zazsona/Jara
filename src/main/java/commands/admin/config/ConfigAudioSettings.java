@@ -1,13 +1,18 @@
 package commands.admin.config;
 
 import configuration.GuildSettings;
+import configuration.SettingsUtil;
 import jara.MessageManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class ConfigAudioSettings
@@ -33,6 +38,10 @@ public class ConfigAudioSettings
             {
                 modifyVoiceLeaving(msgEvent);
             }
+            else if (request.equalsIgnoreCase("queuelimits"))
+            {
+                modifyQueueLimits(msgEvent);
+            }
             else
             {
                 EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
@@ -49,7 +58,7 @@ public class ConfigAudioSettings
     public void showMenu(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
-        String embedDescription = "What would you like to modify?\nSay `quit` to close this menu.\n**Skip Votes**\n**Voice Leaving**";
+        String embedDescription = "What would you like to modify?\nSay `quit` to close this menu.\n**Skip Votes**\n**Voice Leaving**\n**Queue Limits**";
         embed.setDescription(embedDescription);
         channel.sendMessage(embed.build()).queue();
 
@@ -66,6 +75,10 @@ public class ConfigAudioSettings
                 else if (msgContent.equalsIgnoreCase("voice leaving") || msgContent.equalsIgnoreCase("voiceleaving"))
                 {
                     modifyVoiceLeaving(msgEvent);
+                }
+                else if (msgContent.equalsIgnoreCase("queue limits") || msgContent.equalsIgnoreCase("queuelimits"))
+                {
+                    modifyQueueLimits(msgEvent);
                 }
                 else if (msgContent.equalsIgnoreCase("quit"))
                 {
@@ -161,5 +174,68 @@ public class ConfigAudioSettings
                 }
             }
         }
+    }
+
+    public void modifyQueueLimits(GuildMessageReceivedEvent msgEvent) throws IOException
+    {
+        HashMap<Role, Integer> customRoles = new HashMap<>();
+        int defaultLimit = guildSettings.getAudioQueueLimit(msgEvent.getGuild().getPublicRole());
+        for (Role role : msgEvent.getGuild().getRoles())
+        {
+            int limit = guildSettings.getAudioQueueLimit(role);
+            if (limit != defaultLimit)
+            {
+                customRoles.put(role, limit);
+            }
+        }
+        StringBuilder descBuilder = new StringBuilder();
+        descBuilder.append("Queue limits dictate how many tracks a member of that role can queue at a time.\nTo set/edit a role, enter the role name followed by the queue limit.\nE.g: everyone 2\n\n**Existing Settings:**\n");
+        descBuilder.append("Everyone: ").append(defaultLimit).append("\n");
+        for (Map.Entry<Role, Integer> roleLimit : customRoles.entrySet())
+        {
+            descBuilder.append(roleLimit.getKey().getName()).append(": ").append(roleLimit.getValue()).append("\n");
+        }
+        if (descBuilder.length() >= 1024)
+        {
+            descBuilder.setLength(1020);
+            descBuilder.append("...");
+        }
+        EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
+        embed.setDescription(descBuilder.toString());
+        channel.sendMessage(embed.build()).queue();
+        MessageManager mm = new MessageManager();
+        while (true)
+        {
+            try
+            {
+                Message msg = mm.getNextMessage(channel);
+                if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+                {
+                    String response = msg.getContentDisplay().toLowerCase();
+                    String[] responseWords = response.split(" ");
+                    String roleName = response.substring(0, response.length()-responseWords[responseWords.length-1].length()).trim();
+                    if (responseWords[0].equals(SettingsUtil.getGuildCommandPrefix(msg.getGuild().getId())+"quit") || responseWords[0].equals("quit"))
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        Role role = (roleName.equals("everyone")) ? msgEvent.getGuild().getPublicRole() : msgEvent.getGuild().getRolesByName(roleName, true).get(0);
+                        int limit = Integer.parseInt(responseWords[responseWords.length-1]);
+                        guildSettings.setAudioQueueLimit(role, limit);
+                        embed.setDescription("Queue limit updated!");
+                        channel.sendMessage(embed.build()).queue();
+                        return;
+                    }
+
+                }
+            }
+            catch (NumberFormatException | IndexOutOfBoundsException | NullPointerException e)
+            {
+                embed.setDescription("Invalid response format. To cancel, use the quit command.\n\nRequired: [Role name] [Limit]\nE.g: everyone 2");
+                channel.sendMessage(embed.build()).queue();
+            }
+        }
+
     }
 }

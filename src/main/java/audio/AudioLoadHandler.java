@@ -4,6 +4,8 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import configuration.SettingsUtil;
+import net.dv8tion.jda.core.entities.Member;
 import org.slf4j.LoggerFactory;
 
 public class AudioLoadHandler implements AudioLoadResultHandler
@@ -13,13 +15,18 @@ public class AudioLoadHandler implements AudioLoadResultHandler
      */
     private final Audio audio;
     /**
+     * The ID of the user who issued the request.
+     */
+    private final Member member;
+    /**
      * The result of the load
      */
     private Audio.RequestResult result;
 
-    public AudioLoadHandler(Audio audio)
+    public AudioLoadHandler(Audio audio, Member member)
     {
         this.audio = audio;
+        this.member = member;
         this.result = Audio.RequestResult.REQUEST_PENDING;
     }
 
@@ -34,36 +41,54 @@ public class AudioLoadHandler implements AudioLoadResultHandler
     @Override
     public void trackLoaded(AudioTrack track)
     {
-        audio.getTrackQueue().add(track);
-        if (!audio.isAudioPlayingInGuild())
+        if (registerUserQueueItem())
         {
-            audio.getPlayer().playTrack(audio.getTrackQueue().get(0));
-            result = Audio.RequestResult.REQUEST_NOW_PLAYING;
+            audio.getTrackQueue().add(new ScheduledTrack(track, member.getUser().getId()));
+            if (!audio.isAudioPlayingInGuild())
+            {
+                audio.getPlayer().playTrack(audio.getTrackQueue().get(0).getAudioTrack());
+                result = Audio.RequestResult.REQUEST_NOW_PLAYING;
+            }
+            else
+            {
+                result = Audio.RequestResult.REQUEST_ADDED_TO_QUEUE;
+            }
         }
         else
         {
-            result = Audio.RequestResult.REQUEST_ADDED_TO_QUEUE;
+            result = Audio.RequestResult.REQUEST_USER_LIMITED;
         }
-
     }
 
     @Override
     public void playlistLoaded(AudioPlaylist playlist)
     {
+        int queueCount = 0;
         for (AudioTrack track : playlist.getTracks())
         {
-            audio.getTrackQueue().add(track);
+            if (registerUserQueueItem())
+            {
+                audio.getTrackQueue().add(new ScheduledTrack(track, member.getUser().getId()));
+                queueCount++;
+            }
+
         }
-        if (!audio.isAudioPlayingInGuild())
+        if (queueCount > 0)
         {
-            audio.getPlayer().playTrack(audio.getTrackQueue().get(0));
-            result = Audio.RequestResult.REQUEST_NOW_PLAYING;
+            if (!audio.isAudioPlayingInGuild())
+            {
+                audio.getPlayer().playTrack(audio.getTrackQueue().get(0).getAudioTrack());
+                result = Audio.RequestResult.REQUEST_NOW_PLAYING;
+            }
+            else
+            {
+                result = Audio.RequestResult.REQUEST_ADDED_TO_QUEUE;
+            }
         }
         else
         {
-            result = Audio.RequestResult.REQUEST_ADDED_TO_QUEUE;
+            result = Audio.RequestResult.REQUEST_USER_LIMITED;
         }
-
     }
 
     @Override
@@ -79,5 +104,34 @@ public class AudioLoadHandler implements AudioLoadResultHandler
         //Error
         result = Audio.RequestResult.REQUEST_RESULTED_IN_ERROR;
         LoggerFactory.getLogger(this.getClass()).info(e.toString());
+    }
+
+    private boolean registerUserQueueItem()
+    {
+        if (audio.getUserQueueQuantity().get(member.getUser().getId()) == null)
+        {
+            if (SettingsUtil.getGuildSettings(audio.getAudioManager().getGuild().getId()).getAudioQueueLimit(member) > 0)
+            {
+                audio.getUserQueueQuantity().put(member.getUser().getId(), 1);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            int queueQuantity = audio.getUserQueueQuantity().get(member.getUser().getId());
+            if (queueQuantity < SettingsUtil.getGuildSettings(audio.getAudioManager().getGuild().getId()).getAudioQueueLimit(member))
+            {
+                audio.getUserQueueQuantity().replace(member.getUser().getId(), queueQuantity+1);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

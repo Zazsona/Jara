@@ -18,6 +18,7 @@ import net.dv8tion.jda.core.managers.AudioManager;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class Audio
@@ -29,7 +30,11 @@ public class Audio
 	/**
 	 * The list of tracks waiting to be played, including that currently playing
 	 */
-	private final ArrayList<AudioTrack> trackQueue = new ArrayList<>();
+	private final ArrayList<ScheduledTrack> trackQueue = new ArrayList<>();
+	/**
+	 * The number of tracks a user has queued.
+	 */
+	private final HashMap<String, Integer> userQueueQuantity = new HashMap<>();
 	/**
 	 * The guild's player manager
 	 */
@@ -60,7 +65,8 @@ public class Audio
 		REQUEST_USER_NOT_IN_VOICE,
 		REQUEST_IS_BAD,
         REQUEST_CHANNEL_FULL,
-		REQUEST_CHANNEL_PERMISSION_DENIED
+		REQUEST_CHANNEL_PERMISSION_DENIED,
+		REQUEST_USER_LIMITED
 	}
 
 	/**
@@ -111,7 +117,7 @@ public class Audio
 					}
 
 				}
-				AudioLoadHandler audioLoadHandler = new AudioLoadHandler(this);
+				AudioLoadHandler audioLoadHandler = new AudioLoadHandler(this, member);
 				playerManager.loadItem(query, audioLoadHandler); //If audio is already playing, it will be added to the queue instead.
 				while (audioLoadHandler.getResult() == RequestResult.REQUEST_PENDING)
 				{
@@ -155,7 +161,7 @@ public class Audio
 		{
 			result = play(member, query);
 			if (result == RequestResult.REQUEST_NOW_PLAYING || result == RequestResult.REQUEST_ADDED_TO_QUEUE)
-				requestedTrackInfo = getTrackQueue().get(getTrackQueue().size()-1).getInfo(); //This always returns the last track (i.e, the one that was just requested)
+				requestedTrackInfo = getTrackQueue().get(getTrackQueue().size()-1).getAudioTrack().getInfo(); //This always returns the last track (i.e, the one that was just requested)
 		}
 		else
 		{
@@ -183,7 +189,7 @@ public class Audio
 		switch (result)
 		{
 			case REQUEST_NOW_PLAYING:
-				embed.setDescription(CmdUtil.formatAudioTrackDetails(getTrackQueue().get(0)));
+				embed.setDescription(CmdUtil.formatAudioTrackDetails(getTrackQueue().get(0).getAudioTrack()));
 				break;
 
 			case REQUEST_ADDED_TO_QUEUE:
@@ -191,7 +197,7 @@ public class Audio
 				descBuilder.append("Position: ").append(getTrackQueue().size()).append("\n"); //So, index 1 is position 2, 2 is 3, etc. Should be more readable for non-programmers.
 				descBuilder.append("ETA: ").append((((getTotalQueuePlayTime() - requestedTrackInfo.length) / 1000) / 60)).append(" Minutes\n"); //This ETA is really rough. It abstracts to minutes and ignores the progress of the current track.
 				descBuilder.append("=====\n");
-				descBuilder.append(CmdUtil.formatAudioTrackDetails(getTrackQueue().get(getTrackQueue().size()-1)));
+				descBuilder.append(CmdUtil.formatAudioTrackDetails(getTrackQueue().get(getTrackQueue().size()-1).getAudioTrack()));
 				embed.setDescription(descBuilder.toString());
 				break;
 
@@ -225,6 +231,11 @@ public class Audio
 				embed.setDescription("You haven't provided a valid track.");
 				break;
 
+			case REQUEST_USER_LIMITED:
+				embed.setTitle("Queue Limit Reached");
+				embed.setDescription("You have reached your queue limit.");
+				break;
+
 			default:
 				embed.setTitle("Uh-Oh!");
 				embed.setDescription("An unexpected event occurred. You may experience some issues.");
@@ -248,7 +259,7 @@ public class Audio
 	 * Returns the currently queued tracks. The currently playing track is at index 0.
 	 * @return AudioTrack ArrayList
 	 */
-	public ArrayList<AudioTrack> getTrackQueue()
+	public ArrayList<ScheduledTrack> getTrackQueue()
 	{
 		return trackQueue;
 	}
@@ -271,9 +282,9 @@ public class Audio
 	public long getTotalQueuePlayTime()
 	{
 		long time = 0;
-		for (AudioTrack audioTrack : getTrackQueue())
+		for (ScheduledTrack scheduledTrack : getTrackQueue())
 		{
-			time += audioTrack.getInfo().length;
+			time += scheduledTrack.getAudioTrack().getInfo().length;
 		}
 		return time;
 	}
@@ -334,6 +345,15 @@ public class Audio
     {
         return trackHistory;
     }
+
+	/**
+	 * Gets a the map of user id to queued track quantity.
+	 * @return
+	 */
+	public HashMap<String, Integer> getUserQueueQuantity()
+	{
+		return userQueueQuantity;
+	}
 
 
 

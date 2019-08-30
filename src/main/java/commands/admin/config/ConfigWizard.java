@@ -67,6 +67,7 @@ public class ConfigWizard
     {
         cas.modifySkipVotes(msgEvent);
         cas.modifyVoiceLeaving(msgEvent);
+        cas.modifyQueueLimits(msgEvent);
     }
 
     private void configureGames() throws IOException

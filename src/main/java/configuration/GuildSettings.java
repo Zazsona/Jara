@@ -99,6 +99,7 @@ public class GuildSettings implements Serializable
                 FileInputStream fis = new FileInputStream(getGuildSettingsFilePath(guildID));
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 GuildSettings settingsFromFile = (GuildSettings) ois.readObject();
+
                 this.commandPrefix = settingsFromFile.commandPrefix;
                 this.audioConfig = settingsFromFile.audioConfig;
                 this.gameConfig = settingsFromFile.gameConfig;
@@ -213,18 +214,19 @@ public class GuildSettings implements Serializable
             this.commandConfig.put(ca.getCommandKey(), new CommandConfig(!ca.isDisableable(), new ArrayList<>())); //By inverting isDisableable, we are disabling the command whenever isDisablable is true.
         }
 
+        Guild guild = Core.getShardManager().getGuildById(guildID);
+        addPermissions(guild.getPublicRole().getId(), "Help");
+
         commandPrefix = '/';
         audioConfig.useVoiceLeaving = true;
         audioConfig.skipVotePercent = 50;
+        audioConfig.roleQueueLimit = new HashMap<>();
+        audioConfig.roleQueueLimit.put(guild.getPublicRole().getId(), 1);
         gameConfig.useGameChannels = false;
         gameConfig.gameChannelTimeout = "0";
         gameConfig.gameCategoryId = "";
         gameConfig.concurrentGameInChannelAllowed = false;
 
-        Guild guild = Core.getShardManager().getGuildById(guildID);
-        ArrayList<String> everyoneRole = new ArrayList<>();
-        everyoneRole.add(guild.getPublicRole().getId());
-        addPermissions(everyoneRole, "Help");
         save();
     }
 
@@ -603,6 +605,54 @@ public class GuildSettings implements Serializable
     public void setVoiceLeaving(boolean state) throws IOException
     {
         this.audioConfig.useVoiceLeaving = state;
+        save();
+    }
+
+    /**
+     * Gets the member's highest audio queue amount, based on their roles.
+     * @param member
+     * @return
+     */
+    public int getAudioQueueLimit(Member member)
+    {
+        List<Role> memberRoles = member.getRoles();
+        int queueLimit = audioConfig.roleQueueLimit.get(member.getGuild().getPublicRole().getId());
+        Integer queueLimitForCurrentRole = 0;
+        for (Role role : memberRoles)
+        {
+            queueLimitForCurrentRole = audioConfig.roleQueueLimit.get(role.getId());
+            if (queueLimitForCurrentRole != null && queueLimitForCurrentRole > queueLimit)
+            {
+                queueLimit = queueLimitForCurrentRole;
+            }
+        }
+        return queueLimit;
+    }
+
+    /**
+     * Gets the audio queue limit for this role.
+     * @param role
+     * @return
+     */
+    public int getAudioQueueLimit(Role role)
+    {
+        int queueLimit = audioConfig.roleQueueLimit.get(role.getGuild().getPublicRole().getId());
+        if (audioConfig.roleQueueLimit.get(role.getId()) != null && audioConfig.roleQueueLimit.get(role.getId()) > queueLimit)
+        {
+            queueLimit = audioConfig.roleQueueLimit.get(role.getId());
+        }
+        return queueLimit;
+    }
+
+    /**
+     * Sets the audio queue limit for this role.
+     * @param role
+     * @param limit the number of tracks a role member can queue up
+     * @throws IOException
+     */
+    public void setAudioQueueLimit(Role role, int limit) throws IOException
+    {
+        audioConfig.roleQueueLimit.put(role.getId(), limit);
         save();
     }
 
