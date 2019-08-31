@@ -23,6 +23,11 @@ import java.util.*;
 public class GuildSettings implements Serializable
 {
     private static final long serialVersionUID = 1L;
+
+    /**
+     * The Jara version this config was last accessed with.
+     */
+    private String jaraVersion;
     /**
      * The ID of this guild
      */
@@ -43,16 +48,15 @@ public class GuildSettings implements Serializable
      * The guild's command settings.
      */
     protected HashMap<String, CommandConfig> commandConfig;
+    /**
+     * The user made custom commands for this guild.
+     */
+    protected HashMap<String, CustomCommandBuilder> customCommandsConfig;
 
     /**
      * The logger.
      */
     private static transient final Logger logger = LoggerFactory.getLogger(GuildSettings.class);
-
-    /**
-     * The user made custom commands for this guild.
-     */
-    protected HashMap<String, CustomCommandBuilder> customCommandsConfig;
 
     public GuildSettings(String guildID) throws IOException
     {
@@ -99,12 +103,20 @@ public class GuildSettings implements Serializable
                 FileInputStream fis = new FileInputStream(getGuildSettingsFilePath(guildID));
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 GuildSettings settingsFromFile = (GuildSettings) ois.readObject();
-
-                this.commandPrefix = settingsFromFile.commandPrefix;
-                this.audioConfig = settingsFromFile.audioConfig;
-                this.gameConfig = settingsFromFile.gameConfig;
-                this.customCommandsConfig = settingsFromFile.customCommandsConfig;
-                this.commandConfig = new HashMap<>(settingsFromFile.commandConfig);
+                ois.close();
+                fis.close();
+                if (!Core.getVersion().equalsIgnoreCase(settingsFromFile.jaraVersion))
+                {
+                    updateConfig(settingsFromFile);
+                }
+                else
+                {
+                    this.commandPrefix = settingsFromFile.commandPrefix;
+                    this.audioConfig = settingsFromFile.audioConfig;
+                    this.gameConfig = settingsFromFile.gameConfig;
+                    this.customCommandsConfig = settingsFromFile.customCommandsConfig;
+                    this.commandConfig = new HashMap<>(settingsFromFile.commandConfig);
+                }
                 if (!commandConfig.keySet().containsAll(Arrays.asList(CommandRegister.getAllCommandKeys())))
                 {
                     ArrayList<String> newCommands = addMissingCommands();
@@ -204,6 +216,7 @@ public class GuildSettings implements Serializable
      */
     public void setDefaultSettings() throws IOException
     {
+        this.jaraVersion = Core.getVersion();
         this.commandConfig = new HashMap<>();
         this.customCommandsConfig = new HashMap<>();
         this.audioConfig = new AudioConfig();
@@ -226,8 +239,52 @@ public class GuildSettings implements Serializable
         gameConfig.gameChannelTimeout = "0";
         gameConfig.gameCategoryId = "";
         gameConfig.concurrentGameInChannelAllowed = false;
+        save();
+    }
+
+    /**
+     * This method will take a legacy config and match it to the current Jara version.
+     * Once updated in this object, the updates will be written to file.
+     * @param legacySettings
+     * @throws IOException
+     */
+    private void updateConfig(GuildSettings legacySettings) throws IOException
+    {
+        setDefaultSettings();
+        if (legacySettings.audioConfig != null)
+        {
+            if (legacySettings.audioConfig.roleQueueLimit != null)
+                this.audioConfig.roleQueueLimit = legacySettings.audioConfig.roleQueueLimit;
+
+            if (legacySettings.audioConfig.skipVotePercent != 0)
+                this.audioConfig.skipVotePercent = legacySettings.audioConfig.skipVotePercent;
+
+            if (legacySettings.audioConfig.useVoiceLeaving != false)
+                this.audioConfig.useVoiceLeaving = legacySettings.audioConfig.useVoiceLeaving;
+        }
+        if (legacySettings.gameConfig != null)
+        {
+            if (legacySettings.gameConfig.concurrentGameInChannelAllowed != false)
+                this.gameConfig.concurrentGameInChannelAllowed = legacySettings.gameConfig.concurrentGameInChannelAllowed;
+
+            if (legacySettings.gameConfig.gameCategoryId != null)
+                this.gameConfig.gameCategoryId = legacySettings.gameConfig.gameCategoryId;
+
+            if (legacySettings.gameConfig.gameChannelTimeout != null)
+                this.gameConfig.gameChannelTimeout = legacySettings.gameConfig.gameChannelTimeout;
+
+            if (legacySettings.gameConfig.useGameChannels != false)
+                this.gameConfig.useGameChannels = legacySettings.gameConfig.useGameChannels;
+        }
+        if (legacySettings.commandConfig != null)
+            this.commandConfig = legacySettings.commandConfig;
+        if (legacySettings.customCommandsConfig != null)
+            this.customCommandsConfig = legacySettings.customCommandsConfig;
+        if (legacySettings.commandPrefix != 0)
+            this.commandPrefix = legacySettings.commandPrefix;
 
         save();
+        logger.info("Updated settings for guild "+guildID+" to Jara "+Core.getVersion());
     }
 
     /**
