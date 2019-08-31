@@ -22,7 +22,6 @@ public class ScheduleHandler extends AudioEventAdapter
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track)
     {
-        audio.getTrackHistory().add(track);
     }
     @Override
     public void onPlayerPause(AudioPlayer player)
@@ -40,6 +39,7 @@ public class ScheduleHandler extends AudioEventAdapter
         audio.resetSkipVotes();
         String userID = audio.getTrackQueue().get(0).getUserID();
         audio.getUserQueueQuantity().replace(userID, audio.getUserQueueQuantity().get(userID)-1);
+        audio.getTrackHistory().add(audio.getTrackQueue().get(0));
         audio.getTrackQueue().remove(0); //Remove the track we just played
         if (audio.getTrackQueue().size() > 0)
         {

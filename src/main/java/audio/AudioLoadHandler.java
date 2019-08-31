@@ -41,7 +41,8 @@ public class AudioLoadHandler implements AudioLoadResultHandler
     @Override
     public void trackLoaded(AudioTrack track)
     {
-        if (registerUserQueueItem())
+        boolean canQueue = registerUserQueueItem();
+        if (canQueue)
         {
             audio.getTrackQueue().add(new ScheduledTrack(track, member.getUser().getId()));
             if (!audio.isAudioPlayingInGuild())
@@ -106,7 +107,7 @@ public class AudioLoadHandler implements AudioLoadResultHandler
         LoggerFactory.getLogger(this.getClass()).info(e.toString());
     }
 
-    private boolean registerUserQueueItem()
+    private synchronized boolean registerUserQueueItem()
     {
         if (audio.getUserQueueQuantity().get(member.getUser().getId()) == null)
         {
