@@ -10,6 +10,7 @@ import javax.security.auth.login.LoginException;
 import configuration.SettingsUtil;
 import exceptions.InvalidModuleException;
 import gui.HeadedGUI;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,10 +73,10 @@ public class Core //A class for covering the global manners of the bot.
 		try
 		{
 			HashMap<String, CommandLauncher> commands = new HashMap<>();
-			for (CommandAttributes ca : CommandRegister.getRegister())
+			for (ModuleAttributes ma : ModuleRegister.getCommandModules())
 			{
-				CommandLauncher cl = new CommandLauncher(ca, SettingsUtil.getGlobalSettings().isCommandEnabled(ca.getCommandKey()));
-				for (String alias : ca.getAliases())
+				CommandLauncher cl = new CommandLauncher(ma, SettingsUtil.getGlobalSettings().isModuleEnabled(ma.getKey()));
+				for (String alias : ma.getAliases())
 				{
 					commands.put(alias.toLowerCase(), cl);
 				}
