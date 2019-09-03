@@ -1,11 +1,11 @@
 package commands.admin;
 
 import commands.CmdUtil;
-import commands.Command;
+import module.Command;
 import configuration.GuildSettings;
 import configuration.SettingsUtil;
 import configuration.guild.CustomCommandBuilder;
-import jara.CommandRegister;
+import jara.ModuleRegister;
 import jara.MessageManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -65,7 +65,7 @@ public class CustomCommandManager extends Command
                             {
                                 ArrayList<String> everyoneRole = new ArrayList<>();
                                 everyoneRole.add(msgEvent.getGuild().getPublicRole().getId());
-                                customCommand = guildSettings.addCustomCommand(selection[1], new String[0], "A custom command.", CommandRegister.Category.UTILITY, new ArrayList<>(), "", "");
+                                customCommand = guildSettings.addCustomCommand(selection[1], new String[0], "A custom command.", ModuleRegister.Category.UTILITY, new ArrayList<>(), "", "");
                                 guildSettings.addPermissions(everyoneRole, selection[1]);
                                 editCommand(msgEvent, customCommand);
                             }
@@ -217,12 +217,12 @@ public class CustomCommandManager extends Command
     private void modifyCategory(GuildMessageReceivedEvent msgEvent, CustomCommandBuilder customCommand)
     {
         EmbedBuilder embed = getEmbedStyle(msgEvent);
-        embed.setDescription("Please enter the new category out of:\n**Admin**\n**Audio**\n**Games**\n**Toys**\n**Utility**\n\nCurrent Category: "+CommandRegister.getCategoryName(customCommand.getCategory()));
+        embed.setDescription("Please enter the new category out of:\n**Admin**\n**Audio**\n**Games**\n**Toys**\n**Utility**\n\nCurrent Category: "+ ModuleRegister.getCategoryName(customCommand.getCategory()));
         msgEvent.getChannel().sendMessage(embed.build()).queue();
         while (true)
         {
             Message message = mm.getNextMessage(msgEvent.getChannel());
-            CommandRegister.Category category = CommandRegister.getCategoryID(message.getContentDisplay());
+            ModuleRegister.Category category = ModuleRegister.getCategoryID(message.getContentDisplay());
 
             if (guildSettings.isPermitted(message.getMember(), getClass()))
             {

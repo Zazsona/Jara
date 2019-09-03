@@ -4,8 +4,9 @@ package commands;
 import audio.Audio;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import jara.CommandRegister;
+import jara.ModuleRegister;
 import jara.Core;
+import module.Command;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -363,7 +364,7 @@ public class CmdUtil
      */
     public static void sendHelpInfo(GuildMessageReceivedEvent msgEvent, Class<? extends Command> clazz)
     {
-        new Help().run(msgEvent, "/?", CommandRegister.getCommand(clazz).getCommandKey());
+        new Help().run(msgEvent, "/?", ModuleRegister.getModule(clazz).getKey());
         /*
          * So, technically this is fine, as help is *always* enabled and cannot be disabled. But generally calling commands like this is a bad idea, as they may be disabled.
          * This also saves us having to copy command usage info for each command, which could be a problem as commands change.
