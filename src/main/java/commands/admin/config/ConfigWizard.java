@@ -1,8 +1,8 @@
 package commands.admin.config;
 
 import configuration.GuildSettings;
-import jara.CommandAttributes;
-import jara.CommandRegister;
+import jara.ModuleAttributes;
+import jara.ModuleRegister;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -86,11 +86,11 @@ public class ConfigWizard
     private void configureCommands() throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
-        for (CommandAttributes ca : CommandRegister.getRegister())
+        for (ModuleAttributes ma : ModuleRegister.getCommandModules())
         {
-            if (ca.isDisableable())
+            if (ma.isDisableable())
             {
-                ccs.showMenu(ca, embed);
+                ccs.showMenu(ma, embed);
             }
         }
     }

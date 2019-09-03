@@ -1,6 +1,6 @@
 package configuration.guild;
 
-import jara.CommandRegister;
+import jara.ModuleRegister;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class CustomCommandBuilder implements Serializable
     /**
      * The category of the command
      */
-    private CommandRegister.Category category;
+    private ModuleRegister.Category category;
     /**
      * The text that will be returned when a user calls the command.
      */
@@ -41,7 +41,7 @@ public class CustomCommandBuilder implements Serializable
     /**
      * Constructor
      */
-    public CustomCommandBuilder(String key, String[] aliases, String description, CommandRegister.Category category, ArrayList<String> roleIDs, String audioLink, String message)
+    public CustomCommandBuilder(String key, String[] aliases, String description, ModuleRegister.Category category, ArrayList<String> roleIDs, String audioLink, String message)
     {
         this.key = key;
         this.aliases = aliases;
@@ -78,7 +78,7 @@ public class CustomCommandBuilder implements Serializable
     /**
      * @return category
      */
-    public CommandRegister.Category getCategory()
+    public ModuleRegister.Category getCategory()
     {
         return category;
     }
@@ -128,7 +128,7 @@ public class CustomCommandBuilder implements Serializable
     {
         this.description = description;
     }
-    public void setCategory(CommandRegister.Category category)
+    public void setCategory(ModuleRegister.Category category)
     {
         this.category = category;
     }

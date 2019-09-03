@@ -1,6 +1,6 @@
 package configuration;
 
-import jara.CommandAttributes;
+import jara.ModuleAttributes;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 public class CustomCommandLauncher extends CommandLauncher
 {
-    public CustomCommandLauncher(CommandAttributes attributes)
+    public CustomCommandLauncher(ModuleAttributes attributes)
     {
         super(attributes, true); //Enabled state is not used here
     }
@@ -19,7 +19,7 @@ public class CustomCommandLauncher extends CommandLauncher
     public void execute(GuildMessageReceivedEvent msgEvent, String...parameters)
     {
         GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
-        if (guildSettings.isCommandEnabled(attributes.getCommandKey()))
+        if (guildSettings.isCommandEnabled(attributes.getKey()))
         {
             if (guildSettings.isPermitted(msgEvent.getMember(), parameters[0].replace(SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId()).toString(), "").toLowerCase()))
             {
@@ -36,7 +36,7 @@ public class CustomCommandLauncher extends CommandLauncher
                     }
                 };
                 Thread commandThread = new Thread(commandRunnable);
-                commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getCommandKey()+"-Thread");
+                commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getKey()+"-Thread");
                 commandThread.start();
                 return;
             }

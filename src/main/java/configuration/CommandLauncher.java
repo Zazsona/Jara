@@ -8,16 +8,16 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jara.CommandAttributes;
+import jara.ModuleAttributes;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 public class CommandLauncher
 {
 	private static Logger logger = LoggerFactory.getLogger(CommandLauncher.class);
 	protected final boolean enabledState; //Whether the config allows this command to be used
-	protected final CommandAttributes attributes;
+	protected final ModuleAttributes attributes;
 	
-	public CommandLauncher(CommandAttributes attributes, boolean enabledState)
+	public CommandLauncher(ModuleAttributes attributes, boolean enabledState)
 	{
 		this.attributes = attributes;
 		this.enabledState = enabledState;
@@ -35,7 +35,7 @@ public class CommandLauncher
         if (isEnabled() || !attributes.isDisableable()) //If it can't be disabled, run it anyway even if it is disabled. Stops people fucking with settings to the point the bot is unusable.
         {
             GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
-            if (guildSettings.isCommandEnabled(attributes.getCommandKey()))
+            if (guildSettings.isCommandEnabled(attributes.getKey()))
             {
                 if (guildSettings.isPermitted(msgEvent.getMember(), attributes.getCommandClass()))
                 {
@@ -60,7 +60,7 @@ public class CommandLauncher
                         }
                     };
                     Thread commandThread = new Thread(commandRunnable);
-                    commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getCommandKey()+"-Thread");
+                    commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getKey()+"-Thread");
                     commandThread.start();
                     return;
                 }
@@ -87,7 +87,7 @@ public class CommandLauncher
 	 */
 	public String getCommandKey()
 	{
-		return attributes.getCommandKey();
+		return attributes.getKey();
 	}
 	/**
 	 * 

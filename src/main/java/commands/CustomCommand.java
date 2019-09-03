@@ -2,6 +2,7 @@ package commands;
 
 import configuration.SettingsUtil;
 import configuration.guild.CustomCommandBuilder;
+import module.Command;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;

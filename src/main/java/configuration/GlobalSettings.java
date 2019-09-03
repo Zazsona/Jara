@@ -1,5 +1,6 @@
 package configuration;
-import jara.CommandRegister;
+import jara.ModuleRegister;
+import jara.ModuleAttributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,7 @@ public class GlobalSettings implements Serializable
     /**
      * The list of configured commands, and their enabled status.
      */
-    protected HashMap<String, Boolean> commandConfig;
+    protected HashMap<String, Boolean> moduleConfig;
 
     /**
      * Returns the file where global settings are stored.
@@ -35,19 +36,16 @@ public class GlobalSettings implements Serializable
 
     public synchronized void save() throws IOException
     {
-        if (!commandConfig.keySet().containsAll(Arrays.asList(CommandRegister.getAllCommandKeys())))
+        if (!moduleConfig.keySet().containsAll(Arrays.asList(ModuleRegister.getCommandModuleKeys())))
         {
-            if (!commandConfig.keySet().containsAll(Arrays.asList(CommandRegister.getAllCommandKeys())))
+            for (ModuleAttributes ma : ModuleRegister.getModules())
             {
-                for (String key : CommandRegister.getAllCommandKeys())
+                if (!moduleConfig.keySet().contains(ma.getKey()))
                 {
-                    if (!commandConfig.keySet().contains(key))
-                    {
-                        commandConfig.put(key, !CommandRegister.getCommand(key).isDisableable());
-                    }
+                    moduleConfig.put(ma.getKey(), !ma.isDisableable());
                 }
-                logger.info("Commands were missing in the config, so have been added with disabled state.");
             }
+            logger.info("Modules were missing in the config, so have been added with disabled state.");
         }
 
         File configFile = new File(getGlobalSettingsFilePath());
@@ -72,17 +70,17 @@ public class GlobalSettings implements Serializable
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 GlobalSettings gs = (GlobalSettings) ois.readObject();
                 this.token = gs.token;
-                this.commandConfig = gs.commandConfig;
+                this.moduleConfig = gs.moduleConfig;
                 ois.close();
                 fis.close();
-                if (!commandConfig.keySet().containsAll(Arrays.asList(CommandRegister.getAllCommandKeys())))
+                if (!moduleConfig.keySet().containsAll(Arrays.asList(ModuleRegister.getCommandModuleKeys())))
                 {
                     logger.info("Found new commands. Adding them to the config.");
-                    for (String key : CommandRegister.getAllCommandKeys())
+                    for (String key : ModuleRegister.getModuleKeys())
                     {
-                        if (!commandConfig.keySet().contains(key))
+                        if (!moduleConfig.keySet().contains(key))
                         {
-                            commandConfig.put(key, true);
+                            moduleConfig.put(key, true);
                         }
                     }
                     save();
@@ -92,7 +90,7 @@ public class GlobalSettings implements Serializable
             else
             {
                 this.token = "";
-                this.commandConfig = new HashMap<>();
+                this.moduleConfig = new HashMap<>();
                 return false;
             }
         }
@@ -117,29 +115,29 @@ public class GlobalSettings implements Serializable
         save();
     }
 
-    public HashMap<String, Boolean> getCommandConfigMap()
+    public HashMap<String, Boolean> getModuleConfigMap()
     {
-        return commandConfig;
+        return moduleConfig;
     }
 
-    public void setCommandConfigMap(HashMap<String, Boolean> commandConfig) throws IOException
+    public void setModuleConfigMap(HashMap<String, Boolean> commandConfig) throws IOException
     {
-        this.commandConfig = commandConfig;
+        this.moduleConfig = commandConfig;
         save();
     }
     /**
-     * Updates the stored information for the commands defined by their keys.
+     * Updates the stored information for the modules defined by their keys.
      * @param newState
-     * @param commandKeys
+     * @param keys
      */
-    public void setCommandConfiguration(boolean newState, String... commandKeys) throws IOException
+    public void setModuleConfiguration(boolean newState, String... keys) throws IOException
     {
         boolean changed = false;
-        for (String key : commandKeys)
+        for (String key : keys)
         {
-            if (CommandRegister.getCommand(key).isDisableable())
+            if (ModuleRegister.getModule(key).isDisableable())
             {
-                commandConfig.replace(key, newState);
+                moduleConfig.replace(key, newState);
                 changed = true;
             }
         }
@@ -148,11 +146,11 @@ public class GlobalSettings implements Serializable
     }
 
     /**
-     * @param commandKey
+     * @param key
      * @return
      */
-    public boolean isCommandEnabled(String commandKey)
+    public boolean isModuleEnabled(String key)
     {
-        return commandConfig.get(commandKey);
+        return moduleConfig.get(key);
     }
 }

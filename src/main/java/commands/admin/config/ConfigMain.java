@@ -1,7 +1,7 @@
 package commands.admin.config;
 
 import commands.CmdUtil;
-import commands.Command;
+import module.Command;
 import configuration.GuildSettings;
 import configuration.SettingsUtil;
 import jara.MessageManager;

@@ -1,8 +1,8 @@
 package commands.admin.config;
 
 import configuration.GuildSettings;
-import jara.CommandAttributes;
-import jara.CommandRegister;
+import jara.ModuleAttributes;
+import jara.ModuleRegister;
 import jara.MessageManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -33,11 +33,11 @@ public class ConfigCommandSettings
         if (parameters.length > 2)
         {
             EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
-            CommandAttributes ca = CommandRegister.getCommand(parameters[2]);
-            if (ca == null)
+            ModuleAttributes ma = ModuleRegister.getModule(parameters[2]);
+            if (ma == null)
             {
-                ca = guildSettings.getCustomCommandAttributes(parameters[2].toLowerCase());
-                if (ca == null)
+                ma = guildSettings.getCustomCommandAttributes(parameters[2].toLowerCase());
+                if (ma == null)
                 {
                     embed.setDescription("Command "+parameters[2]+" not found.");
                     channel.sendMessage(embed.build()).queue();
@@ -61,7 +61,7 @@ public class ConfigCommandSettings
 
                             if (msgEvent.getMessage().getMentionedRoles().size() > 0)
                             {
-                                modifyRoles(embed, ca, roles.toString().trim(), msgEvent.getMessage().getMentionedRoles());
+                                modifyRoles(embed, ma, roles.toString().trim(), msgEvent.getMessage().getMentionedRoles());
                             }
                             else
                             {
@@ -69,7 +69,7 @@ public class ConfigCommandSettings
                                 {
                                     roles.append(parameters[i]).append(" ");
                                 }
-                                modifyRoles(embed, ca, roles.toString().trim());
+                                modifyRoles(embed, ma, roles.toString().trim());
                             }
                         }
                         else
@@ -80,11 +80,11 @@ public class ConfigCommandSettings
                     }
                     else if (commandTask.equals("enable"))
                     {
-                        modifyState(embed, ca, true);
+                        modifyState(embed, ma, true);
                     }
                     else if (commandTask.equals("disable"))
                     {
-                        modifyState(embed, ca, false);
+                        modifyState(embed, ma, false);
                     }
                     else
                     {
@@ -94,7 +94,7 @@ public class ConfigCommandSettings
                 }
                 else
                 {
-                    showMenu(ca, embed);
+                    showMenu(ma, embed);
                 }
             }
         }
@@ -106,7 +106,7 @@ public class ConfigCommandSettings
 
     public void getCommand(GuildMessageReceivedEvent msgEvent) throws IOException
     {
-        CommandAttributes ca;
+        ModuleAttributes ma;
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
         embed.setDescription("Please enter the command you would like to modify.");
         channel.sendMessage(embed.build()).queue();
@@ -116,10 +116,13 @@ public class ConfigCommandSettings
             Message msg = msgManager.getNextMessage(channel);
             if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
             {
-                if (!(((ca = CommandRegister.getCommand(msg.getContentDisplay())) == null) && ((ca = guildSettings.getCustomCommandAttributes(msg.getContentDisplay())) == null))) //Ensure CommandAttributes is not null
+                if (!(((ma = ModuleRegister.getModule(msg.getContentDisplay())) == null) && ((ma = guildSettings.getCustomCommandAttributes(msg.getContentDisplay())) == null))) //Ensure ModuleAttributes is not null
                 {
-                    showMenu(ca, embed);
-                    break;
+                    if (ma.getCommandClass() != null)
+                    {
+                        showMenu(ma, embed);
+                        break;
+                    }
                 }
                 else if (msg.getContentDisplay().equalsIgnoreCase("quit"))
                 {
@@ -134,11 +137,11 @@ public class ConfigCommandSettings
         }
     }
 
-    public void showMenu(CommandAttributes ca, EmbedBuilder embed) throws IOException
+    public void showMenu(ModuleAttributes ma, EmbedBuilder embed) throws IOException
     {
         while (true)
         {
-            embed.setDescription(getCommandProfile(ca));
+            embed.setDescription(getCommandProfile(ma));
             channel.sendMessage(embed.build()).queue();
 
             Message msg = msgManager.getNextMessage(channel);
@@ -149,20 +152,20 @@ public class ConfigCommandSettings
                 {
                     if (msg.getMentionedRoles().size() > 0)
                     {
-                        modifyRoles(embed, ca, request, msg.getMentionedRoles());
+                        modifyRoles(embed, ma, request, msg.getMentionedRoles());
                     }
                     else
                     {
-                        modifyRoles(embed, ca, request);
+                        modifyRoles(embed, ma, request);
                     }
                 }
                 else if (request.equals("enable"))
                 {
-                    modifyState(embed, ca, true);
+                    modifyState(embed, ma, true);
                 }
                 else if (request.equals("disable"))
                 {
-                    modifyState(embed, ca, false);
+                    modifyState(embed, ma, false);
                 }
                 else if (request.startsWith("quit"))
                 {
@@ -177,14 +180,14 @@ public class ConfigCommandSettings
         }
     }
 
-    private void modifyState(EmbedBuilder embed, CommandAttributes ca, boolean newState) throws IOException
+    private void modifyState(EmbedBuilder embed, ModuleAttributes ma, boolean newState) throws IOException
     {
-        guildSettings.setCommandConfiguration(newState, null, ca.getCommandKey());
-        embed.setDescription((newState) ? ca.getCommandKey()+" is now enabled." : ca.getCommandKey()+" is now disabled.");
+        guildSettings.setCommandConfiguration(newState, null, ma.getKey());
+        embed.setDescription((newState) ? ma.getKey()+" is now enabled." : ma.getKey()+" is now disabled.");
         channel.sendMessage(embed.build()).queue();
     }
 
-    private void modifyRoles(EmbedBuilder embed, CommandAttributes ca, String request, List<Role> roles) throws IOException
+    private void modifyRoles(EmbedBuilder embed, ModuleAttributes ma, String request, List<Role> roles) throws IOException
     {
         request = request.toLowerCase();
         ArrayList<String> roleIDs = new ArrayList<>();
@@ -195,17 +198,17 @@ public class ConfigCommandSettings
         boolean success = false;
         if (request.startsWith("addroles"))
         {
-            success = guildSettings.addPermissions(roleIDs, ca.getCommandKey());
+            success = guildSettings.addPermissions(roleIDs, ma.getKey());
         }
         else if (request.startsWith("removeroles"))
         {
-            success = guildSettings.removePermissions(roleIDs, ca.getCommandKey());
+            success = guildSettings.removePermissions(roleIDs, ma.getKey());
         }
-        embed.setDescription((success) ? "Roles have been updated for "+ca.getCommandKey()+"." : "No roles have been changed for "+ca.getCommandKey()+".");
+        embed.setDescription((success) ? "Roles have been updated for "+ma.getKey()+"." : "No roles have been changed for "+ma.getKey()+".");
         channel.sendMessage(embed.build()).queue();
     }
 
-    private void modifyRoles(EmbedBuilder embed, CommandAttributes ca, String request) throws IOException
+    private void modifyRoles(EmbedBuilder embed, ModuleAttributes ma, String request) throws IOException
     {
         request = request.toLowerCase();
         String requestedRoles = request.replace("addroles ", "").replace("removeroles ", "");
@@ -231,33 +234,26 @@ public class ConfigCommandSettings
         boolean success = false;
         if (request.startsWith("addroles"))
         {
-            success = guildSettings.addPermissions(roleIDs, ca.getCommandKey());
+            success = guildSettings.addPermissions(roleIDs, ma.getKey());
         }
         else if (request.startsWith("removeroles"))
         {
-            success = guildSettings.removePermissions(roleIDs, ca.getCommandKey());
+            success = guildSettings.removePermissions(roleIDs, ma.getKey());
         }
 
-        embed.setDescription((success) ? "Roles have been updated for "+ca.getCommandKey()+"." : "No roles have been changed for "+ca.getCommandKey()+".");
+        embed.setDescription((success) ? "Roles have been updated for "+ma.getKey()+"." : "No roles have been changed for "+ma.getKey()+".");
         channel.sendMessage(embed.build()).queue();
     }
 
-    private String getCommandProfile(CommandAttributes ca)
+    private String getCommandProfile(ModuleAttributes ma)
     {
         StringBuilder profileBuilder = new StringBuilder();
-        profileBuilder.append("**Command:** ").append(ca.getCommandKey()).append("\n");
-        profileBuilder.append("**Description:** ").append(ca.getDescription()).append("\n");
-        profileBuilder.append("**Enabled:** ");
-        if (guildSettings.isCommandEnabled(ca.getCommandKey()))
-        {
-            profileBuilder.append("Yes\n");
-        }
-        else
-        {
-            profileBuilder.append("No\n");
-        }
+        profileBuilder.append("**Command:** ").append(ma.getKey()).append("\n");
+        profileBuilder.append("**Description:** ").append(ma.getDescription()).append("\n");
+        profileBuilder.append("**Configurable:** ").append((ma.getConfigClass() != null) ? "Yes" : "No").append("\n");
+        profileBuilder.append("**Enabled:** ").append((guildSettings.isCommandEnabled(ma.getKey())) ? "Yes" : "No").append("\n");
         profileBuilder.append("**Roles:** ");
-        for (String roleID : guildSettings.getPermissions(ca.getCommandKey()))
+        for (String roleID : guildSettings.getPermissions(ma.getKey()))
         {
             Role role = channel.getGuild().getRoleById(roleID);
             if (role != null)
