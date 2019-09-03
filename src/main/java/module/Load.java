@@ -1,4 +1,4 @@
-package commands;
+package module;
 
 /**
  * A class to identify methods to run when the module is first loaded

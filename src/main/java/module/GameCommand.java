@@ -1,5 +1,6 @@
-package commands;
+package module;
 
+import commands.CmdUtil;
 import configuration.GuildSettings;
 import configuration.SettingsUtil;
 import net.dv8tion.jda.core.EmbedBuilder;

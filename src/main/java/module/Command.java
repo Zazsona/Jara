@@ -1,4 +1,4 @@
-package commands;
+package module;
 
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 

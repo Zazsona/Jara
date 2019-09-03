@@ -1,12 +1,14 @@
 package jara;
 
 import com.google.gson.Gson;
-import commands.Command;
-import commands.Load;
+import module.Command;
+import module.Load;
 import commands.Help;
 import configuration.SettingsUtil;
 import exceptions.ConflictException;
 import exceptions.InvalidModuleException;
+import module.ModuleConfig;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +38,7 @@ public class ModuleManager
     /**
      * The collection of classes to be run during program boot
      */
-    private static HashMap<Class<? extends Load>, JarFile> onLoadClasses;
+    private static HashMap<JarFile, Class<? extends Load>> onLoadClasses;
 
     /**
      * The number of issues that will not impact operations
@@ -49,17 +51,17 @@ public class ModuleManager
 
 
     /**
-     * Parses through each jar within the modules folder and gathers its {@link CommandAttributes}.
-     * @return the list of {@link CommandAttributes}
+     * Parses through each jar within the modules folder and gathers its {@link ModuleAttributes}.
+     * @return the list of {@link ModuleAttributes}
      * @throws InvalidModuleException one or more fatal errors occurred during module loading
      */
-    public static LinkedList<CommandAttributes> loadModules(ArrayList<CommandAttributes> register) throws InvalidModuleException
+    public static synchronized LinkedList<ModuleAttributes> loadModules(ArrayList<ModuleAttributes> register) throws InvalidModuleException
     {
         onLoadClasses = new HashMap<>();
         reservedAliases = new HashSet<>();
-        LinkedList<CommandAttributes> cas = new LinkedList<>();
+        LinkedList<ModuleAttributes> moduleAttributes = new LinkedList<>();
 
-        for (CommandAttributes inBuiltCA : register)
+        for (ModuleAttributes inBuiltCA : register)
         {
             //Adds all in-built aliases so modules can't try and claim these.
             reservedAliases.addAll(Arrays.asList(inBuiltCA.getAliases()));
@@ -75,11 +77,11 @@ public class ModuleManager
             {
                 if (file.isFile() && file.getName().endsWith(".jar"))
                 {
-                    CommandAttributes ca = loadModule(file.getPath());
-                    if (ca != null)
+                    ModuleAttributes ma = loadModule(file.getPath());
+                    if (ma != null)
                     {
-                        cas.add(ca);
-                        reservedAliases.addAll(Arrays.asList(ca.getAliases()));
+                        moduleAttributes.add(ma);
+                        reservedAliases.addAll(Arrays.asList(ma.getAliases()));
                     }
                 }
             }
@@ -89,7 +91,7 @@ public class ModuleManager
                 errors++;
             }
         }
-        for (Class<? extends Load> c : onLoadClasses.keySet())
+        for (Class<? extends Load> c : onLoadClasses.values())
         {
             Thread loadThread = new Thread(() ->
                        {
@@ -109,137 +111,151 @@ public class ModuleManager
         }
         if (errors <= 0)
         {
-            logger.info("Loaded "+cas.size()+" modules. ("+warnings+" warnings)");
-            return cas;
+            logger.info("Loaded "+moduleAttributes.size()+" modules. ("+warnings+" warnings)");
+            return moduleAttributes;
         }
         else
         {
-            throw new InvalidModuleException("Attempted to load "+cas.size()+" modules, but failed. ("+errors+" errors) ("+warnings+" warnings)");
+            throw new InvalidModuleException("Attempted to load "+moduleAttributes.size()+" modules, but failed. ("+errors+" errors) ("+warnings+" warnings)");
         }
     }
 
     /**
-     * Gets the {@link CommandAttributes} for the specified jar.
+     * Gets the {@link ModuleAttributes} for the specified jar.
      * @param jarPath the jar to analyse
      * @return the attributes of the command in the module, or null if unavailable
      * @throws ClassNotFoundException jar layout is invalid
      * @throws IOException unable to access jar
      * @throws ConflictException unable to resolve pact conflicts
      */
-    private static CommandAttributes loadModule(String jarPath) throws ClassNotFoundException, IOException, ConflictException
+    private static ModuleAttributes loadModule(String jarPath) throws ClassNotFoundException, IOException, ConflictException
     {
-        CommandAttributes ca = null;
         JarFile jarFile = new JarFile(jarPath);
         Enumeration<JarEntry> entries = jarFile.entries();
 
         URL[] urls = {new URL("jar:file:" + jarPath + "!/")};
         URLClassLoader cl = URLClassLoader.newInstance(urls);
 
-        JarEntry jarPact = jarFile.getJarEntry("pact.json");
-
-        while (entries.hasMoreElements())
+        ModuleAttributes ma = loadClasses(jarFile, cl, entries);
+        if (ma == null)
         {
-            JarEntry jarEntry = entries.nextElement();
-            if (jarEntry.getName().endsWith(".class"))
+            if (onLoadClasses.get(jarFile) == null)
             {
-                ca = loadClass(ca, jarFile, cl, jarPact, jarEntry);
+                warnings++;
+                logger.warn(formatJarName(jarFile) + " has no pact or load class. It cannot directly communicate with Jara.");
             }
-            //TODO: It's possible to load in files from a module's resources using Java 7's FileSystem, however, this will require an external process.
+        }
+        else if (ma.getCommandClass() == null && ma.getLoadClass() == null && ma.getConfigClass() == null)
+        {
+            warnings++;
+            logger.warn(formatJarName(jarFile)+" is a useless module. It has a pact, but no functionality.");
+        }
+        else if (ma.getCommandClass() != null && ma.getHelpPage().equals(new Help.HelpPage()))
+        {
+            warnings++;
+            logger.warn(formatJarName(jarFile)+" has a command, but does not provide a help page.");
+        }
+        else if (!Core.getSupportedVersions().contains(ma.getTargetVersion()))
+        {
+            warnings++;
+            logger.warn(ma.getKey()+" is built for unsupported Jara version: "+ma.getTargetVersion()+". It may not function as intended, please update for full support with Jara "+Core.getVersion()+".");
+        }
+        else
+        {
+            //logger.info("Successfully loaded "+ formatJarName(jarFile));
+        }
+        return ma;
+    }
 
-        }
-        if (ca != null && jarPact == null)
-        {
-            warnings++;
-            throw new ClassNotFoundException(jarFile.getName() + " has no pact.");
-        }
-        else if (ca == null && jarPact != null) //If no Command class is found...
-        {
-            warnings++;
-            throw new ClassNotFoundException(jarFile.getName()+" has no entry point associated with the pact. (That is, a class that extends Command)");
-        }
-        return ca;
+    @NotNull
+    private static String formatJarName(JarFile jarFile)
+    {
+        return jarFile.getName().substring(jarFile.getName().lastIndexOf("\\")+1).replace(".jar", "");
     }
 
     /**
      * Loads a class from the specified module setup
-     * @param ca the command attributes associated with this module setup
      * @param jarFile the module's jar
      * @param cl the classloader
-     * @param jarPact the module's pact
-     * @param jarEntry the class' jar entry
      * @return potentially modified CommandAttributes
      * @throws ClassNotFoundException
      * @throws IOException
      * @throws ConflictException
      */
-    private static CommandAttributes loadClass(CommandAttributes ca, JarFile jarFile, URLClassLoader cl, JarEntry jarPact, JarEntry jarEntry) throws ClassNotFoundException, IOException, ConflictException
+    private static ModuleAttributes loadClasses(JarFile jarFile, URLClassLoader cl, Enumeration<JarEntry> jarEntries) throws ClassNotFoundException, IOException, ConflictException
+    {
+        JarEntry jarPact = jarFile.getJarEntry("pact.json");
+        ModuleAttributes ma = getAttributesInPact(jarFile, jarPact);
+        loadHelpPage(ma, jarFile);
+        while (jarEntries.hasMoreElements())
+        {
+            JarEntry jarEntry = jarEntries.nextElement();
+            if (jarEntry.getName().endsWith(".class"))
+            {
+                loadClass(jarFile, cl, ma, jarEntry);
+            }
+            //TODO: It's possible to load in files from a module's resources using Java 7's FileSystem, however, this will require an external process.
+
+        }
+        return ma;
+    }
+
+    private static void loadClass(JarFile jarFile, URLClassLoader cl, ModuleAttributes ma, JarEntry jarEntry) throws ClassNotFoundException, IOException
     {
         String className = jarEntry.getName().substring(0, jarEntry.getName().length() - 6);
         className = className.replace("/", ".");
         Class c = cl.loadClass(className);
 
-        if (Command.class.isAssignableFrom(c) && jarPact != null)
+        if (ma != null)
         {
-            CommandAttributes pactCA = getAttributesInPact(jarFile, jarPact);
-            ca = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), c, pactCA.getAliases(), pactCA.getCategory(), pactCA.getTargetVersion(), true);
-
-            if (!Core.getSupportedVersions().contains(ca.getTargetVersion()))
+            if (Command.class.isAssignableFrom(c))
             {
-                warnings++;
-                logger.info(ca.getCommandKey()+" is built for unsupported Jara version: "+ca.getTargetVersion()+". It may not function as intended, please update for full support with Jara "+Core.getVersion()+".");
+                ma.setCommandClass(c);
             }
-
-            JarEntry jarHelp = jarFile.getJarEntry("help.json"); //We only load help after identifying it's a command
-            if (jarHelp != null)
+            if (ModuleConfig.class.isAssignableFrom(c))
             {
-                for (String alias : ca.getAliases())
-                {
-                    Help.addPage(alias.toLowerCase(), getHelpPage(jarFile, jarHelp));
-                }
-            }
-            else
-            {
-                for (String alias : ca.getAliases())
-                {
-                    Help.addPage(alias.toLowerCase(), new Help.HelpPage()); //Default values
-                }
-                logger.info(jarFile.getName()+" has no help page.");
-                warnings++;
+                ma.setConfigClass(c);
             }
         }
         if (Load.class.isAssignableFrom(c))
         {
-            onLoadClasses.put(c, jarFile);
+            onLoadClasses.put(jarFile, c);
+            if (ma != null)
+            {
+                ma.setLoadClass(c);
+            }
         }
-        return ca;
+    }
+
+    private static void loadHelpPage(ModuleAttributes ma, JarFile jarFile) throws IOException
+    {
+        JarEntry jarHelp = jarFile.getJarEntry("help.json");
+        if (jarHelp != null && ma != null)
+        {
+            Gson gson = new Gson();
+            ma.setHelpPage(gson.fromJson(getJson(jarFile, jarHelp), Help.HelpPage.class));
+        }
     }
 
     /**
-     * Gets the non-conflicting attributes defined in the pact file and converts them to {@link CommandAttributes}.
+     * Gets the non-conflicting attributes defined in the pact file and converts them to {@link ModuleAttributes}.
      * @param jarFile the jar of the module
      * @param jarPact the pact
-     * @return the {@link CommandAttributes} defined in the pact, where the class will be null.
+     * @return the {@link ModuleAttributes} defined in the pact, where the class will be null.
      * @throws IOException unable to access pact
      * @throws ConflictException unable to resolve conflicts
      */
-    private static CommandAttributes getAttributesInPact(JarFile jarFile, JarEntry jarPact) throws IOException, ConflictException
+    private static ModuleAttributes getAttributesInPact(JarFile jarFile, JarEntry jarPact) throws IOException, ConflictException
     {
-        Gson gson = new Gson();
-        CommandAttributes pactCA = gson.fromJson(getJson(jarFile, jarPact), CommandAttributes.class);
-        return resolveConflicts(jarFile, pactCA);
-    }
-
-    /**
-     * Gets the help page for the module
-     * @param jarFile the jar of the module
-     * @param jarHelp the help file
-     * @return the {@link Help.HelpPage} from the file
-     * @throws IOException unable to access file
-     */
-    private static Help.HelpPage getHelpPage(JarFile jarFile, JarEntry jarHelp) throws IOException
-    {
-        Gson gson = new Gson();
-        return gson.fromJson(getJson(jarFile, jarHelp), Help.HelpPage.class);
+        if (jarPact != null)
+        {
+            ModuleAttributes ma = new ModuleAttributes(getJson(jarFile, jarPact));
+            return resolveConflicts(jarFile, ma);
+        }
+        else
+        {
+            return null;
+        }
     }
 
     /**
@@ -266,43 +282,40 @@ public class ModuleManager
      * Attempts to resolve any conflicts with the aliases in the pact.<br>
      *     Key conflicts cannot be resolved, as these must be unique.
      * @param jarFile the jar file of the module
-     * @param pactCA the command attributes in the pact
+     * @param moduleAttributes the command attributes in the pact
      * @return the resolved command attributes with a null class.
      * @throws ConflictException unable to resolve conflicts
      */
-    private static CommandAttributes resolveConflicts(JarFile jarFile, CommandAttributes pactCA) throws ConflictException
+    private static ModuleAttributes resolveConflicts(JarFile jarFile, ModuleAttributes moduleAttributes) throws ConflictException
     {
-        if (!Collections.disjoint(reservedAliases, Arrays.asList(pactCA.getAliases()))) //Fucking arrays.
+        if (!Collections.disjoint(reservedAliases, Arrays.asList(moduleAttributes.getAliases()))) //Fucking arrays.
         {
-            if (reservedAliases.contains(pactCA.getCommandKey()))
+            if (reservedAliases.contains(moduleAttributes.getKey()))
             {
-                errors++;
-                throw new ConflictException(jarFile.getName()+" has a conflicting key: "+pactCA.getCommandKey()+". It cannot be used.");
+                throw new ConflictException(formatJarName(jarFile)+" has a conflicting key: "+moduleAttributes.getKey()+". It cannot be used.");
             }
             else    //TODO: One possible idea here is to remove the aliases from the modules that will end up with the highest quantity. However, this is an expensive operation as there may be many modules with conflicting aliases, which need to be searched for.
             {
-                logger.info(jarFile.getName()+" has overlapping aliases in the pact:");
+                logger.info(formatJarName(jarFile)+" has overlapping aliases in the pact:");
                 ArrayList<String> aliases = new ArrayList<>();
-                for (String alias : pactCA.getAliases())
+                for (String alias : moduleAttributes.getAliases())
                 {
-                    if (!reservedAliases.contains(alias))
+                    if (!moduleAttributes.getKey().equalsIgnoreCase(alias))
                     {
-                        aliases.add(alias);
-                    }
-                    else
-                    {
-                        logger.info(alias);
+                        if (!reservedAliases.contains(alias))
+                        {
+                            aliases.add(alias);
+                        }
+                        else
+                        {
+                            logger.info(alias);
+                        }
                     }
                 }
-                logger.info("These will be ignored from "+jarFile.getName());
-                if (aliases.size() == 0)
-                {
-                    errors++;
-                    throw new ConflictException(jarFile.getName()+" has NO non-conflicting aliases. It cannot be run.");
-                }
-                pactCA = new CommandAttributes(pactCA.getCommandKey(), pactCA.getDescription(), null, aliases.toArray(pactCA.getAliases()), pactCA.getCategory(), pactCA.getTargetVersion(), true);
+                logger.info("These will be ignored from "+formatJarName(jarFile));
+                moduleAttributes = new ModuleAttributes(moduleAttributes.getKey(), moduleAttributes.getDescription(), aliases.toArray(new String[0]), moduleAttributes.getCategory(), moduleAttributes.getTargetVersion(), true);
             }
         }
-        return pactCA;
+        return moduleAttributes;
     }
 }
