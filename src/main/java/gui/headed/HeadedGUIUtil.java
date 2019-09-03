@@ -71,6 +71,7 @@ public class HeadedGUIUtil extends Application
         catch (IOException e)
         {
             logger.error(e.toString());
+            e.printStackTrace();
         }
     }
 

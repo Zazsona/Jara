@@ -1,8 +1,8 @@
 package gui.headed;
 
 import configuration.SettingsUtil;
-import jara.CommandAttributes;
-import jara.CommandRegister;
+import jara.ModuleAttributes;
+import jara.ModuleRegister;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -18,7 +18,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static jara.CommandRegister.Category.*;
+import static jara.ModuleRegister.Category.*;
 
 public class CommandConfigSetup
 {
@@ -97,7 +97,7 @@ public class CommandConfigSetup
         utilityCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(utilityCategoryCheckBox, UTILITY));
         seasonalCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(seasonalCategoryCheckBox, SEASONAL));
 
-        for (CommandAttributes ca : CommandRegister.getRegister())
+        for (ModuleAttributes ma : ModuleRegister.getModules())
         {
             Pane topSpacePane = new Pane();
             topSpacePane.setMinHeight(5);
@@ -108,25 +108,25 @@ public class CommandConfigSetup
             bottomSpacePane.setMaxHeight(topSpacePane.getMaxHeight());
             bottomSpacePane.setPrefHeight(topSpacePane.getPrefHeight());
 
-            switch (ca.getCategory())
+            switch (ma.getCategory())
             {
                 case GAMES:
-                    gamesList.getChildren().addAll(topSpacePane, generateCommandListElement(ca), bottomSpacePane);
+                    gamesList.getChildren().addAll(topSpacePane, generateCommandListElement(ma), bottomSpacePane);
                     break;
                 case UTILITY:
-                    utilityList.getChildren().addAll(topSpacePane, generateCommandListElement(ca), bottomSpacePane);
+                    utilityList.getChildren().addAll(topSpacePane, generateCommandListElement(ma), bottomSpacePane);
                     break;
                 case TOYS:
-                    toysList.getChildren().addAll(topSpacePane, generateCommandListElement(ca), bottomSpacePane);
+                    toysList.getChildren().addAll(topSpacePane, generateCommandListElement(ma), bottomSpacePane);
                     break;
                 case AUDIO:
-                    audioList.getChildren().addAll(topSpacePane, generateCommandListElement(ca), bottomSpacePane);
+                    audioList.getChildren().addAll(topSpacePane, generateCommandListElement(ma), bottomSpacePane);
                     break;
                 case ADMIN:
-                    adminList.getChildren().addAll(topSpacePane, generateCommandListElement(ca), bottomSpacePane);
+                    adminList.getChildren().addAll(topSpacePane, generateCommandListElement(ma), bottomSpacePane);
                     break;
                 case SEASONAL:
-                    seasonalList.getChildren().addAll(topSpacePane, generateCommandListElement(ca), bottomSpacePane);
+                    seasonalList.getChildren().addAll(topSpacePane, generateCommandListElement(ma), bottomSpacePane);
                     break;
             }
         }
@@ -141,11 +141,11 @@ public class CommandConfigSetup
     }
 
     /**
-     * This method will add the required fields onto the menu for the passed command, allowing the user to view and select it.
-     * @param commandAttributes
+     * This method will add the required fields onto the menu for the passed module, allowing the user to view and select it.
+     * @param moduleAttributes
      * @return
      */
-    private BorderPane generateCommandListElement(CommandAttributes commandAttributes)
+    private BorderPane generateCommandListElement(ModuleAttributes moduleAttributes)
     {
         BorderPane bp = new BorderPane();
         Pane topPane = new Pane();
@@ -162,11 +162,11 @@ public class CommandConfigSetup
         bp.setBottom(bottomPane);
         CheckBox checkBox = new CheckBox();
         checkBox.setSelected(true);
-        if (SettingsUtil.getGlobalSettings().getCommandConfigMap() != null) //Restore from existing config (if possible)
+        if (SettingsUtil.getGlobalSettings().getModuleConfigMap() != null) //Restore from existing config (if possible)
         {
             try
             {
-                checkBox.setSelected(SettingsUtil.getGlobalSettings().getCommandConfigMap().get(commandAttributes.getCommandKey()));
+                checkBox.setSelected(SettingsUtil.getGlobalSettings().getModuleConfigMap().get(moduleAttributes.getKey()));
             }
             catch (NullPointerException e) //New command
             {
@@ -174,22 +174,22 @@ public class CommandConfigSetup
             }
         }
 
-        if (!commandAttributes.isDisableable())
+        if (!moduleAttributes.isDisableable())
         {
             checkBox.setDisable(true);
         }
-        checkBox.setId(commandAttributes.getCommandKey()+"CheckBox");
+        checkBox.setId(moduleAttributes.getKey()+"CheckBox");
         bp.setRight(checkBox);
         bp.setAlignment(checkBox, Pos.CENTER);
         VBox vbox = new VBox();
-        String key = (commandAttributes.getCommandKey().length() > 22) ? commandAttributes.getCommandKey().substring(0, 19)+"..." : commandAttributes.getCommandKey();
+        String key = (moduleAttributes.getKey().length() > 22) ? moduleAttributes.getKey().substring(0, 19)+"..." : moduleAttributes.getKey();
         Text nameText = new Text(key);
-        String description = (commandAttributes.getDescription().length() > 30) ? commandAttributes.getDescription().substring(0, 27)+"..." : commandAttributes.getDescription();
+        String description = (moduleAttributes.getDescription().length() > 30) ? moduleAttributes.getDescription().substring(0, 27)+"..." : moduleAttributes.getDescription();
         Text descText = new Text(description);
         nameText.setFont(new Font("System", 12));
         nameText.setStyle("-fx-font-weight: bold;");
         nameText.setFill(Paint.valueOf("#FFFFFF"));
-        nameText.setId(commandAttributes.getCommandKey()+"Title");
+        nameText.setId(moduleAttributes.getKey()+"Title");
         descText.setFont(new Font("System", 12));
         descText.setFill(Paint.valueOf("#FFFFFF"));
         vbox.getChildren().addAll(nameText, descText);
@@ -199,15 +199,15 @@ public class CommandConfigSetup
     }
 
     /**
-     * This method will have all commands in the category match the check box's state
+     * This method will have all modules in the category match the check box's state
      * @param categoryCheckBox
      * @param categoryID
      */
-    private void toggleCategory(CheckBox categoryCheckBox, CommandRegister.Category categoryID)
+    private void toggleCategory(CheckBox categoryCheckBox, ModuleRegister.Category categoryID)
     {
-        for (CommandAttributes ca : CommandRegister.getCommandsInCategory(categoryID))
+        for (ModuleAttributes ma : ModuleRegister.getModulesInCategory(categoryID))
         {
-            CheckBox checkBox = (CheckBox) ccSetupScreen.lookup("#" + ca.getCommandKey() + "CheckBox");
+            CheckBox checkBox = (CheckBox) ccSetupScreen.lookup("#" + ma.getKey() + "CheckBox");
             if (!checkBox.isDisabled())
             {
                 checkBox.setSelected(categoryCheckBox.isSelected());
@@ -219,16 +219,16 @@ public class CommandConfigSetup
      * Retrives category IDs where at least one command is enabled.
      * @return
      */
-    public ArrayList<CommandRegister.Category> getSupportedCategories()
+    public ArrayList<ModuleRegister.Category> getSupportedCategories()
     {
-        ArrayList<CommandRegister.Category> supportedCategories = new ArrayList<>();
-        for (CommandAttributes ca : CommandRegister.getRegister())
+        ArrayList<ModuleRegister.Category> supportedCategories = new ArrayList<>();
+        for (ModuleAttributes ma : ModuleRegister.getModules())
         {
-            if (!supportedCategories.contains(ca.getCategory()) && ca.getCategory() != NOGROUP)
+            if (!supportedCategories.contains(ma.getCategory()) && ma.getCategory() != NOGROUP)
             {
-                if (((CheckBox) ccSetupScreen.lookup("#"+ca.getCommandKey()+"CheckBox")).isSelected())
+                if (((CheckBox) ccSetupScreen.lookup("#"+ma.getKey()+"CheckBox")).isSelected())
                 {
-                    supportedCategories.add(ca.getCategory());
+                    supportedCategories.add(ma.getCategory());
                 }
             }
         }
@@ -236,26 +236,26 @@ public class CommandConfigSetup
     }
 
     /**
-     * Returns the selected commands as a CommandConfig compatible with GlobalSettings.
+     * Returns the selected modules as a config compatible with GlobalSettings.
      * @return
      */
-    public HashMap<String, Boolean> getCommandConfig()
+    public HashMap<String, Boolean> getModuleConfig()
     {
-        HashMap<String, Boolean> commandConfig = new HashMap<>();
+        HashMap<String, Boolean> moduleConfig = new HashMap<>();
 
-        for (CommandAttributes ca : CommandRegister.getRegister())
+        for (ModuleAttributes ma : ModuleRegister.getModules())
         {
-            if (CommandRegister.getCommand(ca.getCommandKey()).getCategory() != NOGROUP)
+            if (ModuleRegister.getModule(ma.getKey()).getCategory() != NOGROUP)
             {
-                commandConfig.put(ca.getCommandKey(), ((CheckBox) ccSetupScreen.lookup("#"+ca.getCommandKey()+"CheckBox")).isSelected());
+                moduleConfig.put(ma.getKey(), ((CheckBox) ccSetupScreen.lookup("#"+ma.getKey()+"CheckBox")).isSelected());
             }
             else
             {
-                commandConfig.put(ca.getCommandKey(), true);
+                moduleConfig.put(ma.getKey(), true);
             }
 
         }
-        return commandConfig;
+        return moduleConfig;
     }
 
     /**

@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.shape.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.effect.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.*?>
+
 <VBox fx:id="ccSetupScreen" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.headed.CommandConfigSetup">
    <children>
       <BorderPane fx:id="titleBar" maxHeight="80.0" minHeight="80.0" prefHeight="80.0" prefWidth="1280.0" style="-fx-background-color: #23272A;">
@@ -103,7 +106,7 @@
       <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" prefHeight="9000.0" prefWidth="1280.0" style="-fx-background-color: #36393F;">
          <children>
             <Pane maxHeight="16.0" minHeight="10.0" prefHeight="16.0" prefWidth="1280.0" />
-            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Select which commands you would like to be enabled below.">
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Select which modules you would like to be enabled below.">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>
@@ -146,7 +149,7 @@
                                                             <Font name="System Bold" size="12.0" />
                                                          </font>
                                                       </Text>
-                                                      <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggles all modifiable commands" />
+                                                      <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggles all modifiable modules" />
                                                    </children>
                                                 </VBox>
                                              </center>
@@ -227,7 +230,7 @@
                                                             <Font name="System Bold" size="12.0" />
                                                          </font>
                                                       </Text>
-                                                      <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggles all modifiable commands" />
+                                                      <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggles all modifiable modules" />
                                                    </children>
                                                 </VBox>
                                              </center>
@@ -308,7 +311,7 @@
                                                             <Font name="System Bold" size="12.0" />
                                                          </font>
                                                       </Text>
-                                                      <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggles all modifiable commands" />
+                                                      <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggles all modifiable modules" />
                                                    </children>
                                                 </VBox>
                                              </center>
@@ -389,7 +392,7 @@
                                                             <Font name="System Bold" size="12.0" />
                                                          </font>
                                                       </Text>
-                                                      <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggles all modifiable commands" />
+                                                      <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggles all modifiable modules" />
                                                    </children>
                                                 </VBox>
                                              </center>
@@ -470,7 +473,7 @@
                                                             <Font name="System Bold" size="12.0" />
                                                          </font>
                                                       </Text>
-                                                      <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggles all modifiable commands" />
+                                                      <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggles all modifiable modules" />
                                                    </children>
                                                 </VBox>
                                              </center>
@@ -551,7 +554,7 @@
                                                             <Font name="System Bold" size="12.0" />
                                                          </font>
                                                       </Text>
-                                                      <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggles all modifiable commands" />
+                                                      <Text fill="#a8a8a8" strokeType="OUTSIDE" strokeWidth="0.0" text="Toggles all modifiable modules" />
                                                    </children>
                                                 </VBox>
                                              </center>

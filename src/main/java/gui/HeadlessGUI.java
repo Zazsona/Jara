@@ -141,18 +141,18 @@ public class HeadlessGUI
 //        }
 //    }
 //
-//    private static void printGlobalConfig(JsonFormats.GlobalCommandConfigJson[] commandConfig)
+//    private static void printGlobalConfig(JsonFormats.GlobalCommandConfigJson[] moduleConfig)
 //    {
 //        ArrayList<String> games = new ArrayList<String>();
 //        ArrayList<String> toys = new ArrayList<String>();
 //        ArrayList<String> utility = new ArrayList<String>();
 //        ArrayList<String> audio = new ArrayList<String>();
 //        ArrayList<String> admin = new ArrayList<String>();
-//        for (JsonFormats.GlobalCommandConfigJson aCommandConfig : commandConfig)
+//        for (JsonFormats.GlobalCommandConfigJson aCommandConfig : moduleConfig)
 //        {
-//            if (CommandRegister.getCommand(aCommandConfig.getCommandKey()).isDisableable())
+//            if (CommandRegister.getModule(aCommandConfig.getKey()).isDisableable())
 //            {
-//                int category = CommandRegister.getCommand(aCommandConfig.getCommandKey()).getCategoryID();
+//                int category = CommandRegister.getModule(aCommandConfig.getKey()).getCategoryID();
 //                switch (category)
 //                {
 //                    case CommandRegister.NOGROUP:
@@ -162,27 +162,27 @@ public class HeadlessGUI
 //                    }
 //                    case CommandRegister.GAMES:
 //                    {
-//                        games.add(aCommandConfig.getCommandKey() + " :: " + aCommandConfig.isEnabled());
+//                        games.add(aCommandConfig.getKey() + " :: " + aCommandConfig.isEnabled());
 //                        break;
 //                    }
 //                    case CommandRegister.TOYS:
 //                    {
-//                        toys.add(aCommandConfig.getCommandKey() + " :: " + aCommandConfig.isEnabled());
+//                        toys.add(aCommandConfig.getKey() + " :: " + aCommandConfig.isEnabled());
 //                        break;
 //                    }
 //                    case CommandRegister.UTILITY:
 //                    {
-//                        utility.add(aCommandConfig.getCommandKey() + " :: " + aCommandConfig.isEnabled());
+//                        utility.add(aCommandConfig.getKey() + " :: " + aCommandConfig.isEnabled());
 //                        break;
 //                    }
 //                    case CommandRegister.AUDIO:
 //                    {
-//                        audio.add(aCommandConfig.getCommandKey() + " :: " + aCommandConfig.isEnabled());
+//                        audio.add(aCommandConfig.getKey() + " :: " + aCommandConfig.isEnabled());
 //                        break;
 //                    }
 //                    case CommandRegister.ADMIN:
 //                    {
-//                        admin.add(aCommandConfig.getCommandKey() + " :: " + aCommandConfig.isEnabled());
+//                        admin.add(aCommandConfig.getKey() + " :: " + aCommandConfig.isEnabled());
 //                        break;
 //                    }
 //                }

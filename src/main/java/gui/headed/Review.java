@@ -2,7 +2,7 @@ package gui.headed;
 
 import configuration.SettingsUtil;
 import gui.HeadedGUI;
-import jara.CommandRegister;
+import jara.ModuleRegister;
 import jara.Core;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -83,9 +83,9 @@ public class Review
         CommandConfigSetup ccSetup = HeadedGUIUtil.getCcSetupController();
 
         StringBuilder supportListBuilder = new StringBuilder();
-        for (CommandRegister.Category id : ccSetup.getSupportedCategories())
+        for (ModuleRegister.Category id : ccSetup.getSupportedCategories())
         {
-            supportListBuilder.append(CommandRegister.getCategoryName(id)).append("\n");
+            supportListBuilder.append(ModuleRegister.getCategoryName(id)).append("\n");
         }
         supportListLbl.setText(supportListBuilder.toString());
 
@@ -159,7 +159,7 @@ public class Review
             else
             {
                 SettingsUtil.getGlobalSettings().setToken(token);
-                SettingsUtil.getGlobalSettings().setCommandConfigMap(HeadedGUIUtil.getCcSetupController().getCommandConfig());
+                SettingsUtil.getGlobalSettings().setModuleConfigMap(HeadedGUIUtil.getCcSetupController().getModuleConfig());
                 if (!invitePressed) //Just so we don't have a useless bot running...
                 {
                     while (generateInviteLink(false).equals(""));
