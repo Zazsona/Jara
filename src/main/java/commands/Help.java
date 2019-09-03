@@ -2,8 +2,9 @@ package commands;
 
 import configuration.GuildSettings;
 import configuration.SettingsUtil;
-import jara.CommandAttributes;
-import jara.CommandRegister;
+import jara.ModuleAttributes;
+import jara.ModuleRegister;
+import module.Command;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
@@ -22,10 +23,6 @@ public class Help extends Command
      * The settings for this guild
      */
     private GuildSettings guildSettings;
-    /**
-     * A static map holding all of the {@link HelpPage}s recorded. Indexed by command key
-     */
-    private static HashMap<String, HelpPage> pageMap = new HashMap<>();
 
     /**
      * Layout for help pages, where params lists the various call parameters, and description provides detailed information about the command.
@@ -55,20 +52,6 @@ public class Help extends Command
             this.description = "No information has been provided for this command.";
         }
 
-    }
-
-    /**
-     * This method adds a page to the HelpPage map
-     * @param alias the alias to provide help for
-     * @param hp the {@link HelpPage} to associated with it
-     * @throws IllegalArgumentException alias already registered
-     */
-    public static void addPage(String alias, HelpPage hp)
-    {
-        if (pageMap.put(alias.toLowerCase(), hp) != null)
-        {
-            throw new IllegalArgumentException("Key "+alias+" has already been set.");
-        }
     }
 
     @Override
@@ -109,7 +92,7 @@ public class Help extends Command
      */
     private EmbedBuilder getPage(GuildMessageReceivedEvent msgEvent, String[] parameters, EmbedBuilder embed)
     {
-        CommandRegister.Category category = getCategory(parameters[1]);
+        ModuleRegister.Category category = getCategory(parameters[1]);
         boolean limitToPerms = !(msgEvent.getMember().isOwner() | (parameters.length >= 3 && parameters[2].equalsIgnoreCase("all")));
         if (category != null)
         {
@@ -117,21 +100,24 @@ public class Help extends Command
             /*
                 Get commands from all sources
              */
-            for (CommandAttributes ca : CommandRegister.getCommandsInCategory(category))
+            for (ModuleAttributes ma : ModuleRegister.getModulesInCategory(category))
             {
-                if (SettingsUtil.getGlobalSettings().isCommandEnabled(ca.getCommandKey()) && guildSettings.isCommandEnabled(ca.getCommandKey()))
+                if (ma.getCommandClass() != null)
                 {
-                    if (!limitToPerms || guildSettings.isPermitted(msgEvent.getMember(), ca.getCommandKey()))
-                        commandInfo.add("**"+ca.getCommandKey()+"** - "+ca.getDescription());
+                    if (SettingsUtil.getGlobalSettings().isModuleEnabled(ma.getKey()) && guildSettings.isCommandEnabled(ma.getKey()))
+                    {
+                        if (!limitToPerms || guildSettings.isPermitted(msgEvent.getMember(), ma.getKey()))
+                            commandInfo.add("**"+ma.getKey()+"** - "+ma.getDescription());
+                    }
                 }
             }
             for (String key : guildSettings.getCustomCommandMap().keySet())
             {
-                CommandAttributes ca = guildSettings.getCustomCommandAttributes(key);
+                ModuleAttributes ma = guildSettings.getCustomCommandAttributes(key);
                 if (guildSettings.getCustomCommandAttributes(key).getCategory() == category)
                 {
                     if (!limitToPerms || guildSettings.isPermitted(msgEvent.getMember(), key))
-                        commandInfo.add("**"+key+"** - "+ca.getDescription());
+                        commandInfo.add("**"+key+"** - "+ma.getDescription());
                 }
             }
             commandInfo.sort(Comparator.naturalOrder());
@@ -185,12 +171,13 @@ public class Help extends Command
             By not doing the check here they can still find out about the other commands when seeing them be used.
          */
 
-        HelpPage helpPage = pageMap.get(alias);
+        ModuleAttributes moduleAttributes = ModuleRegister.getModule(alias);
+        HelpPage helpPage = moduleAttributes.getHelpPage();
         if (helpPage != null)
         {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("__Aliases__\n");
-            for (String otherAlias : CommandRegister.getCommand(alias).getAliases())
+            for (String otherAlias : moduleAttributes.getAliases())
             {
                 stringBuilder.append(otherAlias).append(", ");
             }
@@ -207,24 +194,23 @@ public class Help extends Command
             {
                 stringBuilder.append(prefix).append(alias).append("\n");
             }
-
             stringBuilder.append("\n__Description__\n");
             stringBuilder.append(helpPage.description);
             return stringBuilder.toString();
         }
         else if (guildSettings.getCustomCommandAttributes(alias) != null)
         {
-            CommandAttributes ca = guildSettings.getCustomCommandAttributes(alias);
+            ModuleAttributes ma = guildSettings.getCustomCommandAttributes(alias);
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("__Aliases__\n");
-            stringBuilder.append(ca.getCommandKey()).append(", ");
+            stringBuilder.append(ma.getKey()).append(", ");
             for (String otherAlias : guildSettings.getCustomCommand(alias).getAliases())
             {
                 stringBuilder.append(otherAlias).append(", ");
             }
             stringBuilder.setLength(stringBuilder.length()-2);
             stringBuilder.append("\n\n__Description__\n");
-            stringBuilder.append("A custom command.\n\n").append(ca.getDescription());
+            stringBuilder.append("A custom command.\n\n").append(ma.getDescription());
             return stringBuilder.toString();
         }
         else
@@ -238,9 +224,9 @@ public class Help extends Command
      * @param parameter the user request
      * @return the category, or null if it is an invalid request
      */
-    private CommandRegister.Category getCategory(String parameter)
+    private ModuleRegister.Category getCategory(String parameter)
     {
-        for (CommandRegister.Category category : CommandRegister.Category.values())
+        for (ModuleRegister.Category category : ModuleRegister.Category.values())
         {
             if (parameter.equalsIgnoreCase(category.toString()))
             {
