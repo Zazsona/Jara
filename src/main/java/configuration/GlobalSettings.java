@@ -1,4 +1,6 @@
 package configuration;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import jara.ModuleRegister;
 import jara.ModuleAttributes;
 import org.slf4j.Logger;
@@ -55,7 +57,8 @@ public class GlobalSettings implements Serializable
         }
         FileOutputStream fos = new FileOutputStream(getGlobalSettingsFilePath());
         ObjectOutputStream oos = new ObjectOutputStream(fos);
-        oos.writeObject(this);
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        oos.writeObject(gson.toJson(this));
         oos.close();
         fos.close();
     }
@@ -68,7 +71,8 @@ public class GlobalSettings implements Serializable
             {
                 FileInputStream fis = new FileInputStream(getGlobalSettingsFilePath());
                 ObjectInputStream ois = new ObjectInputStream(fis);
-                GlobalSettings gs = (GlobalSettings) ois.readObject();
+                Gson gson = new Gson();
+                GlobalSettings gs = gson.fromJson((String) ois.readObject(), GlobalSettings.class);
                 this.token = gs.token;
                 this.moduleConfig = gs.moduleConfig;
                 ois.close();

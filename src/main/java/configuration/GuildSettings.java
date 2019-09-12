@@ -1,5 +1,7 @@
 package configuration;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import commands.CmdUtil;
 import module.Command;
 import commands.CustomCommand;
@@ -102,7 +104,8 @@ public class GuildSettings implements Serializable
             {
                 FileInputStream fis = new FileInputStream(getGuildSettingsFilePath(guildID));
                 ObjectInputStream ois = new ObjectInputStream(fis);
-                GuildSettings settingsFromFile = (GuildSettings) ois.readObject();
+                Gson gson = new Gson();
+                GuildSettings settingsFromFile = gson.fromJson((String) ois.readObject(), GuildSettings.class);
                 ois.close();
                 fis.close();
                 if (!Core.getVersion().equalsIgnoreCase(settingsFromFile.jaraVersion))
@@ -174,7 +177,8 @@ public class GuildSettings implements Serializable
         }
         FileOutputStream fos = new FileOutputStream(getGuildSettingsFilePath(guildID));
         ObjectOutputStream oos = new ObjectOutputStream(fos);
-        oos.writeObject(this);
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        oos.writeObject(gson.toJson(this));
         oos.close();
         fos.close();
     }
