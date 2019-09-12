@@ -27,7 +27,7 @@ public class CustomCommandManager extends Command
         guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
 
         StringBuilder commandListBuilder = new StringBuilder();
-        for (String key : guildSettings.getCustomCommandMap().keySet())
+        for (String key : guildSettings.getCustomCommandSettings().getCommandKeys())
         {
             commandListBuilder.append(key).append(", ");
         }
@@ -51,7 +51,7 @@ public class CustomCommandManager extends Command
                     CustomCommandBuilder customCommand = null;
                     String[] selection = message.getContentDisplay().toLowerCase().split(" ");
                     if (!selection[0].equals("quit"))
-                        customCommand = guildSettings.getCustomCommand(selection[1]);
+                        customCommand = guildSettings.getCustomCommandSettings().getCommand(selection[1]);
 
                     switch (selection[0].trim())
                     {
@@ -65,7 +65,7 @@ public class CustomCommandManager extends Command
                             {
                                 ArrayList<String> everyoneRole = new ArrayList<>();
                                 everyoneRole.add(msgEvent.getGuild().getPublicRole().getId());
-                                customCommand = guildSettings.addCustomCommand(selection[1], new String[0], "A custom command.", ModuleRegister.Category.UTILITY, new ArrayList<>(), "", "");
+                                customCommand = guildSettings.getCustomCommandSettings().addCommand(selection[1], new String[0], "A custom command.", ModuleRegister.Category.UTILITY, new ArrayList<>(), "", "");
                                 guildSettings.addPermissions(everyoneRole, selection[1]);
                                 editCommand(msgEvent, customCommand);
                             }
@@ -74,7 +74,7 @@ public class CustomCommandManager extends Command
                             editCommand(msgEvent, customCommand);
                             return;
                         case "delete":
-                            guildSettings.removeCustomCommand(selection[1]);
+                            guildSettings.getCustomCommandSettings().removeCommand(selection[1]);
                             embed.setDescription("Command "+selection[1]+" successfully removed.");
                             msgEvent.getChannel().sendMessage(embed.build()).queue();
                             return;
@@ -155,7 +155,7 @@ public class CustomCommandManager extends Command
     {
         try
         {
-            guildSettings.editCustomCommand(customCommand.getKey(), customCommand);
+            guildSettings.getCustomCommandSettings().editCommand(customCommand.getKey(), customCommand);
             return "Saved & exited.";
         }
         catch (IOException e)

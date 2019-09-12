@@ -19,7 +19,7 @@ public class CustomCommand extends Command
         try
         {
             String key = getKey(msgEvent.getGuild().getId(), parameters[0]);
-            CustomCommandBuilder customCommand = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommand(key);
+            CustomCommandBuilder customCommand = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandSettings().getCommand(key);
 
             if (!customCommand.getMessage().equals(""))
             {

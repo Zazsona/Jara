@@ -2,6 +2,7 @@ package jara;
 
 import com.google.gson.Gson;
 import commands.Help;
+import configuration.GuildCommandLauncher;
 import module.Command;
 import module.Load;
 import module.ModuleConfig;
@@ -141,7 +142,7 @@ public class ModuleAttributes
 	 * Simple get method for the module's corresponding command class.
 	 * Instantiating a command from this method does not perform any config checks.
 	 * 
-	 * Instead, use execute() in {@link configuration.CommandLauncher}
+	 * Instead, use execute() in {@link GuildCommandLauncher}
 	 * 
 	 * @return
 	 * Class<? extends Command> - The command class.

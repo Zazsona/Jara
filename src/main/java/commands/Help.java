@@ -111,10 +111,10 @@ public class Help extends Command
                     }
                 }
             }
-            for (String key : guildSettings.getCustomCommandMap().keySet())
+            for (String key : guildSettings.getCustomCommandSettings().getCommandKeys())
             {
-                ModuleAttributes ma = guildSettings.getCustomCommandAttributes(key);
-                if (guildSettings.getCustomCommandAttributes(key).getCategory() == category)
+                ModuleAttributes ma = guildSettings.getCustomCommandSettings().getCommandAttributes(key);
+                if (guildSettings.getCustomCommandSettings().getCommandAttributes(key).getCategory() == category)
                 {
                     if (!limitToPerms || guildSettings.isPermitted(msgEvent.getMember(), key))
                         commandInfo.add("**"+key+"** - "+ma.getDescription());
@@ -172,9 +172,9 @@ public class Help extends Command
          */
 
         ModuleAttributes moduleAttributes = ModuleRegister.getModule(alias);
-        HelpPage helpPage = moduleAttributes.getHelpPage();
-        if (helpPage != null)
+        if (moduleAttributes != null)
         {
+            HelpPage helpPage = moduleAttributes.getHelpPage();
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("__Aliases__\n");
             for (String otherAlias : moduleAttributes.getAliases())
@@ -198,13 +198,13 @@ public class Help extends Command
             stringBuilder.append(helpPage.description);
             return stringBuilder.toString();
         }
-        else if (guildSettings.getCustomCommandAttributes(alias) != null)
+        else if (guildSettings.getCustomCommandSettings().getCommandAttributes(alias) != null)
         {
-            ModuleAttributes ma = guildSettings.getCustomCommandAttributes(alias);
+            ModuleAttributes ma = guildSettings.getCustomCommandSettings().getCommandAttributes(alias);
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("__Aliases__\n");
             stringBuilder.append(ma.getKey()).append(", ");
-            for (String otherAlias : guildSettings.getCustomCommand(alias).getAliases())
+            for (String otherAlias : guildSettings.getCustomCommandSettings().getCommand(alias).getAliases())
             {
                 stringBuilder.append(otherAlias).append(", ");
             }
@@ -215,7 +215,7 @@ public class Help extends Command
         }
         else
         {
-            return "PICNIC Error: Unknown Parameter \""+alias+"\". Usage: /Help [Category]/[Command] (all) (Page #)";
+            return "PICNIC Error: Unknown Parameter \""+alias+"\".\n Usage: /Help [Category]/[Command] (all) (Page #)";
         }
     }
 

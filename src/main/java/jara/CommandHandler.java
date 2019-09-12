@@ -1,6 +1,7 @@
 package jara;
 
-import configuration.CommandLauncher;
+import configuration.GuildCommandLauncher;
+import configuration.GuildSettings;
 import configuration.SettingsUtil;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -9,8 +10,8 @@ import java.util.HashMap;
 
 public class CommandHandler extends ListenerAdapter 
 {
-	private final HashMap<String, CommandLauncher> commandLaunchers; //Contains details on all commands.
-	public CommandHandler(HashMap<String, CommandLauncher> commandLaunchers)
+	private final HashMap<String, GuildCommandLauncher> commandLaunchers; //Contains details on all commands.
+	public CommandHandler(HashMap<String, GuildCommandLauncher> commandLaunchers)
 	{
 		this.commandLaunchers = commandLaunchers;
 	}
@@ -27,19 +28,20 @@ public class CommandHandler extends ListenerAdapter
 
 				if (commandString.startsWith(commandPrefix))									   //Prefix to signify that a command is being called.
 				{
+					GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
 					String[] command = commandString.split(" ");							   //Separating parameters.
 					String key = command[0].replaceFirst(commandPrefix, "").toLowerCase();
 
-					CommandLauncher cl = commandLaunchers.get(key);
-					if (cl == null && SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommand(key) != null) //This second check ensures that, if the key also matches a custom command, that gets precedence. This is because the custom command key is stored as a regular command for compatibility.
+					GuildCommandLauncher cl = commandLaunchers.get(key);
+					if (cl == null && guildSettings.getCustomCommandSettings().getCommand(key) != null) //This second check ensures that, if the key also matches a custom command, that gets precedence. This is because the custom command key is stored as a regular command for compatibility.
 					{
-						cl = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandLauncher(key.toLowerCase());
+						cl = guildSettings.getCustomCommandSettings().getCommandLauncher(key.toLowerCase());
 
 						if (cl == null)
 						{
-							for (String customCommandKey : SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandMap().keySet())
+							for (String customCommandKey : guildSettings.getCustomCommandSettings().getCommandKeys())
 							{
-								cl = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandLauncher(customCommandKey);
+								cl = guildSettings.getCustomCommandSettings().getCommandLauncher(customCommandKey);
 								String[] aliases = cl.getAliases();
 
 								int min = 0;

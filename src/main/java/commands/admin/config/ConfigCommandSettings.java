@@ -36,7 +36,7 @@ public class ConfigCommandSettings
             ModuleAttributes ma = ModuleRegister.getModule(parameters[2]);
             if (ma == null)
             {
-                ma = guildSettings.getCustomCommandAttributes(parameters[2].toLowerCase());
+                ma = guildSettings.getCustomCommandSettings().getCommandAttributes(parameters[2].toLowerCase());
                 if (ma == null)
                 {
                     embed.setDescription("Command "+parameters[2]+" not found.");
@@ -116,7 +116,7 @@ public class ConfigCommandSettings
             Message msg = msgManager.getNextMessage(channel);
             if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
             {
-                if (!(((ma = ModuleRegister.getModule(msg.getContentDisplay())) == null) && ((ma = guildSettings.getCustomCommandAttributes(msg.getContentDisplay())) == null))) //Ensure ModuleAttributes is not null
+                if (!(((ma = ModuleRegister.getModule(msg.getContentDisplay())) == null) && ((ma = guildSettings.getCustomCommandSettings().getCommandAttributes(msg.getContentDisplay())) == null))) //Ensure ModuleAttributes is not null
                 {
                     if (ma.getCommandClass() != null)
                     {

@@ -11,13 +11,13 @@ import org.slf4j.LoggerFactory;
 import jara.ModuleAttributes;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
-public class CommandLauncher
+public class GuildCommandLauncher
 {
-	private static Logger logger = LoggerFactory.getLogger(CommandLauncher.class);
+	private static Logger logger = LoggerFactory.getLogger(GuildCommandLauncher.class);
 	protected final boolean enabledState; //Whether the config allows this command to be used
 	protected final ModuleAttributes attributes;
 	
-	public CommandLauncher(ModuleAttributes attributes, boolean enabledState)
+	public GuildCommandLauncher(ModuleAttributes attributes, boolean enabledState)
 	{
 		this.attributes = attributes;
 		this.enabledState = enabledState;
@@ -47,7 +47,7 @@ public class CommandLauncher
                         catch (InstantiationException | IllegalAccessException e)
                         {
                             msgEvent.getChannel().sendMessage("Sorry, I was unable to run the command.").queue();
-                            Logger logger = LoggerFactory.getLogger(CommandLauncher.class);
+                            Logger logger = LoggerFactory.getLogger(GuildCommandLauncher.class);
                             logger.error("A command request was sent but could not be fulfilled.\nCommand: "+ Arrays.toString(parameters) +"\nGuild: "+msgEvent.getGuild().getId()+" ("+msgEvent.getGuild().getName()+")\nUser: "+msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+"Channel: "+msgEvent.getChannel().getId()+" ("+msgEvent.getChannel().getName()+")\nDate/Time: "+LocalDateTime.now().toString()+"\n\nError: \n"+e.toString());
                         }
                         catch (NoSuchMethodError e)

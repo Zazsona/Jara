@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
-public class CustomCommandLauncher extends CommandLauncher
+public class GuildCustomCommandLauncher extends GuildCommandLauncher
 {
-    public CustomCommandLauncher(ModuleAttributes attributes)
+    public GuildCustomCommandLauncher(ModuleAttributes attributes)
     {
         super(attributes, true); //Enabled state is not used here
     }
@@ -31,7 +31,7 @@ public class CustomCommandLauncher extends CommandLauncher
                     catch (InstantiationException | IllegalAccessException e)
                     {
                         msgEvent.getChannel().sendMessage("Sorry, I was unable to run the command.").queue();
-                        Logger logger = LoggerFactory.getLogger(CommandLauncher.class);
+                        Logger logger = LoggerFactory.getLogger(GuildCommandLauncher.class);
                         logger.error("A custom command request was sent but could not be fulfilled.\nCommand: "+ Arrays.toString(parameters) +"\nGuild: "+msgEvent.getGuild().getId()+" ("+msgEvent.getGuild().getName()+")\nUser: "+msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+"Channel: "+msgEvent.getChannel().getId()+" ("+msgEvent.getChannel().getName()+")\nDate/Time: "+ LocalDateTime.now().toString()+"\n\nError: \n"+e.toString());
                     }
                 };

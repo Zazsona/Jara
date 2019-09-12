@@ -10,11 +10,10 @@ import javax.security.auth.login.LoginException;
 import configuration.SettingsUtil;
 import exceptions.InvalidModuleException;
 import gui.HeadedGUI;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import configuration.CommandLauncher;
+import configuration.GuildCommandLauncher;
 import event.GuildJoinHandler;
 import event.GuildLeaveHandler;
 import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
@@ -72,10 +71,10 @@ public class Core //A class for covering the global manners of the bot.
 	{
 		try
 		{
-			HashMap<String, CommandLauncher> commands = new HashMap<>();
+			HashMap<String, GuildCommandLauncher> commands = new HashMap<>();
 			for (ModuleAttributes ma : ModuleRegister.getCommandModules())
 			{
-				CommandLauncher cl = new CommandLauncher(ma, SettingsUtil.getGlobalSettings().isModuleEnabled(ma.getKey()));
+				GuildCommandLauncher cl = new GuildCommandLauncher(ma, SettingsUtil.getGlobalSettings().isModuleEnabled(ma.getKey()));
 				for (String alias : ma.getAliases())
 				{
 					commands.put(alias.toLowerCase(), cl);

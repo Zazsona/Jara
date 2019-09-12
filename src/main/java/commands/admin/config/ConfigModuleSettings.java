@@ -1,7 +1,7 @@
 package commands.admin.config;
 
 import commands.CmdUtil;
-import configuration.CommandLauncher;
+import configuration.GuildCommandLauncher;
 import module.ModuleConfig;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -31,7 +31,7 @@ public class ConfigModuleSettings
         catch (InstantiationException | IllegalAccessException e)
         {
             msgEvent.getChannel().sendMessage("Sorry, I was unable to run the config.").queue();
-            Logger logger = LoggerFactory.getLogger(CommandLauncher.class);
+            Logger logger = LoggerFactory.getLogger(GuildCommandLauncher.class);
             logger.error("A config request was sent but could not be fulfilled.\nCommand: "+ Arrays.toString(parameters) +"\nGuild: "+msgEvent.getGuild().getId()+" ("+msgEvent.getGuild().getName()+")\nUser: "+msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+"Channel: "+msgEvent.getChannel().getId()+" ("+msgEvent.getChannel().getName()+")\nDate/Time: "+ LocalDateTime.now().toString()+"\n\nError: \n"+e.toString());
         }
         catch (NoSuchMethodError e)
