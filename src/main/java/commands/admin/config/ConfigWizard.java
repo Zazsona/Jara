@@ -18,6 +18,7 @@ public class ConfigWizard
     private ConfigAudioSettings cas;
     private ConfigGameSettings cgs;
     private ConfigCommandSettings ccs;
+    private ConfigModuleSettings cmos;
     private GuildMessageReceivedEvent msgEvent;
 
     public ConfigWizard(GuildMessageReceivedEvent msgEvent, GuildSettings guildSettings, TextChannel channel)
@@ -30,6 +31,7 @@ public class ConfigWizard
             cas = new ConfigAudioSettings(guildSettings, channel);
             cgs = new ConfigGameSettings(guildSettings, channel);
             ccs = new ConfigCommandSettings(guildSettings, channel);
+            cmos = new ConfigModuleSettings(guildSettings, channel);
 
             EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
             embed.setDescription("**Welcome to the Setup Wizard.**\n\nThis will guide you through each of the settings available for the guild, and then direct you through every command. Let's begin.");
@@ -46,8 +48,11 @@ public class ConfigWizard
             embed.setDescription("**COMMANDS**");
             msgEvent.getChannel().sendMessage(embed.build()).queue();
             configureCommands();
+            embed.setDescription("**MODULE SPECIFIC SETTINGS**");
+            msgEvent.getChannel().sendMessage(embed.build()).queue();
+            configureModuleSettings();
             embed = ConfigMain.getEmbedStyle(msgEvent);
-            embed.setDescription("**Setup Complete**\n\nAnd that's that, you're good to go!\nSome commands may have their own individual settings, so look out for those. You can also create your own custom commands using the CustomCommandManager.");
+            embed.setDescription("**Setup Complete**\n\nAnd that's that, you're good to go!\nFor any additional assistance, use "+guildSettings.getCommandPrefix()+"help.");
             msgEvent.getChannel().sendMessage(embed.build()).queue();
         }
         catch (IOException e)
@@ -91,6 +96,18 @@ public class ConfigWizard
             if (ma.isDisableable())
             {
                 ccs.showMenu(ma, embed);
+            }
+        }
+    }
+
+    private void configureModuleSettings() throws IOException
+    {
+        EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
+        for (ModuleAttributes ma : ModuleRegister.getModules())
+        {
+            if (ma.getConfigClass() != null)
+            {
+                cmos.loadConfig(msgEvent, ma, null);
             }
         }
     }

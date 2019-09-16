@@ -27,7 +27,7 @@ public class ConfigMain extends Command
                 MessageManager mm = new MessageManager();
                 String embedDescription = "Welcome to the Config\nPlease select a menu, or say `quit` to cancel.";
                 embed.setDescription(embedDescription);
-                embed.addField("Menus", "**Prefix**\n**Audio**\n**Games**\n**Commands**\n**Setup**", true);
+                embed.addField("Menus", "**Prefix**\n**Audio**\n**Games**\n**Commands**\n**Modules**\n**Setup**", true);
                 channel.sendMessage(embed.build()).queue();
                 while (true)
                 {
@@ -51,6 +51,10 @@ public class ConfigMain extends Command
                         else if (selection.equalsIgnoreCase("commands"))
                         {
                             new ConfigCommandSettings(guildSettings, channel).getCommand(msgEvent);
+                        }
+                        else if (selection.equalsIgnoreCase("modules"))
+                        {
+                            new ConfigModuleSettings(guildSettings, channel).getModule(msgEvent);
                         }
                         else if (selection.equalsIgnoreCase("setup"))
                         {
@@ -105,6 +109,10 @@ public class ConfigMain extends Command
             else if (selection.equalsIgnoreCase("commands"))
             {
                 new ConfigCommandSettings(guildSettings, channel).parseAsParameters(msgEvent, parameters);
+            }
+            else if (selection.equalsIgnoreCase("modules"))
+            {
+                new ConfigModuleSettings(guildSettings, channel).parseAsParameters(msgEvent, parameters);
             }
             else if (selection.equalsIgnoreCase("setup"))
             {
