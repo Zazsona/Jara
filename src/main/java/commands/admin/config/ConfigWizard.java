@@ -34,7 +34,7 @@ public class ConfigWizard
             cmos = new ConfigModuleSettings(guildSettings, channel);
 
             EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
-            embed.setDescription("**Welcome to the Setup Wizard.**\n\nThis will guide you through each of the settings available for the guild, and then direct you through every command. Let's begin.");
+            embed.setDescription("**Welcome to the Setup Wizard.**\n\nThis will guide you through each of the settings available for the guild, and then direct you through every command and module.\nYou can use \"quit\" at any point to keep default settings.\n\nLet's begin.");
             msgEvent.getChannel().sendMessage(embed.build()).queue();
 
             configurePrefix();

@@ -80,7 +80,7 @@ public class ConfigAudioSettings
                 {
                     modifyQueueLimits(msgEvent);
                 }
-                else if (msgContent.equalsIgnoreCase("quit"))
+                else if (msgContent.equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(msg.getGuild().getId())+"quit") || msgContent.equalsIgnoreCase("quit"))
                 {
                     return;
                 }
@@ -130,6 +130,10 @@ public class ConfigAudioSettings
                         break;
                     }
                 }
+                else if (response.equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(msg.getGuild().getId())+"quit") || response.equalsIgnoreCase("quit"))
+                {
+                    return;
+                }
                 else
                 {
                     embed.setDescription("Unknown percentage value. Please enter a percentage.");
@@ -167,6 +171,10 @@ public class ConfigAudioSettings
                     channel.sendMessage(embed.build()).queue();
                     break;
                 }
+                else if (response.equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(msg.getGuild().getId())+"quit") || response.equalsIgnoreCase("quit"))
+                {
+                    return;
+                }
                 else
                 {
                     embed.setDescription("Unknown response. Would you like to enable voice leaving? [Y/n]");
@@ -189,7 +197,7 @@ public class ConfigAudioSettings
             }
         }
         StringBuilder descBuilder = new StringBuilder();
-        descBuilder.append("Queue limits dictate how many tracks a member of that role can queue at a time.\nTo set/edit a role, enter the role name followed by the queue limit.\nE.g: everyone 2\n\n**Existing Settings:**\n");
+        descBuilder.append("Queue limits dictate how many tracks a member of that role can queue at a time.\nTo set/edit a role, enter the role name followed by the queue limit.\nUse the quit command to exit.\nE.g: everyone 2\n\n**Existing Settings:**\n");
         descBuilder.append("Everyone: ").append(defaultLimit).append("\n");
         for (Map.Entry<Role, Integer> roleLimit : customRoles.entrySet())
         {
@@ -214,7 +222,7 @@ public class ConfigAudioSettings
                     String response = msg.getContentDisplay().toLowerCase();
                     String[] responseWords = response.split(" ");
                     String roleName = response.substring(0, response.length()-responseWords[responseWords.length-1].length()).trim();
-                    if (responseWords[0].equals(SettingsUtil.getGuildCommandPrefix(msg.getGuild().getId())+"quit") || responseWords[0].equals("quit"))
+                    if (responseWords[0].equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(msg.getGuild().getId())+"quit") || responseWords[0].equalsIgnoreCase("quit"))
                     {
                         return;
                     }

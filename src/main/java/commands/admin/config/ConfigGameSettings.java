@@ -1,6 +1,7 @@
 package commands.admin.config;
 
 import configuration.GuildSettings;
+import configuration.SettingsUtil;
 import jara.MessageManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -83,7 +84,7 @@ public class ConfigGameSettings
                 {
                     modifyConcurrentGameInChannel(msgEvent);
                 }
-                else if (msgContent.equalsIgnoreCase("quit"))
+                else if (msgContent.equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(msg.getGuild().getId())+"quit") || msgContent.equalsIgnoreCase("quit"))
                 {
                     return;
                 }
@@ -129,6 +130,10 @@ public class ConfigGameSettings
                     embed.setDescription("Game Channels has been disabled.");
                     channel.sendMessage(embed.build()).queue();
                     break;
+                }
+                else if (response.equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(msg.getGuild().getId())+"quit") || response.equalsIgnoreCase("quit"))
+                {
+                    return;
                 }
                 else
                 {
@@ -177,7 +182,11 @@ public class ConfigGameSettings
                 }
                 else
                 {
-                    if (channel.getGuild().getCategoriesByName(id, true).size() == 0)
+                    if (id.equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(msg.getGuild().getId())+"quit") || id.equalsIgnoreCase("quit"))
+                    {
+                        return;
+                    }
+                    else if (channel.getGuild().getCategoriesByName(id, true).size() == 0)
                     {
                         embed.setDescription("Category does not exist: "+id+". Please try again.");
                         channel.sendMessage(embed.build()).queue();
@@ -232,6 +241,10 @@ public class ConfigGameSettings
                     channel.sendMessage(embed.build()).queue();
                     break;
                 }
+                else if (timeout.equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(msg.getGuild().getId())+"quit") || timeout.equalsIgnoreCase("quit"))
+                {
+                    return;
+                }
                 else
                 {
                     embed.setDescription("Could not find a valid timeout value. Please try again.");
@@ -269,6 +282,10 @@ public class ConfigGameSettings
                     embed.setDescription("Concurrent games have been disabled.");
                     channel.sendMessage(embed.build()).queue();
                     break;
+                }
+                else if (response.equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(msg.getGuild().getId())+"quit") || response.equalsIgnoreCase("quit"))
+                {
+                    return;
                 }
                 else
                 {

@@ -1,6 +1,7 @@
 package commands.admin.config;
 
 import configuration.GuildSettings;
+import configuration.SettingsUtil;
 import jara.ModuleAttributes;
 import jara.ModuleRegister;
 import jara.MessageManager;
@@ -44,7 +45,7 @@ public class ConfigCommandSettings
                     return;
                 }
             }
-            else
+            else if (ma.getCommandClass() != null)
             {
                 if (parameters.length > 3)
                 {
@@ -97,6 +98,11 @@ public class ConfigCommandSettings
                     showMenu(ma, embed);
                 }
             }
+            else
+            {
+                embed.setDescription("No command is available for module "+ma.getKey()+".");
+                channel.sendMessage(embed.build()).queue();
+            }
         }
         else
         {
@@ -123,8 +129,13 @@ public class ConfigCommandSettings
                         showMenu(ma, embed);
                         break;
                     }
+                    else
+                    {
+                        embed.setDescription("No command is available for module "+ma.getKey()+".");
+                        channel.sendMessage(embed.build()).queue();
+                    }
                 }
-                else if (msg.getContentDisplay().equalsIgnoreCase("quit"))
+                else if (msg.getContentDisplay().equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(msg.getGuild().getId())+"quit") || msg.getContentDisplay().equalsIgnoreCase("quit"))
                 {
                     return;
                 }
@@ -167,9 +178,9 @@ public class ConfigCommandSettings
                 {
                     modifyState(embed, ma, false);
                 }
-                else if (request.startsWith("quit"))
+                else if (request.equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(msg.getGuild().getId())+"quit") || request.equalsIgnoreCase("quit"))
                 {
-                    break;
+                    return;
                 }
                 else
                 {

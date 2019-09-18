@@ -275,7 +275,11 @@ public class CustomCommandManager extends Command
 
             if (guildSettings.isPermitted(message.getMember(), getClass()))
             {
-                selectCommandSubmenu(msgEvent, customCommand, selection, null);
+                CCResponseType responseType = selectCommandSubmenu(msgEvent, customCommand, selection, null);
+                if (responseType == CCResponseType.QUIT)
+                {
+                    return;
+                }
             }
         }
     }

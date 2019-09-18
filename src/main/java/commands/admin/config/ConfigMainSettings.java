@@ -35,11 +35,9 @@ public class ConfigMainSettings
             Message msg = mm.getNextMessage(channel);
             if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
             {
-                if (msg.getContentDisplay().length() == 5 && msg.getContentDisplay().toLowerCase().endsWith("quit"))
+                if (msg.getContentDisplay().equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(msg.getGuild().getId())+"quit") || msg.getContentDisplay().equalsIgnoreCase("quit"))
                 {
-                    embed.setDescription("Config closed.");
-                    channel.sendMessage(embed.build()).queue();
-                    break;
+                    return;
                 }
                 String prefix = msg.getContentDisplay();
                 if (prefix.length() == 1)
