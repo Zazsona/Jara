@@ -21,7 +21,7 @@ public class GuildCustomCommandLauncher extends GuildCommandLauncher
         GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
         if (guildSettings.isCommandEnabled(attributes.getKey()))
         {
-            if (guildSettings.isPermitted(msgEvent.getMember(), parameters[0].replace(SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId()).toString(), "").toLowerCase()))
+            if (guildSettings.isPermitted(msgEvent.getMember(), attributes.getKey()))
             {
                 Runnable commandRunnable = () -> {
                     try
