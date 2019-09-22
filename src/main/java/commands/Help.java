@@ -176,23 +176,34 @@ public class Help extends Command
         {
             HelpPage helpPage = moduleAttributes.getHelpPage();
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("__Aliases__\n");
+            stringBuilder.append("__Attributes__\n");
+            stringBuilder.append("Name: ").append(moduleAttributes.getKey()).append("\n");
+            stringBuilder.append("Command: ").append((moduleAttributes.getCommandClass() != null) ? "*Yes*" : "*No*").append("\n");
+            stringBuilder.append("Configurable: ").append((moduleAttributes.getConfigClass() != null) ? "*Yes*" : "*No*").append("\n");
+            stringBuilder.append("\n__Aliases__\n");
             for (String otherAlias : moduleAttributes.getAliases())
             {
                 stringBuilder.append(otherAlias).append(", ");
             }
             stringBuilder.setLength(stringBuilder.length()-2);
-            stringBuilder.append("\n\n__Parameters__\n");
-            if (helpPage.params.length > 0)
+            if (moduleAttributes.getCommandClass() != null)
             {
-                for (String param : helpPage.params)
+                stringBuilder.append("\n\n__Parameters__\n");
+                if (helpPage.params.length > 0)
                 {
-                    stringBuilder.append(prefix).append(param).append("\n");
+                    for (String param : helpPage.params)
+                    {
+                        stringBuilder.append(prefix).append(param).append("\n");
+                    }
+                }
+                else
+                {
+                    stringBuilder.append(prefix).append(alias).append("\n");
                 }
             }
             else
             {
-                stringBuilder.append(prefix).append(alias).append("\n");
+                stringBuilder.append("\n");
             }
             stringBuilder.append("\n__Description__\n");
             stringBuilder.append(helpPage.description);
@@ -200,17 +211,21 @@ public class Help extends Command
         }
         else if (guildSettings.getCustomCommandSettings().getCommandAttributes(alias) != null)
         {
-            ModuleAttributes ma = guildSettings.getCustomCommandSettings().getCommandAttributes(alias);
+            moduleAttributes = guildSettings.getCustomCommandSettings().getCommandAttributes(alias);
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("__Aliases__\n");
-            stringBuilder.append(ma.getKey()).append(", ");
+            stringBuilder.append("__Attributes__\n");
+            stringBuilder.append("Name: ").append(moduleAttributes.getKey()).append("\n");
+            stringBuilder.append("Command: ").append("*Yes (Custom)*").append("\n");
+            stringBuilder.append("Configurable: ").append("*Yes (Custom)*").append("\n");
+            stringBuilder.append("\n__Aliases__\n");
+            stringBuilder.append(moduleAttributes.getKey()).append(", ");
             for (String otherAlias : guildSettings.getCustomCommandSettings().getCommand(alias).getAliases())
             {
                 stringBuilder.append(otherAlias).append(", ");
             }
             stringBuilder.setLength(stringBuilder.length()-2);
             stringBuilder.append("\n\n__Description__\n");
-            stringBuilder.append("A custom command.\n\n").append(ma.getDescription());
+            stringBuilder.append("A custom command.\n\n").append(moduleAttributes.getDescription());
             return stringBuilder.toString();
         }
         else
