@@ -8,10 +8,7 @@ import jara.ModuleRegister;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class CustomCommandSettings implements Serializable
 {
@@ -48,12 +45,11 @@ public class CustomCommandSettings implements Serializable
      */
     public CustomCommandBuilder addCommand(String key, String[] aliases, String description, ModuleRegister.Category category, ArrayList<String> roleIDs, String audioLink, String message) throws IOException
     {
-        key = key.toLowerCase();
-        if (customCommands.containsKey(key) || ModuleRegister.getModule(key) != null)
+        if (customCommands.containsKey(key.toLowerCase()) || ModuleRegister.getModule(key) != null)
         {
             return null;
         }
-        customCommands.put(key, new CustomCommandBuilder(key, aliases, description, category, roleIDs, audioLink, message));
+        customCommands.put(key.toLowerCase(), new CustomCommandBuilder(key, aliases, description, category, roleIDs, audioLink, message));
         guildSettings.setCommandConfiguration(true, new ArrayList<>(), key);
         return customCommands.get(key);
     }
@@ -94,9 +90,10 @@ public class CustomCommandSettings implements Serializable
     public CustomCommandBuilder getCommand(String key)
     {
         key = key.toLowerCase();
-        if (customCommands.containsKey(key))
+        CustomCommandBuilder ccb = customCommands.get(key);
+        if (ccb != null)
         {
-            return customCommands.get(key.toLowerCase());
+            return ccb;
         }
         else
         {
@@ -104,7 +101,7 @@ public class CustomCommandSettings implements Serializable
             {
                 for (String alias : entry.getValue().getAliases())
                 {
-                    if (key.equals(alias))
+                    if (key.equalsIgnoreCase(alias))
                     {
                         return customCommands.get(entry.getKey());
                     }
@@ -115,13 +112,17 @@ public class CustomCommandSettings implements Serializable
     }
 
     /**
-     * Returns the HashMap with the custom command config details.<br>
-     * The key is the command key, with the value being of type CustomCommandConfig.
+     * Returns the case-respecting command keys.
      * @return
      */
-    public Set<String> getCommandKeys()
+    public Collection<String> getCommandKeys()
     {
-        return customCommands.keySet();
+        LinkedList<String> keys = new LinkedList<>();
+        for (CustomCommandBuilder ccb : customCommands.values())
+        {
+            keys.add(ccb.getKey());
+        }
+        return keys;
     }
 
     /**
@@ -160,7 +161,7 @@ public class CustomCommandSettings implements Serializable
         }
         else
         {
-            return new GuildCustomCommandLauncher(getCommandAttributes(key));
+            return new GuildCustomCommandLauncher(ma);
         }
 
     }
