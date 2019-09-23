@@ -66,15 +66,16 @@ public class CustomCommandManager extends Command
                     if (guildSettings.isPermitted(message.getMember(), getClass()))
                     {
                         CustomCommandBuilder customCommand = null;
-                        String[] selection = message.getContentDisplay().toLowerCase().split(" ");
+                        String[] selection = message.getContentDisplay().split(" ");
                         if (!selection[0].equals("quit"))
                         {
                             customCommand = guildSettings.getCustomCommandSettings().getCommand(selection[1]);
-                            CCResponseType responseType = selectRootSubmenu(msgEvent, customCommand, selection[0], selection[1]);
+                            CCResponseType responseType = selectRootSubmenu(msgEvent, customCommand, selection[0].toLowerCase(), selection[1]);
                             if (responseType == CCResponseType.VALID)
                             {
                                 customCommand = (customCommand == null) ? guildSettings.getCustomCommandSettings().getCommand(selection[1]) : customCommand; //Just in case it was an add operation, in which case, we need to set the reference to the now existing command.
                                 editCommand(msgEvent, customCommand);
+                                return; //Assumedly, they won't want to go back to the root menu.
                             }
                             else if (responseType == CCResponseType.QUIT)
                             {
@@ -83,7 +84,7 @@ public class CustomCommandManager extends Command
                         }
                         else
                         {
-                            selectRootSubmenu(msgEvent, customCommand, selection[0], null);
+                            selectRootSubmenu(msgEvent, customCommand, selection[0].toLowerCase(), null);
                             return;
                         }
 
@@ -188,7 +189,7 @@ public class CustomCommandManager extends Command
                 {
                     ArrayList<String> everyoneRole = new ArrayList<>();
                     everyoneRole.add(msgEvent.getGuild().getPublicRole().getId());
-                    guildSettings.getCustomCommandSettings().addCommand(commandName, new String[0], "A custom command.", ModuleRegister.Category.UTILITY, new ArrayList<>(), "", "");
+                    guildSettings.getCustomCommandSettings().addCommand(commandName, new String[0], "No description.", ModuleRegister.Category.UTILITY, new ArrayList<>(), "", "");
                     guildSettings.addPermissions(everyoneRole, commandName);
                 }
                 return CCResponseType.VALID;
@@ -267,20 +268,30 @@ public class CustomCommandManager extends Command
         while (true)
         {
             EmbedBuilder embed = getEmbedStyle(msgEvent);
-            embed.setDescription("What would you like to modify?\n**Aliases**\n**Description**\n**Category**\n\n**Message**\n**Audio**\n**Roles**\n\n**Quit**");
-            msgEvent.getChannel().sendMessage(embed.build()).queue();
-
-            Message message = mm.getNextMessage(msgEvent.getChannel());
-            String selection = message.getContentDisplay().toLowerCase();
-
-            if (guildSettings.isPermitted(message.getMember(), getClass()))
+            if (customCommand == null)
             {
-                CCResponseType responseType = selectCommandSubmenu(msgEvent, customCommand, selection, null);
-                if (responseType == CCResponseType.QUIT)
+                embed.setDescription("That command does not exist.");
+                msgEvent.getChannel().sendMessage(embed.build()).queue();
+                return;
+            }
+            else
+            {
+                embed.setDescription("What would you like to modify?\n**Aliases**\n**Description**\n**Category**\n\n**Message**\n**Audio**\n**Roles**\n\n**Quit**");
+                msgEvent.getChannel().sendMessage(embed.build()).queue();
+
+                Message message = mm.getNextMessage(msgEvent.getChannel());
+                String selection = message.getContentDisplay().toLowerCase();
+
+                if (guildSettings.isPermitted(message.getMember(), getClass()))
                 {
-                    return;
+                    CCResponseType responseType = selectCommandSubmenu(msgEvent, customCommand, selection, null);
+                    if (responseType == CCResponseType.QUIT)
+                    {
+                        return;
+                    }
                 }
             }
+
         }
     }
 
@@ -448,7 +459,11 @@ public class CustomCommandManager extends Command
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         if (value == null)
         {
-            embed.setDescription("Please enter the new message, or `disable`.\n\nExisting message: " + customCommand.getMessage());
+            embed.setDescription("Please enter the new message, or `disable`.");
+            if (customCommand.getMessage() != null && !customCommand.getMessage().equals(""))
+            {
+                embed.getDescriptionBuilder().append("\n\nExisting message: ").append(customCommand.getMessage());
+            }
             msgEvent.getChannel().sendMessage(embed.build()).queue();
 
             Message message = null;
@@ -458,7 +473,7 @@ public class CustomCommandManager extends Command
                 message = mm.getNextMessage(msgEvent.getChannel());
                 responseType = getResponseType(message);
             }
-            value = message.getContentDisplay();
+            value = message.getContentRaw();
         }
         if (responseType == CCResponseType.VALID)
         {
@@ -490,17 +505,22 @@ public class CustomCommandManager extends Command
         if (value == null)
         {
             StringBuilder descBuilder = new StringBuilder();
-            descBuilder.append("Please enter the roles (by name) you would like to add/remove, separated by commas, or `disable`.\n\nExisting Roles:\n");
-            for (String roleID : customCommand.getRoles())
+            descBuilder.append("Please enter the roles (by name) you would like to add/remove, separated by commas, or `disable`.");
+            if (customCommand.getRoles() != null && customCommand.getRoles().size() > 0)
             {
-                Role role = msgEvent.getGuild().getRoleById(roleID);
-                if (role != null)
+                descBuilder.append("\n\nExisting Roles:\n");
+                for (String roleID : customCommand.getRoles())
                 {
-                    descBuilder.append(role.getName()).append(", ");
-                }
+                    Role role = msgEvent.getGuild().getRoleById(roleID);
+                    if (role != null)
+                    {
+                        descBuilder.append(role.getName()).append(", ");
+                    }
 
+                }
+                embed.setDescription(descBuilder.toString().substring(0, descBuilder.length()-2));
             }
-            embed.setDescription(descBuilder.toString().substring(0, descBuilder.length()-2));
+            embed.setDescription(descBuilder.toString());
             msgEvent.getChannel().sendMessage(embed.build()).queue();
 
             Message message = null;
@@ -544,7 +564,11 @@ public class CustomCommandManager extends Command
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         if (value == null)
         {
-            embed.setDescription("Please enter the new audio track link, or `disable`.\n\nExisting link: " + customCommand.getAudioLink());
+            embed.setDescription("Please enter the new audio track link, or `disable`.");
+            if (customCommand.getAudioLink() != null && !customCommand.getAudioLink().equals(""))
+            {
+                embed.getDescriptionBuilder().append("\n\nExisting link: ").append(customCommand.getAudioLink());
+            }
             msgEvent.getChannel().sendMessage(embed.build()).queue();
 
             Message message = null;
