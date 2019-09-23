@@ -2,6 +2,7 @@ package configuration;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.stream.MalformedJsonException;
 import commands.CmdUtil;
 import module.Command;
 import configuration.guild.AudioConfig;
@@ -18,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 public class GuildSettings implements Serializable
@@ -98,7 +101,8 @@ public class GuildSettings implements Serializable
     {
         try
         {
-            if (new File(getGuildSettingsFilePath(guildID)).exists())
+            File guildFile = new File(getGuildSettingsFilePath(guildID));
+            if (guildFile.exists())
             {
                 FileInputStream fis = new FileInputStream(getGuildSettingsFilePath(guildID));
                 ObjectInputStream ois = new ObjectInputStream(fis);
@@ -143,11 +147,12 @@ public class GuildSettings implements Serializable
                 save();
             }
         }
-        catch (ClassNotFoundException e)
+        catch (ClassNotFoundException | StreamCorruptedException | MalformedJsonException e)
         {
             Guild guild = Core.getShardManager().getGuildById(guildID);
-            guild.getOwner().getUser().openPrivateChannel().complete().sendMessage("The config for your guild, "+guild.getName()+", has become corrupted or is no longer available and has been reset. Please contact your host for further details.").queue();
+            guild.getOwner().getUser().openPrivateChannel().complete().sendMessage("The config for your guild, "+guild.getName()+", has become corrupted or is no longer available and has been reset.\nA backup of the corrupted config has been created. Please contact your host for further details.").queue();
             logger.error("Guild settings are corrupted for guild "+guildID+" ("+guild.getName()+"). Resetting.");
+            Files.copy(new File(getGuildSettingsFilePath(guildID)).toPath(), new File(getGuildSettingsFilePath(guildID)+" - Corrupted.jara").toPath(), StandardCopyOption.REPLACE_EXISTING);
             setDefaultSettings();
             save();
         }
