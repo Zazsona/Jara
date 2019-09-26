@@ -30,7 +30,34 @@ public class ConfigMainSettings
 
     public void parseAsParameters(GuildMessageReceivedEvent msgEvent, String[] parameters) throws IOException
     {
-        //TODO
+        if (parameters[1].equalsIgnoreCase("prefix"))
+        {
+            if (parameters.length > 2)
+            {
+                setPrefix(msgEvent, parameters[2]);
+            }
+            else
+            {
+                modifyPrefix(msgEvent);
+            }
+        }
+        else if (parameters[1].equalsIgnoreCase("timezone"))
+        {
+            if (parameters.length > 2)
+            {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 2; i<parameters.length; i++)
+                {
+                    sb.append(parameters[i]).append("_");
+                }
+                sb.setLength(sb.length()-1);
+                setTimeZone(new MessageManager(), sb.toString(), msgEvent);
+            }
+            else
+            {
+                modifyTimeZone(msgEvent);
+            }
+        }
     }
 
 
@@ -53,31 +80,42 @@ public class ConfigMainSettings
                     return;
                 }
                 String prefix = msg.getContentDisplay();
-                if (prefix.length() == 1)
-                {
-                    if (prefix.equals("\\"))
-                    {
-                        channel.sendMessage("Sorry, that prefix is not supported.").queue();
-                    }
-                    else
-                    {
-                        GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
-                        guildSettings.setCommandPrefix(prefix.charAt(0));
-                        SettingsUtil.refreshGuildCommandPrefix(msgEvent.getGuild().getId());
-                        embed.setDescription("Prefix set to "+prefix);
-                        channel.sendMessage(embed.build()).queue();
-                        break;
-                    }
-                }
-                else
-                {
-                    embed.setDescription("Invalid prefix. The prefix can only be 1 character long. Please try again.");
-                    channel.sendMessage(embed.build()).queue();
-                }
+                boolean success = setPrefix(msgEvent, prefix);
+                if (success) break;
             }
         }
     }
 
+    private boolean setPrefix(GuildMessageReceivedEvent msgEvent, String prefix) throws IOException
+    {
+        EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
+        if (prefix.length() == 1)
+        {
+            if (prefix.equals("\\"))
+            {
+                channel.sendMessage("Sorry, that prefix is not supported. Please try again.").queue();
+                return false;
+            }
+            else
+            {
+                guildSettings.setCommandPrefix(prefix.charAt(0));
+                SettingsUtil.refreshGuildCommandPrefix(guildSettings.getGuildId());
+                embed.setDescription("Prefix set to "+prefix);
+                channel.sendMessage(embed.build()).queue();
+                return true;
+            }
+        }
+        else
+        {
+            embed.setDescription("Invalid prefix. The prefix can only be 1 character long. Please try again.");
+            channel.sendMessage(embed.build()).queue();
+            return false;
+        }
+    }
+
+    /*TODO: One change worth considering is taking user input as, for example, BST or British Standard Time, and then comparing against the display name
+    This would be a more expensive operation, as every Id would have to be converted to ZoneId, and then getting its display name in both short and full.
+    However. This would not respect daylight savings.*/
     public void modifyTimeZone(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
@@ -93,27 +131,22 @@ public class ConfigMainSettings
                 {
                     return;
                 }
-                String selectedTimeZone = parseTZDBName(mm, msg, msgEvent);
-                if (selectedTimeZone != null)
-                {
-                    embed.setDescription("Time zone successfully set to "+guildSettings.getTimeZoneId().getDisplayName(TextStyle.FULL, Locale.ENGLISH)+"!");
-                    channel.sendMessage(embed.build()).queue();
-                    return;
-                }
                 else
                 {
-                    embed.setDescription("Unable to find a valid time zone.\nPlease try again, or use "+guildSettings.getCommandPrefix()+"quit to cancel.");
-                    channel.sendMessage(embed.build()).queue();
+                    boolean success = setTimeZone(mm, msg.getContentDisplay(), msgEvent);
+                    if (success)
+                        return;
                 }
             }
         }
     }
 
-    private String parseTZDBName(MessageManager mm, Message inputMessage, GuildMessageReceivedEvent msgEvent) throws IOException
+    private boolean setTimeZone(MessageManager mm, String input, GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
-        String input = inputMessage.getContentDisplay().replace(" ", "_");
+        input = input.replace(" ", "_");
         boolean tzdbInput = (input.contains("/"));
+        boolean success = false;
         if (tzdbInput)
         {
             for (String tzDbName : TimeZone.getAvailableIDs())
@@ -121,7 +154,8 @@ public class ConfigMainSettings
                 if (input.equalsIgnoreCase(tzDbName))
                 {
                     guildSettings.setTimeZoneId(tzDbName);
-                    return tzDbName;
+                    success = true;
+                    break;
                 }
             }
         }
@@ -135,7 +169,7 @@ public class ConfigMainSettings
 
                     embed.setDescription("Are you in "+tzDbName.replace("_", "")+" ("+ZoneId.of(tzDbName).getDisplayName(TextStyle.FULL, Locale.ENGLISH)+")?\n[Y/N]");
                     channel.sendMessage(embed.build()).queue();
-                    while (true)
+                    while (!success)
                     {
                         Message confirmMessage = mm.getNextMessage(channel);
                         if (guildSettings.isPermitted(confirmMessage.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
@@ -144,7 +178,8 @@ public class ConfigMainSettings
                             if (msgContent.equalsIgnoreCase("y") || msgContent.equalsIgnoreCase("yes"))
                             {
                                 guildSettings.setTimeZoneId(tzDbName);
-                                return tzDbName;
+                                success = true;
+                                break;
                             }
                             else if (msgContent.equalsIgnoreCase("n") || msgContent.equalsIgnoreCase("no"))
                             {
@@ -152,19 +187,31 @@ public class ConfigMainSettings
                             }
                             else if (msgContent.equalsIgnoreCase("quit") || msgContent.equalsIgnoreCase(guildSettings.getCommandPrefix()+"quit"))
                             {
-                                return null;
+                                return true;
                             }
                             else
                             {
                                 embed.setDescription("Unknown response. Please enter yes or no.");
                                 channel.sendMessage(embed.build()).queue();
                             }
-
                         }
                     }
+                    if (success)
+                        break;
                 }
             }
         }
-        return null;
+
+        if (success)
+        {
+            embed.setDescription("Time zone successfully set to "+guildSettings.getTimeZoneId().getDisplayName(TextStyle.FULL, Locale.ENGLISH)+"!");
+            channel.sendMessage(embed.build()).queue();
+        }
+        else
+        {
+            embed.setDescription("Unable to find a valid time zone.\nPlease try again, or use "+guildSettings.getCommandPrefix()+"quit to cancel.");
+            channel.sendMessage(embed.build()).queue();
+        }
+        return success;
     }
 }
