@@ -21,6 +21,10 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 public class GuildSettings implements Serializable
@@ -39,6 +43,10 @@ public class GuildSettings implements Serializable
      * The Character used to summon the bot
      */
     protected char commandPrefix;
+    /**
+     * The Time Zone id for this guild.
+     */
+    private String timeZoneId;
     /**
      * The guild's audio settings.
      */
@@ -118,6 +126,7 @@ public class GuildSettings implements Serializable
                 else
                 {
                     this.commandPrefix = settingsFromFile.commandPrefix;
+                    this.timeZoneId = settingsFromFile.timeZoneId;
                     this.audioConfig = settingsFromFile.audioConfig;
                     this.gameConfig = settingsFromFile.gameConfig;
                     this.commandConfig = new HashMap<>(settingsFromFile.commandConfig);
@@ -241,6 +250,7 @@ public class GuildSettings implements Serializable
         addPermissions(guild.getPublicRole().getId(), "Help");
 
         commandPrefix = '/';
+        timeZoneId = TimeZone.getTimeZone(ZoneOffset.UTC).getID();
         audioConfig.useVoiceLeaving = true;
         audioConfig.skipVotePercent = 50;
         audioConfig.roleQueueLimit = new HashMap<>();
@@ -292,6 +302,8 @@ public class GuildSettings implements Serializable
             this.customCommandSettings = legacySettings.customCommandSettings;
         if (legacySettings.commandPrefix != 0)
             this.commandPrefix = legacySettings.commandPrefix;
+        if (legacySettings.timeZoneId != null)
+            this.timeZoneId = legacySettings.timeZoneId;
 
         save();
         logger.info("Updated settings for guild "+guildID+" to Jara "+Core.getVersion());
@@ -759,5 +771,26 @@ public class GuildSettings implements Serializable
     public CustomCommandSettings getCustomCommandSettings()
     {
         return customCommandSettings;
+    }
+
+    /**
+     * Gets the Zoned Date Time this guild.
+     * @return
+     */
+    public ZonedDateTime getZonedDateTime()
+    {
+        ZonedDateTime zdt = LocalDateTime.now().atZone(ZoneId.of(timeZoneId));
+        return zdt;
+    }
+
+    public ZoneId getTimeZoneId()
+    {
+        return ZoneId.of(timeZoneId);
+    }
+
+    public void setTimeZoneId(String timeZoneId) throws IOException
+    {
+        this.timeZoneId = timeZoneId;
+        save();
     }
 }

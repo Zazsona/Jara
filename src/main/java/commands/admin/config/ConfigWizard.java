@@ -38,6 +38,7 @@ public class ConfigWizard
             msgEvent.getChannel().sendMessage(embed.build()).queue();
 
             configurePrefix();
+            configureTimezone();
             embed.setColor(Color.RED);
             embed.setDescription("**AUDIO**");
             msgEvent.getChannel().sendMessage(embed.build()).queue();
@@ -66,6 +67,11 @@ public class ConfigWizard
     private void configurePrefix() throws IOException
     {
         cms.modifyPrefix(msgEvent);
+    }
+
+    private void configureTimezone() throws IOException
+    {
+        cms.modifyTimeZone(msgEvent);
     }
 
     private void configureAudio() throws IOException
