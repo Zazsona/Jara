@@ -114,10 +114,10 @@ public class Help extends Command
             for (String key : guildSettings.getCustomCommandSettings().getCommandKeys())
             {
                 ModuleAttributes ma = guildSettings.getCustomCommandSettings().getCommandAttributes(key);
-                if (guildSettings.getCustomCommandSettings().getCommandAttributes(key).getCategory() == category)
+                if (ma.getCategory() == category)
                 {
                     if (!limitToPerms || guildSettings.isPermitted(msgEvent.getMember(), key))
-                        commandInfo.add("**"+key+"** - "+ma.getDescription());
+                        commandInfo.add("**"+key+"** - "+((ma.getDescription().length() > 30) ? ma.getDescription().replace("\n", " ").substring(0, 27)+"..." : ma.getDescription().replace("\n", " ")));
                 }
             }
             commandInfo.sort(Comparator.naturalOrder());
@@ -154,7 +154,7 @@ public class Help extends Command
         }
         else
         {
-            embed.setDescription(getCommandPage(parameters[1].toLowerCase()));
+            embed.setDescription(getCommandPage(parameters[1].toLowerCase(), msgEvent.getMember().isOwner() || guildSettings.isPermitted(msgEvent.getMember(), "Config")));
             return embed;
         }
     }
@@ -164,7 +164,7 @@ public class Help extends Command
      * @param alias the alias to get the help page for
      * @return the page as a string
      */
-    private String getCommandPage(String alias)
+    private String getCommandPage(String alias, boolean userHasConfigAccess)
     {
         /*
             No permissions check here is deliberate. The aim of removing those commands from the list is so that the user gets a list of commands they can use, thus do not have to play the guessing game.
@@ -176,11 +176,15 @@ public class Help extends Command
         {
             HelpPage helpPage = moduleAttributes.getHelpPage();
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("__Attributes__\n");
-            stringBuilder.append("Name: ").append(moduleAttributes.getKey()).append("\n");
-            stringBuilder.append("Command: ").append((moduleAttributes.getCommandClass() != null) ? "*Yes*" : "*No*").append("\n");
-            stringBuilder.append("Configurable: ").append((moduleAttributes.getConfigClass() != null) ? "*Yes*" : "*No*").append("\n");
-            stringBuilder.append("\n__Aliases__\n");
+            if (userHasConfigAccess) //This is limited to config users for the sake of tidiness. Standard users have no use for this information.
+            {
+                stringBuilder.append("__Attributes__\n");
+                stringBuilder.append("Name: ").append(moduleAttributes.getKey()).append("\n");
+                stringBuilder.append("Command: ").append((moduleAttributes.getCommandClass() != null) ? "*Yes*" : "*No*").append("\n");
+                stringBuilder.append("Configurable: ").append((moduleAttributes.getConfigClass() != null) ? "*Yes*" : "*No*").append("\n");
+                stringBuilder.append("\n");
+            }
+            stringBuilder.append("__Aliases__\n");
             for (String otherAlias : moduleAttributes.getAliases())
             {
                 stringBuilder.append(otherAlias).append(", ");
