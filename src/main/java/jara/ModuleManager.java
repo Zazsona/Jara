@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
@@ -71,13 +72,15 @@ public class ModuleManager
         if (!moduleDir.exists())
             moduleDir.mkdirs();
 
+        URLClassLoader cl = getClassLoader(moduleDir);
+
         for (File file : moduleDir.listFiles())
         {
             try
             {
                 if (file.isFile() && file.getName().endsWith(".jar"))
                 {
-                    ModuleAttributes ma = loadModule(file.getPath());
+                    ModuleAttributes ma = loadModule(file.getPath(), cl);
                     if (ma != null)
                     {
                         moduleAttributes.add(ma);
@@ -120,6 +123,27 @@ public class ModuleManager
         }
     }
 
+    private static URLClassLoader getClassLoader(File moduleDir)
+    {
+        ArrayList<URL> urls = new ArrayList<>();
+        for (File file : moduleDir.listFiles())
+        {
+            try
+            {
+                if (file.isFile() && file.getName().endsWith(".jar"))
+                {
+                    urls.add(new URL("jar:file:" + file.getPath() + "!/"));
+                }
+            }
+            catch (MalformedURLException e)
+            {
+                logger.info(e.toString());
+            }
+        }
+        URLClassLoader cl = URLClassLoader.newInstance(urls.toArray(new URL[0]));
+        return cl;
+    }
+
     /**
      * Gets the {@link ModuleAttributes} for the specified jar.
      * @param jarPath the jar to analyse
@@ -128,13 +152,10 @@ public class ModuleManager
      * @throws IOException unable to access jar
      * @throws ConflictException unable to resolve pact conflicts
      */
-    private static ModuleAttributes loadModule(String jarPath) throws ClassNotFoundException, IOException, ConflictException
+    private static ModuleAttributes loadModule(String jarPath, URLClassLoader cl) throws ClassNotFoundException, IOException, ConflictException
     {
         JarFile jarFile = new JarFile(jarPath);
         Enumeration<JarEntry> entries = jarFile.entries();
-
-        URL[] urls = {new URL("jar:file:" + jarPath + "!/")};
-        URLClassLoader cl = URLClassLoader.newInstance(urls);
 
         ModuleAttributes ma = loadClasses(jarFile, cl, entries);
         if (ma == null)
