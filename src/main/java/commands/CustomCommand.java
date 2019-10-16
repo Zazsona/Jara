@@ -21,33 +21,9 @@ public class CustomCommand extends Command
             String key = getKey(msgEvent.getGuild().getId(), parameters[0]);
             CustomCommandBuilder customCommand = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).getCustomCommandSettings().getCommand(key);
 
-            if (!customCommand.getMessage().equals(""))
-            {
-                EmbedBuilder embed = new EmbedBuilder();
-                embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
-                embed.setDescription(customCommand.getMessage());
-                msgEvent.getChannel().sendMessage(embed.build()).queue();
-            }
-            if (customCommand.getRoles().size() > 0)
-            {
-                ArrayList<Role> roles = new ArrayList<>();
-                for (String roleID : customCommand.getRoles())
-                {
-                    Role role = msgEvent.getGuild().getRoleById(roleID);
-                    if (role != null)
-                    {
-                        roles.add(role);
-                    }
-                }
-                msgEvent.getGuild().getController().addRolesToMember(msgEvent.getMember(), roles).queue();
-            }
-            if (!customCommand.getAudioLink().equals(""))
-            {
-                if (customCommand.getMessage().equals("") || msgEvent.getMessage().getMember().getVoiceState().inVoiceChannel())
-                {
-                    CmdUtil.getGuildAudio(msgEvent.getGuild().getId()).playWithFeedback(msgEvent.getMember(), customCommand.getAudioLink(), msgEvent.getChannel());
-                }
-            }
+            runMessage(msgEvent, customCommand);
+            runRoles(msgEvent, customCommand);
+            runAudio(msgEvent, customCommand);
         }
         catch (NullPointerException e)
         {
@@ -64,6 +40,70 @@ public class CustomCommand extends Command
             embed.setTitle("Error");
             embed.setDescription("I do not have sufficient permissions / role hierarchy to fully perform the command.");
             msgEvent.getChannel().sendMessage(embed.build()).queue();
+        }
+    }
+
+    private void runAudio(GuildMessageReceivedEvent msgEvent, CustomCommandBuilder customCommand)
+    {
+        if (!customCommand.getAudioLink().equals(""))
+        {
+            if (customCommand.getMessage().equals("") || msgEvent.getMessage().getMember().getVoiceState().inVoiceChannel())
+            {
+                CmdUtil.getGuildAudio(msgEvent.getGuild().getId()).playWithFeedback(msgEvent.getMember(), customCommand.getAudioLink(), msgEvent.getChannel());
+            }
+        }
+    }
+
+    private void runRoles(GuildMessageReceivedEvent msgEvent, CustomCommandBuilder customCommand)
+    {
+        if (customCommand.getRoles().size() > 0)
+        {
+            ArrayList<Role> roles = new ArrayList<>();
+            for (String roleID : customCommand.getRoles())
+            {
+                Role role = msgEvent.getGuild().getRoleById(roleID);
+                if (role != null)
+                {
+                    roles.add(role);
+                }
+            }
+            msgEvent.getGuild().getController().addRolesToMember(msgEvent.getMember(), roles).queue();
+        }
+    }
+
+    private void runMessage(GuildMessageReceivedEvent msgEvent, CustomCommandBuilder customCommand)
+    {
+        if (!customCommand.getMessage().equals(""))
+        {
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+            try
+            {
+                String lcMessage = customCommand.getMessage().toLowerCase();
+                String url = "";
+                if (lcMessage.contains(".png") || lcMessage.contains(".jpg") || lcMessage.contains(".jpeg") || lcMessage.contains(".gif"))
+                {
+                    for (String word : customCommand.getMessage().split(" "))
+                    {
+                        String lcWord = word.toLowerCase();
+                        if (lcWord.contains(".png") || lcWord.contains(".jpg") || lcWord.contains(".jpeg") || lcWord.contains(".gif"))
+                        {
+                            embed.setImage(word);
+                            url = word;
+                        }
+                    }
+                }
+                embed.setDescription(customCommand.getMessage().replace(url, ""));
+            }
+            catch (IllegalArgumentException e)
+            {
+                embed.setImage(null);
+                embed.setDescription(customCommand.getMessage());
+            }
+            finally
+            {
+                msgEvent.getChannel().sendMessage(embed.build()).queue();
+            }
         }
     }
 
