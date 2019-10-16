@@ -51,7 +51,7 @@ public class CustomCommandSettings implements Serializable
         }
         customCommands.put(key.toLowerCase(), new CustomCommandBuilder(key, aliases, description, category, roleIDs, audioLink, message));
         guildSettings.setCommandConfiguration(true, new ArrayList<>(), key);
-        return customCommands.get(key);
+        return customCommands.get(key.toLowerCase());
     }
 
     /**

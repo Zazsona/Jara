@@ -189,8 +189,15 @@ public class CustomCommandManager extends Command
                 {
                     ArrayList<String> everyoneRole = new ArrayList<>();
                     everyoneRole.add(msgEvent.getGuild().getPublicRole().getId());
-                    guildSettings.getCustomCommandSettings().addCommand(commandName, new String[0], "No description.", ModuleRegister.Category.UTILITY, new ArrayList<>(), "", "");
+                    CustomCommandBuilder ccb = guildSettings.getCustomCommandSettings().addCommand(commandName, new String[0], "No description.", ModuleRegister.Category.UTILITY, new ArrayList<>(), "", "");
                     guildSettings.addPermissions(everyoneRole, commandName);
+                    if (ccb == null)
+                    {
+                        embed.setDescription("That command name is taken by a module.\nPlease try again.");
+                        msgEvent.getChannel().sendMessage(embed.build()).queue();
+                        return CCResponseType.INVALID;
+                    }
+
                 }
                 return CCResponseType.VALID;
             case "edit":
@@ -474,6 +481,15 @@ public class CustomCommandManager extends Command
                 responseType = getResponseType(message);
             }
             value = message.getContentRaw();
+            if (message.getAttachments().size() > 0)
+            {
+                StringBuilder sb = new StringBuilder(value);
+                for (Message.Attachment attachment : message.getAttachments())
+                {
+                    sb.append(attachment.getUrl()).append("\n");
+                }
+                value = sb.toString();
+            }
         }
         if (responseType == CCResponseType.VALID)
         {
