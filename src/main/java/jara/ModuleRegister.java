@@ -141,7 +141,7 @@ public class ModuleRegister
 		{
 			getModules();
 			int min = 0;
-			int max = getRegisterSize();
+			int max = getRegisterSize()-1;
 
 			/*================================================================
 			We first check for command keys, as this should be what the
@@ -151,19 +151,19 @@ public class ModuleRegister
 
 			while (min <= max)
 			{
-				int mid = (max+min)/2;
-
-				if (getModules()[mid].getKey().compareToIgnoreCase(alias) < 0)
+				int mid = (int) Math.floor((min+max)/2);
+				ModuleAttributes ma = getModules()[mid];
+				if (ma.getKey().compareToIgnoreCase(alias) < 0)
 				{
 					min = mid+1;
 				}
-				else if (getModules()[mid].getKey().compareToIgnoreCase(alias) > 0)
+				else if (ma.getKey().compareToIgnoreCase(alias) > 0)
 				{
 					max = mid-1;
 				}
-				else if (getModules()[mid].getKey().compareToIgnoreCase(alias) == 0)
+				else if (ma.getKey().compareToIgnoreCase(alias) == 0)
 				{
-					return getModules()[mid];
+					return ma;
 				}
 			}
 
@@ -187,16 +187,17 @@ public class ModuleRegister
 				max = moduleAttributes.getAliases().length-1;
 				while (min <= max)
 				{
-					int mid = (max+min)/2;
-					if (moduleAttributes.getAliases()[mid].compareToIgnoreCase(alias) < 0)
+					int mid = (int) Math.floor((min+max)/2);
+					String moduleAlias = moduleAttributes.getAliases()[mid].toLowerCase();
+					if (moduleAlias.compareToIgnoreCase(alias) < 0)
 					{
 						min = mid+1;
 					}
-					else if (moduleAttributes.getAliases()[mid].compareToIgnoreCase(alias) > 0)
+					else if (moduleAlias.compareToIgnoreCase(alias) > 0)
 					{
 						max = mid-1;
 					}
-					else if (moduleAttributes.getAliases()[mid].compareToIgnoreCase(alias) == 0)
+					else if (moduleAlias.compareToIgnoreCase(alias) == 0)
 					{
 						return moduleAttributes;
 					}

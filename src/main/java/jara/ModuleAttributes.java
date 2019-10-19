@@ -39,7 +39,7 @@ public class ModuleAttributes
 		{
 			int index = i-1;
 			String element = getAliases()[i];
-			while ((index > -1) && (element.compareTo(getAliases()[index]) < 0))
+			while ((index > -1) && (element.compareToIgnoreCase(getAliases()[index]) < 0))
 			{
 				getAliases()[index+1] = getAliases()[index];
 				index--;
@@ -72,7 +72,7 @@ public class ModuleAttributes
 		{
 			int index = i-1;
 			String element = getAliases()[i];
-			while ((index > -1) && (element.compareTo(getAliases()[index]) < 0))
+			while ((index > -1) && (element.compareToIgnoreCase(getAliases()[index]) < 0))
 			{
 				getAliases()[index+1] = getAliases()[index];
 				index--;
@@ -102,7 +102,7 @@ public class ModuleAttributes
 		{
 			int index = i-1;
 			String element = getAliases()[i];
-			while ((index > -1) && (element.compareTo(getAliases()[index]) < 0))
+			while ((index > -1) && (element.compareToIgnoreCase(getAliases()[index]) < 0))
 			{
 				getAliases()[index+1] = getAliases()[index];
 				index--;
