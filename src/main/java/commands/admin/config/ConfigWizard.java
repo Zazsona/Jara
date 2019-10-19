@@ -113,7 +113,7 @@ public class ConfigWizard
         {
             if (ma.getConfigClass() != null)
             {
-                cmos.loadConfig(msgEvent, ma, null);
+                cmos.loadConfig(msgEvent, ma, null, true);
             }
         }
     }

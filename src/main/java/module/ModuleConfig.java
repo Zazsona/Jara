@@ -16,12 +16,12 @@ public abstract class ModuleConfig
      * @param msgEvent the context
      * @throws IOException throw for errors writing to file
      */
-    public abstract void run(GuildMessageReceivedEvent msgEvent, GuildSettings guildSettings, TextChannel channel) throws IOException;
+    public abstract void run(GuildMessageReceivedEvent msgEvent, GuildSettings guildSettings, TextChannel channel, boolean isSetup) throws IOException;
 
     /**
      * The entrance method for a config, when being navigated through a single message.
      * @param msgEvent the context
-     * @param parameters the parameters, including those for previous menu navigation
+     * @param parameters the parameters, not including those for previous menu navigation
      * @throws IOException throw for errors writing to file
      */
     public abstract void parseAsParameters(GuildMessageReceivedEvent msgEvent, Collection<String> parameters, GuildSettings guildSettings, TextChannel channel) throws IOException;

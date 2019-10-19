@@ -41,7 +41,7 @@ public class ConfigModuleSettings
             ModuleAttributes ma = ModuleRegister.getModule(parameters[2]);
             if (ma != null)
             {
-                loadConfig(msgEvent, ma, convertParametersToCollection(parameters));
+                loadConfig(msgEvent, ma, convertParametersToCollection(parameters), false);
             }
             else
             {
@@ -81,7 +81,7 @@ public class ConfigModuleSettings
             {
                 if ((ma = ModuleRegister.getModule(msg.getContentDisplay())) != null)
                 {
-                    loadConfig(msgEvent, ma, null);
+                    loadConfig(msgEvent, ma, null, false);
                     break;
                 }
                 else if (msg.getContentDisplay().equalsIgnoreCase("quit") || msg.getContentDisplay().equalsIgnoreCase(guildSettings.getCommandPrefix()+"quit"))
@@ -97,7 +97,7 @@ public class ConfigModuleSettings
         }
     }
 
-    public void loadConfig(GuildMessageReceivedEvent msgEvent, ModuleAttributes ma, Collection<String> parameters) throws IOException
+    public void loadConfig(GuildMessageReceivedEvent msgEvent, ModuleAttributes ma, Collection<String> parameters, boolean isSetup) throws IOException
     {
         try
         {
@@ -106,7 +106,7 @@ public class ConfigModuleSettings
             if (moduleConfigClass != null)
             {
                 if (parameters == null)
-                    moduleConfigClass.newInstance().run(msgEvent, guildSettings, channel);
+                    moduleConfigClass.newInstance().run(msgEvent, guildSettings, channel, isSetup);
                 else
                     moduleConfigClass.newInstance().parseAsParameters(msgEvent, parameters, guildSettings, channel);
             }
