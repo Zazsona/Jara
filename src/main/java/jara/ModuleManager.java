@@ -269,7 +269,12 @@ public class ModuleManager
     {
         if (jarPact != null)
         {
-            ModuleAttributes ma = new ModuleAttributes(getJson(jarFile, jarPact));
+            String json = getJson(jarFile, jarPact);
+            ModuleAttributes ma = new ModuleAttributes(json);
+
+            if (ma.getCategory() == ModuleRegister.Category.SEASONAL)
+                ma = new SeasonalModuleAttributes(json);
+
             return resolveConflicts(jarFile, ma);
         }
         else

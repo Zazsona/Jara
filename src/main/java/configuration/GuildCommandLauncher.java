@@ -1,9 +1,11 @@
 package configuration;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 
 import commands.CmdUtil;
+import jara.SeasonalModuleAttributes;
 import net.dv8tion.jda.core.EmbedBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,48 +39,71 @@ public class GuildCommandLauncher
             GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
             if (guildSettings.isCommandEnabled(attributes.getKey()))
             {
-                if (guildSettings.isPermitted(msgEvent.getMember(), attributes.getCommandClass()))
-                {
-                    Runnable commandRunnable = () -> {
-                        try
-                        {
-                            attributes.getCommandClass().newInstance().run(msgEvent, parameters);
-                        }
-                        catch (InstantiationException | IllegalAccessException e)
-                        {
-                            msgEvent.getChannel().sendMessage("Sorry, I was unable to run the command.").queue();
-                            Logger logger = LoggerFactory.getLogger(GuildCommandLauncher.class);
-                            logger.error("A command request was sent but could not be fulfilled.\nCommand: "+ Arrays.toString(parameters) +"\nGuild: "+msgEvent.getGuild().getId()+" ("+msgEvent.getGuild().getName()+")\nUser: "+msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+"Channel: "+msgEvent.getChannel().getId()+" ("+msgEvent.getChannel().getName()+")\nDate/Time: "+LocalDateTime.now().toString()+"\n\nError: \n"+e.toString());
-                        }
-                        catch (NoSuchMethodError e)
-                        {
-                            logger.error("User attempted command "+parameters[0]+ ", but it is using an older API version, and is not supported.\n"+e.toString());
-                            EmbedBuilder embedBuilder = new EmbedBuilder();
-                            embedBuilder.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
-                            embedBuilder.setDescription("This command module is outdated and cannot properly function.\nIt is recommended to disable this command.");
-                            msgEvent.getChannel().sendMessage(embedBuilder.build()).queue();
-                        }
-                    };
-                    Thread commandThread = new Thread(commandRunnable);
-                    commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getKey()+"-Thread");
-                    commandThread.start();
-                    return;
-                }
-                else
-                {
-                    msgEvent.getChannel().sendMessage("You do not have permission to use this command.").queue();
-                }
+				if (checkForTimedAvailability(attributes, guildSettings))
+				{
+					if (guildSettings.isPermitted(msgEvent.getMember(), attributes.getCommandClass()))
+					{
+						Runnable commandRunnable = () -> instantiateCommand(msgEvent, parameters);
+						Thread commandThread = new Thread(commandRunnable);
+						commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getKey()+"-Thread");
+						commandThread.start();
+						return;
+					}
+					else
+					{
+						msgEvent.getChannel().sendMessage("You do not have permission to use this command.").queue();
+					}
+				}
+				else
+				{
+					msgEvent.getChannel().sendMessage("This seasonal command is out of season.").queue();
+				}
             }
             else
             {
                 msgEvent.getChannel().sendMessage("This command is disabled.").queue();
             }
-
         }
         else
         {
             logger.info(msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+" attempted to use the command "+parameters[0]+", however it's disabled. Please enable it in the config.");
         }
+	}
+
+	private void instantiateCommand(GuildMessageReceivedEvent msgEvent, String[] parameters)
+	{
+		try
+		{
+			attributes.getCommandClass().newInstance().run(msgEvent, parameters);
+		}
+		catch (InstantiationException | IllegalAccessException e)
+		{
+			msgEvent.getChannel().sendMessage("Sorry, I was unable to run the command.").queue();
+			Logger logger = LoggerFactory.getLogger(GuildCommandLauncher.class);
+			logger.error("A command request was sent but could not be fulfilled.\nCommand: "+ Arrays.toString(parameters) +"\nGuild: "+msgEvent.getGuild().getId()+" ("+msgEvent.getGuild().getName()+")\nUser: "+msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+"Channel: "+msgEvent.getChannel().getId()+" ("+msgEvent.getChannel().getName()+")\nDate/Time: "+ LocalDateTime.now().toString()+"\n\nError: \n"+e.toString());
+		}
+		catch (NoSuchMethodError e)
+		{
+			logger.error("User attempted command "+parameters[0]+ ", but it is using an older API version, and is not supported.\n"+e.toString());
+			EmbedBuilder embedBuilder = new EmbedBuilder();
+			embedBuilder.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+			embedBuilder.setDescription("This command module is outdated and cannot properly function.\nIt is recommended to disable this command.");
+			msgEvent.getChannel().sendMessage(embedBuilder.build()).queue();
+		}
+	}
+
+	private boolean checkForTimedAvailability(ModuleAttributes ma, GuildSettings guildSettings)
+	{
+		if (ma instanceof SeasonalModuleAttributes)
+		{
+			ZonedDateTime zdt = ZonedDateTime.now(guildSettings.getTimeZoneId());
+			SeasonalModuleAttributes sma = (SeasonalModuleAttributes) ma;
+			return sma.isActive(zdt);
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 	/**
