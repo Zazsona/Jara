@@ -38,7 +38,7 @@ public class GlobalSettings implements Serializable
 
     public synchronized void save() throws IOException
     {
-        if (!moduleConfig.keySet().containsAll(Arrays.asList(ModuleRegister.getCommandModuleKeys())))
+        if (!moduleConfig.keySet().containsAll(ModuleRegister.getCommandModuleKeys()))
         {
             for (ModuleAttributes ma : ModuleRegister.getModules())
             {
@@ -77,7 +77,7 @@ public class GlobalSettings implements Serializable
                 this.moduleConfig = gs.moduleConfig;
                 ois.close();
                 fis.close();
-                if (!moduleConfig.keySet().containsAll(Arrays.asList(ModuleRegister.getCommandModuleKeys())))
+                if (!moduleConfig.keySet().containsAll(ModuleRegister.getCommandModuleKeys()))
                 {
                     logger.info("Found new commands. Adding them to the config.");
                     for (String key : ModuleRegister.getModuleKeys())

@@ -133,7 +133,7 @@ public class GuildSettings implements Serializable
                     this.customCommandSettings = settingsFromFile.customCommandSettings;
                     this.customCommandSettings.setGuildSettings(this);
                 }
-                if (!commandConfig.keySet().containsAll(Arrays.asList(ModuleRegister.getCommandModuleKeys())))
+                if (!commandConfig.keySet().containsAll(ModuleRegister.getCommandModuleKeys()))
                 {
                     ArrayList<String> newCommands = addMissingCommands();
                     StringBuilder sb = new StringBuilder();
@@ -212,8 +212,8 @@ public class GuildSettings implements Serializable
      */
     private ArrayList<String> addMissingCommands()
     {
-        String[] commandModuleKeys = ModuleRegister.getCommandModuleKeys();
-        if (!commandConfig.keySet().containsAll(Arrays.asList(commandModuleKeys)))
+        ArrayList<String> commandModuleKeys = ModuleRegister.getCommandModuleKeys();
+        if (!commandConfig.keySet().containsAll(commandModuleKeys))
         {
             ArrayList<String> newKeys = new ArrayList<>();
             for (String key : commandModuleKeys)

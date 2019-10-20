@@ -1,8 +1,6 @@
 package jara;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.*;
 
 import module.Command;
 import commands.CustomCommand;
@@ -10,6 +8,7 @@ import commands.Help;
 import commands.admin.CustomCommandManager;
 import commands.admin.config.ConfigMain;
 import commands.utility.*;
+import org.apache.commons.collections4.list.UnmodifiableList;
 
 import static jara.ModuleRegister.Category.*;
 
@@ -39,9 +38,8 @@ public class ModuleRegister
 	/**
 	 * This method returns the command list of all programmed commands, with their classes and alias arrays.<br>
 	 * @return
-	 *{@link ModuleAttributes}[] - An array of all modules.
 	 */
-	public static ModuleAttributes[] getModules()
+	private static void prepareModules()
 	{
 		if (register == null)
 		{
@@ -58,51 +56,59 @@ public class ModuleRegister
 			register.addAll(ModuleManager.loadModules(register));			//Load modules
 			register.sort(Comparator.comparing(ModuleAttributes::getKey)); //Sort the commands into alphabetical order based on their keys
 		}
-		return register.toArray(new ModuleAttributes[0]);
+	}
+
+	/**
+	 * Gets an unmodifiable list of all modules.
+	 * @return
+	 */
+	public static List<ModuleAttributes> getModules()
+	{
+		prepareModules();
+		return Collections.unmodifiableList(register);
 	}
 	/**
 	 * Returns all strings which can be used to trigger commands. 
 	 * @return
-	 * String[] - All command aliases
+	 * All module aliases
 	 */
-	public static String[] getModuleAliases()
+	public static ArrayList<String> getModuleAliases()
 	{
-		getModules();
+		prepareModules();
 		ArrayList<String> aliases = new ArrayList<>();
 		for (ModuleAttributes moduleAttributes : register)
 		{
 			Collections.addAll(aliases, moduleAttributes.getAliases());
 		}
-		return aliases.toArray(new String[0]);
+		return aliases;
 	}
 	/**
 	 * Returns all registered command keys, which can be used to obtain other data about a command.
-	 * 
 	 * @return
-	 * String[] - The keys
+	 * The keys
 	 */
-	public static String[] getModuleKeys()
+	public static ArrayList<String> getModuleKeys()
 	{
-		getModules();
+		prepareModules();
 		ArrayList<String> keys = new ArrayList<>();
 		for (ModuleAttributes moduleAttributes : register)
 		{
 			keys.add(moduleAttributes.getKey());
 		}
-		return keys.toArray(new String[0]);
+		return keys;
 	}
 
 	/**
 	 * Gets all modules that have a command class
 	 * @return
 	 */
-	public static ModuleAttributes[] getCommandModules()
+	public static ArrayList<ModuleAttributes> getCommandModules()
 	{
 		if (commandModules == null)
 		{
-			getModules();
+			prepareModules();
 			ArrayList<ModuleAttributes> commandModulesBuilder = new ArrayList<>();
-			for (ModuleAttributes ma : getModules())
+			for (ModuleAttributes ma : register)
 			{
 				if (ma.getCommandClass() != null)
 				{
@@ -111,19 +117,19 @@ public class ModuleRegister
 			}
 			commandModules = commandModulesBuilder;
 		}
-		return commandModules.toArray(new ModuleAttributes[0]);
+		return commandModules;
 	}
 
 	/**
 	 * Gets the keys of all command modules.
 	 * @return
 	 */
-	public static String[] getCommandModuleKeys()
+	public static ArrayList<String> getCommandModuleKeys()
 	{
-		String[] keys = new String[getCommandModules().length];
-		for (int i = 0; i<keys.length; i++)
+		ArrayList<String> keys = new ArrayList<>();
+		for (ModuleAttributes ma : getCommandModules())
 		{
-			keys[i] = getCommandModules()[i].getKey();
+			keys.add(ma.getKey());
 		}
 		return keys;
 	}
@@ -139,7 +145,7 @@ public class ModuleRegister
 	{
 		try
 		{
-			getModules();
+			prepareModules();
 			int min = 0;
 			int max = getRegisterSize()-1;
 
@@ -152,7 +158,7 @@ public class ModuleRegister
 			while (min <= max)
 			{
 				int mid = (int) Math.floor((min+max)/2);
-				ModuleAttributes ma = getModules()[mid];
+				ModuleAttributes ma = register.get(mid);
 				if (ma.getKey().compareToIgnoreCase(alias) < 0)
 				{
 					min = mid+1;
@@ -181,7 +187,7 @@ public class ModuleRegister
 
 			================================================================*/
 
-			for (ModuleAttributes moduleAttributes : register) //TODO: This is still wank. TextVoiceChannels has anything behind the key break.
+			for (ModuleAttributes moduleAttributes : register)
 			{
 				min = 0;
 				max = moduleAttributes.getAliases().length-1;
@@ -218,7 +224,7 @@ public class ModuleRegister
 	 */
 	public static int getRegisterSize()
 	{
-		getModules();
+		prepareModules();
 		return register.size();
 	}
 	/**
@@ -231,7 +237,7 @@ public class ModuleRegister
 	 */
 	public static ModuleAttributes getModule(Class<? extends Command> clazz)
 	{
-		getModules();
+		prepareModules();
 		if (clazz != null)
 		{
 			for (ModuleAttributes moduleAttributes : register)
@@ -319,11 +325,10 @@ public class ModuleRegister
 	}
 
 	/**
-	 * Returns the Command Attributes all all commands in this category.
+	 * Returns the Module Attributes all all modules in this category.
 	 * @param category
-	 * @return CommandAttributes[] - Array of attributes.
 	 */
-	public static ModuleAttributes[] getModulesInCategory(Category category)
+	public static ArrayList<ModuleAttributes> getModulesInCategory(Category category)
 	{
 		ArrayList<ModuleAttributes> categoryModules;
 		switch (category)
@@ -354,7 +359,7 @@ public class ModuleRegister
 		}
 		if (categoryModules != null)
 		{
-			return categoryModules.toArray(new ModuleAttributes[0]);
+			return categoryModules;
 		}
 		else
 		{
@@ -367,9 +372,9 @@ public class ModuleRegister
 	 * @param categoryID
 	 * @return
 	 */
-	private static ModuleAttributes[] generateModulesInCategory(Category categoryID)
+	private static ArrayList<ModuleAttributes> generateModulesInCategory(Category categoryID)
 	{
-		getModules();
+		prepareModules();
 		ArrayList<ModuleAttributes> categoryModules = new ArrayList<>();
 		for (ModuleAttributes moduleAttributes : register)
 		{
@@ -404,7 +409,7 @@ public class ModuleRegister
 			default:
 				return null;
 		}
-		return categoryModules.toArray(new ModuleAttributes[0]);
+		return categoryModules;
 	}
 	
 }

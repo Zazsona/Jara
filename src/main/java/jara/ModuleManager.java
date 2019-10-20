@@ -56,7 +56,7 @@ public class ModuleManager
      * @return the list of {@link ModuleAttributes}
      * @throws InvalidModuleException one or more fatal errors occurred during module loading
      */
-    public static synchronized LinkedList<ModuleAttributes> loadModules(ArrayList<ModuleAttributes> register) throws InvalidModuleException
+    protected static synchronized LinkedList<ModuleAttributes> loadModules(ArrayList<ModuleAttributes> register) throws InvalidModuleException
     {
         onLoadClasses = new HashMap<>();
         reservedAliases = new HashSet<>();
@@ -140,8 +140,7 @@ public class ModuleManager
                 logger.info(e.toString());
             }
         }
-        URLClassLoader cl = URLClassLoader.newInstance(urls.toArray(new URL[0]));
-        return cl;
+        return URLClassLoader.newInstance(urls.toArray(new URL[0]));
     }
 
     /**
@@ -221,7 +220,7 @@ public class ModuleManager
         return ma;
     }
 
-    private static void loadClass(JarFile jarFile, URLClassLoader cl, ModuleAttributes ma, JarEntry jarEntry) throws ClassNotFoundException, IOException
+    private static void loadClass(JarFile jarFile, URLClassLoader cl, ModuleAttributes ma, JarEntry jarEntry) throws ClassNotFoundException
     {
         String className = jarEntry.getName().substring(0, jarEntry.getName().length() - 6);
         className = className.replace("/", ".");
