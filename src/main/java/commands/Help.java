@@ -4,10 +4,13 @@ import configuration.GuildSettings;
 import configuration.SettingsUtil;
 import jara.ModuleAttributes;
 import jara.ModuleRegister;
+import jara.SeasonalModuleAttributes;
 import module.Command;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
+import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
@@ -96,34 +99,7 @@ public class Help extends Command
         boolean limitToPerms = !(msgEvent.getMember().isOwner() | (parameters.length >= 3 && parameters[2].equalsIgnoreCase("all")));
         if (category != null)
         {
-            LinkedList<String> commandInfo = new LinkedList<>();
-            /*
-                Get commands from all sources
-             */
-            for (ModuleAttributes ma : ModuleRegister.getModulesInCategory(category))
-            {
-                if (ma.getCommandClass() != null)
-                {
-                    if (SettingsUtil.getGlobalSettings().isModuleEnabled(ma.getKey()) && guildSettings.isCommandEnabled(ma.getKey()))
-                    {
-                        if (!limitToPerms || guildSettings.isPermitted(msgEvent.getMember(), ma.getKey()))
-                            commandInfo.add("**"+ma.getKey()+"** - "+ma.getDescription());
-                    }
-                }
-            }
-            for (String key : guildSettings.getCustomCommandSettings().getCommandKeys())
-            {
-                ModuleAttributes ma = guildSettings.getCustomCommandSettings().getCommandAttributes(key);
-                if (ma.getCategory() == category)
-                {
-                    if (!limitToPerms || guildSettings.isPermitted(msgEvent.getMember(), key))
-                        commandInfo.add("**"+key+"** - "+((ma.getDescription().length() > 30) ? ma.getDescription().replace("\n", " ").substring(0, 27)+"..." : ma.getDescription().replace("\n", " ")));
-                }
-            }
-            commandInfo.sort(Comparator.naturalOrder());
-            /*
-                All commands added & sorted.
-             */
+            LinkedList<String> commandInfo = getCommandStrings(msgEvent, category, limitToPerms);
 
             if (commandInfo.size() == 0)
             {
@@ -157,6 +133,44 @@ public class Help extends Command
             embed.setDescription(getCommandPage(parameters[1].toLowerCase(), msgEvent.getMember().isOwner() || guildSettings.isPermitted(msgEvent.getMember(), "Config")));
             return embed;
         }
+    }
+
+    @NotNull
+    private LinkedList<String> getCommandStrings(GuildMessageReceivedEvent msgEvent, ModuleRegister.Category category, boolean limitToPerms)
+    {
+        LinkedList<String> commandInfo = new LinkedList<>();
+        for (ModuleAttributes ma : ModuleRegister.getModulesInCategory(category))
+        {
+            if (ma.getCommandClass() != null)
+            {
+                if (SettingsUtil.getGlobalSettings().isModuleEnabled(ma.getKey()) && guildSettings.isCommandEnabled(ma.getKey()))
+                {
+                    if (!limitToPerms || guildSettings.isPermitted(msgEvent.getMember(), ma.getKey()))
+                    {
+                        if (ma instanceof SeasonalModuleAttributes)
+                        {
+                            if (limitToPerms && !((SeasonalModuleAttributes) ma).isActive(ZonedDateTime.now(guildSettings.getTimeZoneId())))
+                            {
+                                continue;
+                            }
+                        }
+                        commandInfo.add("**"+ma.getKey()+"** - "+ma.getDescription());
+                    }
+
+                }
+            }
+        }
+        for (String key : guildSettings.getCustomCommandSettings().getCommandKeys())
+        {
+            ModuleAttributes ma = guildSettings.getCustomCommandSettings().getCommandAttributes(key);
+            if (ma.getCategory() == category)
+            {
+                if (!limitToPerms || guildSettings.isPermitted(msgEvent.getMember(), key))
+                    commandInfo.add("**"+key+"** - "+((ma.getDescription().length() > 30) ? ma.getDescription().replace("\n", " ").substring(0, 27)+"..." : ma.getDescription().replace("\n", " ")));
+            }
+        }
+        commandInfo.sort(Comparator.naturalOrder());
+        return commandInfo;
     }
 
     /**
@@ -234,7 +248,7 @@ public class Help extends Command
         }
         else
         {
-            return "PICNIC Error: Unknown Parameter \""+alias+"\".\n Usage: /Help [Category]/[Command] (all) (Page #)";
+            return "PICNIC Error: Unknown Parameter \""+alias+"\".";
         }
     }
 
