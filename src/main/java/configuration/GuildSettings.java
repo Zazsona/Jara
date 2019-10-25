@@ -42,7 +42,7 @@ public class GuildSettings implements Serializable
     /**
      * The Character used to summon the bot
      */
-    protected char commandPrefix;
+    private char commandPrefix;
     /**
      * The Time Zone id for this guild.
      */
@@ -63,6 +63,11 @@ public class GuildSettings implements Serializable
      * The custom commands
      */
     protected CustomCommandSettings customCommandSettings;
+    /**
+     * The guild's settings, supplied by modules.
+     */
+    private HashMap<String, Object> moduleConfig;
+
 
     /**
      * The logger.
@@ -130,6 +135,7 @@ public class GuildSettings implements Serializable
                     this.audioConfig = settingsFromFile.audioConfig;
                     this.gameConfig = settingsFromFile.gameConfig;
                     this.commandConfig = new HashMap<>(settingsFromFile.commandConfig);
+                    this.moduleConfig = settingsFromFile.moduleConfig;
                     this.customCommandSettings = settingsFromFile.customCommandSettings;
                     this.customCommandSettings.setGuildSettings(this);
                 }
@@ -251,6 +257,7 @@ public class GuildSettings implements Serializable
 
         commandPrefix = '/';
         timeZoneId = TimeZone.getTimeZone(ZoneOffset.UTC).getID();
+        moduleConfig = new HashMap<>();
         audioConfig.useVoiceLeaving = true;
         audioConfig.skipVotePercent = 50;
         audioConfig.roleQueueLimit = new HashMap<>();
@@ -304,6 +311,8 @@ public class GuildSettings implements Serializable
             this.commandPrefix = legacySettings.commandPrefix;
         if (legacySettings.timeZoneId != null)
             this.timeZoneId = legacySettings.timeZoneId;
+        if (legacySettings.moduleConfig != null)
+            this.moduleConfig = legacySettings.moduleConfig;
 
         save();
         logger.info("Updated settings for guild "+guildID+" to Jara "+Core.getVersion());
@@ -783,14 +792,58 @@ public class GuildSettings implements Serializable
         return zdt;
     }
 
+    /**
+     * Gets the timezone ID for this guild.
+     * @return
+     */
     public ZoneId getTimeZoneId()
     {
         return ZoneId.of(timeZoneId);
     }
 
+    /**
+     * Sets the timezone id.
+     * @param timeZoneId
+     * @throws IOException
+     */
     public void setTimeZoneId(String timeZoneId) throws IOException
     {
         this.timeZoneId = timeZoneId;
+        save();
+    }
+
+    /**
+     * A method for module developers to have basic configuration without creating their own files.<br>
+     *     This method adds the specified value into the guild's main config, so storing large values is heavily not recommended.<br>
+     *         It is essential the key you provide is unique to avoid conflicts with other modules. It is recommended to use your classpath, followed by a specific name for this key, such as com.Zazsona.Jara.MyModuleSetting
+     * @param key a key unique to your module
+     * @param value the small value to store
+     * @throws IOException unable to save
+     */
+    public void setCustomModuleSetting(String key, Object value) throws IOException
+    {
+        moduleConfig.put(key, value);
+        save();
+    }
+
+    /**
+     * Gets a value, denoted by the key, previously stored with {@link #setCustomModuleSetting(String, Object)}.
+     * @param key the key paired with a value
+     * @return the value, or null if the key points to nothing
+     */
+    public Object getCustomModuleSetting(String key)
+    {
+        return moduleConfig.get(key);
+    }
+
+    /**
+     * Removes a module setting from the file.
+     * @param key
+     * @throws IOException
+     */
+    public void removeCustomModuleSetting(String key) throws IOException
+    {
+        moduleConfig.remove(key);
         save();
     }
 }
