@@ -135,6 +135,13 @@ public class Help extends Command
         }
     }
 
+    /**
+     * Gets the list of commands, and description snippets
+     * @param msgEvent context
+     * @param category the category of commands to list
+     * @param limitToPerms whether to only display commands the user can use
+     * @return a list of commands keys and their description in pretty print
+     */
     @NotNull
     private LinkedList<String> getCommandStrings(GuildMessageReceivedEvent msgEvent, ModuleRegister.Category category, boolean limitToPerms)
     {
@@ -176,6 +183,7 @@ public class Help extends Command
     /**
      * Gets a specific command's details
      * @param alias the alias to get the help page for
+     * @param userHasConfigAccess boolean on config access, displays configuration details
      * @return the page as a string
      */
     private String getCommandPage(String alias, boolean userHasConfigAccess)

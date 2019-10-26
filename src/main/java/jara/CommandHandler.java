@@ -11,11 +11,20 @@ import java.util.HashMap;
 public class CommandHandler extends ListenerAdapter 
 {
 	private final HashMap<String, GuildCommandLauncher> commandLaunchers; //Contains details on all commands.
+
+	/**
+	 * Constructor
+	 * @param commandLaunchers a map of module keys to command launchers
+	 */
 	public CommandHandler(HashMap<String, GuildCommandLauncher> commandLaunchers)
 	{
 		this.commandLaunchers = commandLaunchers;
 	}
-	
+
+	/**
+	 * Listen for valid command strings, and run the command launcher if one is found
+	 * @param msgEvent the context of the message
+	 */
 	@Override 
 	public void onGuildMessageReceived(GuildMessageReceivedEvent msgEvent) //Reads commands
 	{

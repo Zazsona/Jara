@@ -43,6 +43,11 @@ public class CustomCommand extends Command
         }
     }
 
+    /**
+     * Runs the audio associated with this command
+     * @param msgEvent context
+     * @param customCommand the command's data
+     */
     private void runAudio(GuildMessageReceivedEvent msgEvent, CustomCommandBuilder customCommand)
     {
         if (!customCommand.getAudioLink().equals(""))
@@ -54,6 +59,11 @@ public class CustomCommand extends Command
         }
     }
 
+    /**
+     * Toggles the roles associated with this command
+     * @param msgEvent context
+     * @param customCommand the command's data
+     */
     private void runRoles(GuildMessageReceivedEvent msgEvent, CustomCommandBuilder customCommand)
     {
         if (customCommand.getRoles().size() > 0)
@@ -71,6 +81,11 @@ public class CustomCommand extends Command
         }
     }
 
+    /**
+     * Prints the message associated with this command
+     * @param msgEvent context
+     * @param customCommand the command's data
+     */
     private void runMessage(GuildMessageReceivedEvent msgEvent, CustomCommandBuilder customCommand)
     {
         if (!customCommand.getMessage().equals(""))

@@ -107,8 +107,8 @@ public class CustomCommandManager extends Command
 
     /**
      * Runs the command through parameters
-     * @param msgEvent
-     * @param parameters
+     * @param msgEvent context
+     * @param parameters the parameters to parse
      */
     private void parseAsParameters(GuildMessageReceivedEvent msgEvent, String[] parameters)
     {
@@ -168,11 +168,11 @@ public class CustomCommandManager extends Command
      * @param customCommand the custom command, can be null
      * @param menuSelection the submenu to get
      * @param commandName the name of the custom command
-     * @return
+     * @return the response type
      * Valid - Edit Menu<br>
      * Quit - Other menu, operation completed here<br>
      * Invalid - Invalid selection<br>
-     * @throws IOException
+     * @throws IOException unable to create new command
      */
     private CCResponseType selectRootSubmenu(GuildMessageReceivedEvent msgEvent, CustomCommandBuilder customCommand, String menuSelection, String commandName) throws IOException
     {
@@ -305,7 +305,7 @@ public class CustomCommandManager extends Command
     /**
      * Saves the custom command
      * @param customCommand the command
-     * @return
+     * @return boolean on success
      */
     private boolean save(CustomCommandBuilder customCommand)
     {
@@ -613,7 +613,7 @@ public class CustomCommandManager extends Command
     /**
      * Gets the validity of a response, including a permissions check
      * @param message the message to check
-     * @return
+     * @return the response type
      */
     private CCResponseType getResponseType(Message message)
     {
@@ -636,7 +636,7 @@ public class CustomCommandManager extends Command
     /**
      * Gets the validity of a message's content. As such, it will not run a permissions check.
      * @param messageContent the content of a message
-     * @return
+     * @return the response type
      */
     private CCResponseType getResponseType(String messageContent)
     {
@@ -661,8 +661,8 @@ public class CustomCommandManager extends Command
 
     /**
      * Gets the standard embed style for this command
-     * @param msgEvent
-     * @return
+     * @param msgEvent context
+     * @return a pre-set EmbedBuilder
      */
     private EmbedBuilder getEmbedStyle(GuildMessageReceivedEvent msgEvent)
     {

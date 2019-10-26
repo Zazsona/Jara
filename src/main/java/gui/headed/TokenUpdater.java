@@ -26,6 +26,9 @@ public class TokenUpdater extends Application
     @FXML
     private TextField txtFieldToken;
 
+    /**
+     * Initializes the UI, setting element functionality
+     */
     public void initialize()
     {
         enterButton.setOnMouseClicked((event) -> enterAction());

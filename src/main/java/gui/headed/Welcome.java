@@ -30,6 +30,9 @@ public class Welcome extends Application
     @FXML
     private Text navBar_review_text;
 
+    /**
+     * Initializes the UI, setting element functionality
+     */
     public void initialize()
     {
         backButton.setOnMouseClicked((event) -> HeadedGUIUtil.goBack());
@@ -50,7 +53,7 @@ public class Welcome extends Application
 
     /**
      * Displays this screen on the stage.
-     * @param stage
+     * @param stage the stage to show on
      */
     public void show(Stage stage)
     {
@@ -73,7 +76,8 @@ public class Welcome extends Application
     }
 
     /**
-     * @param root
+     * Sets the root
+     * @param root the root
      */
     public void setRoot(Parent root)
     {
@@ -81,7 +85,8 @@ public class Welcome extends Application
     }
 
     /**
-     * @return
+     * Gets the root
+     * @return the root
      */
     public Parent getRoot()
     {

@@ -3,6 +3,8 @@ package jara;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
@@ -21,6 +23,10 @@ public class MessageManager
 	private Guild guildToListen;
 	private TextChannel channelToListen;
 	private final MessageListener messageListener;
+
+	/**
+	 * Constructor
+	 */
 	public MessageManager()
 	{
 		messageLog = new ArrayList<>();
@@ -36,8 +42,8 @@ public class MessageManager
 	 * @param guild The guild to listen to
 	 * @param timeout The amount of time to record messages for
 	 * @param messageCount The number of messages to record
-	 * @return
-	 * Message[] - The messages sent after the method was called, size matches messageCount<br>
+	 * @return The messages sent after the method was called, size matches messageCount, or null if the operation is interrupted, or time runs out with no messages
+	 * Message[] - <br>
 	 * null - If the thread is interrupted before a message is received, or a timeout occurs.
 	 */
 	private Message[] futureGuildMessageCollector(Guild guild, int timeout, int messageCount)
@@ -96,9 +102,7 @@ public class MessageManager
 	 * @param channel The channel to listen to
 	 * @param timeout The amount of time to record messages for
 	 * @param messageCount The number of messages to record
-	 * @return
-	 * Message[] - The messages sent after the method was called, size matches messageCount
-	 * null - If the thread is interrupted before a message is received, or a timeout occurs.
+	 * @return The messages sent after the method was called, size matches messageCount, or null if the operation is interrupted, or time runs out with no messages
 	 */
 	private Message[] futureChannelMessageCollector(TextChannel channel, long timeout, int messageCount)
 	{
@@ -163,8 +167,7 @@ public class MessageManager
 	 * This method will block the thread while waiting for a message.
 	 * 
 	 * @param guild The guild to listen to
-	 * @return
-	 * Message - The message.
+	 * @return the message
 	 */
 	public Message getNextMessage(Guild guild)
 	{
@@ -182,8 +185,7 @@ public class MessageManager
 	 * This method will block the thread while waiting for a message.
 	 * 
 	 * @param channel The channel to listen to
-	 * @return
-	 * Message - The message.
+	 * @return the message
 	 */
 	public Message getNextMessage(TextChannel channel)
 	{
@@ -202,8 +204,7 @@ public class MessageManager
 	 * 
 	 * @param guild The guild to listen to
 	 * @param timeout The amount of time to record for
-	 * @return
-	 * Message - The message.
+	 * @return the message
 	 */
 	public Message getNextMessage(Guild guild, int timeout)
 	{
@@ -222,8 +223,7 @@ public class MessageManager
 	 * 
 	 * @param channel The channel to listen to
 	 * @param timeout The amount of time to record for
-	 * @return
-	 * Message - The message.
+	 * @return the message
 	 */
 	public Message getNextMessage(TextChannel channel, int timeout)
 	{
@@ -243,8 +243,7 @@ public class MessageManager
 	 * 
 	 * @param guild The guild to listen to
 	 * @param count Message count required
-	 * @return
-	 * Message[] - Array of messages received equal to count.
+	 * @return The messages sent after the method was called, size matches count, or null if the operation is interrupted
 	 */
 	public Message[] getNextMessages(Guild guild, int count)
 	{
@@ -256,8 +255,7 @@ public class MessageManager
 	 * 
 	 * @param channel The channel to listen to
 	 * @param count Message count required
-	 * @return
-	 * Message[] - Array of messages received equal to count.
+	 * @return The messages sent after the method was called, size matches count, or null if the operation is interrupted
 	 */
 	public Message[] getNextMessages(TextChannel channel, int count)
 	{
@@ -270,8 +268,7 @@ public class MessageManager
 	 * @param guild The guild to listen to
 	 * @param count Message count required
 	 * @param timeout The amount of time to record for
-	 * @return
-	 * Message[] - Array of messages received equal to count.
+	 * @return The messages sent after the method was called, size matches count, or null if the operation is interrupted, or time runs out with no messages
 	 */
 	public Message[] getNextMessages(Guild guild, int timeout, int count)
 	{
@@ -284,33 +281,27 @@ public class MessageManager
 	 * @param channel The channel to listen to
 	 * @param count Message count required
 	 * @param timeout The amount of time to record for
-	 * @return
-	 * Message[] - Array of messages received equal to count.
+	 * @return The messages sent after the method was called, size matches count, or null if the operation is interrupted, or time runs out with no messages
 	 */
 	public Message[] getNextMessages(TextChannel channel, int timeout, int count)
 	{
 		return futureChannelMessageCollector(channel, timeout, count);
 	}
 	/**
-	 * Takes all messages received from this instance and returns them as an array.
-	 * 
-	 * @return
-	 * ArrayList<Message>- Full history of all messages from this instance
+	 * Gets every message this object instance has gathered.
+	 * @return the messages
 	 */
-	public ArrayList<Message> getMessageHistory()
+	public List<Message> getMessageHistory()
 	{
-		return (ArrayList<Message>) messageLog.clone();
+		return Collections.unmodifiableList(messageLog);
 	}
 	/**
 	 * 
-	 * This method retrieves all messages received by this MessageListener instance. 
-	 * History is gathered starting from most recent and going back by the specified number.
-	 * 
-	 * If the total amount of messages requested is less than the total available, as many as possible will be returned.
+	 * This method retrieves all messages received by this instance.
+	 * History is gathered starting from most recent and going back by the specified number, or until there are no more.
 	 * 
 	 * @param count The number of messages to get
-	 * @return
-	 * Message[] - Array of messages requested
+	 * @return the messages
 	 */
 	public Message[] getMessageHistoryFromEnd(int count)
 	{
@@ -326,14 +317,10 @@ public class MessageManager
 		return messages;
 	}
 	/**
-	 * This method retrieves all messages received by this MessageListener instance. 
-	 * History is gathered starting from the first message and going forward by the specified number.
-	 * 
-	 * If the total amount of messages requested is less than the total available, as many as possible will be returned.
-	 * 
+	 * This method retrieves all messages received by this instance.
+	 * History is gathered starting from the first message and going forward by the specified number, or until there are no more.
 	 * @param count The number of messages to get
-	 * @return
-	 * Message[] - Array of messages requested
+	 * @return the messages
 	 */
 	public Message[] getMessageHistoryFromStart(int count)
 	{
@@ -350,11 +337,8 @@ public class MessageManager
 	}
 	/**
 	 * Returns the last received message. 
-	 * The output here will match that of the last getNextMessage.
-	 * 
-	 * @return
-	 * Message - The last received message<br>
-	 * null - No messages have been received.
+	 * The output here will match that of the last getNextMessage() call.
+	 * @return the message
 	 */
 	public Message getLastMessage()
 	{
@@ -368,12 +352,9 @@ public class MessageManager
 		}
 	}
 	/**
-	 * Resets the message history from this instance.<br>
+	 * Resets the message history for this instance.<br>
 	 * Note: Running this while gathering future messages will not work.
-	 * 
-	 * @return
-	 * true - Message history reset.<br>
-	 * false - Message history not reset.
+	 * @return boolean on success
 	 */
 	public boolean resetMessageHistory()
 	{
@@ -387,6 +368,10 @@ public class MessageManager
 		}
 		return false;
 	}
+
+	/**
+	 * An EventHandler that gathers messages
+	 */
 	private class MessageListener extends ListenerAdapter
 	{
 		@Override

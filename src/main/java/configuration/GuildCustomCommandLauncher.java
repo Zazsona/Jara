@@ -10,6 +10,10 @@ import java.util.Arrays;
 
 public class GuildCustomCommandLauncher extends GuildCommandLauncher
 {
+    /**
+     * Constructor
+     * @param attributes the attributes of the custom command this launches
+     */
     public GuildCustomCommandLauncher(ModuleAttributes attributes)
     {
         super(attributes, true); //Enabled state is not used here

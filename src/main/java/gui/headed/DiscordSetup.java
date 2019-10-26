@@ -60,6 +60,9 @@ public class DiscordSetup extends ListenerAdapter
     @FXML
     private TextField txtFieldToken;
 
+    /**
+     * Initializes the UI, setting element functionality
+     */
     public void initialize()
     {
         backButton.setOnMouseClicked((event) -> HeadedGUIUtil.goBack());
@@ -105,7 +108,7 @@ public class DiscordSetup extends ListenerAdapter
     }
     /**
      * Displays this screen on the stage.
-     * @param stage
+     * @param stage the stage to display on
      */
     public void show(Stage stage)
     {
@@ -113,7 +116,8 @@ public class DiscordSetup extends ListenerAdapter
     }
 
     /**
-     * @return
+     * Gets the value entered into the token field.
+     * @return the entered token
      */
     public String getToken()
     {
@@ -121,7 +125,8 @@ public class DiscordSetup extends ListenerAdapter
     }
 
     /**
-     * @return
+     * Checks if a valid token has been entered.
+     * @return true on valid
      */
     public boolean isValidToken()
     {
@@ -129,7 +134,8 @@ public class DiscordSetup extends ListenerAdapter
     }
 
     /**
-     * @return
+     * Gets the client ID
+     * @return the entered client ID
      */
     public String getClientID()
     {
@@ -137,7 +143,8 @@ public class DiscordSetup extends ListenerAdapter
     }
 
     /**
-     * @param root
+     * Sets the root
+     * @param root the root
      */
     public void setRoot(Parent root)
     {
@@ -145,7 +152,8 @@ public class DiscordSetup extends ListenerAdapter
     }
 
     /**
-     * @return
+     * Gets the root
+     * @return the root
      */
     public Parent getRoot()
     {

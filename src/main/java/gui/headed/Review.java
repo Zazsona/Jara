@@ -54,6 +54,9 @@ public class Review
      */
     private boolean invitePressed = false;
 
+    /**
+     * Initializes the UI, setting element functionality
+     */
     public void initialize()
     {
         backButton.setOnMouseClicked((event) -> HeadedGUIUtil.goBack());
@@ -76,7 +79,7 @@ public class Review
     }
     /**
      * Displays this screen on the stage.
-     * @param stage
+     * @param stage the stage to display on
      */
     public void show(Stage stage)
     {
@@ -128,7 +131,8 @@ public class Review
     }
 
     /**
-     * @param root
+     * Sets the root
+     * @param root the root
      */
     public void setRoot(Parent root)
     {
@@ -136,7 +140,8 @@ public class Review
     }
 
     /**
-     * @return
+     * Gets the root
+     * @return the root
      */
     public Parent getRoot()
     {
@@ -145,7 +150,7 @@ public class Review
 
     /**
      * Accumulates all the data the user has entered and saves it to a Global Settings file.<br>
-     *     This will also open the bot invite page, if the user has not already.
+     * This will also open the bot invite page, if the user has not already.
      */
     private void completeSetup()
     {

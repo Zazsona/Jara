@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class GlobalSettings implements Serializable
@@ -27,15 +26,18 @@ public class GlobalSettings implements Serializable
     protected HashMap<String, Boolean> moduleConfig;
 
     /**
-     * Returns the file where global settings are stored.
-     * @return
-     * File - Global settings file
+     * Returns the filepath where global settings are stored.
+     * @return the filepath
      */
     private String getGlobalSettingsFilePath()
     {
         return (SettingsUtil.getDirectory().getAbsolutePath()+"/Settings.jara");
     }
 
+    /**
+     * Saves global settings
+     * @throws IOException unable to access file
+     */
     public synchronized void save() throws IOException
     {
         if (!moduleConfig.keySet().containsAll(ModuleRegister.getCommandModuleKeys()))
@@ -63,6 +65,11 @@ public class GlobalSettings implements Serializable
         fos.close();
     }
 
+    /**
+     * Loads in global settings from file
+     * @return true on restoration, false on reset/error
+     * @throws IOException unable to read file
+     */
     public synchronized boolean restore() throws IOException
     {
         try
@@ -105,13 +112,19 @@ public class GlobalSettings implements Serializable
         }
     }
 
+    /**
+     * Gets the Discord API token
+     * @return the token
+     */
     public String getToken()
     {
         return token;
     }
 
     /**
-     * @param token
+     * Sets the Discord API token
+     * @param token the token
+     * @throws IOException unable to write to file
      */
     public void setToken(String token) throws IOException
     {
@@ -119,11 +132,20 @@ public class GlobalSettings implements Serializable
         save();
     }
 
+    /**
+     * Gets the enabled status of modules
+     * @return map of module key to enabled state
+     */
     public HashMap<String, Boolean> getModuleConfigMap()
     {
         return moduleConfig;
     }
 
+    /**
+     * Sets the module config map
+     * @param commandConfig map of module key to enabled state
+     * @throws IOException unable to save
+     */
     public void setModuleConfigMap(HashMap<String, Boolean> commandConfig) throws IOException
     {
         this.moduleConfig = commandConfig;
@@ -131,15 +153,17 @@ public class GlobalSettings implements Serializable
     }
     /**
      * Updates the stored information for the modules defined by their keys.
-     * @param newState
-     * @param keys
+     * @param newState the new enabled state of the modules
+     * @param keys the modules to update
+     * @throws IOException unable to write to file
      */
     public void setModuleConfiguration(boolean newState, String... keys) throws IOException
     {
         boolean changed = false;
         for (String key : keys)
         {
-            if (ModuleRegister.getModule(key).isDisableable())
+            ModuleAttributes ma = ModuleRegister.getModule(key);
+            if (ma != null && ma.isDisableable())
             {
                 moduleConfig.replace(key, newState);
                 changed = true;
@@ -150,8 +174,9 @@ public class GlobalSettings implements Serializable
     }
 
     /**
-     * @param key
-     * @return
+     * Checks if a module is enabled globally
+     * @param key the module to check's key
+     * @return boolean on enabled
      */
     public boolean isModuleEnabled(String key)
     {

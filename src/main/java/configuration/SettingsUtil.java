@@ -13,6 +13,9 @@ import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Class with convenience methods and memory management for configuration data.
+ */
 public class SettingsUtil
 {
     private static final Logger logger = LoggerFactory.getLogger(SettingsUtil.class);
@@ -23,6 +26,10 @@ public class SettingsUtil
     private static HashMap<String, Long> guildSettingsLastCall = new HashMap<>();
     private static HashMap<String, Character> guildCommandPrefix = new HashMap<>();
 
+    /**
+     * Loads the global settings.<br>
+     *     If no global settings exist, the setup GUI will be launched.
+     */
     public static void initialise()
     {
         try
@@ -51,16 +58,16 @@ public class SettingsUtil
 
     /**
      * Returns the global settings.
-     * @return
+     * @return the global settings
      */
     public static GlobalSettings getGlobalSettings()
     {
         return globalSettings;
     }
+
     /**
      * Returns the base settings directory.
-     * @return
-     * File - The dir where Jara stores settings
+     * @return the directory where settings are stored
      */
     public static File getDirectory()
     {
@@ -93,7 +100,7 @@ public class SettingsUtil
 
     /**
      * Gets the directory to save module configs, saves, etc in.
-     * @return
+     * @return the directory for modules
      */
     public static File getModuleDataDirectory()
     {
@@ -105,6 +112,11 @@ public class SettingsUtil
         return dir;
     }
 
+    /**
+     * Gets the {@link GuildSettings} for the guild denoted by ID
+     * @param guildID the guild to get settings for
+     * @return the guild's settings
+     */
     public static GuildSettings getGuildSettings(String guildID)
     {
         if (guildSettingsMap.containsKey(guildID))
@@ -130,6 +142,12 @@ public class SettingsUtil
         }
     }
 
+    /**
+     * Gets the command prefix for the guild specified.<br>
+     *     This method caches only the command prefix, reducing memory costs compared to getting the whole guild settings.
+     * @param guildID the id of the guild
+     * @return the command invocation character
+     */
     public static Character getGuildCommandPrefix(String guildID)
     {
         if (guildCommandPrefix.containsKey(guildID))
@@ -145,8 +163,8 @@ public class SettingsUtil
     }
 
     /**
-     * Reloads the cached Guild command prefix. Only really useful for if it has just been changed in settings.
-     * @param guildID
+     * Reloads the cached Guild command prefixes. Only really useful for if it has just been changed in settings.
+     * @param guildID the guild prefix to refresh
      */
     public static void refreshGuildCommandPrefix(String guildID)
     {

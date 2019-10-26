@@ -14,6 +14,11 @@ public class ScheduleHandler extends AudioEventAdapter
      * The audio instance for this guild
      */
     private Audio audio;
+
+    /**
+     * Constructor
+     * @param audio the {@link Audio} to report back to
+     */
     public ScheduleHandler(Audio audio)
     {
         this.audio = audio;

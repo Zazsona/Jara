@@ -32,10 +32,7 @@ public class HeadedGUIUtil extends Application
     private static String updatedToken;
     private static String errorMessage;
 
-    private static AccountData accData;
-
     private static boolean complete = false;
-
 
     @Override
     public void start(Stage primaryStage)
@@ -85,6 +82,10 @@ public class HeadedGUIUtil extends Application
         }
     }
 
+    /**
+     * Loads the page based on the ID of the NavBar button.
+     * @param selection the NavBar id.
+     */
     public static void manageTitleSelection(Text selection)
     {
         String selectionID = selection.getId();
@@ -108,6 +109,9 @@ public class HeadedGUIUtil extends Application
         }
     }
 
+    /**
+     * Returns to the previous page
+     */
     public static void goBack()
     {
         String screenID = stage.getScene().getRoot().getId();
@@ -132,6 +136,10 @@ public class HeadedGUIUtil extends Application
                 break;
         }
     }
+
+    /**
+     * Proceeds to the next page
+     */
     public static void goNext()
     {
         String screenID = stage.getScene().getRoot().getId();
@@ -153,6 +161,10 @@ public class HeadedGUIUtil extends Application
         }
     }
 
+    /**
+     * Performs the hover over animation for the next button
+     * @param rectangle the button
+     */
     public static void nextButtonHover(Rectangle rectangle)
     {
         if (rectangle.getFill().equals(Paint.valueOf("#7289da")))
@@ -164,6 +176,11 @@ public class HeadedGUIUtil extends Application
             rectangle.setFill(Paint.valueOf("#7289da"));
         }
     }
+
+    /**
+     * Performs the hover over animation for the back button
+     * @param rectangle the button
+     */
     public static void backButtonHover(Rectangle rectangle)
     {
         if (rectangle.getFill().equals(Paint.valueOf("#99aab5")))
@@ -175,6 +192,11 @@ public class HeadedGUIUtil extends Application
             rectangle.setFill(Paint.valueOf("#99aab5"));
         }
     }
+
+    /**
+     * Opens a URL in the default browser
+     * @param url the url
+     */
     public static void openWebpage(String url)
     {
         if (url.equals(""))
@@ -214,66 +236,93 @@ public class HeadedGUIUtil extends Application
             HeadedGUI.showError("ERROR: Unable to locate default browser. Please go to https://discordapp.com/developers/applications/ to set up your bot account.");
         }
     }
+
+    /**
+     * Shows the GUI to update the application token
+     * @return the application token
+     */
     public static String showUpdateTokenPane()
     {
         Application.launch(TokenUpdater.class);
         return updatedToken;
     }
+
+    /**
+     * Shows the error window
+     * @param error the error to display
+     */
     public static void showErrorPane(String error)
     {
         errorMessage = error;
         new ErrorPane().start(null);
     }
+
+    /**
+     * Gets the error to display on the error pane
+     * @return the error message
+     */
     public static String getError()
     {
         return errorMessage;
     }
+
+    /**
+     * Gets the Discord Setup Controller
+     * @return the controller
+     */
     public static DiscordSetup getDiscordSetupController()
     {
         return discordSetup;
     }
+    /**
+     * Gets the Command Configuration Controller
+     * @return the controller
+     */
     public static CommandConfigSetup getCcSetupController()
     {
         return ccSetup;
     }
+
+    /**
+     * Gets the Welcome Controller
+     * @return the controller
+     */
     public static Welcome getWelcomeController()
     {
         return welcome;
     }
+
+    /**
+     * Gets the Review Controller
+     * @return the controller
+     */
     public static Review getReviewController()
     {
         return review;
     }
+
+    /**
+     * Sets the token set by the Update Token GUI
+     * @param token the token, or null if none has been set this session
+     */
     public static void setUpdatedToken(String token)
     {
         updatedToken = token;
     }
-    public static void setAccountData(String username, String discim, String avatarURL, String clientID)
-    {
-        accData = new AccountData(username, discim,  avatarURL, clientID);
-    }
-    public static AccountData getAccountData()
-    {
-        return accData;
-    }
-    public static class AccountData
-    {
-        public AccountData(String username, String discim, String avatarURL, String clientID)
-        {
-            this.username = username;
-            this.discrim = discim;
-            this.avatarURL = avatarURL;
-            this.clientID = clientID;
-        }
-        final String username;
-        final String discrim;
-        final String avatarURL;
-        final String clientID;
-    }
+
+    /**
+     * Sets the setup state to complete
+     * @param state the state of setup
+     */
     public static void setSetupComplete(boolean state)
     {
         complete = state;
     }
+
+    /**
+     * Checks if the setup is complete
+     * @return the setup state
+     */
     public static boolean isSetupComplete()
     {
         return complete;

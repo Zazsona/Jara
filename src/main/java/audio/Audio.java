@@ -4,11 +4,9 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import commands.CmdUtil;
-import configuration.SettingsUtil;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -19,7 +17,9 @@ import net.dv8tion.jda.core.managers.AudioManager;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class Audio
@@ -247,9 +247,7 @@ public class Audio
 
 	/**
 	 * Checks to see if audio is playing in the guild
-	 * @return
-	 * true - Audio playing<br>
-	 * false - Audio not playing
+	 * @return boolean on audio playing
 	 */
 	public boolean isAudioPlayingInGuild()
 	{
@@ -257,8 +255,8 @@ public class Audio
 	}
 
 	/**
-	 * Returns the currently queued tracks. The currently playing track is at index 0.
-	 * @return AudioTrack ArrayList
+	 * Returns the currently scheduled tracks. The currently playing track is at index 0.
+	 * @return list of queued tracks
 	 */
 	public ArrayList<ScheduledTrack> getTrackQueue()
 	{
@@ -267,8 +265,7 @@ public class Audio
 
 	/**
 	 * Returns this guild's audio player.
-	 * @return
-	 * AudioPlayer - the player
+	 * @return the player
 	 */
 	public AudioPlayer getPlayer()
 	{
@@ -277,8 +274,7 @@ public class Audio
 
 	/**
 	 * Calculates the total run time of all songs in the queue.
-	 * @return
-	 * long - The total run time in ms.
+	 * @return The total run time in ms.
 	 */
 	public long getTotalQueuePlayTime()
 	{
@@ -292,8 +288,7 @@ public class Audio
 
 	/**
 	 * Gets the current number of users who have voted to skip the current track.
-	 * @return
-	 * int - The # of skip votes
+	 * @return The # of skip votes
 	 */
 	public int getSkipVotes()
 	{
@@ -303,9 +298,7 @@ public class Audio
 	/**
 	 * Inverts the user's current vote state.
 	 * @param userID The user who has voted
-	 * @return
-	 * true - Vote added<br>
-	 * false - Vote removed
+	 * @return true if added, false if removed
 	 */
 	public boolean registerSkipVote(String userID)
 	{
@@ -322,7 +315,7 @@ public class Audio
 	}
 
 	/**
-	 * Creates a new ArrayList to count skip votes, de-referencing the old one.
+	 * Clears the current skip vote count
 	 */
 	public void resetSkipVotes()
 	{
@@ -330,7 +323,8 @@ public class Audio
 	}
 
 	/**
-	 * @return AudioManager - The guild's audio manager
+	 * Gets the guild audio manager
+	 * @return the {@link AudioManager}
 	 */
 	public AudioManager getAudioManager()
 	{
@@ -349,7 +343,7 @@ public class Audio
 
 	/**
 	 * Gets a the map of user id to queued track quantity.
-	 * @return
+	 * @return map of userID to queue count
 	 */
 	public HashMap<String, Integer> getUserQueueQuantity()
 	{

@@ -40,6 +40,13 @@ public class CustomCommandBuilder implements Serializable
 
     /**
      * Constructor
+     * @param key the unique identifier for the command
+     * @param aliases The strings which can be used to call the command
+     * @param description A short description to describe the command
+     * @param category The {@link jara.ModuleRegister.Category} of the command
+     * @param roleIDs The IDs of the roles the command will toggle, or null to disable
+     * @param audioLink the URL of audio to play, or null to disable
+     * @param message the message to send, or null to disable
      */
     public CustomCommandBuilder(String key, String[] aliases, String description, ModuleRegister.Category category, ArrayList<String> roleIDs, String audioLink, String message)
     {
@@ -53,7 +60,8 @@ public class CustomCommandBuilder implements Serializable
     }
 
     /**
-     * @return
+     * Gets the custom command's key
+     * @return the key
      */
     public String getKey()
     {
@@ -61,13 +69,15 @@ public class CustomCommandBuilder implements Serializable
     }
 
     /**
-     * @return
+     * Gets the custom command's aliases, alternate strings used to summon a command
+     * @return the aliases
      */
     public String[] getAliases()
     {
         return aliases;
     }
     /**
+     * Gets a short description of the custom command
      * @return description
      */
     public String getDescription()
@@ -76,6 +86,7 @@ public class CustomCommandBuilder implements Serializable
     }
 
     /**
+     * Gets the command's category
      * @return category
      */
     public ModuleRegister.Category getCategory()
@@ -84,7 +95,8 @@ public class CustomCommandBuilder implements Serializable
     }
 
     /**
-     * @return message
+     * Gets the message to display upon execution
+     * @return message or null if absent
      */
     public String getMessage()
     {
@@ -92,7 +104,8 @@ public class CustomCommandBuilder implements Serializable
     }
 
     /**
-     * @return
+     * Gets the audio to play when the command is run
+     * @return audio URL or null if absent
      */
     public String getAudioLink()
     {
@@ -100,13 +113,18 @@ public class CustomCommandBuilder implements Serializable
     }
 
     /**
-     * @return
+     * Gets the roles to toggle when the command is run
+     * @return role IDs, or null if absent
      */
     public ArrayList<String> getRoles()
     {
         return (ArrayList<String>) roleIDs.clone();
     }
 
+    /**
+     * Toggles on/off the aliases to use
+     * @param aliases the aliases to toggle
+     */
     public void modifyAliases(String... aliases)
     {
         ArrayList<String> aliasesList = new ArrayList<>(Arrays.asList(this.aliases));
@@ -124,18 +142,37 @@ public class CustomCommandBuilder implements Serializable
         this.aliases = aliasesList.toArray(new String[0]);
     }
 
+    /**
+     * Sets the description of the command
+     * @param description the description
+     */
     public void setDescription(String description)
     {
         this.description = description;
     }
+
+    /**
+     * Sets the {@link jara.ModuleRegister.Category} of the command.
+     * @param category the category
+     */
     public void setCategory(ModuleRegister.Category category)
     {
         this.category = category;
     }
+
+    /**
+     * Sets the message to display on the command
+     * @param message the message, or null to remove this feature
+     */
     public void setMessage(String message)
     {
         this.message = message;
     }
+
+    /**
+     * Sets the roles to toggle on the command
+     * @param roleIDs role IDs
+     */
     public void modifyRoles(String... roleIDs)
     {
         for (String roleID : roleIDs)
@@ -150,6 +187,10 @@ public class CustomCommandBuilder implements Serializable
             }
         }
     }
+    /**
+     * Sets the audio to play on the command
+     * @param audioLink the audio URL, or null to remove this feature
+     */
     public void setAudioLink(String audioLink)
     {
         this.audioLink = audioLink;

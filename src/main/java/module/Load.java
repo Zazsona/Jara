@@ -1,7 +1,7 @@
 package module;
 
 /**
- * A class to identify methods to run when the module is first loaded
+ * Callback class for once the module is loaded.
  */
 public abstract class Load
 {

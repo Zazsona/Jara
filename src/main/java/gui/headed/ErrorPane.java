@@ -27,6 +27,9 @@ public class ErrorPane extends Application
     @FXML
     private Text msgTxt;
 
+    /**
+     * Initializes the UI, setting element functionality
+     */
     public void initialize()
     {
 

@@ -16,9 +16,14 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 public class GuildCommandLauncher
 {
 	private static Logger logger = LoggerFactory.getLogger(GuildCommandLauncher.class);
-	protected final boolean enabledState; //Whether the config allows this command to be used
+	protected final boolean enabledState;
 	protected final ModuleAttributes attributes;
-	
+
+	/**
+	 * Constructor
+	 * @param attributes the attributes of the module this launches
+	 * @param enabledState whether the global config allows this command to be used or not
+	 */
 	public GuildCommandLauncher(ModuleAttributes attributes, boolean enabledState)
 	{
 		this.attributes = attributes;
@@ -26,11 +31,9 @@ public class GuildCommandLauncher
 	}
 
 	/**
-	 *Creates a new instance of the command and runs it on a separate thread.
-	 *
-	 *@param
-	 *msgEvent - Used to context
-	 *parameters - Command parameters
+	 * Creates a new instance of the command and runs it on a separate thread.
+	 * @param msgEvent context
+	 * @param parameters the additional data passed with the command
 	 */
 	public void execute(GuildMessageReceivedEvent msgEvent, String...parameters)
 	{
@@ -70,6 +73,11 @@ public class GuildCommandLauncher
         }
 	}
 
+	/**
+	 * Instantiates the command, dealing with any exceptions that may occur.
+	 * @param msgEvent context
+	 * @param parameters the additional data passed with the command
+	 */
 	private void instantiateCommand(GuildMessageReceivedEvent msgEvent, String[] parameters)
 	{
 		try
@@ -92,6 +100,12 @@ public class GuildCommandLauncher
 		}
 	}
 
+	/**
+	 * Checks if this command has date/time limits on when it is available, and if so, if we are within those limits.
+	 * @param ma the module's attributes
+	 * @param guildSettings the guild's settings
+	 * @return true on available
+	 */
 	private boolean checkForTimedAvailability(ModuleAttributes ma, GuildSettings guildSettings)
 	{
 		if (ma instanceof SeasonalModuleAttributes)
@@ -108,7 +122,7 @@ public class GuildCommandLauncher
 
 	/**
 	 * Returns the command key for the command associated with this launcher.
-	 * @return String - The key
+	 * @return the key
 	 */
 	public String getCommandKey()
 	{
@@ -119,8 +133,7 @@ public class GuildCommandLauncher
 	 * Simple get for all the different text strings
 	 * that will call the command.
 	 * 
-	 * @return
-	 * String[] - List of all command aliases
+	 * @return the command's aliases
 	 */
 	public String[] getAliases()
 	{
@@ -131,9 +144,7 @@ public class GuildCommandLauncher
 	 * Reports back if the command is enabled in the
 	 * config. If this returns false, execute will also fail.
 	 * 
-	 * @return
-	 * true - Command is enabled
-	 * false - Command is disabled
+	 * @return boolean on enabled
 	 */
 	public boolean isEnabled()
 	{

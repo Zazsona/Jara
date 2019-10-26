@@ -21,6 +21,12 @@ public class ConfigWizard
     private ConfigModuleSettings cmos;
     private GuildMessageReceivedEvent msgEvent;
 
+    /**
+     * Constructor
+     * @param msgEvent context
+     * @param guildSettings the guild settings to run through
+     * @param channel the channel to run in
+     */
     public ConfigWizard(GuildMessageReceivedEvent msgEvent, GuildSettings guildSettings, TextChannel channel)
     {
         try
@@ -64,16 +70,28 @@ public class ConfigWizard
 
     }
 
+    /**
+     * Prompts the user to set the command prefix
+     * @throws IOException unable to save
+     */
     private void configurePrefix() throws IOException
     {
         cms.modifyPrefix(msgEvent);
     }
 
+    /**
+     * Prompts the user to set the timezone
+     * @throws IOException unable to save
+     */
     private void configureTimezone() throws IOException
     {
         cms.modifyTimeZone(msgEvent);
     }
 
+    /**
+     * Runs the user through setting the audio settings
+     * @throws IOException unable to save
+     */
     private void configureAudio() throws IOException
     {
         cas.modifySkipVotes(msgEvent);
@@ -81,6 +99,10 @@ public class ConfigWizard
         cas.modifyQueueLimits(msgEvent);
     }
 
+    /**
+     * Runs the user through setting the game settings
+     * @throws IOException unable to save
+     */
     private void configureGames() throws IOException
     {
         cgs.modifyGameChannels(msgEvent);
@@ -94,6 +116,10 @@ public class ConfigWizard
         }
     }
 
+    /**
+     * Runs the user through setting the command settings
+     * @throws IOException unable to save
+     */
     private void configureCommands() throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
@@ -106,9 +132,12 @@ public class ConfigWizard
         }
     }
 
+    /**
+     * Runs the user through setting the module specific settings
+     * @throws IOException unable to save
+     */
     private void configureModuleSettings() throws IOException
     {
-        EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
         for (ModuleAttributes ma : ModuleRegister.getModules())
         {
             if (ma.getConfigClass() != null)

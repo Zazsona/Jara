@@ -22,12 +22,23 @@ public class ConfigMainSettings
     private final GuildSettings guildSettings;
     private final TextChannel channel;
 
+    /**
+     * Constructor
+     * @param guildSettings the guild settings to modify
+     * @param channel the channel to run in
+     */
     public ConfigMainSettings(GuildSettings guildSettings, TextChannel channel)
     {
         this.guildSettings = guildSettings;
         this.channel = channel;
     }
 
+    /**
+     * Runs through the config using the navigation options supplied in a single message
+     * @param msgEvent context
+     * @param parameters the parameters to parse
+     * @throws IOException unable to write to file
+     */
     public void parseAsParameters(GuildMessageReceivedEvent msgEvent, String[] parameters) throws IOException
     {
         if (parameters[1].equalsIgnoreCase("prefix"))
@@ -60,7 +71,11 @@ public class ConfigMainSettings
         }
     }
 
-
+    /**
+     * Directs the user through setting the command prefix for the guild
+     * @param msgEvent context
+     * @throws IOException unable to write to file
+     */
     public void modifyPrefix(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
@@ -86,6 +101,13 @@ public class ConfigMainSettings
         }
     }
 
+    /**
+     * Verifies the prefix character is valid
+     * @param msgEvent context
+     * @param prefix the prefix to attempt
+     * @return boolean on success
+     * @throws IOException unable to write changes
+     */
     private boolean setPrefix(GuildMessageReceivedEvent msgEvent, String prefix) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
@@ -116,6 +138,11 @@ public class ConfigMainSettings
     /*TODO: One change worth considering is taking user input as, for example, BST or British Standard Time, and then comparing against the display name
     This would be a more expensive operation, as every Id would have to be converted to ZoneId, and then getting its display name in both short and full.
     However. This would not respect daylight savings.*/
+    /**
+     * Directs the user through setting the time zone for the guild
+     * @param msgEvent context
+     * @throws IOException unable to write to file
+     */
     public void modifyTimeZone(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
@@ -141,6 +168,14 @@ public class ConfigMainSettings
         }
     }
 
+    /**
+     * Verifies the timezone value is valid
+     * @param mm the message manager
+     * @param input the input to convert to an id
+     * @param msgEvent context
+     * @return boolean on success
+     * @throws IOException unable to write to file
+     */
     private boolean setTimeZone(MessageManager mm, String input, GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);

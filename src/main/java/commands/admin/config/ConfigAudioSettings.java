@@ -19,12 +19,24 @@ public class ConfigAudioSettings
 {
     private final GuildSettings guildSettings;
     private final TextChannel channel;
+
+    /**
+     * Constructor
+     * @param guildSettings the guild settings to modify
+     * @param channel the channel to run on
+     */
     public ConfigAudioSettings(GuildSettings guildSettings, TextChannel channel)
     {
         this.guildSettings = guildSettings;
         this.channel = channel;
     }
 
+    /**
+     * Runs through the config using the navigation options supplied in a single message
+     * @param msgEvent context
+     * @param parameters the parameters to parse
+     * @throws IOException unable to write to file
+     */
     public void parseAsParameter(GuildMessageReceivedEvent msgEvent, String[] parameters) throws IOException
     {
         if (parameters.length > 2)
@@ -55,6 +67,11 @@ public class ConfigAudioSettings
         }
     }
 
+    /**
+     * Shows the main navigation menu for audio settings, and directs the user to a submenu or exiting.
+     * @param msgEvent context
+     * @throws IOException unable to write to file
+     */
     public void showMenu(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
@@ -95,6 +112,11 @@ public class ConfigAudioSettings
         }
     }
 
+    /**
+     * Takes user input and modifies the percentage of people needing to vote to skip a playing track.
+     * @param msgEvent context
+     * @throws IOException unable to write to file
+     */
     public void modifySkipVotes(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
@@ -143,6 +165,11 @@ public class ConfigAudioSettings
         }
     }
 
+    /**
+     * Takes user input and modifies whether to have the bot leave the channel when nothing is playing
+     * @param msgEvent context
+     * @throws IOException unable to write to file
+     */
     public void modifyVoiceLeaving(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
@@ -184,6 +211,11 @@ public class ConfigAudioSettings
         }
     }
 
+    /**
+     * Opens a sub-menu, prompting the user to enter how many tracks a single role can queue, and writing it to file.
+     * @param msgEvent context
+     * @throws IOException unable to write to file
+     */
     public void modifyQueueLimits(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         HashMap<Role, Integer> customRoles = new HashMap<>();

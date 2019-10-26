@@ -14,6 +14,9 @@ import static jara.ModuleRegister.Category.*;
 
 public class ModuleRegister
 {
+	/**
+	 * The possible categories a module can be attributes to
+	 */
 	public enum Category
 	{
 		NOGROUP,
@@ -24,6 +27,7 @@ public class ModuleRegister
 		ADMIN,
 		SEASONAL
 	}
+
 	private static ArrayList<ModuleAttributes> register;
 	private static ArrayList<ModuleAttributes> commandModules;
 
@@ -36,8 +40,8 @@ public class ModuleRegister
 	private static ArrayList<ModuleAttributes> noGroupModules;
 	
 	/**
-	 * This method returns the command list of all programmed commands, with their classes and alias arrays.<br>
-	 * @return
+	 * Prepares in-built and external modules for execution.<br>
+	 *     This method locks to register, and can only run if register is null.
 	 */
 	private static void prepareModules()
 	{
@@ -60,17 +64,17 @@ public class ModuleRegister
 
 	/**
 	 * Gets an unmodifiable list of all modules.
-	 * @return
+	 * @return the list
 	 */
 	public static List<ModuleAttributes> getModules()
 	{
 		prepareModules();
 		return Collections.unmodifiableList(register);
 	}
+
 	/**
-	 * Returns all strings which can be used to trigger commands. 
-	 * @return
-	 * All module aliases
+	 * Returns all strings which can be used to trigger modules.
+	 * @return All module aliases
 	 */
 	public static ArrayList<String> getModuleAliases()
 	{
@@ -82,10 +86,10 @@ public class ModuleRegister
 		}
 		return aliases;
 	}
+
 	/**
-	 * Returns all registered command keys, which can be used to obtain other data about a command.
-	 * @return
-	 * The keys
+	 * Returns all registered module keys, used to identify them.
+	 * @return The keys
 	 */
 	public static ArrayList<String> getModuleKeys()
 	{
@@ -100,9 +104,9 @@ public class ModuleRegister
 
 	/**
 	 * Gets all modules that have a command class
-	 * @return
+	 * @return modules with command functionality in an unmodifiable list
 	 */
-	public static ArrayList<ModuleAttributes> getCommandModules()
+	public static List<ModuleAttributes> getCommandModules()
 	{
 		if (commandModules == null)
 		{
@@ -117,12 +121,12 @@ public class ModuleRegister
 			}
 			commandModules = commandModulesBuilder;
 		}
-		return commandModules;
+		return Collections.unmodifiableList(commandModules);
 	}
 
 	/**
 	 * Gets the keys of all command modules.
-	 * @return
+	 * @return list of keys
 	 */
 	public static ArrayList<String> getCommandModuleKeys()
 	{
@@ -133,13 +137,11 @@ public class ModuleRegister
 		}
 		return keys;
 	}
+
 	/**
-	 * Returns the class' attributes. Note this does not include any configuration details, so is true for guild & global contexts.
-	 * 
-	 * @param alias - A command triggering string. Using the command's key is most efficient.
-	 * @return
-	 * CommandAttributes - All details about the class.<br>
-	 * null - Key does not exist.
+	 * Returns the module's {@link ModuleAttributes}
+	 * @param alias - A module triggering string. Using the command's key is most efficient.
+	 * @return the attributes, or null if the alias matches no module.
 	 */
 	public static ModuleAttributes getModule(String alias)
 	{
@@ -219,21 +221,18 @@ public class ModuleRegister
 	}
 	/**
 	 * Returns the total count of all registered modules.
-	 * @return
-	 * int - # of registered commands.
+	 * @return no. of modules.
 	 */
 	public static int getRegisterSize()
 	{
 		prepareModules();
 		return register.size();
 	}
+
 	/**
-	 * Returns the class' attributes. Note this does not include any configuration details, so is true for guild & global contexts.
-	 * 
-	 * @param clazz - A class that extends Command
-	 * @return
-	 * CommandAttributes - All details about the class.<br>
-	 * null - Class is not a registered command class.
+	 * Returns the module's {@link ModuleAttributes}
+	 * @param clazz - A module's command class.
+	 * @return the attributes, or null if the class matches no module's command class.
 	 */
 	public static ModuleAttributes getModule(Class<? extends Command> clazz)
 	{
@@ -253,9 +252,7 @@ public class ModuleRegister
 	/**
 	 * Converts a category ID into a category name.
 	 * @param id - The ID number for the category
-	 * @return
-	 * String - Category name
-	 * null = Invalid id.
+	 * @return the category name, or null if the ID is invalid
 	 */
 	public static String getCategoryName(Category id)
 	{
@@ -281,9 +278,7 @@ public class ModuleRegister
 	/**
 	 * Converts a category ID into a category name.
 	 * @param name - The name of the category
-	 * @return
-	 * Category - Category ID
-	 * null = Invalid name.
+	 * @return the category ID, or null if invalid
 	 */
 	public static Category getCategoryID(String name)
 	{
@@ -311,8 +306,7 @@ public class ModuleRegister
 
 	/**
 	 * Returns a list of all category names.
-	 * @return
-	 *ArrayList<String> - the names
+	 * @return the category names
 	 */
 	public static ArrayList<String> getCategoryNames()
 	{
@@ -325,10 +319,11 @@ public class ModuleRegister
 	}
 
 	/**
-	 * Returns the Module Attributes all all modules in this category.
-	 * @param category
+	 * Returns the {@link ModuleAttributes} of all modules in the specified category
+	 * @param category the category to get modules for.
+	 * @return an unmodifiable list of the category's modules
 	 */
-	public static ArrayList<ModuleAttributes> getModulesInCategory(Category category)
+	public static List<ModuleAttributes> getModulesInCategory(Category category)
 	{
 		ArrayList<ModuleAttributes> categoryModules;
 		switch (category)
@@ -359,18 +354,18 @@ public class ModuleRegister
 		}
 		if (categoryModules != null)
 		{
-			return categoryModules;
+			return Collections.unmodifiableList(categoryModules);
 		}
 		else
 		{
-			return generateModulesInCategory(category);
+			return Collections.unmodifiableList(generateModulesInCategory(category));
 		}
 	}
 
 	/**
-	 * Generates the list of commands in this category. Use getModulesInCategory() instead where possible for cached results.
-	 * @param categoryID
-	 * @return
+	 * Generates the list of modules in this category. Use {@link ModuleRegister#getModulesInCategory(Category)} instead where possible for cached results.
+	 * @param categoryID the category to get modules for
+	 * @return list of modules in the category
 	 */
 	private static ArrayList<ModuleAttributes> generateModulesInCategory(Category categoryID)
 	{

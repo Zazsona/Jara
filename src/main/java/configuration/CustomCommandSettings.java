@@ -20,9 +20,9 @@ public class CustomCommandSettings implements Serializable
     protected transient GuildSettings guildSettings; //Transient so it doesn't cause a serialization loop
 
     /**
-     * Gets the guild settings these custom commands are tied to.
+     * Sets the guild settings these custom commands are tied to.
      * The {@link CustomCommandSettings} in the {@link GuildSettings} must match, otherwise desyncronisation will occur.
-     * @param gs
+     * @param gs the guild settings to tie to
      */
     protected void setGuildSettings(GuildSettings gs)
     {
@@ -31,17 +31,15 @@ public class CustomCommandSettings implements Serializable
 
     /**
      * Adda a custom command for this guild. These are simple commands which users can make which will simply reply back with a predefined message.
-     * @param key
-     * @param aliases
-     * @param description
-     * @param category
-     * @param roleIDs
-     * @param audioLink
-     * @param message
-     *
-     * @return
-     * CustomCommandConfig - The new Command<br>
-     * null - A command with that key already exists.
+     * @param key the command's key
+     * @param aliases the command's aliases
+     * @param description the command's description
+     * @param category the command's {@link jara.ModuleRegister.Category}
+     * @param roleIDs the roles this command will grant/remove
+     * @param audioLink the audio this command will play
+     * @param message the message this command will display
+     * @return the command builder, or null if the key is taken
+     * @throws IOException unable to save
      */
     public CustomCommandBuilder addCommand(String key, String[] aliases, String description, ModuleRegister.Category category, ArrayList<String> roleIDs, String audioLink, String message) throws IOException
     {
@@ -51,14 +49,15 @@ public class CustomCommandSettings implements Serializable
         }
         customCommands.put(key.toLowerCase(), new CustomCommandBuilder(key, aliases, description, category, roleIDs, audioLink, message));
         guildSettings.setCommandConfiguration(true, new ArrayList<>(), key);
+        guildSettings.save();
         return customCommands.get(key.toLowerCase());
     }
 
     /**
      * Updates a custom command stored in the config, if it exists.
      * @param key the key of the command to edit
-     * @param ccb the command's new profile
-     * @throws IOException
+     * @param ccb the command's new builder
+     * @throws IOException unable to save
      */
     public void editCommand(String key, CustomCommandBuilder ccb) throws IOException
     {
@@ -72,7 +71,8 @@ public class CustomCommandSettings implements Serializable
 
     /**
      * Removes a custom command for this guild.
-     * @param key
+     * @param key the key of the command to remove
+     * @throws IOException unable to save
      */
     public void removeCommand(String key) throws IOException
     {
@@ -83,9 +83,9 @@ public class CustomCommandSettings implements Serializable
     }
 
     /**
-     * @param key
-     * @return CustomCommandConfig - The custom guild command.
-     * @return null - Invalid key/alias
+     * Gets a command specified by the key
+     * @param key the key of the command to get
+     * @return the command's builder, or null if the key is invalid
      */
     public CustomCommandBuilder getCommand(String key)
     {
@@ -113,7 +113,7 @@ public class CustomCommandSettings implements Serializable
 
     /**
      * Returns the case-respecting command keys.
-     * @return
+     * @return a collection of custom command keys
      */
     public Collection<String> getCommandKeys()
     {
@@ -127,9 +127,8 @@ public class CustomCommandSettings implements Serializable
 
     /**
      * Generates the command attributes for the specified custom command
-     * @param key
-     * @return CommandAttributes - The command's attributes
-     * @return null - Invalid key
+     * @param key the key of the command to get
+     * @return the command's attributes, or null if the key is invalid
      */
     public ModuleAttributes getCommandAttributes(String key)
     {
@@ -147,9 +146,8 @@ public class CustomCommandSettings implements Serializable
 
     /**
      * Returns the custom command's launcher.
-     * @param key
-     * @return CommandLauncher = The custom command's launcher
-     * @return null - Invalid key
+     * @param key the command's key
+     * @return the command's launcher, or null on invalid key
      */
     public GuildCustomCommandLauncher getCommandLauncher(String key)
     {

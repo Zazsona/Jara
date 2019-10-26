@@ -67,6 +67,9 @@ public class CommandConfigSetup
     @FXML
     private CheckBox seasonalCategoryCheckBox;
 
+    /**
+     * Initializes the UI, setting element functionality
+     */
     public void initialize()
     {
         backButton.setOnMouseClicked((event) -> HeadedGUIUtil.goBack());
@@ -133,7 +136,7 @@ public class CommandConfigSetup
     }
     /**
      * Displays this screen on the stage.
-     * @param stage
+     * @param stage the stage to display on
      */
     public void show(Stage stage)
     {
@@ -142,8 +145,8 @@ public class CommandConfigSetup
 
     /**
      * This method will add the required fields onto the menu for the passed module, allowing the user to view and select it.
-     * @param moduleAttributes
-     * @return
+     * @param moduleAttributes the attributes to display
+     * @return the root of the command list element
      */
     private BorderPane generateCommandListElement(ModuleAttributes moduleAttributes)
     {
@@ -200,8 +203,8 @@ public class CommandConfigSetup
 
     /**
      * This method will have all modules in the category match the check box's state
-     * @param categoryCheckBox
-     * @param categoryID
+     * @param categoryCheckBox the check box for this category
+     * @param categoryID the id of the category
      */
     private void toggleCategory(CheckBox categoryCheckBox, ModuleRegister.Category categoryID)
     {
@@ -216,8 +219,8 @@ public class CommandConfigSetup
     }
 
     /**
-     * Retrives category IDs where at least one command is enabled.
-     * @return
+     * Retrieves category IDs where at least one command is enabled.
+     * @return list of supported categories
      */
     public ArrayList<ModuleRegister.Category> getSupportedCategories()
     {
@@ -237,7 +240,7 @@ public class CommandConfigSetup
 
     /**
      * Returns the selected modules as a config compatible with GlobalSettings.
-     * @return
+     * @return HashMap, mapping command keys to their enabled state
      */
     public HashMap<String, Boolean> getModuleConfig()
     {
@@ -259,7 +262,8 @@ public class CommandConfigSetup
     }
 
     /**
-     * @param root
+     * Sets the root
+     * @param root the root
      */
     public void setRoot(Parent root)
     {
@@ -267,7 +271,8 @@ public class CommandConfigSetup
     }
 
     /**
-     * @return
+     * Gets the root
+     * @return the root
      */
     public Parent getRoot()
     {

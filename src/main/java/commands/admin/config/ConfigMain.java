@@ -92,6 +92,15 @@ public class ConfigMain extends Command
         }
     }
 
+    /**
+     * Runs through the config using the navigation options supplied in a single message
+     * @param msgEvent context
+     * @param channel the channel to run in
+     * @param embed the embed style
+     * @param parameters the parameters to parse
+     * @return boolean on success
+     * @throws IOException unable to write to file
+     */
     private boolean parseAsParameters(GuildMessageReceivedEvent msgEvent, TextChannel channel, EmbedBuilder embed, String[] parameters) throws IOException
     {
         if (parameters.length > 1)
@@ -132,6 +141,11 @@ public class ConfigMain extends Command
         return false;
     }
 
+    /**
+     * Gets the default embed style for configs
+     * @param msgEvent context
+     * @return a partially build EmbedBuilder
+     */
     public static EmbedBuilder getEmbedStyle(GuildMessageReceivedEvent msgEvent)
     {
         EmbedBuilder embed = new EmbedBuilder();

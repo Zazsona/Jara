@@ -22,6 +22,11 @@ public class ConfigCommandSettings
     private final TextChannel channel;
     private final MessageManager msgManager;
 
+    /**
+     * Constructor
+     * @param guildSettings the guild settings to modify
+     * @param channel the channel to run on
+     */
     public ConfigCommandSettings(GuildSettings guildSettings, TextChannel channel)
     {
         this.guildSettings = guildSettings;
@@ -29,6 +34,12 @@ public class ConfigCommandSettings
         msgManager = new MessageManager();
     }
 
+    /**
+     * Runs through the config using the navigation options supplied in a single message
+     * @param msgEvent context
+     * @param parameters the parameters to parse
+     * @throws IOException unable to write to file
+     */
     public void parseAsParameters(GuildMessageReceivedEvent msgEvent, String[] parameters) throws IOException
     {
         if (parameters.length > 2)
@@ -110,6 +121,11 @@ public class ConfigCommandSettings
         }
     }
 
+    /**
+     * Prompts the user to select a command, and loads that command's config
+     * @param msgEvent context
+     * @throws IOException unable to write to file
+     */
     public void getCommand(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         ModuleAttributes ma;
@@ -148,6 +164,12 @@ public class ConfigCommandSettings
         }
     }
 
+    /**
+     * Shows the main navigation menu for a command, and directs the user to a submenu or exiting.
+     * @param ma the module attributes for the command
+     * @param embed the embed style
+     * @throws IOException unable to write to file
+     */
     public void showMenu(ModuleAttributes ma, EmbedBuilder embed) throws IOException
     {
         while (true)
@@ -191,6 +213,13 @@ public class ConfigCommandSettings
         }
     }
 
+    /**
+     * Modifies the enabled state of a command
+     * @param embed the embed style
+     * @param ma the module attributes of the command
+     * @param newState the new enabled state
+     * @throws IOException unable to write to file
+     */
     private void modifyState(EmbedBuilder embed, ModuleAttributes ma, boolean newState) throws IOException
     {
         guildSettings.setCommandConfiguration(newState, null, ma.getKey());
@@ -198,6 +227,14 @@ public class ConfigCommandSettings
         channel.sendMessage(embed.build()).queue();
     }
 
+    /**
+     * Modifies the enabled state of a command
+     * @param embed the embed style
+     * @param ma the module attributes of the command
+     * @param request the message content, containing "addroles" or "removeroles"
+     * @param roles the roles to modify
+     * @throws IOException unable to write to file
+     */
     private void modifyRoles(EmbedBuilder embed, ModuleAttributes ma, String request, List<Role> roles) throws IOException
     {
         request = request.toLowerCase();
@@ -219,6 +256,13 @@ public class ConfigCommandSettings
         channel.sendMessage(embed.build()).queue();
     }
 
+    /**
+     * Modifies the enabled state of a command
+     * @param embed the embed style
+     * @param ma the module attributes of the command
+     * @param request the message content, containing "addroles" or "removeroles"
+     * @throws IOException unable to write to file
+     */
     private void modifyRoles(EmbedBuilder embed, ModuleAttributes ma, String request) throws IOException
     {
         request = request.toLowerCase();
@@ -256,6 +300,11 @@ public class ConfigCommandSettings
         channel.sendMessage(embed.build()).queue();
     }
 
+    /**
+     * Gets the command details and menu controls
+     * @param ma the command's module attributes
+     * @return menu content to display
+     */
     private String getCommandProfile(ModuleAttributes ma)
     {
         StringBuilder profileBuilder = new StringBuilder();

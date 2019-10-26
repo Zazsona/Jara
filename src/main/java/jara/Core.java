@@ -29,7 +29,7 @@ public class Core //A class for covering the global manners of the bot.
 
 	/**
 	 * Gets the current Jara version
-	 * @return
+	 * @return the version
 	 */
 	public static String getVersion()
 	{
@@ -37,9 +37,9 @@ public class Core //A class for covering the global manners of the bot.
 	}
 
 	/**
-	 * Gets a set of all past Jara versions with which modules and saves should be compatible with.
+	 * Gets a set of all past Jara versions with which modules should be compatible with.
 	 * If an update breaks the API, this set is to be wiped.
-	 * @return
+	 * @return set of back-compat versions
 	 */
 	public static HashSet<String> getSupportedVersions()
 	{
@@ -51,6 +51,11 @@ public class Core //A class for covering the global manners of the bot.
 	}
 
 
+	/**
+	 * Connect to the Discord network, and initiate the shards.
+	 * @param clientToken the application token
+	 * @return boolean on success
+	 */
 	public static boolean initialiseDiscordConnection(String clientToken)
 	{
 		Logger logger = LoggerFactory.getLogger(Core.class);
@@ -67,6 +72,10 @@ public class Core //A class for covering the global manners of the bot.
 	    	return false;
 		}
 	}
+
+	/**
+	 * Prepares the commands from all loaded modules to be executed
+	 */
 	public static void enableCommands()
 	{
 		try
@@ -92,11 +101,20 @@ public class Core //A class for covering the global manners of the bot.
 		}
 
 	}
+
+	/**
+	 * Starts the handlers for Discord events.
+	 */
 	public static void startListeners()
 	{
 		shardManager.addEventListener(new GuildJoinHandler());
 		shardManager.addEventListener(new GuildLeaveHandler());
 	}
+
+	/**
+	 * Gets the {@link ShardManager}
+	 * @return the shard manager
+	 */
 	public static ShardManager getShardManager()
 	{
 		return shardManager;

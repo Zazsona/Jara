@@ -9,6 +9,10 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.io.IOException;
 
+
+/**
+ * Handles the bot getting removes from a guild
+ */
 public class GuildLeaveHandler extends ListenerAdapter 
 {
 	@Override

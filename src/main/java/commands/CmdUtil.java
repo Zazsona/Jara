@@ -28,15 +28,34 @@ import java.time.ZoneOffset;
 import java.util.*;
 
 /**
- * Don't remove items from this API, as it will break the modules that rely on them.
+ * A set of handy dandy methods to ease with module development
  */
 public class CmdUtil
 {
     /**
+     * A list of almost every english word
+     */
+    private static ArrayList<String> wordList;
+
+    /**
+     * A list of top 10k english words.
+     */
+    private static ArrayList<String> topWordList;
+
+    /**
+     * A list of random topics
+     */
+    private static ArrayList<String> topicList;
+    /**
+     * A map of guildID to that guild's audio instance.
+     */
+    private static HashMap<String, Audio> guildAudios = new HashMap<>();
+
+    /**
      * Gets JDA.<br>
      *     Don't rely on this being a fast operation. It will not work until the bot is launched,
      *     and as such, will hold the thread until that happens.
-     * @return
+     * @return JDA
      */
     public synchronized static JDA getJDA()
     {
@@ -65,29 +84,11 @@ public class CmdUtil
         }
         return null;
     }
-    /**
-     * A list of almost every english word
-     */
-    private static ArrayList<String> wordList;
 
-    /**
-     * A list of top 10k english words.
-     */
-    private static ArrayList<String> topWordList;
-
-    /**
-     * A list of random topics
-     */
-    private static ArrayList<String> topicList;
-    /**
-     * A map of guildID to that guild's audio instance.
-     */
-    private static HashMap<String, Audio> guildAudios = new HashMap<>();
     /**
      * This method sends a HTTP request to the specified URL.
      * @param URL the URL to send a request to
-     * @return The data returned from the request<br>
-     * null - Error occurred.
+     * @return The data returned from the request or null if unavailable
      */
     public static String sendHTTPRequest(String URL)
     {
@@ -99,8 +100,7 @@ public class CmdUtil
      * The HashMap's key will be used as the header name, with the data as the header data.
      * @param URL the URL to send a request to
      * @param headers the header data to include
-     * @return The data returned from the request<br>
-     * null - Error occurred.
+     * @return The data returned from the request or null if unavailable
      */
     public static String sendHTTPRequestWithHeader(String URL, HashMap<String, String> headers)
     {
@@ -150,7 +150,7 @@ public class CmdUtil
     /**
      * Loads the entire word list into memory. Ideal for checking words.
      * @return a list of almost every english word
-     * @throws IOException
+     * @throws IOException unable to access file
      */
     public synchronized static ArrayList<String> getWordList() throws IOException
     {
@@ -171,7 +171,7 @@ public class CmdUtil
     /**
      * Loads the entire top word list into memory. Ideal for giving words.
      * @return a list of roughly the top 10k most used English words. (Excluding curses)
-     * @throws IOException
+     * @throws IOException unable to access file
      */
     public synchronized static ArrayList<String> getTopWordList() throws IOException
     {
@@ -192,7 +192,7 @@ public class CmdUtil
     /**
      * Gets a random word from the word list. If the word list is not loaded into memory, this will load it.
      * @param topWords whether to only get words from the top 10k
-     * @throws IOException
+     * @throws IOException unable to access file
      * @return a random word of any length
      */
     public static String getRandomWord(boolean topWords) throws IOException
@@ -243,8 +243,8 @@ public class CmdUtil
 
     /**
      * Removes the current save for a guild's audio, including history.
-     * @param guildID
-     * @return
+     * @param guildID the guild to uncache Audio for.
+     * @return the cleared Audio
      */
     public synchronized static Audio clearGuildAudio(String guildID)
     {
@@ -311,7 +311,7 @@ public class CmdUtil
     /**
      * Loads the entire topic list into memory
      * @return the topic list
-     * @throws IOException
+     * @throws IOException unable to access file
      */
     public synchronized static ArrayList<String> getTopicList() throws IOException
     {
@@ -332,7 +332,7 @@ public class CmdUtil
     /**
      * Gets a random topic based from the topic list.
      * @return a topic
-     * @throws IOException
+     * @throws IOException unable to access file
      */
     public static String getRandomTopic() throws IOException
     {
@@ -357,10 +357,10 @@ public class CmdUtil
     }
 
     /**
-     * Opens the help page to for the specified command.
+     * Opens the help page to for the specified module.
      *
-     * @param msgEvent
-     * @param clazz
+     * @param msgEvent context
+     * @param clazz the command class
      */
     public static void sendHelpInfo(GuildMessageReceivedEvent msgEvent, Class<? extends Command> clazz)
     {

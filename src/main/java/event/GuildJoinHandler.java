@@ -11,6 +11,9 @@ import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
+/**
+ * Handles the bot being added to new guilds.
+ */
 public class GuildJoinHandler extends ListenerAdapter 
 {
 	@Override

@@ -9,6 +9,10 @@ import java.io.IOException;
 
 public class Boot 
 {
+	/**
+	 * Main.
+	 * @param args the arguments
+	 */
 	public static void main(String[] args)
 	{
 		SettingsUtil.initialise();
@@ -16,6 +20,10 @@ public class Boot
 		Core.startListeners(); //Once this is called, Jara can respond to guild changes
 		Core.enableCommands(); //Once this is called, commands can be used.
 	}
+
+	/**
+	 * Begins the connection to Discord services.
+	 */
 	private static void connectToDiscord()
 	{
 		try

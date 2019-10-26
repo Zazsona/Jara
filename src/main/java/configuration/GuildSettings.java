@@ -38,7 +38,7 @@ public class GuildSettings implements Serializable
     /**
      * The ID of this guild
      */
-    private String guildID;
+    private final String guildID;
     /**
      * The Character used to summon the bot
      */
@@ -74,6 +74,11 @@ public class GuildSettings implements Serializable
      */
     private static transient final Logger logger = LoggerFactory.getLogger(GuildSettings.class);
 
+    /**
+     * Constructor
+     * @param guildID the id of the guild
+     * @throws IOException unable to access file
+     */
     public GuildSettings(String guildID) throws IOException
     {
         this.guildID = guildID;
@@ -82,8 +87,7 @@ public class GuildSettings implements Serializable
 
     /**
      * Returns the directory which stores guild settings files.
-     * @return
-     * File - Guild Settings directory
+     * @return the directory
      */
     private File getGuildSettingsDirectory()
     {
@@ -97,8 +101,9 @@ public class GuildSettings implements Serializable
     }
 
     /**
-     * @param guildID
-     * @return
+     * Gets the filepath for this guild's settings file
+     * @param guildID the guild's id
+     * @return the path
      */
     private String getGuildSettingsFilePath(String guildID)
     {
@@ -205,6 +210,7 @@ public class GuildSettings implements Serializable
 
     /**
      * Deletes this guild's settings.
+     * @throws IOException unable to save
      */
     public synchronized void delete() throws IOException
     {
@@ -238,6 +244,7 @@ public class GuildSettings implements Serializable
 
     /**
      * Applies default settings to the guild config
+     * @throws IOException unable to save
      */
     public void setDefaultSettings() throws IOException
     {
@@ -272,8 +279,8 @@ public class GuildSettings implements Serializable
     /**
      * This method will take a legacy config and match it to the current Jara version.
      * Once updated in this object, the updates will be written to file.
-     * @param legacySettings
-     * @throws IOException
+     * @param legacySettings the settings from a past Jara version
+     * @throws IOException unable to access file
      */
     private void updateConfig(GuildSettings legacySettings) throws IOException
     {
@@ -320,8 +327,10 @@ public class GuildSettings implements Serializable
 
     /**
      * Allows the roles represented by the IDs to use the command.
-     * @param roleIDs
-     * @param commandKeys
+     * @param roleIDs the roles to add
+     * @param commandKeys the commands to add to
+     * @return boolean on change occurred
+     * @throws IOException unable to save
      */
     public boolean addPermissions(ArrayList<String> roleIDs, String... commandKeys) throws IOException
     {
@@ -330,8 +339,10 @@ public class GuildSettings implements Serializable
 
     /**
      * Allows the role represented by the ID to use the command.
-     * @param roleID
-     * @param commandKeys
+     * @param roleID the role to add
+     * @param commandKeys the commands to add to
+     * @return boolean on change occurred
+     * @throws IOException unable to save
      */
     public boolean addPermissions(String roleID, String... commandKeys) throws IOException
     {
@@ -340,8 +351,10 @@ public class GuildSettings implements Serializable
 
     /**
      * Denies the roles represented by the IDs from using the command.
-     * @param roleIDs
-     * @param commandKeys
+     * @param roleIDs the roles to remove
+     * @param commandKeys the commands to remove from
+     * @return boolean on change occurred
+     * @throws IOException unable to save
      */
     public boolean removePermissions(ArrayList<String> roleIDs, String... commandKeys) throws IOException
     {
@@ -350,8 +363,10 @@ public class GuildSettings implements Serializable
 
     /**
      * Denies the role represented by the ID from using the command.
-     * @param roleID
-     * @param commandKeys
+     * @param roleID the role to remove
+     * @param commandKeys the commands to remove from
+     * @return boolean on change occurred
+     * @throws IOException unable to save
      */
     public boolean removePermissions(String roleID, String... commandKeys) throws IOException
     {
@@ -359,7 +374,8 @@ public class GuildSettings implements Serializable
     }
 
     /**
-     * @return
+     * Gets the ID of the guild these settings correspond to
+     * @return the id
      */
     public String getGuildId()
     {
@@ -368,7 +384,7 @@ public class GuildSettings implements Serializable
 
     /**
      * Consider using SettingsUtil#getCommandChar instead if you don't need any other settings.
-     * @return
+     * @return the prefix
      */
     public Character getCommandPrefix()
     {
@@ -376,7 +392,9 @@ public class GuildSettings implements Serializable
     }
 
     /**
-     * @param newChar
+     * The command prefix, that is, the character that must precede command keys/alises for Jara to recognise them.
+     * @param newChar the character to use.
+     * @throws IOException unable to save
      */
     public void setCommandPrefix(Character newChar) throws IOException
     {
@@ -386,9 +404,9 @@ public class GuildSettings implements Serializable
 
     /**
      * Checks if the member is allowed to use this command, based on their roles.
-     * @param member
-     * @param commandKey
-     * @return
+     * @param member the member to check
+     * @param commandKey the key of the command to check
+     * @return boolean on permitted
      */
     public boolean isPermitted(Member member, String commandKey)
     {
@@ -424,9 +442,9 @@ public class GuildSettings implements Serializable
     }
     /**
      * Checks if the member is allowed to use this command, based on their roles.
-     * @param member
-     * @param command
-     * @return
+     * @param member the member to check
+     * @param command the command to check
+     * @return boolean on permitted
      */
     public boolean isPermitted(Member member, Class<? extends Command> command)
     {
@@ -435,8 +453,8 @@ public class GuildSettings implements Serializable
 
     /**
      * Returns a list of role IDs who can use this command
-     * @param key
-     * @return ArrayList<String> - List of Role IDs
+     * @param key the command's key
+     * @return the role IDs
      */
     public ArrayList<String> getPermissions(String key)
     {
@@ -452,6 +470,8 @@ public class GuildSettings implements Serializable
      * @param add whether to add/remove permissions
      * @param roleIDs the roles to permit
      * @param commandKeys the commands to affect
+     * @return boolean on if a change occurred
+     * @throws IOException unable to save
      */
     private boolean setPermissions(boolean add, ArrayList<String> roleIDs, String... commandKeys) throws IOException
     {
@@ -490,6 +510,8 @@ public class GuildSettings implements Serializable
      * @param add whether to add/remove permissions
      * @param roleID the role to permit
      * @param commandKeys the commands to affect
+     * @return boolean on if a change occurred
+     * @throws IOException unable to save
      */
     private boolean setPermissions(boolean add, String roleID, String... commandKeys) throws IOException
     {
@@ -523,7 +545,8 @@ public class GuildSettings implements Serializable
     }
 
     /**
-     * @return
+     * Gets the {@link net.dv8tion.jda.core.entities.Category} id to create game channels in.
+     * @return the id
      */
     public String getGameCategoryId()
     {
@@ -531,7 +554,9 @@ public class GuildSettings implements Serializable
     }
 
     /**
-     * @param gameCategoryId
+     * Sets the ID of the {@link net.dv8tion.jda.core.entities.Category} to create Game Channels in.
+     * @param gameCategoryId the category id
+     * @throws IOException unable to save
      */
     public void setGameCategoryId(String gameCategoryId) throws IOException
     {
@@ -541,9 +566,10 @@ public class GuildSettings implements Serializable
 
     /**
      * Updates the stored information for the commands defined by their keys. Pass null parameter to retain current value.
-     * @param newState (Can be null)
-     * @param newPermissions (Can be null)
-     * @param commandKeys
+     * @param newState the state to set(Can be null)
+     * @param newPermissions the role IDs to toggle access for (Can be null)
+     * @param commandKeys the keys of the commands to modify
+     * @throws IOException unable to save
      */
     public void setCommandConfiguration(Boolean newState, ArrayList<String> newPermissions, String... commandKeys) throws IOException
     {
@@ -582,9 +608,10 @@ public class GuildSettings implements Serializable
 
     /**
      * Updates the stored information for the commands within the category. Pass null parameter to retain current value.
-     * @param newState
-     * @param newPermissions
-     * @param categoryID
+     * @param newState the new enabled state of the category's commands
+     * @param newPermissions the roles IDs to add/remove to commands in the category
+     * @param categoryID the ID of the category
+     * @throws IOException unable to save
      */
     public void setCategoryConfiguration(Boolean newState, ArrayList<String> newPermissions, ModuleRegister.Category categoryID) throws IOException
     {
@@ -600,8 +627,9 @@ public class GuildSettings implements Serializable
     }
 
     /**
-     * @param commandKey
-     * @return
+     * Gets if a command is enabled
+     * @param commandKey the command to check
+     * @return boolean on enabled
      */
     public boolean isCommandEnabled(String commandKey)
     {
@@ -610,7 +638,7 @@ public class GuildSettings implements Serializable
 
     /**
      * Gets the command keys of all commands enabled in this guild.
-     * @return
+     * @return a list of keys
      */
     public ArrayList<String> getEnabledCommands()
     {
@@ -627,7 +655,8 @@ public class GuildSettings implements Serializable
 
 
     /**
-     * @return
+     * Gets how many milliseconds a game channel can be inactive for before deletion.
+     * @return the timeout, in milliseconds
      */
     public String getGameChannelTimeout()
     {
@@ -635,7 +664,9 @@ public class GuildSettings implements Serializable
     }
 
     /**
-     * @param gameChannelTimeout
+     * Sets after how long to delete a game channel
+     * @param gameChannelTimeout the time in milliseconds
+     * @throws IOException unable to save
      */
     public void setGameChannelTimeout(String gameChannelTimeout) throws IOException
     {
@@ -644,7 +675,8 @@ public class GuildSettings implements Serializable
     }
 
     /**
-     * @return
+     * Gets if game channels are enabled
+     * @return boolean on enabled
      */
     public boolean isGameChannelsEnabled()
     {
@@ -652,7 +684,9 @@ public class GuildSettings implements Serializable
     }
 
     /**
-     * @param
+     * Sets whether to create new channels when a game is launched
+     * @param useGameChannels whether to use game channels
+     * @throws IOException unable to save
      */
     public void setUseGameChannels(boolean useGameChannels) throws IOException
     {
@@ -661,7 +695,8 @@ public class GuildSettings implements Serializable
     }
 
     /**
-     * @return
+     * Gets the percentage of users in a voice channel (excluding bots) that need to vote for a skip for the track to move on
+     * @return the percentage
      */
     public int getTrackSkipPercent()
     {
@@ -669,7 +704,9 @@ public class GuildSettings implements Serializable
     }
 
     /**
-     * @param newPercent
+     * Sets the percentage of users in a voice channel (excluding bots) that need to vote for a skip for the track to move on
+     * @param newPercent the percentage of users needed to vote
+     * @throws IOException error writing to file
      */
     public void setTrackSkipPercent(int newPercent) throws IOException
     {
@@ -681,7 +718,8 @@ public class GuildSettings implements Serializable
     }
 
     /**
-     * @return
+     * Checks if voice leaving is enabled
+     * @return voice leaving enabled
      */
     public boolean isVoiceLeavingEnabled()
     {
@@ -689,7 +727,9 @@ public class GuildSettings implements Serializable
     }
 
     /**
-     * @param state
+     * Sets if the bot should leave the voice channel when nothing is playing
+     * @param state whether to enable leaving or not
+     * @throws IOException unable to save
      */
     public void setVoiceLeaving(boolean state) throws IOException
     {
@@ -699,8 +739,8 @@ public class GuildSettings implements Serializable
 
     /**
      * Gets the member's highest audio queue amount, based on their roles.
-     * @param member
-     * @return
+     * @param member the member to check
+     * @return the tracks they can queue
      */
     public int getAudioQueueLimit(Member member)
     {
@@ -719,9 +759,9 @@ public class GuildSettings implements Serializable
     }
 
     /**
-     * Gets the audio queue limit for this role.
-     * @param role
-     * @return
+     * Gets the audio queue limit for this role. This is the number of tracks they can have queued.
+     * @param role the role to get the limit for
+     * @return the limit
      */
     public int getAudioQueueLimit(Role role)
     {
@@ -735,9 +775,9 @@ public class GuildSettings implements Serializable
 
     /**
      * Sets the audio queue limit for this role.
-     * @param role
+     * @param role the role to set a limit for
      * @param limit the number of tracks a role member can queue up
-     * @throws IOException
+     * @throws IOException unable to save
      */
     public void setAudioQueueLimit(Role role, int limit) throws IOException
     {
@@ -747,7 +787,8 @@ public class GuildSettings implements Serializable
 
     /**
      * Sets the ability to have two or more games running in a channel simultaneously.
-     * @param state
+     * @param state true/false on enable
+     * @throws IOException unable to save
      */
     public void setConcurrentGameInChannelAllowed(boolean state) throws IOException
     {
@@ -757,7 +798,7 @@ public class GuildSettings implements Serializable
 
     /**
      * Gets if two or more games can be running in a single channel simultaneously
-     * @return
+     * @return boolean on setting
      */
     public boolean isConcurrentGameInChannelAllowed()
     {
@@ -765,8 +806,8 @@ public class GuildSettings implements Serializable
     }
 
     /**
-     * Removes the configuration entry for the command specified by the key.
-     * @param key
+     * Removes the module command configuration entry for the module specified by the key.
+     * @param key the module key
      */
     protected void removeConfig(String key)
     {
@@ -775,7 +816,7 @@ public class GuildSettings implements Serializable
 
     /**
      * Gets custom command settings
-     * @return
+     * @return the {@link CustomCommandSettings}
      */
     public CustomCommandSettings getCustomCommandSettings()
     {
@@ -784,17 +825,16 @@ public class GuildSettings implements Serializable
 
     /**
      * Gets the Zoned Date Time this guild.
-     * @return
+     * @return current time in the guild
      */
     public ZonedDateTime getZonedDateTime()
     {
-        ZonedDateTime zdt = LocalDateTime.now().atZone(ZoneId.of(timeZoneId));
-        return zdt;
+        return LocalDateTime.now().atZone(ZoneId.of(timeZoneId));
     }
 
     /**
      * Gets the timezone ID for this guild.
-     * @return
+     * @return the Zone ID
      */
     public ZoneId getTimeZoneId()
     {
@@ -803,8 +843,8 @@ public class GuildSettings implements Serializable
 
     /**
      * Sets the timezone id.
-     * @param timeZoneId
-     * @throws IOException
+     * @param timeZoneId the timezone to set
+     * @throws IOException unable to access file
      */
     public void setTimeZoneId(String timeZoneId) throws IOException
     {
@@ -838,8 +878,8 @@ public class GuildSettings implements Serializable
 
     /**
      * Removes a module setting from the file.
-     * @param key
-     * @throws IOException
+     * @param key the key of the setting to remove
+     * @throws IOException unable to access file
      */
     public void removeCustomModuleSetting(String key) throws IOException
     {

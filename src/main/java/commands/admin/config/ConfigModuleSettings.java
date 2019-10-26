@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -27,6 +28,11 @@ public class ConfigModuleSettings
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigModuleSettings.class);
 
+    /**
+     * Constructor
+     * @param guildSettings the guild settings to modify
+     * @param channel the channel to run in
+     */
     public ConfigModuleSettings(GuildSettings guildSettings, TextChannel channel)
     {
         this.guildSettings = guildSettings;
@@ -34,6 +40,12 @@ public class ConfigModuleSettings
         this.msgManager = new MessageManager();
     }
 
+    /**
+     * Runs through the config using the navigation options supplied in a single message
+     * @param msgEvent context
+     * @param parameters the parameters to parse
+     * @throws IOException unable to write to file
+     */
     public void parseAsParameters(GuildMessageReceivedEvent msgEvent, String[] parameters) throws IOException
     {
         if (parameters.length > 2)
@@ -56,17 +68,24 @@ public class ConfigModuleSettings
         }
     }
 
+    /**
+     * Converts the active working parameters (i.e, strips the parameters used to get to this menu) as a collection
+     * @param parameters the parameters
+     * @return parameters yet to parse, as a collection
+     */
     private Collection<String> convertParametersToCollection(String[] parameters)
     {
         LinkedList<String> params = new LinkedList();
-        for (int i = 3; i<parameters.length; i++)
-        {
-            params.add(parameters[i]);
-        }
+        params.addAll(Arrays.asList(parameters).subList(3, parameters.length));
         params = (params.size() > 0) ? params : null;
         return params;
     }
 
+    /**
+     * Prompts the user to select a module, and loads the module's config
+     * @param msgEvent context
+     * @throws IOException unable to save data
+     */
     public void getModule(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         ModuleAttributes ma;
@@ -97,6 +116,14 @@ public class ConfigModuleSettings
         }
     }
 
+    /**
+     * Loads a module's config
+     * @param msgEvent context
+     * @param ma attributes of the module
+     * @param parameters parameters to pass to module config
+     * @param isSetup if this is the setup wizard
+     * @throws IOException unable to access files
+     */
     public void loadConfig(GuildMessageReceivedEvent msgEvent, ModuleAttributes ma, Collection<String> parameters, boolean isSetup) throws IOException
     {
         try

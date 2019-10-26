@@ -15,12 +15,24 @@ public class ConfigGameSettings
 {
     private final GuildSettings guildSettings;
     private final TextChannel channel;
+
+    /**
+     * Constructor
+     * @param guildSettings the guild settings to modify
+     * @param channel the channel to run in
+     */
     public ConfigGameSettings(GuildSettings guildSettings, TextChannel channel)
     {
         this.guildSettings = guildSettings;
         this.channel = channel;
     }
 
+    /**
+     * Runs through the config using the navigation options supplied in a single message
+     * @param msgEvent context
+     * @param parameters the parameters to parse
+     * @throws IOException unable to write to file
+     */
     public void parseAsParameter(GuildMessageReceivedEvent msgEvent, String[] parameters) throws IOException
     {
         if (parameters.length > 2)
@@ -55,6 +67,11 @@ public class ConfigGameSettings
         }
     }
 
+    /**
+     * Shows the main navigation menu for game settings, and directs the user to a submenu or exiting.
+     * @param msgEvent context
+     * @throws IOException unable to write to file
+     */
     public void showMenu(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
@@ -99,6 +116,11 @@ public class ConfigGameSettings
         }
     }
 
+    /**
+     * Takes user input and modifies whether to create unique channels for each game.
+     * @param msgEvent context
+     * @throws IOException unable to write to file
+     */
     public void modifyGameChannels(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
@@ -147,6 +169,12 @@ public class ConfigGameSettings
             modifyGameCategory(msgEvent);
         }
     }
+
+    /**
+     * Takes user input and modifies which channel category to create game channels in
+     * @param msgEvent context
+     * @throws IOException unable to write to file
+     */
     public void modifyGameCategory(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
@@ -205,6 +233,12 @@ public class ConfigGameSettings
 
 
     }
+
+    /**
+     * Takes user input and modifies the time it takes for a game channel with no activity to be deleted
+     * @param msgEvent context
+     * @throws IOException unable to write to file
+     */
     public void modifyChannelTimeout(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
@@ -255,6 +289,11 @@ public class ConfigGameSettings
         }
     }
 
+    /**
+     * Takes user input and modifies if multiple games can run in a single channel
+     * @param msgEvent context
+     * @throws IOException unable to write to file
+     */
     public void modifyConcurrentGameInChannel(GuildMessageReceivedEvent msgEvent) throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);

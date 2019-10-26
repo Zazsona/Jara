@@ -19,6 +19,9 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * A subclass of {@link Command}, provides utility methods for games which respect guild settings.
+ */
 public abstract class GameCommand extends Command //A base class to build commands from.
 {
 	/**
@@ -68,7 +71,7 @@ public abstract class GameCommand extends Command //A base class to build comman
 		embed.setColor(CmdUtil.getHighlightColour(guild.getSelfMember()));
 		if (!guildSettings.isGameChannelsEnabled())
 		{
-			return utiliseCurrentChannel(currentChannel, guild, guildSettings, embed);
+			return utiliseCurrentChannel(currentChannel, guildSettings, embed);
 		}
 		else
 		{
@@ -146,21 +149,21 @@ public abstract class GameCommand extends Command //A base class to build comman
 
 	/**
 	 * Creates a game channel
-	 * @param currentChannel
-	 * @param channelName
-	 * @param guild
-	 * @param logger
-	 * @param embed
-	 * @param gameCategory
-	 * @param players
-	 * @return
+	 * @param currentChannel the channel the command was issued in
+	 * @param channelName the name of the channel to create
+	 * @param guild the guild to create a channel in
+	 * @param logger the logger
+	 * @param embed the embed
+	 * @param gameCategory the category to create a channel in
+	 * @param players any players to add
+	 * @return the channel
 	 */
 	private TextChannel utiliseGameChannel(TextChannel currentChannel, String channelName, Guild guild, Logger logger, EmbedBuilder embed, Category gameCategory, Member[] players)
 	{
 		try
 		{
 			TextChannel channel = (TextChannel) gameCategory.createTextChannel(channelName).complete();
-			enableChannelTimeout(guild, channel);
+			enableChannelTimeout(channel);
 			channel.putPermissionOverride(channel.getGuild().getPublicRole()).setDeny(Permission.MESSAGE_READ).queue();
 			for (Member player : players)
 			{
@@ -193,12 +196,11 @@ public abstract class GameCommand extends Command //A base class to build comman
 
 	/**
 	 * Starts a timer to delete the game channel after the guild's set timeout
-	 * @param guild
-	 * @param channel
+	 * @param channel the channel to delete
 	 */
-	private void enableChannelTimeout(Guild guild, TextChannel channel)
+	private void enableChannelTimeout(TextChannel channel)
 	{
-		int channelTimeout = Integer.parseInt(SettingsUtil.getGuildSettings(guild.getId()).getGameChannelTimeout());
+		int channelTimeout = Integer.parseInt(SettingsUtil.getGuildSettings(channel.getGuild().getId()).getGameChannelTimeout());
 		if (channelTimeout != 0)
 		{
 			channelTimeoutTimer = new Timer();
@@ -223,8 +225,8 @@ public abstract class GameCommand extends Command //A base class to build comman
 
 	/**
 	 * Sends a message allowing players to add a reaction to join the channel
-	 * @param currentChannel
-	 * @param channel
+	 * @param currentChannel the channel the reactable message in in
+	 * @param channel the channel to join
 	 */
 	private void sendGameMsg(TextChannel currentChannel, TextChannel channel)
 	{
@@ -240,16 +242,16 @@ public abstract class GameCommand extends Command //A base class to build comman
 	/**
 	 * Prepares the current channel for a game, and registers it as running a game.<br>
 	 *     Kills the thread if multiple games in a channel is disabled and one is already running
-	 * @param currentChannel
-	 * @param guild
-	 * @param guildSettings
-	 * @param embed
-	 * @return
+	 * @param currentChannel the channel to use
+	 * @param guildSettings the guild's settings
+	 * @param embed the embed
+	 * @return the TextChannel to use
 	 */
-	private TextChannel utiliseCurrentChannel(TextChannel currentChannel, Guild guild, GuildSettings guildSettings, EmbedBuilder embed)
+	private TextChannel utiliseCurrentChannel(TextChannel currentChannel, GuildSettings guildSettings, EmbedBuilder embed)
 	{
 		if (guildSettings.isConcurrentGameInChannelAllowed())
 		{
+			Guild guild = currentChannel.getGuild();
 			channelsRunningGames.putIfAbsent(guild.getId(), new ArrayList<>());
 			if (channelsRunningGames.get(guild.getId()).contains(currentChannel.getId()))
 			{
@@ -267,6 +269,9 @@ public abstract class GameCommand extends Command //A base class to build comman
 		return currentChannel;
 	}
 
+	/**
+	 * EventHandler to pick up on game join reactions.
+	 */
 	private class GameReactionListener extends ListenerAdapter
 	{
 		@Override

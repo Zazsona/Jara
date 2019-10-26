@@ -6,11 +6,12 @@ import configuration.GuildCommandLauncher;
 import module.Command;
 import module.Load;
 import module.ModuleConfig;
+import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 public class ModuleAttributes
 {
 	private final String key;
-	private final String[] aliases; //Text strings that will call the command
+	private final String[] aliases;
 	private final ModuleRegister.Category category;
 	private final boolean disableable;
 	private final String targetVersion;
@@ -20,6 +21,10 @@ public class ModuleAttributes
 	private Class<? extends ModuleConfig> configClass;
 	private Class<? extends Load> loadClass;
 
+	/**
+	 * Constructor from a JSON string
+	 * @param json valid json matching this class' attributes.
+	 */
 	public ModuleAttributes(String json)
 	{
 		Gson gson = new Gson();
@@ -53,6 +58,15 @@ public class ModuleAttributes
 		this.loadClass = null;
 	}
 
+	/**
+	 * Constructor for set values
+	 * @param keyArg the module's unique key
+	 * @param descriptionArg the module's short description
+	 * @param aliasesArg the module's aliases
+	 * @param categoryArg the module's category
+	 * @param targetVersionArg the module's target Jara version
+	 * @param disableableArg the module's ability to be disabled (This should only be used for in-built commands)
+	 */
 	public ModuleAttributes(String keyArg, String descriptionArg, String[] aliasesArg, ModuleRegister.Category categoryArg, String targetVersionArg, boolean disableableArg)
 	{
 		key = keyArg;
@@ -86,6 +100,19 @@ public class ModuleAttributes
 		this.loadClass = null;
 	}
 
+	/**
+	 * Constructor for set values
+	 * @param keyArg the module's unique key
+	 * @param descriptionArg the module's short description
+	 * @param aliasesArg the module's aliases
+	 * @param categoryArg the module's category
+	 * @param targetVersionArg the module's target Jara version
+	 * @param disableableArg the module's ability to be disabled (This should only be used for in-built commands)
+	 * @param commandClass the class to execute a command
+	 * @param helpPage the help information
+	 * @param moduleConfigClass the module's config
+	 * @param loadClass the load callback
+	 */
 	public ModuleAttributes(String keyArg, String descriptionArg, String[] aliasesArg, ModuleRegister.Category categoryArg, String targetVersionArg, boolean disableableArg, Class<? extends Command> commandClass, Help.HelpPage helpPage, Class<? extends ModuleConfig> moduleConfigClass, Class<? extends Load> loadClass)
 	{
 		key = keyArg;
@@ -117,36 +144,29 @@ public class ModuleAttributes
 	}
 
 	/**
-	 * Simple get for the module's key. This is unique to this module and can be used to identify it.
-	 * @return
-	 * String - The key
+	 * This geta a unique key for this module which can be used to identify it.
+	 * @return the key
 	 */
 	public String getKey()
 	{
 		return key;
 	}
+
 	/**
-	 * 
-	 * Simple get for all the different text strings
-	 * that will call the module. Sorted alphabetically.
-	 * 
-	 * @return
-	 * String[] - List of all command aliases
+	 * Alphabetical array of alternate strings that can be used to summon the module, including the key
+	 * @return the aliases
 	 */
 	public String[] getAliases()
 	{
 		return aliases;
 	}
+
 	/**
+	 * Gets the class responsible for the module's command.<br>
+	 *     Instantiating this class will ignore any permissions settings in the guild.
+	 *     Instead, use {@link GuildCommandLauncher#execute(GuildMessageReceivedEvent, String...)}
 	 * 
-	 * Simple get method for the module's corresponding command class.
-	 * Instantiating a command from this method does not perform any config checks.
-	 * 
-	 * Instead, use execute() in {@link GuildCommandLauncher}
-	 * 
-	 * @return
-	 * Class<? extends Command> - The command class.
-	 * null - No command associated with this module
+	 * @return the command class, or null if the module has no command.
 	 */
 	public Class<? extends Command> getCommandClass()
 	{
@@ -155,9 +175,7 @@ public class ModuleAttributes
 
 	/**
 	 * Gets the config class for this module
-	 * @return
-	 * Class extending {@link ModuleConfig} - The config class
-	 * null - No config associated with this module
+	 * @return the config class, or null if none exists.
 	 */
 	public Class<? extends ModuleConfig> getConfigClass()
 	{
@@ -165,10 +183,8 @@ public class ModuleAttributes
 	}
 
 	/**
-	 * Gets the load class for this module
-	 * @return
-	 * Class extending {@link Load} - The load class
-	 * null - No load function with this module
+	 * Gets the class which specifies the callback method to run when the module is loaded.
+	 * @return the class, or null if none exists.
 	 */
 	public Class<? extends Load> getLoadClass()
 	{
@@ -176,9 +192,8 @@ public class ModuleAttributes
 	}
 
 	/**
-	 * Gets the help page for this module
-	 * @return
-	 * {@link commands.Help.HelpPage} - the HelpPage
+	 * Gets the {@link commands.Help.HelpPage} for this module
+	 * @return the help page
 	 */
 	public Help.HelpPage getHelpPage()
 	{
@@ -186,9 +201,8 @@ public class ModuleAttributes
 	}
 
 	/**
-	 * Returns the module's category.<br>
-	 * @return
-	 * Category - The category
+	 * Returns the module's {@link ModuleRegister.Category}.<br>
+	 * @return the category
 	 */
 	public ModuleRegister.Category getCategory()
 	{
@@ -196,19 +210,16 @@ public class ModuleAttributes
 	}
 
 	/**
-	 * Simple get which returns the name of the module's category
-	 * @return
-	 * String - Category name
+	 * Simple get which returns the name of the module's {@link ModuleRegister.Category}
+	 * @return the name of the category
 	 */
 	public String getCategoryName()
 	{
 		return ModuleRegister.getCategoryName(category);
 	}
 	/**
-	 * Simple state check which specifies if this module is able to be disabled
-	 * @return
-	 * true - Can be disabled/enabled freely
-	 * false - Locked. This command should not be disableable.
+	 * Gets if this module can be disabled per guild.
+	 * @return true/false for disable
 	 */
 	public boolean isDisableable()
 	{
@@ -217,8 +228,7 @@ public class ModuleAttributes
 
 	/**
 	 * Returns a small description of the module, suitable for lists.
-	 * @return
-	 * String - the description.
+	 * @return the description
 	 */
 	public String getDescription()
 	{
@@ -235,10 +245,9 @@ public class ModuleAttributes
 	}
 
 	/**
-	 * Sets the Help Page to that specified. For the default help page, pass null.
-	 * @param helpPage
-	 * @return
-	 * The new {@link commands.Help.HelpPage}
+	 * Sets the {@link commands.Help.HelpPage} to that specified. For the default help page, pass null.
+	 * @param helpPage the help page to set
+	 * @return the new help page
 	 */
 	public Help.HelpPage setHelpPage(Help.HelpPage helpPage)
 	{
@@ -255,8 +264,8 @@ public class ModuleAttributes
 
 	/**
 	 * Sets the command class.
-	 * This shouldn't be needed after module loading.
-	 * @param clazz
+	 * Unless you're trying to pull some hack job, you probably shouldn't touch this.
+	 * @param clazz the class to set
 	 */
 	public void setCommandClass(Class<? extends Command> clazz)
 	{
@@ -265,8 +274,8 @@ public class ModuleAttributes
 
 	/**
 	 * Sets the config class.
-	 * This shouldn't be needed after module loading.
-	 * @param clazz
+	 * Unless you're trying to pull some hack job, you probably shouldn't touch this.
+	 * @param clazz the class to set
 	 */
 	public void setConfigClass(Class<? extends ModuleConfig> clazz)
 	{
@@ -275,8 +284,8 @@ public class ModuleAttributes
 
 	/**
 	 * Sets the load class.
-	 * This shouldn't be needed after module loading.
-	 * @param clazz
+	 * Unless you're trying to pull some hack job, you probably shouldn't touch this.
+	 * @param clazz the class to set
 	 */
 	public void setLoadClass(Class<? extends Load> clazz)
 	{

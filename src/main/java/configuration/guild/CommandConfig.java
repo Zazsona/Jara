@@ -17,8 +17,8 @@ public class CommandConfig implements Serializable
 
     /**
      * Constructor
-     * @param enabled
-     * @param permissions
+     * @param enabled whether the command is enabled
+     * @param permissions the roles IDs allowed to use the command
      */
     public CommandConfig(boolean enabled, ArrayList<String> permissions)
     {

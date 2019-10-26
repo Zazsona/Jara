@@ -23,6 +23,11 @@ public class AudioLoadHandler implements AudioLoadResultHandler
      */
     private Audio.RequestResult result;
 
+    /**
+     * Constructor
+     * @param audio the {@link Audio} to feedback to
+     * @param member the member who loaded the track
+     */
     public AudioLoadHandler(Audio audio, Member member)
     {
         this.audio = audio;
@@ -31,7 +36,8 @@ public class AudioLoadHandler implements AudioLoadResultHandler
     }
 
     /**
-     * @return RequestResult - The result of the load
+     * Gets the result of the last track load attempt
+     * @return the result of the load
      */
     public Audio.RequestResult getResult()
     {
@@ -107,6 +113,10 @@ public class AudioLoadHandler implements AudioLoadResultHandler
         LoggerFactory.getLogger(this.getClass()).info(e.toString());
     }
 
+    /**
+     * Confirm the user is able to queue an addition track, and mark it against their quota
+     * @return boolean on if they have permission to queue
+     */
     private synchronized boolean registerUserQueueItem()
     {
         if (audio.getUserQueueQuantity().get(member.getUser().getId()) == null)

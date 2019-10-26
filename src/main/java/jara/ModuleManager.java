@@ -53,6 +53,7 @@ public class ModuleManager
 
     /**
      * Parses through each jar within the modules folder and gathers its {@link ModuleAttributes}.
+     * @param register all currently loaded modules, including built-in ones.
      * @return the list of {@link ModuleAttributes}
      * @throws InvalidModuleException one or more fatal errors occurred during module loading
      */
@@ -123,6 +124,11 @@ public class ModuleManager
         }
     }
 
+    /**
+     * Gets the class loader
+     * @param moduleDir the directory to load modules from
+     * @return the class loader
+     */
     private static URLClassLoader getClassLoader(File moduleDir)
     {
         ArrayList<URL> urls = new ArrayList<>();
@@ -187,6 +193,11 @@ public class ModuleManager
         return ma;
     }
 
+    /**
+     * Gets the jar name for pretty printing
+     * @param jarFile the jar to get a pretty name for
+     * @return the pretty name
+     */
     @NotNull
     private static String formatJarName(JarFile jarFile)
     {
@@ -198,9 +209,9 @@ public class ModuleManager
      * @param jarFile the module's jar
      * @param cl the classloader
      * @return potentially modified CommandAttributes
-     * @throws ClassNotFoundException
-     * @throws IOException
-     * @throws ConflictException
+     * @throws ClassNotFoundException invalid class directory
+     * @throws IOException unable to access module file
+     * @throws ConflictException classpath is taken
      */
     private static ModuleAttributes loadClasses(JarFile jarFile, URLClassLoader cl, Enumeration<JarEntry> jarEntries) throws ClassNotFoundException, IOException, ConflictException
     {
@@ -220,6 +231,14 @@ public class ModuleManager
         return ma;
     }
 
+    /**
+     * Loads a class, and assigns Jara communication classes in the supplied {@link ModuleAttributes}
+     * @param jarFile the jar to load from
+     * @param cl the loader
+     * @param ma the module to attribute classes to
+     * @param jarEntry the class file
+     * @throws ClassNotFoundException invalid class directory supplied
+     */
     private static void loadClass(JarFile jarFile, URLClassLoader cl, ModuleAttributes ma, JarEntry jarEntry) throws ClassNotFoundException
     {
         String className = jarEntry.getName().substring(0, jarEntry.getName().length() - 6);
@@ -247,6 +266,12 @@ public class ModuleManager
         }
     }
 
+    /**
+     * Sets the help page in the {@link ModuleAttributes} for the module.
+     * @param ma the module's attributes
+     * @param jarFile the file to get help from
+     * @throws IOException file inaccessible
+     */
     private static void loadHelpPage(ModuleAttributes ma, JarFile jarFile) throws IOException
     {
         JarEntry jarHelp = jarFile.getJarEntry("help.json");
