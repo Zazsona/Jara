@@ -4,12 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.MalformedJsonException;
 import commands.CmdUtil;
-import module.Command;
 import configuration.guild.AudioConfig;
 import configuration.guild.CommandConfig;
 import configuration.guild.GameConfig;
 import jara.ModuleAttributes;
-import jara.ModuleRegister;
+import jara.ModuleManager;
 import jara.Core;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Guild;
@@ -144,7 +143,7 @@ public class GuildSettings implements Serializable
                     this.customCommandSettings = settingsFromFile.customCommandSettings;
                     this.customCommandSettings.setGuildSettings(this);
                 }
-                if (!commandConfig.keySet().containsAll(ModuleRegister.getCommandModuleKeys()))
+                if (!commandConfig.keySet().containsAll(ModuleManager.getCommandModuleKeys()))
                 {
                     ArrayList<String> newCommands = addMissingCommands();
                     StringBuilder sb = new StringBuilder();
@@ -224,7 +223,7 @@ public class GuildSettings implements Serializable
      */
     private ArrayList<String> addMissingCommands()
     {
-        ArrayList<String> commandModuleKeys = ModuleRegister.getCommandModuleKeys();
+        ArrayList<String> commandModuleKeys = ModuleManager.getCommandModuleKeys();
         if (!commandConfig.keySet().containsAll(commandModuleKeys))
         {
             ArrayList<String> newKeys = new ArrayList<>();
@@ -232,7 +231,7 @@ public class GuildSettings implements Serializable
             {
                 if (!commandConfig.keySet().contains(key))
                 {
-                    commandConfig.put(key, new CommandConfig(!ModuleRegister.getModule(key).isDisableable(), new ArrayList<>()));
+                    commandConfig.put(key, new CommandConfig(!ModuleManager.getModule(key).isDisableable(), new ArrayList<>()));
                     newKeys.add(key);
                 }
             }
@@ -254,7 +253,7 @@ public class GuildSettings implements Serializable
         this.audioConfig = new AudioConfig();
         this.gameConfig = new GameConfig();
 
-        for (ModuleAttributes ma : ModuleRegister.getCommandModules())
+        for (ModuleAttributes ma : ModuleManager.getCommandModules())
         {
             this.commandConfig.put(ma.getKey(), new CommandConfig(!ma.isDisableable(), new ArrayList<>())); //By inverting isDisableable, we are disabling the command whenever isDisablable is true.
         }
@@ -428,7 +427,7 @@ public class GuildSettings implements Serializable
                 cc = commandConfig.get(customCommandSettings.getCommand(commandKey).getKey());
                 if (cc == null)
                 {
-                    cc = commandConfig.get(ModuleRegister.getModule(commandKey).getKey());
+                    cc = commandConfig.get(ModuleManager.getModule(commandKey).getKey());
                 }
             }
             roleIDs.add(member.getGuild().getPublicRole().getId()); //everyone role is not included in getRoles()
@@ -439,16 +438,6 @@ public class GuildSettings implements Serializable
             return permissionGranted;
         }
         return false;
-    }
-    /**
-     * Checks if the member is allowed to use this command, based on their roles.
-     * @param member the member to check
-     * @param command the command to check
-     * @return boolean on permitted
-     */
-    public boolean isPermitted(Member member, Class<? extends Command> command)
-    {
-        return isPermitted(member, ModuleRegister.getModule(command).getKey());
     }
 
     /**
@@ -577,7 +566,7 @@ public class GuildSettings implements Serializable
         ArrayList<String> permissions;
         for (String key : commandKeys)
         {
-            ModuleAttributes ma = customCommandSettings.getCommand(key)!=null ? customCommandSettings.getCommandAttributes(key) : ModuleRegister.getModule(key);
+            ModuleAttributes ma = customCommandSettings.getCommand(key)!=null ? customCommandSettings.getCommandAttributes(key) : ModuleManager.getModule(key);
             if (ma == null)
             {
                 continue;
@@ -613,10 +602,10 @@ public class GuildSettings implements Serializable
      * @param categoryID the ID of the category
      * @throws IOException unable to save
      */
-    public void setCategoryConfiguration(Boolean newState, ArrayList<String> newPermissions, ModuleRegister.Category categoryID) throws IOException
+    public void setCategoryConfiguration(Boolean newState, ArrayList<String> newPermissions, ModuleManager.Category categoryID) throws IOException
     {
         ArrayList<String> keys = new ArrayList<>();
-        for (ModuleAttributes ma : ModuleRegister.getModulesInCategory(categoryID))
+        for (ModuleAttributes ma : ModuleManager.getModulesInCategory(categoryID))
         {
             if (ma.getCommandClass() != null)
             {
@@ -643,7 +632,7 @@ public class GuildSettings implements Serializable
     public ArrayList<String> getEnabledCommands()
     {
         ArrayList<String> enabledCommands = new ArrayList<>();
-        for (String key : ModuleRegister.getModuleKeys())
+        for (String key : ModuleManager.getModuleKeys())
         {
             if (this.commandConfig.get(key).enabled)
             {

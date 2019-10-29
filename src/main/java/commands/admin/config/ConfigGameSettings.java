@@ -15,16 +15,19 @@ public class ConfigGameSettings
 {
     private final GuildSettings guildSettings;
     private final TextChannel channel;
+    private final ConfigMain configMain;
 
     /**
      * Constructor
      * @param guildSettings the guild settings to modify
-     * @param channel the channel to run in
+     * @param channel the channel to run on
+     * @param configMain the config root
      */
-    public ConfigGameSettings(GuildSettings guildSettings, TextChannel channel)
+    public ConfigGameSettings(GuildSettings guildSettings, TextChannel channel, ConfigMain configMain)
     {
         this.guildSettings = guildSettings;
         this.channel = channel;
+        this.configMain = configMain;
     }
 
     /**
@@ -82,7 +85,7 @@ public class ConfigGameSettings
         while (true)
         {
             Message msg = new MessageManager().getNextMessage(channel);
-            if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+            if (guildSettings.isPermitted(msg.getMember(), configMain.getModuleAttributes().getKey())) //If the message is from someone with config permissions
             {
                 String msgContent = msg.getContentDisplay();
                 if (msgContent.equalsIgnoreCase("Game category") || msgContent.equalsIgnoreCase("gamecategory"))
@@ -136,7 +139,7 @@ public class ConfigGameSettings
         while (true)
         {
             Message msg = new MessageManager().getNextMessage(channel);
-            if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+            if (guildSettings.isPermitted(msg.getMember(), configMain.getModuleAttributes().getKey())) //If the message is from someone with config permissions
             {
                 String response = msg.getContentDisplay().toLowerCase();
                 if (response.startsWith("y"))
@@ -190,7 +193,7 @@ public class ConfigGameSettings
         while (true)
         {
             Message msg = new MessageManager().getNextMessage(channel);
-            if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+            if (guildSettings.isPermitted(msg.getMember(), configMain.getModuleAttributes().getKey())) //If the message is from someone with config permissions
             {
                 String id = msg.getContentDisplay().trim();
                 if (Pattern.matches("^[0-9]+$", id))
@@ -258,7 +261,7 @@ public class ConfigGameSettings
         while (true)
         {
             Message msg = new MessageManager().getNextMessage(channel);
-            if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+            if (guildSettings.isPermitted(msg.getMember(), configMain.getModuleAttributes().getKey())) //If the message is from someone with config permissions
             {
                 String timeout = msg.getContentDisplay();
                 if (Pattern.matches("[0-9]*", timeout))
@@ -305,7 +308,7 @@ public class ConfigGameSettings
         while (true)
         {
             Message msg = new MessageManager().getNextMessage(channel);
-            if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+            if (guildSettings.isPermitted(msg.getMember(), configMain.getModuleAttributes().getKey())) //If the message is from someone with config permissions
             {
                 String response = msg.getContentDisplay().toLowerCase();
                 if (response.startsWith("y"))

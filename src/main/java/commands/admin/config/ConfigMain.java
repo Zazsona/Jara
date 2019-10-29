@@ -1,7 +1,8 @@
 package commands.admin.config;
 
 import commands.CmdUtil;
-import module.Command;
+import jara.ModuleAttributes;
+import module.ModuleCommand;
 import configuration.GuildSettings;
 import configuration.SettingsUtil;
 import jara.MessageManager;
@@ -13,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class ConfigMain extends Command
+public class ConfigMain extends ModuleCommand
 {
     @Override
     public void run(GuildMessageReceivedEvent msgEvent, String... parameters)
@@ -32,37 +33,37 @@ public class ConfigMain extends Command
                 while (true)
                 {
                     Message msg = mm.getNextMessage(channel);
-                    if (SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+                    if (SettingsUtil.getGuildSettings(msgEvent.getGuild().getId()).isPermitted(msg.getMember(), getModuleAttributes().getKey())) //If the message is from someone with config permissions
                     {
                         String selection = msg.getContentDisplay();
                         final GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
                         if (selection.equalsIgnoreCase("prefix"))
                         {
-                            new ConfigMainSettings(guildSettings, channel).modifyPrefix(msgEvent);
+                            new ConfigMainSettings(guildSettings, channel, this).modifyPrefix(msgEvent);
                         }
                         else if (selection.equalsIgnoreCase("timezone"))
                         {
-                            new ConfigMainSettings(guildSettings, channel).modifyTimeZone(msgEvent);
+                            new ConfigMainSettings(guildSettings, channel, this).modifyTimeZone(msgEvent);
                         }
                         else if (selection.equalsIgnoreCase("audio"))
                         {
-                            new ConfigAudioSettings(guildSettings, channel).showMenu(msgEvent);
+                            new ConfigAudioSettings(guildSettings, channel, this).showMenu(msgEvent);
                         }
                         else if (selection.equalsIgnoreCase("games"))
                         {
-                            new ConfigGameSettings(guildSettings, channel).showMenu(msgEvent);
+                            new ConfigGameSettings(guildSettings, channel, this).showMenu(msgEvent);
                         }
                         else if (selection.equalsIgnoreCase("commands"))
                         {
-                            new ConfigCommandSettings(guildSettings, channel).getCommand(msgEvent);
+                            new ConfigCommandSettings(guildSettings, channel, this).getCommand(msgEvent);
                         }
                         else if (selection.equalsIgnoreCase("modules"))
                         {
-                            new ConfigModuleSettings(guildSettings, channel).getModule(msgEvent);
+                            new ConfigModuleSettings(guildSettings, channel, this).getModule(msgEvent);
                         }
                         else if (selection.equalsIgnoreCase("setup"))
                         {
-                            new ConfigWizard(msgEvent, guildSettings, channel);
+                            new ConfigWizard(msgEvent, guildSettings, channel, this);
                             return;
                         }
                         else if (selection.equalsIgnoreCase("quit"))
@@ -109,27 +110,27 @@ public class ConfigMain extends Command
             final GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
             if (selection.equalsIgnoreCase("prefix") || selection.equalsIgnoreCase("timezone"))
             {
-                new ConfigMainSettings(guildSettings, channel).parseAsParameters(msgEvent, parameters);
+                new ConfigMainSettings(guildSettings, channel, this).parseAsParameters(msgEvent, parameters);
             }
             else if (selection.equalsIgnoreCase("audio"))
             {
-                new ConfigAudioSettings(guildSettings, channel).parseAsParameter(msgEvent, parameters);
+                new ConfigAudioSettings(guildSettings, channel, this).parseAsParameter(msgEvent, parameters);
             }
             else if (selection.equalsIgnoreCase("games"))
             {
-                new ConfigGameSettings(guildSettings, channel).parseAsParameter(msgEvent, parameters);
+                new ConfigGameSettings(guildSettings, channel, this).parseAsParameter(msgEvent, parameters);
             }
             else if (selection.equalsIgnoreCase("commands"))
             {
-                new ConfigCommandSettings(guildSettings, channel).parseAsParameters(msgEvent, parameters);
+                new ConfigCommandSettings(guildSettings, channel, this).parseAsParameters(msgEvent, parameters);
             }
             else if (selection.equalsIgnoreCase("modules"))
             {
-                new ConfigModuleSettings(guildSettings, channel).parseAsParameters(msgEvent, parameters);
+                new ConfigModuleSettings(guildSettings, channel, this).parseAsParameters(msgEvent, parameters);
             }
             else if (selection.equalsIgnoreCase("setup"))
             {
-                new ConfigWizard(msgEvent, guildSettings, channel);
+                new ConfigWizard(msgEvent, guildSettings, channel, this);
             }
             else
             {

@@ -3,7 +3,7 @@ package commands.admin.config;
 import configuration.GuildSettings;
 import configuration.SettingsUtil;
 import jara.ModuleAttributes;
-import jara.ModuleRegister;
+import jara.ModuleManager;
 import jara.MessageManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -20,17 +20,20 @@ public class ConfigCommandSettings
 {
     private final GuildSettings guildSettings;
     private final TextChannel channel;
+    private final ConfigMain configMain;
     private final MessageManager msgManager;
 
     /**
      * Constructor
      * @param guildSettings the guild settings to modify
      * @param channel the channel to run on
+     * @param configMain the config root
      */
-    public ConfigCommandSettings(GuildSettings guildSettings, TextChannel channel)
+    public ConfigCommandSettings(GuildSettings guildSettings, TextChannel channel, ConfigMain configMain)
     {
         this.guildSettings = guildSettings;
         this.channel = channel;
+        this.configMain = configMain;
         msgManager = new MessageManager();
     }
 
@@ -45,7 +48,7 @@ public class ConfigCommandSettings
         if (parameters.length > 2)
         {
             EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
-            ModuleAttributes ma = ModuleRegister.getModule(parameters[2]);
+            ModuleAttributes ma = ModuleManager.getModule(parameters[2]);
             if (ma == null)
             {
                 ma = guildSettings.getCustomCommandSettings().getCommandAttributes(parameters[2].toLowerCase());
@@ -136,9 +139,9 @@ public class ConfigCommandSettings
         while (true)
         {
             Message msg = msgManager.getNextMessage(channel);
-            if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+            if (guildSettings.isPermitted(msg.getMember(), configMain.getModuleAttributes().getKey())) //If the message is from someone with config permissions
             {
-                if (!(((ma = ModuleRegister.getModule(msg.getContentDisplay())) == null) && ((ma = guildSettings.getCustomCommandSettings().getCommandAttributes(msg.getContentDisplay())) == null))) //Ensure ModuleAttributes is not null
+                if (!(((ma = ModuleManager.getModule(msg.getContentDisplay())) == null) && ((ma = guildSettings.getCustomCommandSettings().getCommandAttributes(msg.getContentDisplay())) == null))) //Ensure ModuleAttributes is not null
                 {
                     if (ma.getCommandClass() != null)
                     {
@@ -178,7 +181,7 @@ public class ConfigCommandSettings
             channel.sendMessage(embed.build()).queue();
 
             Message msg = msgManager.getNextMessage(channel);
-            if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+            if (guildSettings.isPermitted(msg.getMember(), configMain.getModuleAttributes().getKey())) //If the message is from someone with config permissions
             {
                 String request = msg.getContentDisplay().toLowerCase();
                 if (request.startsWith("addroles") || request.startsWith("removeroles"))

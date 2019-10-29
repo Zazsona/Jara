@@ -21,16 +21,19 @@ public class ConfigMainSettings
 {
     private final GuildSettings guildSettings;
     private final TextChannel channel;
+    private final ConfigMain configMain;
 
     /**
      * Constructor
      * @param guildSettings the guild settings to modify
-     * @param channel the channel to run in
+     * @param channel the channel to run on
+     * @param configMain the config root
      */
-    public ConfigMainSettings(GuildSettings guildSettings, TextChannel channel)
+    public ConfigMainSettings(GuildSettings guildSettings, TextChannel channel, ConfigMain configMain)
     {
         this.guildSettings = guildSettings;
         this.channel = channel;
+        this.configMain = configMain;
     }
 
     /**
@@ -88,7 +91,7 @@ public class ConfigMainSettings
         while (true)
         {
             Message msg = mm.getNextMessage(channel);
-            if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+            if (guildSettings.isPermitted(msg.getMember(), configMain.getModuleAttributes().getKey())) //If the message is from someone with config permissions
             {
                 if (msg.getContentDisplay().equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(msg.getGuild().getId())+"quit") || msg.getContentDisplay().equalsIgnoreCase("quit"))
                 {
@@ -152,7 +155,7 @@ public class ConfigMainSettings
         while (true)
         {
             Message msg = mm.getNextMessage(channel);
-            if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+            if (guildSettings.isPermitted(msg.getMember(), configMain.getModuleAttributes().getKey())) //If the message is from someone with config permissions
             {
                 if (msg.getContentDisplay().equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(msg.getGuild().getId())+"quit") || msg.getContentDisplay().equalsIgnoreCase("quit"))
                 {
@@ -207,7 +210,7 @@ public class ConfigMainSettings
                     while (!success)
                     {
                         Message confirmMessage = mm.getNextMessage(channel);
-                        if (guildSettings.isPermitted(confirmMessage.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+                        if (guildSettings.isPermitted(confirmMessage.getMember(), configMain.getModuleAttributes().getKey())) //If the message is from someone with config permissions
                         {
                             String msgContent = confirmMessage.getContentDisplay();
                             if (msgContent.equalsIgnoreCase("y") || msgContent.equalsIgnoreCase("yes"))

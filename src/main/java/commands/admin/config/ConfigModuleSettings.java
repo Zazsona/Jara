@@ -5,7 +5,7 @@ import configuration.GuildCommandLauncher;
 import configuration.GuildSettings;
 import jara.MessageManager;
 import jara.ModuleAttributes;
-import jara.ModuleRegister;
+import jara.ModuleManager;
 import module.ModuleConfig;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -24,6 +24,7 @@ public class ConfigModuleSettings
 {
     private final GuildSettings guildSettings;
     private final TextChannel channel;
+    private final ConfigMain configMain;
     private final MessageManager msgManager;
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigModuleSettings.class);
@@ -32,11 +33,13 @@ public class ConfigModuleSettings
      * Constructor
      * @param guildSettings the guild settings to modify
      * @param channel the channel to run in
+     * @param configMain the config root
      */
-    public ConfigModuleSettings(GuildSettings guildSettings, TextChannel channel)
+    public ConfigModuleSettings(GuildSettings guildSettings, TextChannel channel, ConfigMain configMain)
     {
         this.guildSettings = guildSettings;
         this.channel = channel;
+        this.configMain = configMain;
         this.msgManager = new MessageManager();
     }
 
@@ -50,7 +53,7 @@ public class ConfigModuleSettings
     {
         if (parameters.length > 2)
         {
-            ModuleAttributes ma = ModuleRegister.getModule(parameters[2]);
+            ModuleAttributes ma = ModuleManager.getModule(parameters[2]);
             if (ma != null)
             {
                 loadConfig(msgEvent, ma, convertParametersToCollection(parameters), false);
@@ -96,9 +99,9 @@ public class ConfigModuleSettings
         while (true)
         {
             Message msg = msgManager.getNextMessage(channel);
-            if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+            if (guildSettings.isPermitted(msg.getMember(), configMain.getModuleAttributes().getKey())) //If the message is from someone with config permissions
             {
-                if ((ma = ModuleRegister.getModule(msg.getContentDisplay())) != null)
+                if ((ma = ModuleManager.getModule(msg.getContentDisplay())) != null)
                 {
                     loadConfig(msgEvent, ma, null, false);
                     break;

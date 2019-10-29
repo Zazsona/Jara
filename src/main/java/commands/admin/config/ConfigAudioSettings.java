@@ -19,16 +19,19 @@ public class ConfigAudioSettings
 {
     private final GuildSettings guildSettings;
     private final TextChannel channel;
+    private final ConfigMain configMain;
 
     /**
      * Constructor
      * @param guildSettings the guild settings to modify
      * @param channel the channel to run on
+     * @param configMain the config root
      */
-    public ConfigAudioSettings(GuildSettings guildSettings, TextChannel channel)
+    public ConfigAudioSettings(GuildSettings guildSettings, TextChannel channel, ConfigMain configMain)
     {
         this.guildSettings = guildSettings;
         this.channel = channel;
+        this.configMain = configMain;
     }
 
     /**
@@ -82,7 +85,7 @@ public class ConfigAudioSettings
         while (true)
         {
             Message msg = new MessageManager().getNextMessage(channel);
-            if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+            if (guildSettings.isPermitted(msg.getMember(), configMain.getModuleAttributes().getKey())) //If the message is from someone with config permissions
             {
                 String msgContent = msg.getContentDisplay();
                 if (msgContent.equalsIgnoreCase("skip votes") || msgContent.equalsIgnoreCase("skipvotes"))
@@ -132,7 +135,7 @@ public class ConfigAudioSettings
         while (true)
         {
             Message msg = new MessageManager().getNextMessage(channel);
-            if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+            if (guildSettings.isPermitted(msg.getMember(), configMain.getModuleAttributes().getKey())) //If the message is from someone with config permissions
             {
                 String response = msg.getContentDisplay();
                 response = response.replace("%", "");
@@ -181,7 +184,7 @@ public class ConfigAudioSettings
         while (true)
         {
             Message msg = new MessageManager().getNextMessage(channel);
-            if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+            if (guildSettings.isPermitted(msg.getMember(), configMain.getModuleAttributes().getKey())) //If the message is from someone with config permissions
             {
                 String response = msg.getContentDisplay().toLowerCase();
                 if (response.startsWith("y"))
@@ -249,7 +252,7 @@ public class ConfigAudioSettings
             try
             {
                 Message msg = mm.getNextMessage(channel);
-                if (guildSettings.isPermitted(msg.getMember(), ConfigMain.class)) //If the message is from someone with config permissions
+                if (guildSettings.isPermitted(msg.getMember(), configMain.getModuleAttributes().getKey())) //If the message is from someone with config permissions
                 {
                     String response = msg.getContentDisplay().toLowerCase();
                     String[] responseWords = response.split(" ");

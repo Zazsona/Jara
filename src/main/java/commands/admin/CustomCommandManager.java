@@ -1,11 +1,11 @@
 package commands.admin;
 
 import commands.CmdUtil;
-import module.Command;
+import module.ModuleCommand;
 import configuration.GuildSettings;
 import configuration.SettingsUtil;
 import configuration.guild.CustomCommandBuilder;
-import jara.ModuleRegister;
+import jara.ModuleManager;
 import jara.MessageManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Stack;
 
-public class CustomCommandManager extends Command
+public class CustomCommandManager extends ModuleCommand
 {
     private MessageManager mm;
     private GuildSettings guildSettings;
@@ -63,7 +63,7 @@ public class CustomCommandManager extends Command
                 try
                 {
                     Message message = mm.getNextMessage(msgEvent.getChannel());
-                    if (guildSettings.isPermitted(message.getMember(), getClass()))
+                    if (guildSettings.isPermitted(message.getMember(), getModuleAttributes().getKey()))
                     {
                         CustomCommandBuilder customCommand = null;
                         String[] selection = message.getContentDisplay().split(" ");
@@ -189,7 +189,7 @@ public class CustomCommandManager extends Command
                 {
                     ArrayList<String> everyoneRole = new ArrayList<>();
                     everyoneRole.add(msgEvent.getGuild().getPublicRole().getId());
-                    CustomCommandBuilder ccb = guildSettings.getCustomCommandSettings().addCommand(commandName, new String[0], "No description.", ModuleRegister.Category.UTILITY, new ArrayList<>(), "", "");
+                    CustomCommandBuilder ccb = guildSettings.getCustomCommandSettings().addCommand(commandName, new String[0], "No description.", ModuleManager.Category.UTILITY, new ArrayList<>(), "", "");
                     guildSettings.addPermissions(everyoneRole, commandName);
                     if (ccb == null)
                     {
@@ -289,7 +289,7 @@ public class CustomCommandManager extends Command
                 Message message = mm.getNextMessage(msgEvent.getChannel());
                 String selection = message.getContentDisplay().toLowerCase();
 
-                if (guildSettings.isPermitted(message.getMember(), getClass()))
+                if (guildSettings.isPermitted(message.getMember(), getModuleAttributes().getKey()))
                 {
                     CCResponseType responseType = selectCommandSubmenu(msgEvent, customCommand, selection, null);
                     if (responseType == CCResponseType.QUIT)
@@ -406,7 +406,7 @@ public class CustomCommandManager extends Command
     }
 
     /**
-     * Modifies the {@link jara.ModuleRegister.Category} for the custom command.
+     * Modifies the {@link ModuleManager.Category} for the custom command.
      * @param msgEvent the context
      * @param customCommand the command
      * @param value the pre-defined data to enter
@@ -414,11 +414,11 @@ public class CustomCommandManager extends Command
     private void modifyCategory(GuildMessageReceivedEvent msgEvent, CustomCommandBuilder customCommand, String value)
     {
         CCResponseType responseType = getResponseType(value);
-        ModuleRegister.Category category = customCommand.getCategory();
+        ModuleManager.Category category = customCommand.getCategory();
         EmbedBuilder embed = getEmbedStyle(msgEvent);
         if (value == null)
         {
-            embed.setDescription("Please enter the new category out of:\n**Admin**\n**Audio**\n**Games**\n**Toys**\n**Utility**\n\nCurrent Category: "+ ModuleRegister.getCategoryName(customCommand.getCategory()));
+            embed.setDescription("Please enter the new category out of:\n**Admin**\n**Audio**\n**Games**\n**Toys**\n**Utility**\n\nCurrent Category: "+ ModuleManager.getCategoryName(customCommand.getCategory()));
             msgEvent.getChannel().sendMessage(embed.build()).queue();
 
             Message message = null;
@@ -427,7 +427,7 @@ public class CustomCommandManager extends Command
             {
                 message = mm.getNextMessage(msgEvent.getChannel());
                 responseType = getResponseType(message);
-                category = ModuleRegister.getCategoryID(message.getContentDisplay());
+                category = ModuleManager.getCategoryID(message.getContentDisplay());
                 if (category == null)
                 {
                     embed.setDescription("Invalid category. Please try again, or use the quit command.");
@@ -437,7 +437,7 @@ public class CustomCommandManager extends Command
         }
         else
         {
-            category = ModuleRegister.getCategoryID(value);
+            category = ModuleManager.getCategoryID(value);
             if (category == null)
             {
                 embed.setDescription("Invalid category. Please try again.");
@@ -622,7 +622,7 @@ public class CustomCommandManager extends Command
             return CCResponseType.INVALID;
         }
 
-        if (guildSettings.isPermitted(message.getMember(), getClass()))
+        if (guildSettings.isPermitted(message.getMember(), getModuleAttributes().getKey()))
         {
             String messageContent = message.getContentDisplay().toLowerCase();
             return getResponseType(messageContent);

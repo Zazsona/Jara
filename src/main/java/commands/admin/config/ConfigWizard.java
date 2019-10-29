@@ -2,7 +2,7 @@ package commands.admin.config;
 
 import configuration.GuildSettings;
 import jara.ModuleAttributes;
-import jara.ModuleRegister;
+import jara.ModuleManager;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -14,6 +14,7 @@ import java.io.IOException;
 public class ConfigWizard
 {
     private GuildSettings guildSettings;
+    private ConfigMain configMain;
     private ConfigMainSettings cms;
     private ConfigAudioSettings cas;
     private ConfigGameSettings cgs;
@@ -26,18 +27,19 @@ public class ConfigWizard
      * @param msgEvent context
      * @param guildSettings the guild settings to run through
      * @param channel the channel to run in
+     * @param configMain the config root
      */
-    public ConfigWizard(GuildMessageReceivedEvent msgEvent, GuildSettings guildSettings, TextChannel channel)
+    public ConfigWizard(GuildMessageReceivedEvent msgEvent, GuildSettings guildSettings, TextChannel channel, ConfigMain configMain)
     {
         try
         {
             this.guildSettings = guildSettings;
             this.msgEvent = msgEvent;
-            cms = new ConfigMainSettings(guildSettings, channel);
-            cas = new ConfigAudioSettings(guildSettings, channel);
-            cgs = new ConfigGameSettings(guildSettings, channel);
-            ccs = new ConfigCommandSettings(guildSettings, channel);
-            cmos = new ConfigModuleSettings(guildSettings, channel);
+            cms = new ConfigMainSettings(guildSettings, channel, configMain);
+            cas = new ConfigAudioSettings(guildSettings, channel, configMain);
+            cgs = new ConfigGameSettings(guildSettings, channel, configMain);
+            ccs = new ConfigCommandSettings(guildSettings, channel, configMain);
+            cmos = new ConfigModuleSettings(guildSettings, channel, configMain);
 
             EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
             embed.setDescription("**Welcome to the Setup Wizard.**\n\nThis will guide you through each of the settings available for the guild, and then direct you through every command and module.\nYou can use \"quit\" at any point to keep default settings.\n\nLet's begin.");
@@ -123,7 +125,7 @@ public class ConfigWizard
     private void configureCommands() throws IOException
     {
         EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
-        for (ModuleAttributes ma : ModuleRegister.getCommandModules())
+        for (ModuleAttributes ma : ModuleManager.getCommandModules())
         {
             if (ma.isDisableable())
             {
@@ -138,7 +140,7 @@ public class ConfigWizard
      */
     private void configureModuleSettings() throws IOException
     {
-        for (ModuleAttributes ma : ModuleRegister.getModules())
+        for (ModuleAttributes ma : ModuleManager.getModules())
         {
             if (ma.getConfigClass() != null)
             {
