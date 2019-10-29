@@ -1,371 +1,409 @@
 package jara;
 
-import com.google.gson.Gson;
-import module.Command;
-import module.Load;
-import commands.Help;
-import configuration.SettingsUtil;
-import exceptions.ConflictException;
-import exceptions.InvalidModuleException;
-import module.ModuleConfig;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
-/**
- * Responsible for module management (that is, loads, controls, and resolve issues with jars placed in the modules folder)
- */
+import commands.CustomCommand;
+import commands.Help;
+import commands.admin.CustomCommandManager;
+import commands.admin.config.ConfigMain;
+import commands.utility.*;
+import module.ModuleClass;
+
+import static jara.ModuleManager.Category.*;
+
 public class ModuleManager
 {
-    /**
-     * Set containing all registered aliases.
-     */
-    private static HashSet<String> reservedAliases;
-    /**
-     * Logger
-     */
-    private static final Logger logger = LoggerFactory.getLogger(ModuleManager.class);
-    /**
-     * The collection of classes to be run during program boot
-     */
-    private static HashMap<JarFile, Class<? extends Load>> onLoadClasses;
+	/**
+	 * The possible categories a module can be attributes to
+	 */
+	public enum Category
+	{
+		NOGROUP,
+		GAMES,
+		UTILITY,
+		TOYS,
+		AUDIO,
+		ADMIN,
+		SEASONAL
+	}
 
-    /**
-     * The number of issues that will not impact operations
-     */
-    private static int warnings = 0;
-    /**
-     * The number of issues that may have an impact on operation
-     */
-    private static int errors = 0;
+	private static ArrayList<ModuleAttributes> register;
+	private static ArrayList<ModuleAttributes> commandModules;
 
+	private static ArrayList<ModuleAttributes> adminModules;
+	private static ArrayList<ModuleAttributes> audioModules;
+	private static ArrayList<ModuleAttributes> gamesModules;
+	private static ArrayList<ModuleAttributes> toysModules;
+	private static ArrayList<ModuleAttributes> utilityModules;
+	private static ArrayList<ModuleAttributes> seasonalModules;
+	private static ArrayList<ModuleAttributes> noGroupModules;
+	
+	/**
+	 * Prepares in-built and external modules for execution.<br>
+	 *     This method locks to register, and can only run if register is null.
+	 */
+	private static void prepareModules()
+	{
+		if (register == null)
+		{
+			register = new ArrayList<>();
+			Help.HelpPage AboutHelp = new Help.HelpPage("Shows the details about this bot.");
+			register.add(new ModuleAttributes("About", "Shows Bot credits.", new String[] {"Credits", "Authors"}, UTILITY, Core.getVersion(), false, About.class, AboutHelp, null, null));
+			Help.HelpPage ConfigHelp = new Help.HelpPage("Modify bot settings. Instructions provided on the config menu.");
+			register.add(new ModuleAttributes("Config", "Modify Bot settings.", new String[] {"Settings"}, ADMIN, Core.getVersion(), false, ConfigMain.class, ConfigHelp, null, null));
+			Help.HelpPage HelpHelp = new Help.HelpPage("**General**\nList categories by using Help\n List commands in a category with Help (Category). Adding 'all' lists commands you don't have permission to use.\nUse Help (Command) to find out how to use a command.\n\n**Help Pages**\nAliases: Alternate ways to use the command\nParameters: Information to give to commands\nDescription: Detailed command information.", "Help", "Help (Command)", "Help (Category) (all)");
+			register.add(new ModuleAttributes("Help", "Shows command details.", new String[] {"?", "commands"}, NOGROUP, Core.getVersion(), false, Help.class, HelpHelp, null, null));
+			Help.HelpPage CCMHelp = new Help.HelpPage("Configure custom commands. Instructions provided on manager menu.", "ccm", "ccm [SubMenu] (Command)", "ccm [SubMenu] [Command] [CommandSubMenu] (Value)");
+			register.add(new ModuleAttributes("CustomCommandManager", "Manage custom commands.", new String[] {"AddCustomCommand", "EditCustomCommand", "RemoveCustomCommand", "DeleteCustomCommand", "CustomCommands", "CCM"}, ADMIN, Core.getVersion(), true, CustomCommandManager.class, CCMHelp, null, null));
+			register.add(new ModuleAttributes("CustomCommand", "Custom Command Template.", new String[0], NOGROUP, Core.getVersion(), false, CustomCommand.class, new Help.HelpPage(), null, null)); //This is the interface for converting custom commands to actual commands.
+			register.addAll(ModuleLoader.loadModules(register));			//Load modules
+			register.sort(Comparator.comparing(ModuleAttributes::getKey)); //Sort the commands into alphabetical order based on their keys
+		}
+	}
 
-    /**
-     * Parses through each jar within the modules folder and gathers its {@link ModuleAttributes}.
-     * @param register all currently loaded modules, including built-in ones.
-     * @return the list of {@link ModuleAttributes}
-     * @throws InvalidModuleException one or more fatal errors occurred during module loading
-     */
-    protected static synchronized LinkedList<ModuleAttributes> loadModules(ArrayList<ModuleAttributes> register) throws InvalidModuleException
-    {
-        onLoadClasses = new HashMap<>();
-        reservedAliases = new HashSet<>();
-        LinkedList<ModuleAttributes> moduleAttributes = new LinkedList<>();
+	/**
+	 * Gets an unmodifiable list of all modules.
+	 * @return the list
+	 */
+	public static List<ModuleAttributes> getModules()
+	{
+		prepareModules();
+		return Collections.unmodifiableList(register);
+	}
 
-        for (ModuleAttributes inBuiltCA : register)
-        {
-            //Adds all in-built aliases so modules can't try and claim these.
-            reservedAliases.addAll(Arrays.asList(inBuiltCA.getAliases()));
-        }
+	/**
+	 * Returns all strings which can be used to trigger modules.
+	 * @return All module aliases
+	 */
+	public static ArrayList<String> getModuleAliases()
+	{
+		prepareModules();
+		ArrayList<String> aliases = new ArrayList<>();
+		for (ModuleAttributes moduleAttributes : register)
+		{
+			Collections.addAll(aliases, moduleAttributes.getAliases());
+		}
+		return aliases;
+	}
 
-        File moduleDir = new File(SettingsUtil.getDirectory() + "/Modules/");
-        if (!moduleDir.exists())
-            moduleDir.mkdirs();
+	/**
+	 * Returns all registered module keys, used to identify them.
+	 * @return The keys
+	 */
+	public static ArrayList<String> getModuleKeys()
+	{
+		prepareModules();
+		ArrayList<String> keys = new ArrayList<>();
+		for (ModuleAttributes moduleAttributes : register)
+		{
+			keys.add(moduleAttributes.getKey());
+		}
+		return keys;
+	}
 
-        URLClassLoader cl = getClassLoader(moduleDir);
+	/**
+	 * Gets all modules that have a command class
+	 * @return modules with command functionality in an unmodifiable list
+	 */
+	public static List<ModuleAttributes> getCommandModules()
+	{
+		if (commandModules == null)
+		{
+			prepareModules();
+			ArrayList<ModuleAttributes> commandModulesBuilder = new ArrayList<>();
+			for (ModuleAttributes ma : register)
+			{
+				if (ma.getCommandClass() != null)
+				{
+					commandModulesBuilder.add(ma);
+				}
+			}
+			commandModules = commandModulesBuilder;
+		}
+		return Collections.unmodifiableList(commandModules);
+	}
 
-        for (File file : moduleDir.listFiles())
-        {
-            try
-            {
-                if (file.isFile() && file.getName().endsWith(".jar"))
-                {
-                    ModuleAttributes ma = loadModule(file.getPath(), cl);
-                    if (ma != null)
-                    {
-                        moduleAttributes.add(ma);
-                        reservedAliases.addAll(Arrays.asList(ma.getAliases()));
-                    }
-                }
-            }
-            catch (IOException | ClassNotFoundException | ConflictException e)
-            {
-                logger.error(e.toString());
-                errors++;
-            }
-        }
-        for (Class<? extends Load> c : onLoadClasses.values())
-        {
-            Thread loadThread = new Thread(() ->
-                       {
-                           try
-                           {
-                               c.newInstance().load();
-                           }
-                           catch (InstantiationException | IllegalAccessException e)
-                           {
-                               logger.error("Unable to instantiate "+onLoadClasses.get(c).getName()+"'s load class. There is a high risk this module will not perform correctly, if at all.");
-                               errors++;
-                           }
-                       });
-            loadThread.setName(c.getSimpleName());
-            loadThread.start();
-            //Without creating a new thread, if the load class is infinitely running, Jara will shit the bed and prompt the user to restart setup.
-        }
-        if (errors <= 0)
-        {
-            logger.info("Loaded "+moduleAttributes.size()+" modules. ("+warnings+" warnings)");
-            return moduleAttributes;
-        }
-        else
-        {
-            throw new InvalidModuleException("Attempted to load "+moduleAttributes.size()+" modules, but failed. ("+errors+" errors) ("+warnings+" warnings)");
-        }
-    }
+	/**
+	 * Gets the keys of all command modules.
+	 * @return list of keys
+	 */
+	public static ArrayList<String> getCommandModuleKeys()
+	{
+		ArrayList<String> keys = new ArrayList<>();
+		for (ModuleAttributes ma : getCommandModules())
+		{
+			keys.add(ma.getKey());
+		}
+		return keys;
+	}
 
-    /**
-     * Gets the class loader
-     * @param moduleDir the directory to load modules from
-     * @return the class loader
-     */
-    private static URLClassLoader getClassLoader(File moduleDir)
-    {
-        ArrayList<URL> urls = new ArrayList<>();
-        for (File file : moduleDir.listFiles())
-        {
-            try
-            {
-                if (file.isFile() && file.getName().endsWith(".jar"))
-                {
-                    urls.add(new URL("jar:file:" + file.getPath() + "!/"));
-                }
-            }
-            catch (MalformedURLException e)
-            {
-                logger.info(e.toString());
-            }
-        }
-        return URLClassLoader.newInstance(urls.toArray(new URL[0]));
-    }
+	/**
+	 * Returns the module's {@link ModuleAttributes}
+	 * @param alias - A module triggering string. Using the command's key is most efficient.
+	 * @return the attributes, or null if the alias matches no module.
+	 */
+	public static ModuleAttributes getModule(String alias)
+	{
+		try
+		{
+			prepareModules();
+			int min = 0;
+			int max = getRegisterSize()-1;
 
-    /**
-     * Gets the {@link ModuleAttributes} for the specified jar.
-     * @param jarPath the jar to analyse
-     * @return the attributes of the command in the module, or null if unavailable
-     * @throws ClassNotFoundException jar layout is invalid
-     * @throws IOException unable to access jar
-     * @throws ConflictException unable to resolve pact conflicts
-     */
-    private static ModuleAttributes loadModule(String jarPath, URLClassLoader cl) throws ClassNotFoundException, IOException, ConflictException
-    {
-        JarFile jarFile = new JarFile(jarPath);
-        Enumeration<JarEntry> entries = jarFile.entries();
+			/*================================================================
+			We first check for command keys, as this should be what the
+			majority of requests use, thus saving us having to trawl through
+			ALL aliases when we don't have to.
+			================================================================*/
 
-        ModuleAttributes ma = loadClasses(jarFile, cl, entries);
-        if (ma == null)
-        {
-            if (onLoadClasses.get(jarFile) == null)
-            {
-                warnings++;
-                logger.warn(formatJarName(jarFile) + " has no pact or load class. It cannot directly communicate with Jara.");
-            }
-        }
-        else if (ma.getCommandClass() == null && ma.getLoadClass() == null && ma.getConfigClass() == null)
-        {
-            warnings++;
-            logger.warn(formatJarName(jarFile)+" is a useless module. It has a pact, but no functionality.");
-        }
-        else if (ma.getCommandClass() != null && ma.getHelpPage().equals(new Help.HelpPage()))
-        {
-            warnings++;
-            logger.warn(formatJarName(jarFile)+" has a command, but does not provide a help page.");
-        }
-        else if (!Core.getSupportedVersions().contains(ma.getTargetVersion()))
-        {
-            warnings++;
-            logger.warn(ma.getKey()+" is built for unsupported Jara version: "+ma.getTargetVersion()+". It may not function as intended, please update for full support with Jara "+Core.getVersion()+".");
-        }
-        else
-        {
-            //logger.info("Successfully loaded "+ formatJarName(jarFile));
-        }
-        return ma;
-    }
+			while (min <= max)
+			{
+				int mid = (int) Math.floor((min+max)/2);
+				ModuleAttributes ma = register.get(mid);
+				if (ma.getKey().compareToIgnoreCase(alias) < 0)
+				{
+					min = mid+1;
+				}
+				else if (ma.getKey().compareToIgnoreCase(alias) > 0)
+				{
+					max = mid-1;
+				}
+				else if (ma.getKey().compareToIgnoreCase(alias) == 0)
+				{
+					return ma;
+				}
+			}
 
-    /**
-     * Gets the jar name for pretty printing
-     * @param jarFile the jar to get a pretty name for
-     * @return the pretty name
-     */
-    @NotNull
-    private static String formatJarName(JarFile jarFile)
-    {
-        return jarFile.getName().substring(jarFile.getName().lastIndexOf("\\")+1).replace(".jar", "");
-    }
+			/*===============================================================
+			Well shit, it's not a key.
 
-    /**
-     * Loads a class from the specified module setup
-     * @param jarFile the module's jar
-     * @param cl the classloader
-     * @return potentially modified CommandAttributes
-     * @throws ClassNotFoundException invalid class directory
-     * @throws IOException unable to access module file
-     * @throws ConflictException classpath is taken
-     */
-    private static ModuleAttributes loadClasses(JarFile jarFile, URLClassLoader cl, Enumeration<JarEntry> jarEntries) throws ClassNotFoundException, IOException, ConflictException
-    {
-        JarEntry jarPact = jarFile.getJarEntry("pact.json");
-        ModuleAttributes ma = getAttributesInPact(jarFile, jarPact);
-        loadHelpPage(ma, jarFile);
-        while (jarEntries.hasMoreElements())
-        {
-            JarEntry jarEntry = jarEntries.nextElement();
-            if (jarEntry.getName().endsWith(".class"))
-            {
-                loadClass(jarFile, cl, ma, jarEntry);
-            }
-            //TODO: It's possible to load in files from a module's resources using Java 7's FileSystem, however, this will require an external process.
+			You can do many things while this runs.
+			I find a fan favourite is annoying a friend.
 
-        }
-        return ma;
-    }
+			Other suggestions are:
+			- Make a cuppa
+			- Fix Northern Rail's train timetables
+			- Play a flash game
+			- Mark everything as duplicate on SO
 
-    /**
-     * Loads a class, and assigns Jara communication classes in the supplied {@link ModuleAttributes}
-     * @param jarFile the jar to load from
-     * @param cl the loader
-     * @param ma the module to attribute classes to
-     * @param jarEntry the class file
-     * @throws ClassNotFoundException invalid class directory supplied
-     */
-    private static void loadClass(JarFile jarFile, URLClassLoader cl, ModuleAttributes ma, JarEntry jarEntry) throws ClassNotFoundException
-    {
-        String className = jarEntry.getName().substring(0, jarEntry.getName().length() - 6);
-        className = className.replace("/", ".");
-        Class c = cl.loadClass(className);
+			================================================================*/
 
-        if (ma != null)
-        {
-            if (Command.class.isAssignableFrom(c))
-            {
-                ma.setCommandClass(c);
-            }
-            if (ModuleConfig.class.isAssignableFrom(c))
-            {
-                ma.setConfigClass(c);
-            }
-        }
-        if (Load.class.isAssignableFrom(c))
-        {
-            onLoadClasses.put(jarFile, c);
-            if (ma != null)
-            {
-                ma.setLoadClass(c);
-            }
-        }
-    }
+			for (ModuleAttributes moduleAttributes : register)
+			{
+				min = 0;
+				max = moduleAttributes.getAliases().length-1;
+				while (min <= max)
+				{
+					int mid = (int) Math.floor((min+max)/2);
+					String moduleAlias = moduleAttributes.getAliases()[mid].toLowerCase();
+					if (moduleAlias.compareToIgnoreCase(alias) < 0)
+					{
+						min = mid+1;
+					}
+					else if (moduleAlias.compareToIgnoreCase(alias) > 0)
+					{
+						max = mid-1;
+					}
+					else if (moduleAlias.compareToIgnoreCase(alias) == 0)
+					{
+						return moduleAttributes;
+					}
+				}
+			}
+			return null; //Bad alias
+		}
+		catch (ArrayIndexOutOfBoundsException e)
+		{
+			return null; //Command is not in register.
+		}
 
-    /**
-     * Sets the help page in the {@link ModuleAttributes} for the module.
-     * @param ma the module's attributes
-     * @param jarFile the file to get help from
-     * @throws IOException file inaccessible
-     */
-    private static void loadHelpPage(ModuleAttributes ma, JarFile jarFile) throws IOException
-    {
-        JarEntry jarHelp = jarFile.getJarEntry("help.json");
-        if (jarHelp != null && ma != null)
-        {
-            Gson gson = new Gson();
-            ma.setHelpPage(gson.fromJson(getJson(jarFile, jarHelp), Help.HelpPage.class));
-        }
-    }
+	}
+	/**
+	 * Returns the total count of all registered modules.
+	 * @return no. of modules.
+	 */
+	public static int getRegisterSize()
+	{
+		prepareModules();
+		return register.size();
+	}
 
-    /**
-     * Gets the non-conflicting attributes defined in the pact file and converts them to {@link ModuleAttributes}.
-     * @param jarFile the jar of the module
-     * @param jarPact the pact
-     * @return the {@link ModuleAttributes} defined in the pact, where the class will be null.
-     * @throws IOException unable to access pact
-     * @throws ConflictException unable to resolve conflicts
-     */
-    private static ModuleAttributes getAttributesInPact(JarFile jarFile, JarEntry jarPact) throws IOException, ConflictException
-    {
-        if (jarPact != null)
-        {
-            String json = getJson(jarFile, jarPact);
-            ModuleAttributes ma = new ModuleAttributes(json);
+	/**
+	 * Returns the module's {@link ModuleAttributes}
+	 * @param clazz - A module's command class.
+	 * @return the attributes, or null if the class matches no module's command class.
+	 */
+	public static ModuleAttributes getModule(Class<? extends ModuleClass> clazz)
+	{
+		prepareModules();
+		if (clazz != null)
+		{
+			for (ModuleAttributes moduleAttributes : register)
+			{
+				if (clazz.equals(moduleAttributes.getCommandClass()) || clazz.equals(moduleAttributes.getConfigClass()) || clazz.equals(moduleAttributes.getLoadClass()))
+				{
+					return moduleAttributes;
+				}
+			}
+		}
+		return null; //Invalid class
+	}
+	/**
+	 * Converts a category ID into a category name.
+	 * @param id - The ID number for the category
+	 * @return the category name, or null if the ID is invalid
+	 */
+	public static String getCategoryName(Category id)
+	{
+		switch (id) 
+		{
+			case NOGROUP:
+				return "No Group";
+			case GAMES:
+				return "Games";
+			case UTILITY:
+				return "Utility";
+			case TOYS:
+				return "Toys";
+			case AUDIO:
+				return "Audio";
+			case ADMIN:
+				return "Admin";
+			case SEASONAL:
+				return "Seasonal";
+		}
+		return null; //Invalid id.
+	}
+	/**
+	 * Converts a category ID into a category name.
+	 * @param name - The name of the category
+	 * @return the category ID, or null if invalid
+	 */
+	public static Category getCategoryID(String name)
+	{
+		name = name.toLowerCase();
+		switch (name)
+		{
+			case "nogroup":
+			case "no group":
+				return NOGROUP;
+			case "games":
+				return GAMES;
+			case "utility":
+				return UTILITY;
+			case "toys":
+				return TOYS;
+			case "audio":
+				return AUDIO;
+			case "admin":
+				return ADMIN;
+			case "seasonal":
+				return SEASONAL;
+		}
+		return null; //Invalid name.
+	}
 
-            if (ma.getCategory() == ModuleRegister.Category.SEASONAL)
-                ma = new SeasonalModuleAttributes(json);
+	/**
+	 * Returns a list of all category names.
+	 * @return the category names
+	 */
+	public static ArrayList<String> getCategoryNames()
+	{
+		ArrayList<String> names = new ArrayList<>();
+		for (Category category : Category.values())
+		{
+			names.add(getCategoryName(category));
+		}
+		return names;
+	}
 
-            return resolveConflicts(jarFile, ma);
-        }
-        else
-        {
-            return null;
-        }
-    }
+	/**
+	 * Returns the {@link ModuleAttributes} of all modules in the specified category
+	 * @param category the category to get modules for.
+	 * @return an unmodifiable list of the category's modules
+	 */
+	public static List<ModuleAttributes> getModulesInCategory(Category category)
+	{
+		ArrayList<ModuleAttributes> categoryModules;
+		switch (category)
+		{
+			case NOGROUP:
+				categoryModules = noGroupModules;
+				break;
+			case GAMES:
+				categoryModules = gamesModules;
+				break;
+			case UTILITY:
+				categoryModules = utilityModules;
+				break;
+			case TOYS:
+				categoryModules = toysModules;
+				break;
+			case AUDIO:
+				categoryModules = audioModules;
+				break;
+			case ADMIN:
+				categoryModules = adminModules;
+				break;
+			case SEASONAL:
+				categoryModules = seasonalModules;
+				break;
+			default:
+				return null;
+		}
+		if (categoryModules != null)
+		{
+			return Collections.unmodifiableList(categoryModules);
+		}
+		else
+		{
+			return Collections.unmodifiableList(generateModulesInCategory(category));
+		}
+	}
 
-    /**
-     * Gets the json data from the specified file as a String
-     * @param jarFile the jar of the module
-     * @param jarEntry the file in the jar
-     * @return the json as a String
-     * @throws IOException unable to access jar page
-     */
-    private static String getJson(JarFile jarFile, JarEntry jarEntry) throws IOException
-    {
-        InputStreamReader is = new InputStreamReader(jarFile.getInputStream(jarEntry));
-        BufferedReader br = new BufferedReader(is);
-        StringBuilder jsonBuilder = new StringBuilder();
-        String line;
-        while ((line = br.readLine()) != null)
-        {
-            jsonBuilder.append(line);
-        }
-        return jsonBuilder.toString();
-    }
-
-    /**
-     * Attempts to resolve any conflicts with the aliases in the pact.<br>
-     *     Key conflicts cannot be resolved, as these must be unique.
-     * @param jarFile the jar file of the module
-     * @param moduleAttributes the command attributes in the pact
-     * @return the resolved command attributes with a null class.
-     * @throws ConflictException unable to resolve conflicts
-     */
-    private static ModuleAttributes resolveConflicts(JarFile jarFile, ModuleAttributes moduleAttributes) throws ConflictException
-    {
-        if (!Collections.disjoint(reservedAliases, Arrays.asList(moduleAttributes.getAliases()))) //Fucking arrays.
-        {
-            if (reservedAliases.contains(moduleAttributes.getKey()))
-            {
-                throw new ConflictException(formatJarName(jarFile)+" has a conflicting key: "+moduleAttributes.getKey()+". It cannot be used.");
-            }
-            else    //TODO: One possible idea here is to remove the aliases from the modules that will end up with the highest quantity. However, this is an expensive operation as there may be many modules with conflicting aliases, which need to be searched for.
-            {
-                logger.info(formatJarName(jarFile)+" has overlapping aliases in the pact:");
-                ArrayList<String> aliases = new ArrayList<>();
-                for (String alias : moduleAttributes.getAliases())
-                {
-                    if (!moduleAttributes.getKey().equalsIgnoreCase(alias))
-                    {
-                        if (!reservedAliases.contains(alias))
-                        {
-                            aliases.add(alias);
-                        }
-                        else
-                        {
-                            logger.info(alias);
-                        }
-                    }
-                }
-                logger.info("These will be ignored from "+formatJarName(jarFile));
-                moduleAttributes = new ModuleAttributes(moduleAttributes.getKey(), moduleAttributes.getDescription(), aliases.toArray(new String[0]), moduleAttributes.getCategory(), moduleAttributes.getTargetVersion(), true);
-            }
-        }
-        return moduleAttributes;
-    }
+	/**
+	 * Generates the list of modules in this category. Use {@link ModuleManager#getModulesInCategory(Category)} instead where possible for cached results.
+	 * @param categoryID the category to get modules for
+	 * @return list of modules in the category
+	 */
+	private static ArrayList<ModuleAttributes> generateModulesInCategory(Category categoryID)
+	{
+		prepareModules();
+		ArrayList<ModuleAttributes> categoryModules = new ArrayList<>();
+		for (ModuleAttributes moduleAttributes : register)
+		{
+			if (moduleAttributes.getCategory().equals(categoryID))
+			{
+				categoryModules.add(moduleAttributes);
+			}
+		}
+		switch (categoryID)
+		{
+			case NOGROUP:
+				noGroupModules = categoryModules;
+				break;
+			case GAMES:
+				gamesModules = categoryModules;
+				break;
+			case UTILITY:
+				utilityModules = categoryModules;
+				break;
+			case TOYS:
+				toysModules = categoryModules;
+				break;
+			case AUDIO:
+				audioModules = categoryModules;
+				break;
+			case ADMIN:
+				adminModules = categoryModules;
+				break;
+			case SEASONAL:
+				seasonalModules = categoryModules;
+				break;
+			default:
+				return null;
+		}
+		return categoryModules;
+	}
+	
 }

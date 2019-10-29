@@ -1,8 +1,7 @@
 package gui.headed;
 
 import configuration.SettingsUtil;
-import gui.HeadedGUI;
-import jara.ModuleRegister;
+import jara.ModuleManager;
 import jara.Core;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -86,9 +85,9 @@ public class Review
         CommandConfigSetup ccSetup = HeadedGUIUtil.getCcSetupController();
 
         StringBuilder supportListBuilder = new StringBuilder();
-        for (ModuleRegister.Category id : ccSetup.getSupportedCategories())
+        for (ModuleManager.Category id : ccSetup.getSupportedCategories())
         {
-            supportListBuilder.append(ModuleRegister.getCategoryName(id)).append("\n");
+            supportListBuilder.append(ModuleManager.getCategoryName(id)).append("\n");
         }
         supportListLbl.setText(supportListBuilder.toString());
 

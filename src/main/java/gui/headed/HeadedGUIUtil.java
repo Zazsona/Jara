@@ -1,5 +1,4 @@
 package gui.headed;
-import gui.HeadedGUI;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -86,7 +85,7 @@ public class HeadedGUIUtil extends Application
      * Loads the page based on the ID of the NavBar button.
      * @param selection the NavBar id.
      */
-    public static void manageTitleSelection(Text selection)
+    protected static void manageTitleSelection(Text selection)
     {
         String selectionID = selection.getId();
         switch (selectionID)
@@ -112,7 +111,7 @@ public class HeadedGUIUtil extends Application
     /**
      * Returns to the previous page
      */
-    public static void goBack()
+    protected static void goBack()
     {
         String screenID = stage.getScene().getRoot().getId();
 
@@ -140,7 +139,7 @@ public class HeadedGUIUtil extends Application
     /**
      * Proceeds to the next page
      */
-    public static void goNext()
+    protected static void goNext()
     {
         String screenID = stage.getScene().getRoot().getId();
 
@@ -165,7 +164,7 @@ public class HeadedGUIUtil extends Application
      * Performs the hover over animation for the next button
      * @param rectangle the button
      */
-    public static void nextButtonHover(Rectangle rectangle)
+    protected static void nextButtonHover(Rectangle rectangle)
     {
         if (rectangle.getFill().equals(Paint.valueOf("#7289da")))
         {
@@ -181,7 +180,7 @@ public class HeadedGUIUtil extends Application
      * Performs the hover over animation for the back button
      * @param rectangle the button
      */
-    public static void backButtonHover(Rectangle rectangle)
+    protected static void backButtonHover(Rectangle rectangle)
     {
         if (rectangle.getFill().equals(Paint.valueOf("#99aab5")))
         {
@@ -197,7 +196,7 @@ public class HeadedGUIUtil extends Application
      * Opens a URL in the default browser
      * @param url the url
      */
-    public static void openWebpage(String url)
+    protected static void openWebpage(String url)
     {
         if (url.equals(""))
         {
@@ -241,7 +240,7 @@ public class HeadedGUIUtil extends Application
      * Shows the GUI to update the application token
      * @return the application token
      */
-    public static String showUpdateTokenPane()
+    protected static String showUpdateTokenPane()
     {
         Application.launch(TokenUpdater.class);
         return updatedToken;
@@ -251,7 +250,7 @@ public class HeadedGUIUtil extends Application
      * Shows the error window
      * @param error the error to display
      */
-    public static void showErrorPane(String error)
+    protected static void showErrorPane(String error)
     {
         errorMessage = error;
         new ErrorPane().start(null);
@@ -261,7 +260,7 @@ public class HeadedGUIUtil extends Application
      * Gets the error to display on the error pane
      * @return the error message
      */
-    public static String getError()
+    protected static String getError()
     {
         return errorMessage;
     }
@@ -270,7 +269,7 @@ public class HeadedGUIUtil extends Application
      * Gets the Discord Setup Controller
      * @return the controller
      */
-    public static DiscordSetup getDiscordSetupController()
+    protected static DiscordSetup getDiscordSetupController()
     {
         return discordSetup;
     }
@@ -278,7 +277,7 @@ public class HeadedGUIUtil extends Application
      * Gets the Command Configuration Controller
      * @return the controller
      */
-    public static CommandConfigSetup getCcSetupController()
+    protected static CommandConfigSetup getCcSetupController()
     {
         return ccSetup;
     }
@@ -287,7 +286,7 @@ public class HeadedGUIUtil extends Application
      * Gets the Welcome Controller
      * @return the controller
      */
-    public static Welcome getWelcomeController()
+    protected static Welcome getWelcomeController()
     {
         return welcome;
     }
@@ -296,7 +295,7 @@ public class HeadedGUIUtil extends Application
      * Gets the Review Controller
      * @return the controller
      */
-    public static Review getReviewController()
+    protected static Review getReviewController()
     {
         return review;
     }
@@ -305,7 +304,7 @@ public class HeadedGUIUtil extends Application
      * Sets the token set by the Update Token GUI
      * @param token the token, or null if none has been set this session
      */
-    public static void setUpdatedToken(String token)
+    protected static void setUpdatedToken(String token)
     {
         updatedToken = token;
     }
@@ -314,7 +313,7 @@ public class HeadedGUIUtil extends Application
      * Sets the setup state to complete
      * @param state the state of setup
      */
-    public static void setSetupComplete(boolean state)
+    protected static void setSetupComplete(boolean state)
     {
         complete = state;
     }
@@ -323,7 +322,7 @@ public class HeadedGUIUtil extends Application
      * Checks if the setup is complete
      * @return the setup state
      */
-    public static boolean isSetupComplete()
+    protected static boolean isSetupComplete()
     {
         return complete;
     }

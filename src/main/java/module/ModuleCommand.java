@@ -5,7 +5,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 /**
  * The class which indicates a class is a command. Without this interface, commands will not be identified.
  */
-public abstract class Command extends ModuleClass
+public abstract class ModuleCommand extends ModuleClass
 {
     /**
 	 * The entrance method for the command.

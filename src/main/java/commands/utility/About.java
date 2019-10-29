@@ -1,11 +1,11 @@
 package commands.utility;
 
 import commands.CmdUtil;
-import module.Command;
+import module.ModuleCommand;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
-public class About extends Command
+public class About extends ModuleCommand
 {
 	@Override
 	public void run(GuildMessageReceivedEvent msgEvent, String... parameters)

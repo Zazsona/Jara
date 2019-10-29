@@ -1,6 +1,5 @@
 package gui.headed;
 
-import gui.HeadedGUI;
 import jara.Core;
 import javafx.application.Application;
 import javafx.fxml.FXML;

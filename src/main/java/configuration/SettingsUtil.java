@@ -1,7 +1,7 @@
 package configuration;
 
 import commands.CmdUtil;
-import gui.HeadedGUI;
+import gui.headed.HeadedGUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

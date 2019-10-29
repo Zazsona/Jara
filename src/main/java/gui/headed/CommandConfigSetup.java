@@ -2,7 +2,7 @@ package gui.headed;
 
 import configuration.SettingsUtil;
 import jara.ModuleAttributes;
-import jara.ModuleRegister;
+import jara.ModuleManager;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -18,7 +18,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static jara.ModuleRegister.Category.*;
+import static jara.ModuleManager.Category.*;
 
 public class CommandConfigSetup
 {
@@ -100,7 +100,7 @@ public class CommandConfigSetup
         utilityCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(utilityCategoryCheckBox, UTILITY));
         seasonalCategoryCheckBox.setOnMouseClicked((event) -> toggleCategory(seasonalCategoryCheckBox, SEASONAL));
 
-        for (ModuleAttributes ma : ModuleRegister.getModules())
+        for (ModuleAttributes ma : ModuleManager.getModules())
         {
             Pane topSpacePane = new Pane();
             topSpacePane.setMinHeight(5);
@@ -206,9 +206,9 @@ public class CommandConfigSetup
      * @param categoryCheckBox the check box for this category
      * @param categoryID the id of the category
      */
-    private void toggleCategory(CheckBox categoryCheckBox, ModuleRegister.Category categoryID)
+    private void toggleCategory(CheckBox categoryCheckBox, ModuleManager.Category categoryID)
     {
-        for (ModuleAttributes ma : ModuleRegister.getModulesInCategory(categoryID))
+        for (ModuleAttributes ma : ModuleManager.getModulesInCategory(categoryID))
         {
             CheckBox checkBox = (CheckBox) ccSetupScreen.lookup("#" + ma.getKey() + "CheckBox");
             if (!checkBox.isDisabled())
@@ -222,10 +222,10 @@ public class CommandConfigSetup
      * Retrieves category IDs where at least one command is enabled.
      * @return list of supported categories
      */
-    public ArrayList<ModuleRegister.Category> getSupportedCategories()
+    public ArrayList<ModuleManager.Category> getSupportedCategories()
     {
-        ArrayList<ModuleRegister.Category> supportedCategories = new ArrayList<>();
-        for (ModuleAttributes ma : ModuleRegister.getModules())
+        ArrayList<ModuleManager.Category> supportedCategories = new ArrayList<>();
+        for (ModuleAttributes ma : ModuleManager.getModules())
         {
             if (!supportedCategories.contains(ma.getCategory()) && ma.getCategory() != NOGROUP)
             {
@@ -246,9 +246,9 @@ public class CommandConfigSetup
     {
         HashMap<String, Boolean> moduleConfig = new HashMap<>();
 
-        for (ModuleAttributes ma : ModuleRegister.getModules())
+        for (ModuleAttributes ma : ModuleManager.getModules())
         {
-            if (ModuleRegister.getModule(ma.getKey()).getCategory() != NOGROUP)
+            if (ModuleManager.getModule(ma.getKey()).getCategory() != NOGROUP)
             {
                 moduleConfig.put(ma.getKey(), ((CheckBox) ccSetupScreen.lookup("#"+ma.getKey()+"CheckBox")).isSelected());
             }

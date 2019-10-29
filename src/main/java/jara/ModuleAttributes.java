@@ -3,8 +3,8 @@ package jara;
 import com.google.gson.Gson;
 import commands.Help;
 import configuration.GuildCommandLauncher;
-import module.Command;
-import module.Load;
+import module.ModuleCommand;
+import module.ModuleLoad;
 import module.ModuleConfig;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
@@ -12,14 +12,14 @@ public class ModuleAttributes
 {
 	private final String key;
 	private final String[] aliases;
-	private final ModuleRegister.Category category;
+	private final ModuleManager.Category category;
 	private final boolean disableable;
 	private final String targetVersion;
 	private final String description;
-	private Class<? extends Command> commandClass;
+	private Class<? extends ModuleCommand> commandClass;
 	private Help.HelpPage helpPage;
 	private Class<? extends ModuleConfig> configClass;
-	private Class<? extends Load> loadClass;
+	private Class<? extends ModuleLoad> loadClass;
 
 	/**
 	 * Constructor from a JSON string
@@ -67,7 +67,7 @@ public class ModuleAttributes
 	 * @param targetVersionArg the module's target Jara version
 	 * @param disableableArg the module's ability to be disabled (This should only be used for in-built commands)
 	 */
-	public ModuleAttributes(String keyArg, String descriptionArg, String[] aliasesArg, ModuleRegister.Category categoryArg, String targetVersionArg, boolean disableableArg)
+	public ModuleAttributes(String keyArg, String descriptionArg, String[] aliasesArg, ModuleManager.Category categoryArg, String targetVersionArg, boolean disableableArg)
 	{
 		key = keyArg;
 		description = descriptionArg;
@@ -113,7 +113,7 @@ public class ModuleAttributes
 	 * @param moduleConfigClass the module's config
 	 * @param loadClass the load callback
 	 */
-	public ModuleAttributes(String keyArg, String descriptionArg, String[] aliasesArg, ModuleRegister.Category categoryArg, String targetVersionArg, boolean disableableArg, Class<? extends Command> commandClass, Help.HelpPage helpPage, Class<? extends ModuleConfig> moduleConfigClass, Class<? extends Load> loadClass)
+	public ModuleAttributes(String keyArg, String descriptionArg, String[] aliasesArg, ModuleManager.Category categoryArg, String targetVersionArg, boolean disableableArg, Class<? extends ModuleCommand> commandClass, Help.HelpPage helpPage, Class<? extends ModuleConfig> moduleConfigClass, Class<? extends ModuleLoad> loadClass)
 	{
 		key = keyArg;
 		description = descriptionArg;
@@ -168,7 +168,7 @@ public class ModuleAttributes
 	 * 
 	 * @return the command class, or null if the module has no command.
 	 */
-	public Class<? extends Command> getCommandClass()
+	public Class<? extends ModuleCommand> getCommandClass()
 	{
 		return commandClass;
 	}
@@ -186,7 +186,7 @@ public class ModuleAttributes
 	 * Gets the class which specifies the callback method to run when the module is loaded.
 	 * @return the class, or null if none exists.
 	 */
-	public Class<? extends Load> getLoadClass()
+	public Class<? extends ModuleLoad> getLoadClass()
 	{
 		return loadClass;
 	}
@@ -201,21 +201,21 @@ public class ModuleAttributes
 	}
 
 	/**
-	 * Returns the module's {@link ModuleRegister.Category}.<br>
+	 * Returns the module's {@link ModuleManager.Category}.<br>
 	 * @return the category
 	 */
-	public ModuleRegister.Category getCategory()
+	public ModuleManager.Category getCategory()
 	{
 		return category;
 	}
 
 	/**
-	 * Simple get which returns the name of the module's {@link ModuleRegister.Category}
+	 * Simple get which returns the name of the module's {@link ModuleManager.Category}
 	 * @return the name of the category
 	 */
 	public String getCategoryName()
 	{
-		return ModuleRegister.getCategoryName(category);
+		return ModuleManager.getCategoryName(category);
 	}
 	/**
 	 * Gets if this module can be disabled per guild.
@@ -267,7 +267,7 @@ public class ModuleAttributes
 	 * Unless you're trying to pull some hack job, you probably shouldn't touch this.
 	 * @param clazz the class to set
 	 */
-	public void setCommandClass(Class<? extends Command> clazz)
+	public void setCommandClass(Class<? extends ModuleCommand> clazz)
 	{
 		this.commandClass = clazz;
 	}
@@ -287,7 +287,7 @@ public class ModuleAttributes
 	 * Unless you're trying to pull some hack job, you probably shouldn't touch this.
 	 * @param clazz the class to set
 	 */
-	public void setLoadClass(Class<? extends Load> clazz)
+	public void setLoadClass(Class<? extends ModuleLoad> clazz)
 	{
 		this.loadClass = clazz;
 	}

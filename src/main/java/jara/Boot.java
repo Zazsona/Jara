@@ -1,7 +1,7 @@
 package jara;
 
 import configuration.SettingsUtil;
-import gui.HeadedGUI;
+import gui.headed.HeadedGUI;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;

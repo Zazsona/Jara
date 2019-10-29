@@ -51,7 +51,7 @@ public class CommandHandler extends ListenerAdapter
 							for (String customCommandKey : guildSettings.getCustomCommandSettings().getCommandKeys())
 							{
 								cl = guildSettings.getCustomCommandSettings().getCommandLauncher(customCommandKey);
-								String[] aliases = cl.getAliases();
+								String[] aliases = cl.getModuleAttributes().getAliases();
 
 								int min = 0;
 								int max = aliases.length-1;

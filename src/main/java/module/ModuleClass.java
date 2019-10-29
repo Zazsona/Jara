@@ -14,8 +14,7 @@ public class ModuleClass
     {
         if (moduleAttributes == null)
             moduleAttributes = ModuleManager.getModule(getClass());
-        
+
         return moduleAttributes;
     }
-
 }

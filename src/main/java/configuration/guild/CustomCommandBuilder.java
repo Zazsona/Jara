@@ -1,6 +1,6 @@
 package configuration.guild;
 
-import jara.ModuleRegister;
+import jara.ModuleManager;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class CustomCommandBuilder implements Serializable
     /**
      * The category of the command
      */
-    private ModuleRegister.Category category;
+    private ModuleManager.Category category;
     /**
      * The text that will be returned when a user calls the command.
      */
@@ -43,12 +43,12 @@ public class CustomCommandBuilder implements Serializable
      * @param key the unique identifier for the command
      * @param aliases The strings which can be used to call the command
      * @param description A short description to describe the command
-     * @param category The {@link jara.ModuleRegister.Category} of the command
+     * @param category The {@link ModuleManager.Category} of the command
      * @param roleIDs The IDs of the roles the command will toggle, or null to disable
      * @param audioLink the URL of audio to play, or null to disable
      * @param message the message to send, or null to disable
      */
-    public CustomCommandBuilder(String key, String[] aliases, String description, ModuleRegister.Category category, ArrayList<String> roleIDs, String audioLink, String message)
+    public CustomCommandBuilder(String key, String[] aliases, String description, ModuleManager.Category category, ArrayList<String> roleIDs, String audioLink, String message)
     {
         this.key = key;
         this.aliases = aliases;
@@ -89,7 +89,7 @@ public class CustomCommandBuilder implements Serializable
      * Gets the command's category
      * @return category
      */
-    public ModuleRegister.Category getCategory()
+    public ModuleManager.Category getCategory()
     {
         return category;
     }
@@ -152,10 +152,10 @@ public class CustomCommandBuilder implements Serializable
     }
 
     /**
-     * Sets the {@link jara.ModuleRegister.Category} of the command.
+     * Sets the {@link ModuleManager.Category} of the command.
      * @param category the category
      */
-    public void setCategory(ModuleRegister.Category category)
+    public void setCategory(ModuleManager.Category category)
     {
         this.category = category;
     }

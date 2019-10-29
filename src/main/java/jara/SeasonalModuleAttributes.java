@@ -2,8 +2,8 @@ package jara;
 
 import com.google.gson.Gson;
 import commands.Help;
-import module.Command;
-import module.Load;
+import module.ModuleCommand;
+import module.ModuleLoad;
 import module.ModuleConfig;
 
 import java.io.Serializable;
@@ -40,7 +40,7 @@ public class SeasonalModuleAttributes extends ModuleAttributes implements Serial
      * @param startingDayoOfYear the day of the year the module is first active
      * @param endingDayOfYear the last day of the year the module is active
      */
-    public SeasonalModuleAttributes(String keyArg, String descriptionArg, String[] aliasesArg, ModuleRegister.Category categoryArg, String targetVersionArg, boolean disableableArg, int startingDayoOfYear, int endingDayOfYear)
+    public SeasonalModuleAttributes(String keyArg, String descriptionArg, String[] aliasesArg, ModuleManager.Category categoryArg, String targetVersionArg, boolean disableableArg, int startingDayoOfYear, int endingDayOfYear)
     {
         super(keyArg, descriptionArg, aliasesArg, categoryArg, targetVersionArg, disableableArg);
         this.startingDayOfYear = startingDayoOfYear;
@@ -62,7 +62,7 @@ public class SeasonalModuleAttributes extends ModuleAttributes implements Serial
      * @param moduleConfigClass the module's config
      * @param loadClass the load callback
      */
-    public SeasonalModuleAttributes(String keyArg, String descriptionArg, String[] aliasesArg, ModuleRegister.Category categoryArg, String targetVersionArg, boolean disableableArg, int startingDayoOfYear, int endingDayOfYear, Class<? extends Command> commandClass, Help.HelpPage helpPage, Class<? extends ModuleConfig> moduleConfigClass, Class<? extends Load> loadClass)
+    public SeasonalModuleAttributes(String keyArg, String descriptionArg, String[] aliasesArg, ModuleManager.Category categoryArg, String targetVersionArg, boolean disableableArg, int startingDayoOfYear, int endingDayOfYear, Class<? extends ModuleCommand> commandClass, Help.HelpPage helpPage, Class<? extends ModuleConfig> moduleConfigClass, Class<? extends ModuleLoad> loadClass)
     {
         super(keyArg, descriptionArg, aliasesArg, categoryArg, targetVersionArg, disableableArg, commandClass, helpPage, moduleConfigClass, loadClass);
         this.startingDayOfYear = startingDayoOfYear;

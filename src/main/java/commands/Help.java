@@ -3,9 +3,9 @@ package commands;
 import configuration.GuildSettings;
 import configuration.SettingsUtil;
 import jara.ModuleAttributes;
-import jara.ModuleRegister;
+import jara.ModuleManager;
 import jara.SeasonalModuleAttributes;
-import module.Command;
+import module.ModuleCommand;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +16,7 @@ import java.util.*;
 /**
  * Provides help details for built-in, module, and custom commands.
  */
-public class Help extends Command
+public class Help extends ModuleCommand
 {
     /**
      * The command prefix used for this guild
@@ -95,7 +95,7 @@ public class Help extends Command
      */
     private EmbedBuilder getPage(GuildMessageReceivedEvent msgEvent, String[] parameters, EmbedBuilder embed)
     {
-        ModuleRegister.Category category = getCategory(parameters[1]);
+        ModuleManager.Category category = getCategory(parameters[1]);
         boolean limitToPerms = !(msgEvent.getMember().isOwner() | (parameters.length >= 3 && parameters[2].equalsIgnoreCase("all")));
         if (category != null)
         {
@@ -143,10 +143,10 @@ public class Help extends Command
      * @return a list of commands keys and their description in pretty print
      */
     @NotNull
-    private LinkedList<String> getCommandStrings(GuildMessageReceivedEvent msgEvent, ModuleRegister.Category category, boolean limitToPerms)
+    private LinkedList<String> getCommandStrings(GuildMessageReceivedEvent msgEvent, ModuleManager.Category category, boolean limitToPerms)
     {
         LinkedList<String> commandInfo = new LinkedList<>();
-        for (ModuleAttributes ma : ModuleRegister.getModulesInCategory(category))
+        for (ModuleAttributes ma : ModuleManager.getModulesInCategory(category))
         {
             if (ma.getCommandClass() != null)
             {
@@ -193,7 +193,7 @@ public class Help extends Command
             By not doing the check here they can still find out about the other commands when seeing them be used.
          */
 
-        ModuleAttributes moduleAttributes = ModuleRegister.getModule(alias);
+        ModuleAttributes moduleAttributes = ModuleManager.getModule(alias);
         if (moduleAttributes != null)
         {
             HelpPage helpPage = moduleAttributes.getHelpPage();
@@ -265,9 +265,9 @@ public class Help extends Command
      * @param parameter the user request
      * @return the category, or null if it is an invalid request
      */
-    private ModuleRegister.Category getCategory(String parameter)
+    private ModuleManager.Category getCategory(String parameter)
     {
-        for (ModuleRegister.Category category : ModuleRegister.Category.values())
+        for (ModuleManager.Category category : ModuleManager.Category.values())
         {
             if (parameter.equalsIgnoreCase(category.toString()))
             {

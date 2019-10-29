@@ -20,9 +20,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * A subclass of {@link Command}, provides utility methods for games which respect guild settings.
+ * A subclass of {@link ModuleCommand}, provides utility methods for games which respect guild settings.
  */
-public abstract class GameCommand extends Command //A base class to build commands from.
+public abstract class ModuleGameCommand extends ModuleCommand //A base class to build commands from.
 {
 	/**
 	 * The game channel. If game channels are disabled, this is the same channel the command was used in.
@@ -64,7 +64,7 @@ public abstract class GameCommand extends Command //A base class to build comman
 	protected TextChannel createGameChannel(TextChannel currentChannel, String channelName, Member... players)
 	{
 		Guild guild = currentChannel.getGuild();
-		Logger logger = LoggerFactory.getLogger(GameCommand.class);
+		Logger logger = LoggerFactory.getLogger(ModuleGameCommand.class);
 		GuildSettings guildSettings = SettingsUtil.getGuildSettings(guild.getId());
 		String gameCategoryID = guildSettings.getGameCategoryId();
 		EmbedBuilder embed = new EmbedBuilder();
@@ -81,8 +81,8 @@ public abstract class GameCommand extends Command //A base class to build comman
 				/*
 				 * The listener for reactions to gameMsgs.
 				 */
-				GameReactionListener gameReactionListener = new GameReactionListener();
-				currentChannel.getJDA().addEventListener(gameReactionListener);
+				GameReactionHandler gameReactionHandler = new GameReactionHandler();
+				currentChannel.getJDA().addEventListener(gameReactionHandler);
 			}
 			Category gameCategory = guild.getCategoryById(gameCategoryID);
 			if (gameCategory != null)
@@ -272,7 +272,7 @@ public abstract class GameCommand extends Command //A base class to build comman
 	/**
 	 * EventHandler to pick up on game join reactions.
 	 */
-	private class GameReactionListener extends ListenerAdapter
+	private class GameReactionHandler extends ListenerAdapter
 	{
 		@Override
 		public void onMessageReactionAdd(MessageReactionAddEvent mra)

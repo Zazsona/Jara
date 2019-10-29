@@ -16,7 +16,7 @@ public class GuildCustomCommandLauncher extends GuildCommandLauncher
      */
     public GuildCustomCommandLauncher(ModuleAttributes attributes)
     {
-        super(attributes, true); //Enabled state is not used here
+        super(attributes); //Enabled state is not used here
     }
 
     @Override

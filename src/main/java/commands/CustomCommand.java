@@ -2,7 +2,7 @@ package commands;
 
 import configuration.SettingsUtil;
 import configuration.guild.CustomCommandBuilder;
-import module.Command;
+import module.ModuleCommand;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -10,7 +10,7 @@ import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
 
 import java.util.ArrayList;
 
-public class CustomCommand extends Command
+public class CustomCommand extends ModuleCommand
 {
 
     @Override

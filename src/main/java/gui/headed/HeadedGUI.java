@@ -1,4 +1,4 @@
-package gui;
+package gui.headed;
 
 import gui.headed.HeadedGUIUtil;
 import javafx.application.Application;

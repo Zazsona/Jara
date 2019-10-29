@@ -16,18 +16,15 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 public class GuildCommandLauncher
 {
 	private static Logger logger = LoggerFactory.getLogger(GuildCommandLauncher.class);
-	protected final boolean enabledState;
 	protected final ModuleAttributes attributes;
 
 	/**
 	 * Constructor
 	 * @param attributes the attributes of the module this launches
-	 * @param enabledState whether the global config allows this command to be used or not
 	 */
-	public GuildCommandLauncher(ModuleAttributes attributes, boolean enabledState)
+	public GuildCommandLauncher(ModuleAttributes attributes)
 	{
 		this.attributes = attributes;
-		this.enabledState = enabledState;
 	}
 
 	/**
@@ -37,40 +34,33 @@ public class GuildCommandLauncher
 	 */
 	public void execute(GuildMessageReceivedEvent msgEvent, String...parameters)
 	{
-        if (isEnabled() || !attributes.isDisableable()) //If it can't be disabled, run it anyway even if it is disabled. Stops people fucking with settings to the point the bot is unusable.
-        {
-            GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
-            if (guildSettings.isCommandEnabled(attributes.getKey()))
-            {
-				if (checkForTimedAvailability(attributes, guildSettings))
+		GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
+		if (guildSettings.isCommandEnabled(attributes.getKey()))
+		{
+			if (checkForTimedAvailability(attributes, guildSettings))
+			{
+				if (guildSettings.isPermitted(msgEvent.getMember(), attributes.getKey()))
 				{
-					if (guildSettings.isPermitted(msgEvent.getMember(), attributes.getCommandClass()))
-					{
-						Runnable commandRunnable = () -> instantiateCommand(msgEvent, parameters);
-						Thread commandThread = new Thread(commandRunnable);
-						commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getKey()+"-Thread");
-						commandThread.start();
-						return;
-					}
-					else
-					{
-						msgEvent.getChannel().sendMessage("You do not have permission to use this command.").queue();
-					}
+					Runnable commandRunnable = () -> instantiateCommand(msgEvent, parameters);
+					Thread commandThread = new Thread(commandRunnable);
+					commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getKey()+"-Thread");
+					commandThread.start();
+					return;
 				}
 				else
 				{
-					msgEvent.getChannel().sendMessage("This seasonal command is out of season.").queue();
+					msgEvent.getChannel().sendMessage("You do not have permission to use this command.").queue();
 				}
-            }
-            else
-            {
-                msgEvent.getChannel().sendMessage("This command is disabled.").queue();
-            }
-        }
-        else
-        {
-            logger.info(msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+" attempted to use the command "+parameters[0]+", however it's disabled. Please enable it in the config.");
-        }
+			}
+			else
+			{
+				msgEvent.getChannel().sendMessage("This seasonal command is out of season.").queue();
+			}
+		}
+		else
+		{
+			msgEvent.getChannel().sendMessage("This command is disabled.").queue();
+		}
 	}
 
 	/**
@@ -121,33 +111,12 @@ public class GuildCommandLauncher
 	}
 
 	/**
-	 * Returns the command key for the command associated with this launcher.
-	 * @return the key
+	 * Gets the attributed for the module this launches.
+	 * @return the attributes
 	 */
-	public String getCommandKey()
+	public ModuleAttributes getModuleAttributes()
 	{
-		return attributes.getKey();
+		return attributes;
 	}
-	/**
-	 * 
-	 * Simple get for all the different text strings
-	 * that will call the command.
-	 * 
-	 * @return the command's aliases
-	 */
-	public String[] getAliases()
-	{
-		return attributes.getAliases();
-	}
-	/**
-	 * 
-	 * Reports back if the command is enabled in the
-	 * config. If this returns false, execute will also fail.
-	 * 
-	 * @return boolean on enabled
-	 */
-	public boolean isEnabled()
-	{
-		return enabledState;
-	}
+
 }

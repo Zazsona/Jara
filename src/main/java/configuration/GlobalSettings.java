@@ -1,7 +1,7 @@
 package configuration;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import jara.ModuleRegister;
+import jara.ModuleManager;
 import jara.ModuleAttributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +40,9 @@ public class GlobalSettings implements Serializable
      */
     public synchronized void save() throws IOException
     {
-        if (!moduleConfig.keySet().containsAll(ModuleRegister.getCommandModuleKeys()))
+        if (!moduleConfig.keySet().containsAll(ModuleManager.getCommandModuleKeys()))
         {
-            for (ModuleAttributes ma : ModuleRegister.getModules())
+            for (ModuleAttributes ma : ModuleManager.getModules())
             {
                 if (!moduleConfig.keySet().contains(ma.getKey()))
                 {
@@ -84,10 +84,10 @@ public class GlobalSettings implements Serializable
                 this.moduleConfig = gs.moduleConfig;
                 ois.close();
                 fis.close();
-                if (!moduleConfig.keySet().containsAll(ModuleRegister.getCommandModuleKeys()))
+                if (!moduleConfig.keySet().containsAll(ModuleManager.getCommandModuleKeys()))
                 {
                     logger.info("Found new commands. Adding them to the config.");
-                    for (String key : ModuleRegister.getModuleKeys())
+                    for (String key : ModuleManager.getModuleKeys())
                     {
                         if (!moduleConfig.keySet().contains(key))
                         {
@@ -162,7 +162,7 @@ public class GlobalSettings implements Serializable
         boolean changed = false;
         for (String key : keys)
         {
-            ModuleAttributes ma = ModuleRegister.getModule(key);
+            ModuleAttributes ma = ModuleManager.getModule(key);
             if (ma != null && ma.isDisableable())
             {
                 moduleConfig.replace(key, newState);

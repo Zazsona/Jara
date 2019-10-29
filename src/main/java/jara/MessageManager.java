@@ -4,6 +4,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 
 import net.dv8tion.jda.core.entities.Guild;
@@ -22,7 +23,7 @@ public class MessageManager
 	private int messagesToGet = 0;
 	private Guild guildToListen;
 	private TextChannel channelToListen;
-	private final MessageListener messageListener;
+	private final MessageHandler messageHandler;
 
 	/**
 	 * Constructor
@@ -30,7 +31,7 @@ public class MessageManager
 	public MessageManager()
 	{
 		messageLog = new ArrayList<>();
-		messageListener = new MessageListener();
+		messageHandler = new MessageHandler();
 	}
 	/**
 	 * This method returns the first messages to be sent after its invocation<br>
@@ -50,7 +51,7 @@ public class MessageManager
 	{
 		guildToListen = guild;
 		messagesToGet = messageCount;
-		guild.getJDA().addEventListener(messageListener);
+		guild.getJDA().addEventListener(messageHandler);
 		try 
 		{
 			int messageLogSize = messageLog.size();
@@ -66,7 +67,7 @@ public class MessageManager
 						long timeSinceStart = runtimeBean.getUptime() - startTime - timeout; //This will be zero or less if timeout has expired
 						if (timeSinceStart <= 0)
 						{
-							guild.getJDA().removeEventListener(messageListener);
+							guild.getJDA().removeEventListener(messageHandler);
 							guildToListen = null;
 							return null; //Timeout expired, and we didn't get anything.
 						}
@@ -77,7 +78,7 @@ public class MessageManager
 					}
 				}
 			}
-			guild.getJDA().removeEventListener(messageListener);
+			guild.getJDA().removeEventListener(messageHandler);
 			Message[] messages = new Message[messageCount];
 			for (int i = 0; i<messageCount; i++)
 			{
@@ -88,7 +89,7 @@ public class MessageManager
 		} 
 		catch (InterruptedException e) 
 		{
-			guild.getJDA().removeEventListener(messageListener);
+			guild.getJDA().removeEventListener(messageHandler);
 			guildToListen = null;
 			return null; //Let the calling method handle this.
 		}
@@ -108,7 +109,7 @@ public class MessageManager
 	{
 		channelToListen = channel;
 		messagesToGet = messageCount;
-		channel.getJDA().addEventListener(messageListener);
+		channel.getJDA().addEventListener(messageHandler);
 		try 
 		{
 			int messageLogSize = messageLog.size();
@@ -133,7 +134,7 @@ public class MessageManager
 					}
 				}
 			}
-			channel.getJDA().removeEventListener(messageListener);
+			channel.getJDA().removeEventListener(messageHandler);
 			channelToListen = null;
 			if (messageLogSize != messageLog.size())
 			{
@@ -156,7 +157,7 @@ public class MessageManager
 		} 
 		catch (InterruptedException e) 
 		{
-			channel.getJDA().removeEventListener(messageListener);
+			channel.getJDA().removeEventListener(messageHandler);
 			channelToListen = null;
 			return null; //Let the calling method handle this.
 		}
@@ -303,7 +304,7 @@ public class MessageManager
 	 * @param count The number of messages to get
 	 * @return the messages
 	 */
-	public Message[] getMessageHistoryFromEnd(int count)
+	public Message[] getMessageHistoryFromRecent(int count)
 	{
 		if (count > messageLog.size())
 		{
@@ -353,26 +354,22 @@ public class MessageManager
 	}
 	/**
 	 * Resets the message history for this instance.<br>
-	 * Note: Running this while gathering future messages will not work.
 	 * @return boolean on success
+	 * @throws ConcurrentModificationException reset while gathering messages
 	 */
-	public boolean resetMessageHistory()
+	public void resetMessageHistory() throws ConcurrentModificationException
 	{
-		if (guildToListen == null)
+		if (guildToListen == null && channelToListen == null)
 		{
-			if (channelToListen == null)
-			{
-				messageLog = new ArrayList<>();
-				return true;
-			}
+			messageLog = new ArrayList<>();
 		}
-		return false;
+		throw new ConcurrentModificationException("Cannot reset while gathering messages.");
 	}
 
 	/**
 	 * An EventHandler that gathers messages
 	 */
-	private class MessageListener extends ListenerAdapter
+	private class MessageHandler extends ListenerAdapter
 	{
 		@Override
 		public void onGuildMessageReceived(GuildMessageReceivedEvent msgEvent)

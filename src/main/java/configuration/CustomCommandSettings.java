@@ -4,7 +4,7 @@ import commands.CustomCommand;
 import configuration.guild.CustomCommandBuilder;
 import jara.Core;
 import jara.ModuleAttributes;
-import jara.ModuleRegister;
+import jara.ModuleManager;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -34,16 +34,16 @@ public class CustomCommandSettings implements Serializable
      * @param key the command's key
      * @param aliases the command's aliases
      * @param description the command's description
-     * @param category the command's {@link jara.ModuleRegister.Category}
+     * @param category the command's {@link ModuleManager.Category}
      * @param roleIDs the roles this command will grant/remove
      * @param audioLink the audio this command will play
      * @param message the message this command will display
      * @return the command builder, or null if the key is taken
      * @throws IOException unable to save
      */
-    public CustomCommandBuilder addCommand(String key, String[] aliases, String description, ModuleRegister.Category category, ArrayList<String> roleIDs, String audioLink, String message) throws IOException
+    public CustomCommandBuilder addCommand(String key, String[] aliases, String description, ModuleManager.Category category, ArrayList<String> roleIDs, String audioLink, String message) throws IOException
     {
-        if (customCommands.containsKey(key.toLowerCase()) || ModuleRegister.getModule(key) != null)
+        if (customCommands.containsKey(key.toLowerCase()) || ModuleManager.getModule(key) != null)
         {
             return null;
         }
@@ -62,7 +62,7 @@ public class CustomCommandSettings implements Serializable
     public void editCommand(String key, CustomCommandBuilder ccb) throws IOException
     {
         key = key.toLowerCase();
-        if (customCommands.containsKey(key) || ModuleRegister.getModule(key) != null)
+        if (customCommands.containsKey(key) || ModuleManager.getModule(key) != null)
         {
             customCommands.put(key, ccb);
             guildSettings.save();

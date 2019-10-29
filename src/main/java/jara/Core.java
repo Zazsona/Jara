@@ -9,7 +9,7 @@ import javax.security.auth.login.LoginException;
 
 import configuration.SettingsUtil;
 import exceptions.InvalidModuleException;
-import gui.HeadedGUI;
+import gui.headed.HeadedGUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,12 +81,15 @@ public class Core //A class for covering the global manners of the bot.
 		try
 		{
 			HashMap<String, GuildCommandLauncher> commands = new HashMap<>();
-			for (ModuleAttributes ma : ModuleRegister.getCommandModules())
+			for (ModuleAttributes ma : ModuleManager.getCommandModules())
 			{
-				GuildCommandLauncher cl = new GuildCommandLauncher(ma, SettingsUtil.getGlobalSettings().isModuleEnabled(ma.getKey()));
-				for (String alias : ma.getAliases())
+				if (SettingsUtil.getGlobalSettings().isModuleEnabled(ma.getKey()))
 				{
-					commands.put(alias.toLowerCase(), cl);
+					GuildCommandLauncher cl = new GuildCommandLauncher(ma);
+					for (String alias : ma.getAliases())
+					{
+						commands.put(alias.toLowerCase(), cl);
+					}
 				}
 			}
 			shardManager.addEventListener(new CommandHandler(commands));
