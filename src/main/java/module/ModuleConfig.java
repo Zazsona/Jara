@@ -12,7 +12,7 @@ import java.util.Collection;
 /**
  * The class for interacting with Jara's Config command.
  */
-public abstract class ModuleConfig
+public abstract class ModuleConfig extends ModuleClass
 {
     /**
      * The entrance method for a config via the wizard.

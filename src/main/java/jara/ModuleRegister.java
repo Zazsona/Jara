@@ -2,13 +2,12 @@ package jara;
 
 import java.util.*;
 
-import module.Command;
 import commands.CustomCommand;
 import commands.Help;
 import commands.admin.CustomCommandManager;
 import commands.admin.config.ConfigMain;
 import commands.utility.*;
-import org.apache.commons.collections4.list.UnmodifiableList;
+import module.ModuleClass;
 
 import static jara.ModuleRegister.Category.*;
 
@@ -234,14 +233,14 @@ public class ModuleRegister
 	 * @param clazz - A module's command class.
 	 * @return the attributes, or null if the class matches no module's command class.
 	 */
-	public static ModuleAttributes getModule(Class<? extends Command> clazz)
+	public static ModuleAttributes getModule(Class<? extends ModuleClass> clazz)
 	{
 		prepareModules();
 		if (clazz != null)
 		{
 			for (ModuleAttributes moduleAttributes : register)
 			{
-				if (clazz.equals(moduleAttributes.getCommandClass()))
+				if (clazz.equals(moduleAttributes.getCommandClass()) || clazz.equals(moduleAttributes.getConfigClass()) || clazz.equals(moduleAttributes.getLoadClass()))
 				{
 					return moduleAttributes;
 				}
