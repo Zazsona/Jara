@@ -5,19 +5,22 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import javax.annotation.Nullable;
 import javax.security.auth.login.LoginException;
 
 import configuration.SettingsUtil;
 import exceptions.InvalidModuleException;
 import gui.headed.HeadedGUI;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
+import net.dv8tion.jda.api.sharding.ShardManager;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import configuration.GuildCommandLauncher;
 import event.GuildJoinHandler;
 import event.GuildLeaveHandler;
-import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
-import net.dv8tion.jda.bot.sharding.ShardManager;
 
 public class Core //A class for covering the global manners of the bot.
 {
@@ -118,8 +121,30 @@ public class Core //A class for covering the global manners of the bot.
 	 * Gets the {@link ShardManager}
 	 * @return the shard manager
 	 */
+	@Nullable
 	public static ShardManager getShardManager()
 	{
 		return shardManager;
 	}
+
+    /**
+     * Gets the {@link ShardManager}. This will hold the calling thread until the shard manager has been built.
+     * @return the shard manager, once built.
+     */
+	@NotNull
+	public static ShardManager getShardManagerNotNull()
+    {
+        while (shardManager == null || shardManager.getStatus(0) != JDA.Status.CONNECTED)
+        {
+            try
+            {
+                Thread.sleep(500);
+            }
+            catch (InterruptedException e)
+            {
+                logger.error(e.toString());
+            }
+        }
+        return shardManager;
+    }
 }
