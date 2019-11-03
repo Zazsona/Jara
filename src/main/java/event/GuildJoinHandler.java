@@ -2,19 +2,18 @@ package event;
 
 import commands.CmdUtil;
 import configuration.SettingsUtil;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 /**
  * Handles the bot being added to new guilds.
  */
-public class GuildJoinHandler extends ListenerAdapter 
+public class GuildJoinHandler extends ListenerAdapter
 {
 	@Override
 	public void onGuildJoin(GuildJoinEvent joinEvent)

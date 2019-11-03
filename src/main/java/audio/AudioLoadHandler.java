@@ -5,7 +5,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import configuration.SettingsUtil;
-import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.api.entities.Member;
 import org.slf4j.LoggerFactory;
 
 public class AudioLoadHandler implements AudioLoadResultHandler

@@ -3,11 +3,10 @@ package commands;
 import configuration.SettingsUtil;
 import configuration.guild.CustomCommandBuilder;
 import module.ModuleCommand;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
-
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import java.util.ArrayList;
 
 public class CustomCommand extends ModuleCommand
@@ -77,7 +76,7 @@ public class CustomCommand extends ModuleCommand
                     roles.add(role);
                 }
             }
-            msgEvent.getGuild().getController().addRolesToMember(msgEvent.getMember(), roles).queue();
+            msgEvent.getGuild().modifyMemberRoles(msgEvent.getMember(), roles, null).queue();
         }
     }
 

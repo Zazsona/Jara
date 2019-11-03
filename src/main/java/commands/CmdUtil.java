@@ -4,11 +4,10 @@ package commands;
 import audio.Audio;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import jara.ModuleManager;
 import jara.Core;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
@@ -54,13 +53,14 @@ public class CmdUtil
      * Gets JDA.<br>
      *     Don't rely on this being a fast operation. It will not work until the bot is launched,
      *     and as such, will hold the thread until that happens.
+     * @param shard the id of the shard to get
      * @return JDA
      */
-    public synchronized static JDA getJDA()
+    public synchronized static JDA getJDA(int shard)
     {
         try
         {
-            return Core.getShardManager().getApplicationInfo().getJDA();
+            return Core.getShardManager().getShardById(shard);
         }
         catch (NullPointerException e)
         {
@@ -70,11 +70,11 @@ public class CmdUtil
                 {
                     Thread.sleep(10);
                 }
-                while (!Core.getShardManager().getApplicationInfo().getJDA().getStatus().equals(JDA.Status.CONNECTED))
+                while (!Core.getShardManager().getShardById(shard).getStatus().equals(JDA.Status.CONNECTED))
                 {
                     Thread.sleep(10);
                 }
-                return Core.getShardManager().getApplicationInfo().getJDA();
+                return Core.getShardManager().getShardById(shard);
             }
             catch (InterruptedException e1)
             {
@@ -363,7 +363,8 @@ public class CmdUtil
      */
     public static void sendHelpInfo(GuildMessageReceivedEvent msgEvent, String alias)
     {
-        new Help().run(msgEvent, "/?", ModuleManager.getModule(alias).getKey());
+        Help help = new Help();
+        help.run(msgEvent, help.getModuleAttributes().getKey(), alias);
         /*
          * So, technically this is fine, as help is *always* enabled and cannot be disabled. But generally calling commands like this is a bad idea, as they may be disabled.
          * This also saves us having to copy command usage info for each command, which could be a problem as commands change.

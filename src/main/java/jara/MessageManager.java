@@ -7,11 +7,11 @@ import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 /**
  * Class to streamline message collection.
@@ -354,7 +354,6 @@ public class MessageManager
 	}
 	/**
 	 * Resets the message history for this instance.<br>
-	 * @return boolean on success
 	 * @throws ConcurrentModificationException reset while gathering messages
 	 */
 	public void resetMessageHistory() throws ConcurrentModificationException

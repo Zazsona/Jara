@@ -10,10 +10,10 @@ import configuration.guild.GameConfig;
 import jara.ModuleAttributes;
 import jara.ModuleManager;
 import jara.Core;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,12 +121,9 @@ public class GuildSettings implements Serializable
             File guildFile = new File(getGuildSettingsFilePath(guildID));
             if (guildFile.exists())
             {
-                FileInputStream fis = new FileInputStream(getGuildSettingsFilePath(guildID));
-                ObjectInputStream ois = new ObjectInputStream(fis);
+                String json = new String(Files.readAllBytes(guildFile.toPath())); //TODO: Not ideal as files can be of any size
                 Gson gson = new Gson();
-                GuildSettings settingsFromFile = gson.fromJson((String) ois.readObject(), GuildSettings.class);
-                ois.close();
-                fis.close();
+                GuildSettings settingsFromFile = gson.fromJson(json, GuildSettings.class);
                 if (!Core.getVersion().equalsIgnoreCase(settingsFromFile.jaraVersion))
                 {
                     updateConfig(settingsFromFile);
@@ -134,6 +131,7 @@ public class GuildSettings implements Serializable
                 }
                 else
                 {
+                    this.jaraVersion = Core.getVersion();
                     this.commandPrefix = settingsFromFile.commandPrefix;
                     this.timeZoneId = settingsFromFile.timeZoneId;
                     this.audioConfig = settingsFromFile.audioConfig;
@@ -154,7 +152,7 @@ public class GuildSettings implements Serializable
                     EmbedBuilder embed = new EmbedBuilder();
                     embed.setDescription("The bot has been updated with new commands/settings added!\nUse config to configure these, they have been disabled for now.\n"+sb.toString());
                     embed.setColor(CmdUtil.getHighlightColour(null));
-                    Core.getShardManager().getGuildById(guildID).getOwner().getUser().openPrivateChannel().complete().sendMessage(embed.build()).queue(); //Yuck.
+                    Core.getShardManagerNotNull().getGuildById(guildID).getOwner().getUser().openPrivateChannel().complete().sendMessage(embed.build()).queue(); //Yuck.
                     save();
                 }
             }
@@ -166,7 +164,7 @@ public class GuildSettings implements Serializable
                 save();
             }
         }
-        catch (ClassNotFoundException | StreamCorruptedException | MalformedJsonException e)
+        catch (StreamCorruptedException | MalformedJsonException e)
         {
             Guild guild = Core.getShardManager().getGuildById(guildID);
             guild.getOwner().getUser().openPrivateChannel().complete().sendMessage("The config for your guild, "+guild.getName()+", has become corrupted or is no longer available and has been reset.\nA backup of the corrupted config has been created. Please contact your host for further details.").queue();
@@ -200,10 +198,10 @@ public class GuildSettings implements Serializable
             settingsFile.createNewFile();
         }
         FileOutputStream fos = new FileOutputStream(getGuildSettingsFilePath(guildID));
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        PrintWriter pw = new PrintWriter(fos);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        oos.writeObject(gson.toJson(this));
-        oos.close();
+        pw.print(gson.toJson(this));
+        pw.close();
         fos.close();
     }
 
@@ -534,7 +532,7 @@ public class GuildSettings implements Serializable
     }
 
     /**
-     * Gets the {@link net.dv8tion.jda.core.entities.Category} id to create game channels in.
+     * Gets the {@link net.dv8tion.jda.api.entities.Category} id to create game channels in.
      * @return the id
      */
     public String getGameCategoryId()
@@ -543,7 +541,7 @@ public class GuildSettings implements Serializable
     }
 
     /**
-     * Sets the ID of the {@link net.dv8tion.jda.core.entities.Category} to create Game Channels in.
+     * Sets the ID of the {@link net.dv8tion.jda.api.entities.Category} to create Game Channels in.
      * @param gameCategoryId the category id
      * @throws IOException unable to save
      */

@@ -3,13 +3,13 @@ package module;
 import commands.CmdUtil;
 import configuration.GuildSettings;
 import configuration.SettingsUtil;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.core.exceptions.GuildUnavailableException;
-import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.exceptions.GuildUnavailableException;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
@@ -211,9 +211,9 @@ public abstract class ModuleGameCommand extends ModuleCommand //A base class to 
 				{
 					if (channel.hasLatestMessage())
 					{
-						Message lastMessage = channel.getMessageById(channel.getLatestMessageIdLong()).complete();
-						OffsetDateTime timeToDelete = lastMessage.getCreationTime().plusSeconds(channelTimeout/1000);
-						if (!lastMessage.getCreationTime().isBefore(timeToDelete))
+						Message lastMessage = channel.retrieveMessageById(channel.getLatestMessageIdLong()).complete();
+						OffsetDateTime timeToDelete = lastMessage.getTimeCreated().plusSeconds(channelTimeout/1000);
+						if (!lastMessage.getTimeCreated().isBefore(timeToDelete))
 						{
 							deleteGameChannel();
 						}
@@ -279,7 +279,7 @@ public abstract class ModuleGameCommand extends ModuleCommand //A base class to 
 		{
 			try
 			{
-				if (mra.getChannel().getMessageById(mra.getMessageIdLong()).complete().getMember().equals(mra.getGuild().getSelfMember())) //Since this method checks all reactions, this at least limits it to bot only ones
+				if (mra.getChannel().retrieveMessageById(mra.getMessageIdLong()).complete().getMember().equals(mra.getGuild().getSelfMember())) //Since this method checks all reactions, this at least limits it to bot only ones
 				{
 					if (gameChannelMap.containsKey(mra.getMessageId()))
 					{

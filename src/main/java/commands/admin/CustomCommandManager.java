@@ -7,10 +7,10 @@ import configuration.SettingsUtil;
 import configuration.guild.CustomCommandBuilder;
 import jara.ModuleManager;
 import jara.MessageManager;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;

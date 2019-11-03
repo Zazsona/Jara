@@ -6,8 +6,8 @@ import jara.ModuleAttributes;
 import jara.ModuleManager;
 import jara.SeasonalModuleAttributes;
 import module.ModuleCommand;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.ZonedDateTime;

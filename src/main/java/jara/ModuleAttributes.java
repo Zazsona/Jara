@@ -6,7 +6,6 @@ import configuration.GuildCommandLauncher;
 import module.ModuleCommand;
 import module.ModuleLoad;
 import module.ModuleConfig;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 public class ModuleAttributes
 {

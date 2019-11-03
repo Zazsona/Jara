@@ -13,9 +13,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import net.dv8tion.jda.core.entities.SelfUser;
-import net.dv8tion.jda.core.events.ReadyEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.entities.SelfUser;
+import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -187,7 +187,7 @@ public class DiscordSetup extends ListenerAdapter
         Platform.runLater(() ->
                           {
 
-                              SelfUser selfUser = Core.getShardManager().getApplicationInfo().getJDA().getSelfUser();
+                              SelfUser selfUser = re.getJDA().getSelfUser();
                               clientID = selfUser.getId();
                               try //Attempt to fill the profile.
                               {

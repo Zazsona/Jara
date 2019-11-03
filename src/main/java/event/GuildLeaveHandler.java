@@ -1,11 +1,10 @@
 package event;
 
 import configuration.SettingsUtil;
+import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.io.IOException;
 
@@ -13,7 +12,7 @@ import java.io.IOException;
 /**
  * Handles the bot getting removes from a guild
  */
-public class GuildLeaveHandler extends ListenerAdapter 
+public class GuildLeaveHandler extends ListenerAdapter
 {
 	@Override
 	public void onGuildLeave(GuildLeaveEvent leaveEvent)

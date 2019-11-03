@@ -6,12 +6,12 @@ import java.util.Arrays;
 
 import commands.CmdUtil;
 import jara.SeasonalModuleAttributes;
-import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jara.ModuleAttributes;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 public class GuildCommandLauncher
 {

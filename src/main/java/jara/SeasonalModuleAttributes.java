@@ -76,7 +76,14 @@ public class SeasonalModuleAttributes extends ModuleAttributes implements Serial
      */
     public boolean isActive(ZonedDateTime zdt)
     {
-        int dayOfYear = zdt.getDayOfYear();
-        return (dayOfYear >= startingDayOfYear && dayOfYear <= endingDayOfYear);
+        if (startingDayOfYear > 0 && endingDayOfYear > 0)
+        {
+            int dayOfYear = zdt.getDayOfYear();
+            return (dayOfYear >= startingDayOfYear && dayOfYear <= endingDayOfYear);
+        }
+        else
+        {
+            return true;
+        }
     }
 }

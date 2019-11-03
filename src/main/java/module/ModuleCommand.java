@@ -1,6 +1,6 @@
 package module;
 
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 /**
  * The class which indicates a class is a command. Without this interface, commands will not be identified.
