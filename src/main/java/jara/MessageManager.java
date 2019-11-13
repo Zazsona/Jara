@@ -7,7 +7,12 @@ import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 
+import commands.CmdUtil;
+import configuration.SettingsUtil;
+import exceptions.QuitException;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -288,6 +293,112 @@ public class MessageManager
 	{
 		return futureChannelMessageCollector(channel, timeout, count);
 	}
+
+	/**
+	 * Gets confirmation (yes or no) from the specified user anywhere in the guild.<br><br>
+	 *     In the case the user responds with an invalid answer, a notice is sent in the default embed style.
+	 * @param guild the guild to listen to
+	 * @param member the member to listen for
+	 * @return true on confirmation, and vice versa.
+	 * @throws QuitException the user quit the operation
+	 */
+	public boolean getNextConfirmation(Guild guild, Member member) throws QuitException
+	{
+		while (true)
+		{
+			Message msg = getNextMessage(guild);
+			if (msg.getMember().equals(member))
+			{
+				return getConfirmation(msg, true, null);
+			}
+		}
+	}
+
+	/**
+	 * Gets confirmation (yes or no) from the specified user anywhere in the guild.<br><br>
+	 *     In the case the user responds with an invalid answer, a notice is sent in the supplied embed style.
+	 * @param guild the guild to listen to
+	 * @param member the member to listen for
+	 * @param embed the embed style to use
+	 * @return true on confirmation, and vice versa.
+	 * @throws QuitException the user quit the operation
+	 */
+	public boolean getNextConfirmation(Guild guild, Member member, EmbedBuilder embed) throws QuitException
+	{
+		while (true)
+		{
+			Message msg = getNextMessage(guild);
+			if (msg.getMember().equals(member))
+			{
+				return getConfirmation(msg, true, embed);
+			}
+		}
+	}
+
+	/**
+	 * Gets confirmation (yes or no) from the specified user in the channel.<br><br>
+	 *     In the case the user responds with an invalid answer, a notice is sent in the default embed style.
+	 * @param channel the channel to listen to
+	 * @param member the member to listen for
+	 * @return true on confirmation, and vice versa.
+	 * @throws QuitException the user quit the operation
+	 */
+	public boolean getNextConfirmation(TextChannel channel, Member member) throws QuitException
+	{
+		while (true)
+		{
+			Message msg = getNextMessage(channel);
+			if (msg.getMember().equals(member))
+			{
+				return getConfirmation(msg, true, null);
+			}
+		}
+	}
+
+	/**
+	 * Gets confirmation (yes or no) from the specified user in the channel.<br><br>
+	 *     In the case the user responds with an invalid answer, a notice is sent in the supplied embed style.
+	 * @param channel the channel to listen to
+	 * @param member the member to listen for
+	 * @param embed the embed style to use
+	 * @return true on confirmation, and vice versa.
+	 * @throws QuitException the user quit the operation
+	 */
+	public boolean getNextConfirmation(TextChannel channel, Member member, EmbedBuilder embed) throws QuitException
+	{
+		while (true)
+		{
+			Message msg = getNextMessage(channel);
+			if (msg.getMember().equals(member))
+			{
+				return getConfirmation(msg, true, embed);
+			}
+		}
+	}
+
+	private boolean getConfirmation(Message message, boolean sendInvalidInputMessage, EmbedBuilder embedStyle) throws QuitException
+	{
+		String messageContent = message.getContentDisplay();
+		if (messageContent.equalsIgnoreCase("yes") || messageContent.equalsIgnoreCase("confirm") || messageContent.equalsIgnoreCase("y"))
+		{
+			return true;
+		}
+		else if (messageContent.equalsIgnoreCase("no") ||  messageContent.equalsIgnoreCase("deny") || messageContent.equalsIgnoreCase("n"))
+		{
+			return false;
+		}
+		else if (messageContent.equalsIgnoreCase("quit") || messageContent.equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(message.getGuild().getId())+"quit"))
+		{
+			throw new QuitException();
+		}
+		else if (sendInvalidInputMessage)
+		{
+			EmbedBuilder embed = (embedStyle != null) ? embedStyle : new EmbedBuilder().setColor(CmdUtil.getHighlightColour(message.getGuild().getSelfMember()));
+			embed.setDescription("Unrecognised option. Yes/No expected.");
+			message.getChannel().sendMessage(embed.build()).queue();
+		}
+	}
+
 	/**
 	 * Gets every message this object instance has gathered.
 	 * @return the messages
