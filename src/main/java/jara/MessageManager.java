@@ -18,6 +18,8 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import javax.annotation.Nullable;
+
 /**
  * Class to streamline message collection.
  */
@@ -28,6 +30,7 @@ public class MessageManager
 	private int messagesToGet = 0;
 	private Guild guildToListen;
 	private TextChannel channelToListen;
+	private Member memberToListen;
 	private final MessageHandler messageHandler;
 
 	/**
@@ -38,81 +41,29 @@ public class MessageManager
 		messageLog = new ArrayList<>();
 		messageHandler = new MessageHandler();
 	}
+
 	/**
-	 * This method returns the first messages to be sent after its invocation<br>
-	 * within any channel of the guild that the bot has access to.<br>
-	 * This method will end when either the timeout expires, or the message count is hit. Whichever comes first.<br>
-	 * <br>
-	 * This function will block the thread until the message count has been received, or the timeout elapses.<br>
-	 * <br>
+	 * This method returns the first message to be sent after its invocation.
+	 * This function will block the thread until the message count has been received, or the timeout elapses.
+	 * <br><br>Note: at least one of guild or channel must not be null.
 	 * @param guild The guild to listen to
+	 * @param channel The channel to listen to, this will override the guild
+	 * @param member The member to listen for
 	 * @param timeout The amount of time to record messages for
 	 * @param messageCount The number of messages to record
 	 * @return The messages sent after the method was called, size matches messageCount, or null if the operation is interrupted, or time runs out with no messages
-	 * Message[] - <br>
-	 * null - If the thread is interrupted before a message is received, or a timeout occurs.
+	 * @throws NullPointerException guild and channel are both null
 	 */
-	private Message[] futureGuildMessageCollector(Guild guild, int timeout, int messageCount)
+	private Message[] futureMessageCollector(@Nullable Guild guild, @Nullable TextChannel channel, @Nullable Member member, long timeout, int messageCount) throws NullPointerException
 	{
-		guildToListen = guild;
-		messagesToGet = messageCount;
-		guild.getJDA().addEventListener(messageHandler);
-		try 
-		{
-			int messageLogSize = messageLog.size();
-			synchronized (lock)
-			{
-				while (messageLog.size() != (messageLogSize + messageCount)) //If no new entries have been added, continue the wait, as the thread wasn't meant to notify.
-				{
-			        RuntimeMXBean runtimeBean = ManagementFactory.getRuntimeMXBean();
-			        long startTime = runtimeBean.getUptime(); //Getting the time to check for spurious wake-up or timeout later.
-					lock.wait(timeout);
-					if (timeout > 0)
-					{
-						long timeSinceStart = runtimeBean.getUptime() - startTime - timeout; //This will be zero or less if timeout has expired
-						if (timeSinceStart <= 0)
-						{
-							guild.getJDA().removeEventListener(messageHandler);
-							guildToListen = null;
-							return null; //Timeout expired, and we didn't get anything.
-						}
-						else
-						{
-							timeout = (int) (timeout - timeSinceStart); //Maintain the timeout if a spurious unlock occurs. This ensures additional time isn't granted.
-						}
-					}
-				}
-			}
-			guild.getJDA().removeEventListener(messageHandler);
-			Message[] messages = new Message[messageCount];
-			for (int i = 0; i<messageCount; i++)
-			{
-				messages[i] = messageLog.get(messageLog.size()-messageCount-i);
-			}
-			guildToListen = null;
-			return messages;
-		} 
-		catch (InterruptedException e) 
-		{
-			guild.getJDA().removeEventListener(messageHandler);
-			guildToListen = null;
-			return null; //Let the calling method handle this.
-		}
-	}
-	/**
-	 * This method returns the first message to be sent after its invocation<br>
-	 * within a specific channel of the guild that the bot has access to.<br>
-	 * <br>
-	 * This function will block the thread until the message count has been received, or the timeout elapses.<br>
-	 * <br>
-	 * @param channel The channel to listen to
-	 * @param timeout The amount of time to record messages for
-	 * @param messageCount The number of messages to record
-	 * @return The messages sent after the method was called, size matches messageCount, or null if the operation is interrupted, or time runs out with no messages
-	 */
-	private Message[] futureChannelMessageCollector(TextChannel channel, long timeout, int messageCount)
-	{
-		channelToListen = channel;
+		if (guild == null && channel == null)
+			throw new NullPointerException("There must be at least one location to listen to.");
+		else if (channelToListen != null)
+			channelToListen = channel;
+		else
+			guildToListen = guild;
+
+		memberToListen = member;
 		messagesToGet = messageCount;
 		channel.getJDA().addEventListener(messageHandler);
 		try 
@@ -179,17 +130,38 @@ public class MessageManager
 	{
 		try
 		{
-			return futureGuildMessageCollector(guild, 0, 1)[0];
+			return futureMessageCollector(guild, null, null, 0, 1)[0];
 		}
 		catch (ArrayIndexOutOfBoundsException | NullPointerException e)
 		{
 			return null;
 		}
 	}
+
+	/**
+	 * Waits and returns the first message to be sent in any channel of the guild after invocation.<br>
+	 * This method will block the thread while waiting for a message.
+	 *
+	 * @param guild The guild to listen to
+	 * @param member The member to listen for
+	 * @return the message
+	 */
+	public Message getNextMessage(Guild guild, Member member)
+	{
+		try
+		{
+			return futureMessageCollector(guild, null, member, 0, 1)[0];
+		}
+		catch (ArrayIndexOutOfBoundsException | NullPointerException e)
+		{
+			return null;
+		}
+	}
+
 	/**
 	 * Waits and returns the first message to be sent in the channel after invocation.<br>
 	 * This method will block the thread while waiting for a message.
-	 * 
+	 *
 	 * @param channel The channel to listen to
 	 * @return the message
 	 */
@@ -197,7 +169,27 @@ public class MessageManager
 	{
 		try
 		{
-			return futureChannelMessageCollector(channel, 0, 1)[0];
+			return futureMessageCollector(null, channel, null, 0, 1)[0];
+		}
+		catch (ArrayIndexOutOfBoundsException | NullPointerException e)
+		{
+			return null;
+		}
+	}
+
+	/**
+	 * Waits and returns the first message to be sent in the channel after invocation.<br>
+	 * This method will block the thread while waiting for a message.
+	 *
+	 * @param channel The channel to listen to
+	 * @param member The member to listen for
+	 * @return the message
+	 */
+	public Message getNextMessage(TextChannel channel, Member member)
+	{
+		try
+		{
+			return futureMessageCollector(null, channel, member, 0, 1)[0];
 		}
 		catch (ArrayIndexOutOfBoundsException | NullPointerException e)
 		{
@@ -216,7 +208,28 @@ public class MessageManager
 	{
 		try
 		{
-			return futureGuildMessageCollector(guild, timeout, 1)[0];
+			return futureMessageCollector(guild, null, null, timeout, 1)[0];
+		}
+		catch (ArrayIndexOutOfBoundsException | NullPointerException e)
+		{
+			return null;
+		}
+	}
+
+	/**
+	 * Waits and returns the first message to be sent in the guild after invocation and within a set time.<br>
+	 * This method will block the thread while waiting for a message, or for the time limit to elapse.
+	 *
+	 * @param guild The guild to listen to
+	 * @param timeout The amount of time to record for
+	 * @param member The member to listen for
+	 * @return the message
+	 */
+	public Message getNextMessage(Guild guild, Member member, int timeout)
+	{
+		try
+		{
+			return futureMessageCollector(guild, null, member, timeout, 1)[0];
 		}
 		catch (ArrayIndexOutOfBoundsException | NullPointerException e)
 		{
@@ -235,13 +248,32 @@ public class MessageManager
 	{
 		try
 		{
-			return futureChannelMessageCollector(channel, timeout, 1)[0];
+			return futureMessageCollector(null, channel, null, timeout, 1)[0];
 		}
 		catch (ArrayIndexOutOfBoundsException | NullPointerException e)
 		{
 			return null; //No messages
 		}
+	}
 
+	/**
+	 * Waits and returns the first message to be sent in the channel after invocation and within a set time.<br>
+	 * This method will block the thread while waiting for a message, or for the time limit to elapse.
+	 *
+	 * @param channel The channel to listen to
+	 * @param timeout The amount of time to record for
+	 * @return the message
+	 */
+	public Message getNextMessage(TextChannel channel, Member member, int timeout)
+	{
+		try
+		{
+			return futureMessageCollector(null, channel, member, timeout, 1)[0];
+		}
+		catch (ArrayIndexOutOfBoundsException | NullPointerException e)
+		{
+			return null; //No messages
+		}
 	}
 	/**
 	 * Waits and returns the first X messages to be sent in the guild after invocation.<br>
@@ -253,7 +285,21 @@ public class MessageManager
 	 */
 	public Message[] getNextMessages(Guild guild, int count)
 	{
-		return futureGuildMessageCollector(guild, 0, count);
+		return futureMessageCollector(guild, null, null,0, count);
+	}
+
+	/**
+	 * Waits and returns the first X messages to be sent in the guild after invocation.<br>
+	 * This method will block the thread while waiting for all messages.
+	 *
+	 * @param guild The guild to listen to
+	 * @param count Message count required
+	 * @param member The member to listen for
+	 * @return The messages sent after the method was called, size matches count, or null if the operation is interrupted
+	 */
+	public Message[] getNextMessages(Guild guild, Member member, int count)
+	{
+		return futureMessageCollector(guild, null, member,0, count);
 	}
 	/**
 	 * Waits and returns the first X messages to be sent in the channel after invocation.<br>
@@ -265,7 +311,21 @@ public class MessageManager
 	 */
 	public Message[] getNextMessages(TextChannel channel, int count)
 	{
-		return futureChannelMessageCollector(channel, 0, count);
+		return futureMessageCollector(null, channel, null, 0, count);
+	}
+
+	/**
+	 * Waits and returns the first X messages to be sent in the channel after invocation.<br>
+	 * This method will block the thread while waiting for all messages.
+	 *
+	 * @param channel The channel to listen to
+	 * @param count Message count required
+	 * @param member the member to listen for
+	 * @return The messages sent after the method was called, size matches count, or null if the operation is interrupted
+	 */
+	public Message[] getNextMessages(TextChannel channel, Member member, int count)
+	{
+		return futureMessageCollector(null, channel, null, 0, count);
 	}
 	/**
 	 * Waits and returns the first X messages to be sent in the guild after invocation and within the time limit.<br>
@@ -278,7 +338,22 @@ public class MessageManager
 	 */
 	public Message[] getNextMessages(Guild guild, int timeout, int count)
 	{
-		return futureGuildMessageCollector(guild, timeout, count);
+		return futureMessageCollector(guild, null, null, timeout, count);
+	}
+
+	/**
+	 * Waits and returns the first X messages to be sent in the guild after invocation and within the time limit.<br>
+	 * This method will block the thread while waiting for all messages or for the time limit to expire.
+	 *
+	 * @param guild The guild to listen to
+	 * @param count Message count required
+	 * @param timeout The amount of time to record for
+	 * @param member The member to listen for
+	 * @return The messages sent after the method was called, size matches count, or null if the operation is interrupted, or time runs out with no messages
+	 */
+	public Message[] getNextMessages(Guild guild, Member member, int timeout, int count)
+	{
+		return futureMessageCollector(guild, null, null, timeout, count);
 	}
 	/**
 	 * Waits and returns the first X messages to be sent in the channel after invocation and within the time limit.<br>
@@ -291,7 +366,22 @@ public class MessageManager
 	 */
 	public Message[] getNextMessages(TextChannel channel, int timeout, int count)
 	{
-		return futureChannelMessageCollector(channel, timeout, count);
+		return futureMessageCollector(null, channel, null, timeout, count);
+	}
+
+	/**
+	 * Waits and returns the first X messages to be sent in the channel after invocation and within the time limit.<br>
+	 * This method will block the thread while waiting for all messages or for the time limit to expire.
+	 *
+	 * @param channel The channel to listen to
+	 * @param count Message count required
+	 * @param timeout The amount of time to record for
+	 * @param member The member to listen for
+	 * @return The messages sent after the method was called, size matches count, or null if the operation is interrupted, or time runs out with no messages
+	 */
+	public Message[] getNextMessages(TextChannel channel, Member member, int timeout, int count)
+	{
+		return futureMessageCollector(null, channel, member, timeout, count);
 	}
 
 	/**
@@ -309,7 +399,9 @@ public class MessageManager
 			Message msg = getNextMessage(guild);
 			if (msg.getMember().equals(member))
 			{
-				return getConfirmation(msg, true, null);
+				Boolean result = getConfirmation(msg, true, null);
+				if (result != null)
+					return result;
 			}
 		}
 	}
@@ -330,7 +422,9 @@ public class MessageManager
 			Message msg = getNextMessage(guild);
 			if (msg.getMember().equals(member))
 			{
-				return getConfirmation(msg, true, embed);
+				Boolean result = getConfirmation(msg, true, embed);
+				if (result != null)
+					return result;
 			}
 		}
 	}
@@ -350,7 +444,9 @@ public class MessageManager
 			Message msg = getNextMessage(channel);
 			if (msg.getMember().equals(member))
 			{
-				return getConfirmation(msg, true, null);
+				Boolean result = getConfirmation(msg, true, null);
+				if (result != null)
+					return result;
 			}
 		}
 	}
@@ -371,12 +467,14 @@ public class MessageManager
 			Message msg = getNextMessage(channel);
 			if (msg.getMember().equals(member))
 			{
-				return getConfirmation(msg, true, embed);
+				Boolean result = getConfirmation(msg, true, embed);
+				if (result != null)
+					return result;
 			}
 		}
 	}
 
-	private boolean getConfirmation(Message message, boolean sendInvalidInputMessage, EmbedBuilder embedStyle) throws QuitException
+	private Boolean getConfirmation(Message message, boolean sendInvalidInputMessage, EmbedBuilder embedStyle) throws QuitException
 	{
 		String messageContent = message.getContentDisplay();
 		if (messageContent.equalsIgnoreCase("yes") || messageContent.equalsIgnoreCase("confirm") || messageContent.equalsIgnoreCase("y"))
@@ -397,6 +495,7 @@ public class MessageManager
 			embed.setDescription("Unrecognised option. Yes/No expected.");
 			message.getChannel().sendMessage(embed.build()).queue();
 		}
+		return null; //Invalid response
 	}
 
 	/**
@@ -486,16 +585,24 @@ public class MessageManager
 		{
 			if (!msgEvent.getAuthor().isBot())
 			{
-				if (guildToListen != null)									//These checks set limits on where messages can be read from and are based on what parameters
-				{															//were passed to the previous methods.
-					if (!guildToListen.equals(msgEvent.getGuild()))
+				if (memberToListen != null)
+				{
+					if (!msgEvent.getMember().getId().equals(memberToListen.getId()))
 					{
 						return;
 					}
 				}
+
 				if (channelToListen != null)
 				{
 					if (!channelToListen.equals(msgEvent.getChannel()))
+					{
+						return;
+					}
+				}
+				else if (guildToListen != null)									//These checks set limits on where messages can be read from and are based on what parameters
+				{																//were passed to the previous methods.
+					if (!guildToListen.equals(msgEvent.getGuild()))
 					{
 						return;
 					}
