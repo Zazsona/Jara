@@ -1,6 +1,7 @@
 package commands.admin.config;
 
 import configuration.GuildSettings;
+import jara.MessageManager;
 import jara.ModuleAttributes;
 import jara.ModuleManager;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -55,6 +56,7 @@ public class ConfigWizard
             msgEvent.getChannel().sendMessage(embed.build()).queue();
             configureGames();
             embed.setDescription("**COMMANDS**");
+            configureWhitelistChannels();
             msgEvent.getChannel().sendMessage(embed.build()).queue();
             configureCommands();
             embed.setDescription("**MODULE SPECIFIC SETTINGS**");
@@ -88,6 +90,15 @@ public class ConfigWizard
     private void configureTimezone() throws IOException
     {
         cms.modifyTimeZone(msgEvent);
+    }
+
+    /**
+     * Prompts the user to set the set the whitelist
+     * @throws IOException unable to save
+     */
+    private void configureWhitelistChannels() throws IOException
+    {
+        cms.manageWhitelistChannels(msgEvent, new MessageManager());
     }
 
     /**

@@ -11,8 +11,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import java.io.IOException;
 import java.time.ZoneId;
 import java.time.format.TextStyle;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 
 public class ConfigMainSettings
 {
@@ -67,6 +66,25 @@ public class ConfigMainSettings
             else
             {
                 modifyTimeZone(msgEvent);
+            }
+        }
+        else if (parameters[1].equalsIgnoreCase("whitelist") || parameters[1].equalsIgnoreCase("channel whitelist"))
+        {
+            if (parameters.length > 2)
+            {
+                if (parameters[2].startsWith("add") || parameters[2].startsWith("remove"))
+                {
+                    boolean isAdd = parameters[2].startsWith("add");
+                    setWhitelistChannels(msgEvent, isAdd, msgEvent.getMessage().getMentionedChannels());
+                }
+                else if (parameters[2].equalsIgnoreCase("clear"))
+                {
+                    clearWhitelistChannels(msgEvent);
+                }
+            }
+            else
+            {
+                manageWhitelistChannels(msgEvent, new MessageManager());
             }
         }
     }
@@ -248,5 +266,95 @@ public class ConfigMainSettings
             channel.sendMessage(embed.build()).queue();
         }
         return success;
+    }
+
+
+
+    public void manageWhitelistChannels(GuildMessageReceivedEvent msgEvent, MessageManager mm) throws IOException
+    {
+        EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
+        StringBuilder db = embed.getDescriptionBuilder();
+        db.append("The channel whitelist limits where commands can be used to the channels specified.\nUse clear to disable the whitelist.\n\nCurrent whitelisted channels: ");
+        HashSet<String> channelIDs = guildSettings.getChannelWhitelist();
+        if (channelIDs.size() > 0)
+        {
+            LinkedList<String> idsToClean = new LinkedList<>();
+            for (String channelID : channelIDs)
+            {
+                TextChannel channel = msgEvent.getGuild().getTextChannelById(channelID);
+                if (channel == null)
+                    idsToClean.add(channelID);
+                else
+                    db.append(channel.getAsMention()).append(", ");
+            }
+            guildSettings.removeChannelsFromWhitelist(idsToClean.toArray(new String[0]));
+        }
+        else
+        {
+            db.append("All");
+        }
+        db.append("\n\n==========\n").append("**Controls**\nAdd [#Channel1], [#Channel2]...[#ChannelN]\nRemove [#Channel1], [#Channel2]...[#ChannelN]\nClear");
+        msgEvent.getChannel().sendMessage(embed.build()).queue();
+        while (true)
+        {
+            Message msg = mm.getNextMessage(msgEvent.getChannel(), msgEvent.getMember());
+            String msgContent = msg.getContentDisplay().toLowerCase();
+            if (msgContent.startsWith("add") || msgContent.startsWith("remove"))
+            {
+                boolean isAdd = msgContent.startsWith("add");
+                setWhitelistChannels(msgEvent, isAdd, msg.getMentionedChannels());
+                return;
+            }
+            else if (msgContent.equalsIgnoreCase("clear"))
+            {
+                clearWhitelistChannels(msgEvent);
+                return;
+            }
+            else if (msgContent.equalsIgnoreCase("quit") || msgContent.equalsIgnoreCase(guildSettings.getCommandPrefix()+"quit"))
+            {
+                embed.setDescription("Menu closed.");
+                msgEvent.getChannel().sendMessage(embed.build()).queue();
+                return;
+            }
+            else
+            {
+                embed.setDescription("Invalid input. Please try again.");
+                msgEvent.getChannel().sendMessage(embed.build()).queue();
+            }
+        }
+    }
+
+    private void setWhitelistChannels(GuildMessageReceivedEvent msgEvent, boolean isAdd, List<TextChannel> channels) throws IOException
+    {
+        EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
+        if (channels.size() > 0)
+        {
+            String[] channelIDs = new String[channels.size()];
+            for (int i = 0; i<channels.size(); i++)
+            {
+                channelIDs[i] = channels.get(i).getId();
+            }
+
+            if (isAdd)
+                guildSettings.addChannelsToWhitelist(channelIDs);
+            else
+                guildSettings.removeChannelsFromWhitelist(channelIDs);
+
+            embed.setDescription("Channel whitelist updated.");
+            msgEvent.getChannel().sendMessage(embed.build()).queue();
+        }
+        else
+        {
+            embed.setDescription("No channels were provided.");
+            msgEvent.getChannel().sendMessage(embed.build()).queue();
+        }
+    }
+
+    private void clearWhitelistChannels(GuildMessageReceivedEvent msgEvent) throws IOException
+    {
+        EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
+        guildSettings.removeChannelsFromWhitelist(guildSettings.getChannelWhitelist().toArray(new String[0]));
+        embed.setDescription("Whitelist cleared.");
+        msgEvent.getChannel().sendMessage(embed.build()).queue();
     }
 }

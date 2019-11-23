@@ -26,7 +26,7 @@ public class ConfigMain extends ModuleCommand
                 MessageManager mm = new MessageManager();
                 String embedDescription = "Welcome to the Config\nPlease select a menu, or say `quit` to cancel.";
                 embed.setDescription(embedDescription);
-                embed.addField("Menus", "**Prefix**\n**Timezone**\n**Audio**\n**Games**\n**Commands**\n**Modules**\n**Setup**", true);
+                embed.addField("Menus", "**Prefix**\n**Timezone**\n**Channel Whitelist**\n**Audio**\n**Games**\n**Commands**\n**Modules**\n**Setup**", true);
                 channel.sendMessage(embed.build()).queue();
                 while (true)
                 {
@@ -42,6 +42,10 @@ public class ConfigMain extends ModuleCommand
                         else if (selection.equalsIgnoreCase("timezone"))
                         {
                             new ConfigMainSettings(guildSettings, channel, this).modifyTimeZone(msgEvent);
+                        }
+                        else if (selection.equalsIgnoreCase("whitelist") || selection.equalsIgnoreCase("channel whitelist"))
+                        {
+                            new ConfigMainSettings(guildSettings, channel, this).manageWhitelistChannels(msgEvent, mm);
                         }
                         else if (selection.equalsIgnoreCase("audio"))
                         {
@@ -106,7 +110,7 @@ public class ConfigMain extends ModuleCommand
         {
             String selection = parameters[1].toLowerCase();
             final GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
-            if (selection.equalsIgnoreCase("prefix") || selection.equalsIgnoreCase("timezone"))
+            if (selection.equalsIgnoreCase("prefix") || selection.equalsIgnoreCase("timezone") || selection.equalsIgnoreCase("whitelist"))
             {
                 new ConfigMainSettings(guildSettings, channel, this).parseAsParameters(msgEvent, parameters);
             }
