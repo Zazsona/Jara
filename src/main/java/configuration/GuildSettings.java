@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,10 @@ public class GuildSettings implements Serializable
      * The Character used to summon the bot
      */
     private char commandPrefix;
+    /**
+     * The channels that commands can be sent in
+     */
+    private HashSet<String> commandChannelsWhitelist;
     /**
      * The Time Zone id for this guild.
      */
@@ -136,6 +141,7 @@ public class GuildSettings implements Serializable
                     this.timeZoneId = settingsFromFile.timeZoneId;
                     this.audioConfig = settingsFromFile.audioConfig;
                     this.gameConfig = settingsFromFile.gameConfig;
+                    this.commandChannelsWhitelist = settingsFromFile.commandChannelsWhitelist;
                     this.commandConfig = new HashMap<>(settingsFromFile.commandConfig);
                     this.moduleConfig = settingsFromFile.moduleConfig;
                     this.customCommandSettings = settingsFromFile.customCommandSettings;
@@ -261,6 +267,7 @@ public class GuildSettings implements Serializable
 
         commandPrefix = '/';
         timeZoneId = TimeZone.getTimeZone(ZoneOffset.UTC).getID();
+        commandChannelsWhitelist = new HashSet<>();
         moduleConfig = new HashMap<>();
         audioConfig.useVoiceLeaving = true;
         audioConfig.skipVotePercent = 50;
@@ -317,6 +324,8 @@ public class GuildSettings implements Serializable
             this.timeZoneId = legacySettings.timeZoneId;
         if (legacySettings.moduleConfig != null)
             this.moduleConfig = legacySettings.moduleConfig;
+        if (legacySettings.commandChannelsWhitelist != null)
+            this.commandChannelsWhitelist = legacySettings.commandChannelsWhitelist;
 
         save();
         logger.info("Updated settings for guild "+guildID+" to Jara "+Core.getVersion());
@@ -678,6 +687,59 @@ public class GuildSettings implements Serializable
     public void setUseGameChannels(boolean useGameChannels) throws IOException
     {
         this.gameConfig.useGameChannels = useGameChannels;
+        save();
+    }
+
+    /**
+     * Gets whether this guild has a channel whitelist.
+     * @return true on enabled
+     */
+    public boolean isChannelWhitelistActive()
+    {
+        return (commandChannelsWhitelist != null || commandChannelsWhitelist.size() != 0);
+    }
+
+    /**
+     * Gets the IDs of all whitelisted channels
+     * @return the channel id set
+     */
+    public HashSet<String> getChannelWhitelist()
+    {
+        return commandChannelsWhitelist;
+    }
+
+    /**
+     * Gets whether a channel is whitelisted. If the whitelist is not in use, this always returns true.
+     * @param channel the channel to check
+     * @return boolean on result
+     */
+    public boolean isChannelWhitelisted(TextChannel channel)
+    {
+        return (commandChannelsWhitelist == null || commandChannelsWhitelist.size() == 0 || commandChannelsWhitelist.contains(channel.getId()));
+    }
+
+    /**
+     * Add channels to the whitelist.<br>
+     *     Note: This will enable the whitelist, if it isn't already. Use {@link GuildSettings#isChannelWhitelistActive} if you need to check this.
+     * @param channelIDs the channels to add
+     * @throws IOException unable to save
+     */
+    public void addChannelsToWhitelist(String... channelIDs) throws IOException
+    {
+        for (String channelID : channelIDs)
+            commandChannelsWhitelist.add(channelID);
+        save();
+    }
+
+    /**
+     * Removes channels from the whitelist.
+     * @param channelIDs the channels to remove
+     * @throws IOException unable to save
+     */
+    public void removeChannelsFromWhitelist(String... channelIDs) throws IOException
+    {
+        for (String channelID : channelIDs)
+            commandChannelsWhitelist.remove(channelID);
         save();
     }
 

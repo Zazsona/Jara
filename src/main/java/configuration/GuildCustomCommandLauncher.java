@@ -23,35 +23,38 @@ public class GuildCustomCommandLauncher extends GuildCommandLauncher
     public void execute(GuildMessageReceivedEvent msgEvent, String...parameters)
     {
         GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
-        if (guildSettings.isCommandEnabled(attributes.getKey()))
+        if (guildSettings.isChannelWhitelisted(msgEvent.getChannel()))
         {
-            if (guildSettings.isPermitted(msgEvent.getMember(), attributes.getKey()))
+            if (guildSettings.isCommandEnabled(attributes.getKey()))
             {
-                Runnable commandRunnable = () -> {
-                    try
-                    {
-                        attributes.getCommandClass().newInstance().run(msgEvent, parameters);
-                    }
-                    catch (InstantiationException | IllegalAccessException e)
-                    {
-                        msgEvent.getChannel().sendMessage("Sorry, I was unable to run the command.").queue();
-                        Logger logger = LoggerFactory.getLogger(GuildCommandLauncher.class);
-                        logger.error("A custom command request was sent but could not be fulfilled.\nCommand: "+ Arrays.toString(parameters) +"\nGuild: "+msgEvent.getGuild().getId()+" ("+msgEvent.getGuild().getName()+")\nUser: "+msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+"Channel: "+msgEvent.getChannel().getId()+" ("+msgEvent.getChannel().getName()+")\nDate/Time: "+ LocalDateTime.now().toString()+"\n\nError: \n"+e.toString());
-                    }
-                };
-                Thread commandThread = new Thread(commandRunnable);
-                commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getKey()+"-Thread");
-                commandThread.start();
-                return;
+                if (guildSettings.isPermitted(msgEvent.getMember(), attributes.getKey()))
+                {
+                    Runnable commandRunnable = () -> {
+                        try
+                        {
+                            attributes.getCommandClass().newInstance().run(msgEvent, parameters);
+                        }
+                        catch (InstantiationException | IllegalAccessException e)
+                        {
+                            msgEvent.getChannel().sendMessage("Sorry, I was unable to run the command.").queue();
+                            Logger logger = LoggerFactory.getLogger(GuildCommandLauncher.class);
+                            logger.error("A custom command request was sent but could not be fulfilled.\nCommand: "+ Arrays.toString(parameters) +"\nGuild: "+msgEvent.getGuild().getId()+" ("+msgEvent.getGuild().getName()+")\nUser: "+msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+"Channel: "+msgEvent.getChannel().getId()+" ("+msgEvent.getChannel().getName()+")\nDate/Time: "+ LocalDateTime.now().toString()+"\n\nError: \n"+e.toString());
+                        }
+                    };
+                    Thread commandThread = new Thread(commandRunnable);
+                    commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getKey()+"-Thread");
+                    commandThread.start();
+                    return;
+                }
+                else
+                {
+                    msgEvent.getChannel().sendMessage("You do not have permission to use this command.").queue();
+                }
             }
             else
             {
-                msgEvent.getChannel().sendMessage("You do not have permission to use this command.").queue();
+                msgEvent.getChannel().sendMessage("This command is disabled.").queue();
             }
-        }
-        else
-        {
-            msgEvent.getChannel().sendMessage("This command is disabled.").queue();
         }
     }
 }

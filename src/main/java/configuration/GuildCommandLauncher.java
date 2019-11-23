@@ -35,31 +35,34 @@ public class GuildCommandLauncher
 	public void execute(GuildMessageReceivedEvent msgEvent, String...parameters)
 	{
 		GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
-		if (guildSettings.isCommandEnabled(attributes.getKey()))
+		if (guildSettings.isChannelWhitelisted(msgEvent.getChannel()))
 		{
-			if (checkForTimedAvailability(attributes, guildSettings))
+			if (guildSettings.isCommandEnabled(attributes.getKey()))
 			{
-				if (guildSettings.isPermitted(msgEvent.getMember(), attributes.getKey()))
+				if (checkForTimedAvailability(attributes, guildSettings))
 				{
-					Runnable commandRunnable = () -> instantiateCommand(msgEvent, parameters);
-					Thread commandThread = new Thread(commandRunnable);
-					commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getKey()+"-Thread");
-					commandThread.start();
-					return;
+					if (guildSettings.isPermitted(msgEvent.getMember(), attributes.getKey()))
+					{
+						Runnable commandRunnable = () -> instantiateCommand(msgEvent, parameters);
+						Thread commandThread = new Thread(commandRunnable);
+						commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getKey()+"-Thread");
+						commandThread.start();
+						return;
+					}
+					else
+					{
+						msgEvent.getChannel().sendMessage("You do not have permission to use this command.").queue();
+					}
 				}
 				else
 				{
-					msgEvent.getChannel().sendMessage("You do not have permission to use this command.").queue();
+					msgEvent.getChannel().sendMessage("This seasonal command is out of season.").queue();
 				}
 			}
 			else
 			{
-				msgEvent.getChannel().sendMessage("This seasonal command is out of season.").queue();
+				msgEvent.getChannel().sendMessage("This command is disabled.").queue();
 			}
-		}
-		else
-		{
-			msgEvent.getChannel().sendMessage("This command is disabled.").queue();
 		}
 	}
 
