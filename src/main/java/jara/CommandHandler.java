@@ -1,25 +1,21 @@
 package jara;
 
-import configuration.GuildCommandLauncher;
+import commands.CmdUtil;
 import configuration.GuildSettings;
 import configuration.SettingsUtil;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
 
 public class CommandHandler extends ListenerAdapter
 {
-	private final HashMap<String, GuildCommandLauncher> commandLaunchers; //Contains details on all commands.
-
-	/**
-	 * Constructor
-	 * @param commandLaunchers a map of module keys to command launchers
-	 */
-	public CommandHandler(HashMap<String, GuildCommandLauncher> commandLaunchers)
-	{
-		this.commandLaunchers = commandLaunchers;
-	}
+	private static final Logger logger = LoggerFactory.getLogger(CommandHandler.class);
 
 	/**
 	 * Listen for valid command strings, and run the command launcher if one is found
@@ -28,64 +24,127 @@ public class CommandHandler extends ListenerAdapter
 	@Override 
 	public void onGuildMessageReceived(GuildMessageReceivedEvent msgEvent) //Reads commands
 	{
+		if (!msgEvent.getAuthor().isBot())
+		{
+			GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
+			String commandString = msgEvent.getMessage().getContentDisplay();
+			String commandPrefix = guildSettings.getCommandPrefix().toString();
+
+			if (commandString.startsWith(commandPrefix))
+			{
+				String[] command = commandString.split(" ");
+				String key = command[0].replaceFirst(commandPrefix, "").toLowerCase();
+				ModuleAttributes moduleAttributes = getModuleAttributes(key, guildSettings);
+				if (moduleAttributes != null)
+					execute(msgEvent, moduleAttributes, command);
+			}
+		}
+	}
+
+	/**
+	 * Gets the attributes of a module or custom command
+	 * @param alias the alias to find the module with
+	 * @param guildSettings the guild to get custom modules from
+	 * @return the attributes
+	 */
+	private ModuleAttributes getModuleAttributes(String alias, GuildSettings guildSettings)
+	{
+		ModuleAttributes moduleAttributes = ModuleManager.getModule(alias);
+		if (moduleAttributes == null)
+		{
+			moduleAttributes = guildSettings.getCustomCommandSettings().getCommandAttributes(alias);
+		}
+		return moduleAttributes;
+	}
+
+	/**
+	 * Instantiates the command, dealing with any exceptions that may occur.
+	 * @param msgEvent context
+	 * @param parameters the additional data passed with the command
+	 */
+	private void instantiateCommand(GuildMessageReceivedEvent msgEvent, ModuleAttributes attributes, String[] parameters)
+	{
 		try
 		{
-			if (!msgEvent.getAuthor().isBot()) //This is to prevent /say abuse from this bot & others, which would allow users to execute commands under the bot's permissions.
+			attributes.getCommandClass().newInstance().run(msgEvent, parameters);
+		}
+		catch (InstantiationException | IllegalAccessException e)
+		{
+			msgEvent.getChannel().sendMessage("Sorry, I was unable to run the command.").queue();
+			Logger logger = LoggerFactory.getLogger(CommandHandler.class);
+			logger.error("A command request was sent but could not be fulfilled.\nCommand: "+ Arrays.toString(parameters) +"\nGuild: "+msgEvent.getGuild().getId()+" ("+msgEvent.getGuild().getName()+")\nUser: "+msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+"Channel: "+msgEvent.getChannel().getId()+" ("+msgEvent.getChannel().getName()+")\nDate/Time: "+ LocalDateTime.now().toString()+"\n\nError: \n"+e.toString());
+		}
+		catch (NoSuchMethodError e)
+		{
+			logger.error("User attempted command "+parameters[0]+ ", but it is using an older API version, and is not supported.\n"+e.toString());
+			EmbedBuilder embedBuilder = new EmbedBuilder();
+			embedBuilder.setColor(CmdUtil.getHighlightColour(msgEvent.getGuild().getSelfMember()));
+			embedBuilder.setDescription("This command module is outdated and cannot properly function.\nIt is recommended to disable this command.");
+			msgEvent.getChannel().sendMessage(embedBuilder.build()).queue();
+		}
+	}
+
+	/**
+	 * Creates a new instance of the command and runs it on a separate thread.
+	 * @param msgEvent context
+	 * @param parameters the additional data passed with the command
+	 */
+	private void execute(GuildMessageReceivedEvent msgEvent, ModuleAttributes attributes, String...parameters)
+	{
+		if (SettingsUtil.getGlobalSettings().isModuleEnabled(attributes.getKey()))
+		{
+			GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
+			if (guildSettings.isChannelWhitelisted(msgEvent.getChannel()))
 			{
-				String commandString = msgEvent.getMessage().getContentDisplay();
-				String commandPrefix = SettingsUtil.getGuildCommandPrefix(msgEvent.getGuild().getId()).toString();
-
-				if (commandString.startsWith(commandPrefix))									   //Prefix to signify that a command is being called.
+				if (guildSettings.isCommandEnabled(attributes.getKey()))
 				{
-					GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
-					String[] command = commandString.split(" ");							   //Separating parameters.
-					String key = command[0].replaceFirst(commandPrefix, "").toLowerCase();
-
-					GuildCommandLauncher cl = commandLaunchers.get(key);
-					if (cl == null && guildSettings.getCustomCommandSettings().getCommand(key) != null) //This second check ensures that, if the key also matches a custom command, that gets precedence. This is because the custom command key is stored as a regular command for compatibility.
+					if (checkForTimedAvailability(attributes, guildSettings))
 					{
-						cl = guildSettings.getCustomCommandSettings().getCommandLauncher(key.toLowerCase());
-
-						if (cl == null)
+						if (guildSettings.isPermitted(msgEvent.getMember(), attributes.getKey()))
 						{
-							for (String customCommandKey : guildSettings.getCustomCommandSettings().getCommandKeys())
-							{
-								cl = guildSettings.getCustomCommandSettings().getCommandLauncher(customCommandKey);
-								String[] aliases = cl.getModuleAttributes().getAliases();
-
-								int min = 0;
-								int max = aliases.length-1;
-								while (min <= max)
-								{
-									int mid = (max+min)/2;
-
-									if (aliases[mid].compareToIgnoreCase(key) < 0)
-									{
-										min = mid+1;
-									}
-									else if (aliases[mid].compareToIgnoreCase(key) > 0)
-									{
-										max = mid-1;
-									}
-									else if (aliases[mid].compareToIgnoreCase(key) == 0)
-									{
-										break;
-									}
-								}
-								cl = null; //We haven't found any valid command launcher.
-							}
+							Runnable commandRunnable = () -> instantiateCommand(msgEvent, attributes, parameters);
+							Thread commandThread = new Thread(commandRunnable);
+							commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getKey()+"-Thread");
+							commandThread.start();
+							return;
+						}
+						else
+						{
+							msgEvent.getChannel().sendMessage("You do not have permission to use this command.").queue();
 						}
 					}
-					if (cl != null)
+					else
 					{
-						cl.execute(msgEvent, command);
+						msgEvent.getChannel().sendMessage("This seasonal command is out of season.").queue();
 					}
+				}
+				else
+				{
+					msgEvent.getChannel().sendMessage("This command is disabled.").queue();
 				}
 			}
 		}
-		catch (NullPointerException e)
+	}
+
+	/**
+	 * Checks if this command has date/time limits on when it is available, and if so, if we are within those limits.
+	 * @param ma the module's attributes
+	 * @param guildSettings the guild's settings
+	 * @return true on available
+	 */
+	private boolean checkForTimedAvailability(ModuleAttributes ma, GuildSettings guildSettings)
+	{
+		if (ma instanceof SeasonalModuleAttributes)
 		{
-			//Command does not exist.
+			ZonedDateTime zdt = ZonedDateTime.now(guildSettings.getTimeZoneId());
+			SeasonalModuleAttributes sma = (SeasonalModuleAttributes) ma;
+			return sma.isActive(zdt);
+		}
+		else
+		{
+			return true;
 		}
 	}
+
+
 }

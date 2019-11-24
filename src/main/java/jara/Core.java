@@ -18,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import configuration.GuildCommandLauncher;
 import event.GuildJoinHandler;
 import event.GuildLeaveHandler;
 
@@ -81,31 +80,7 @@ public class Core //A class for covering the global manners of the bot.
 	 */
 	public static void enableCommands()
 	{
-		try
-		{
-			HashMap<String, GuildCommandLauncher> commands = new HashMap<>();
-			for (ModuleAttributes ma : ModuleManager.getCommandModules())
-			{
-				if (SettingsUtil.getGlobalSettings().isModuleEnabled(ma.getKey()))
-				{
-					GuildCommandLauncher cl = new GuildCommandLauncher(ma);
-					for (String alias : ma.getAliases())
-					{
-						commands.put(alias.toLowerCase(), cl);
-					}
-				}
-			}
-			shardManager.addEventListener(new CommandHandler(commands));
-		}
-		catch (InvalidModuleException e)
-		{
-			logger.error(e.toString()+"\nA log has been created.");
-			if (!GraphicsEnvironment.isHeadless())
-			{
-				HeadedGUI.showError(e.toString()+"\nA log has been created.");
-			}
-		}
-
+		shardManager.addEventListener(new CommandHandler());
 	}
 
 	/**

@@ -2,7 +2,6 @@ package jara;
 
 import com.google.gson.Gson;
 import commands.Help;
-import configuration.GuildCommandLauncher;
 import module.ModuleCommand;
 import module.ModuleLoad;
 import module.ModuleConfig;
@@ -163,7 +162,6 @@ public class ModuleAttributes
 	/**
 	 * Gets the class responsible for the module's command.<br>
 	 *     Instantiating this class will ignore any permissions settings in the guild.
-	 *     Instead, use {@link GuildCommandLauncher#execute(GuildMessageReceivedEvent, String...)}
 	 * 
 	 * @return the command class, or null if the module has no command.
 	 */

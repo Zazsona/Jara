@@ -143,24 +143,4 @@ public class CustomCommandSettings implements Serializable
             return new ModuleAttributes(ccc.getKey(), ccc.getDescription(), ccc.getAliases(), ccc.getCategory(), Core.getVersion(), true, CustomCommand.class, null, null, null);
         }
     }
-
-    /**
-     * Returns the custom command's launcher.
-     * @param key the command's key
-     * @return the command's launcher, or null on invalid key
-     */
-    public GuildCustomCommandLauncher getCommandLauncher(String key)
-    {
-        key = key.toLowerCase();
-        ModuleAttributes ma = getCommandAttributes(key);
-        if (ma == null)
-        {
-            return null;
-        }
-        else
-        {
-            return new GuildCustomCommandLauncher(ma);
-        }
-
-    }
 }

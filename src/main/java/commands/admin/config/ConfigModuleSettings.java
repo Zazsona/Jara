@@ -1,8 +1,8 @@
 package commands.admin.config;
 
 import commands.CmdUtil;
-import configuration.GuildCommandLauncher;
 import configuration.GuildSettings;
+import jara.CommandHandler;
 import jara.MessageManager;
 import jara.ModuleAttributes;
 import jara.ModuleManager;
@@ -149,7 +149,7 @@ public class ConfigModuleSettings
         catch (InstantiationException | IllegalAccessException e)
         {
             msgEvent.getChannel().sendMessage("Sorry, I was unable to run the config for "+ma.getKey()+".").queue();
-            Logger logger = LoggerFactory.getLogger(GuildCommandLauncher.class);
+            Logger logger = LoggerFactory.getLogger(CommandHandler.class);
             logger.error("A config request was sent but could not be fulfilled.\nModule: "+ ma.getKey() +"\nGuild: "+msgEvent.getGuild().getId()+" ("+msgEvent.getGuild().getName()+")\nUser: "+msgEvent.getAuthor().getName()+"#"+msgEvent.getAuthor().getDiscriminator()+"Channel: "+msgEvent.getChannel().getId()+" ("+msgEvent.getChannel().getName()+")\nDate/Time: "+ LocalDateTime.now().toString()+"\n\nError: \n"+e.toString());
         }
         catch (NoSuchMethodError e)
