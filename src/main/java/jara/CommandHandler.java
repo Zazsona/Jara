@@ -9,13 +9,19 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class CommandHandler extends ListenerAdapter
 {
 	private static final Logger logger = LoggerFactory.getLogger(CommandHandler.class);
+	private static long commandCount = 0;
+	private static HashMap<Integer, Integer> hourToCommandMap = new HashMap<>();
 
 	/**
 	 * Listen for valid command strings, and run the command launcher if one is found
@@ -96,6 +102,7 @@ public class CommandHandler extends ListenerAdapter
 			GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
 			if (guildSettings.isChannelWhitelisted(msgEvent.getChannel()))
 			{
+				logCommandUsage();
 				if (guildSettings.isCommandEnabled(attributes.getKey()))
 				{
 					if (checkForTimedAvailability(attributes, guildSettings))
@@ -146,5 +153,36 @@ public class CommandHandler extends ListenerAdapter
 		}
 	}
 
+
+	private void logCommandUsage()
+	{
+		commandCount++;
+		int hoursSinceEpoch = (int) Math.floor(Instant.now().getEpochSecond()/3600.0);
+		int usesThisHour = (hourToCommandMap.containsKey(hoursSinceEpoch)) ? hourToCommandMap.get(hoursSinceEpoch) : 0;
+		usesThisHour++;
+		hourToCommandMap.put(hoursSinceEpoch, usesThisHour);
+		if (hourToCommandMap.size() > 24)
+		{
+			hourToCommandMap.remove(hoursSinceEpoch-24);
+		}
+	}
+
+	/**
+	 * Gets the total command count from the active session
+	 * @return the command count
+	 */
+	public static long getCommandCount()
+	{
+		return commandCount;
+	}
+
+	/**
+	 * Gets a map, detailing the number of commands used in the last 24 hours.
+	 * @return Map layout:<br>Key - Hour since epoch<br>Value - The number of commands used in that hour.
+	 */
+	public static HashMap<Integer, Integer> getCommandUsageMap()
+	{
+		return hourToCommandMap;
+	}
 
 }
