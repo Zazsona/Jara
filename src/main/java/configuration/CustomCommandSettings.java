@@ -140,7 +140,7 @@ public class CustomCommandSettings implements Serializable
         }
         else
         {
-            return new ModuleAttributes(ccc.getKey(), ccc.getDescription(), ccc.getAliases(), ccc.getCategory(), Core.getVersion(), true, CustomCommand.class, null, null, null);
+            return new ModuleAttributes(ccc.getKey(), ccc.getDescription(), ccc.getAliases(), ccc.getCategory(), Core.getVersion(), true, true, CustomCommand.class, null, null, null);
         }
     }
 }

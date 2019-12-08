@@ -18,6 +18,7 @@ public class ModuleAttributes
 	private Help.HelpPage helpPage;
 	private Class<? extends ModuleConfig> configClass;
 	private Class<? extends ModuleLoad> loadClass;
+	private boolean isCustomCommand;
 
 	/**
 	 * Constructor from a JSON string
@@ -35,6 +36,7 @@ public class ModuleAttributes
 		System.arraycopy(ma.aliases, 0, aliases, 1, aliases.length - 1);
 		category = ma.category;
 		disableable = true;
+		isCustomCommand = false;
 		targetVersion = ma.targetVersion;
 
 		//Sort aliases alphabetically
@@ -64,8 +66,9 @@ public class ModuleAttributes
 	 * @param categoryArg the module's category
 	 * @param targetVersionArg the module's target Jara version
 	 * @param disableableArg the module's ability to be disabled (This should only be used for in-built commands)
+	 * @param customCommandArg defines whether this command is a custom command, rather than a global module.
 	 */
-	public ModuleAttributes(String keyArg, String descriptionArg, String[] aliasesArg, ModuleManager.Category categoryArg, String targetVersionArg, boolean disableableArg)
+	public ModuleAttributes(String keyArg, String descriptionArg, String[] aliasesArg, ModuleManager.Category categoryArg, String targetVersionArg, boolean disableableArg, boolean customCommandArg)
 	{
 		key = keyArg;
 		description = descriptionArg;
@@ -78,6 +81,7 @@ public class ModuleAttributes
 		category = categoryArg;
 		disableable = disableableArg;
 		targetVersion = targetVersionArg;
+		isCustomCommand = isCustomCommand;
 
 		//Sort aliases alphabetically
 		for (int i = 1; i<getAliases().length; i++)
@@ -106,12 +110,14 @@ public class ModuleAttributes
 	 * @param categoryArg the module's category
 	 * @param targetVersionArg the module's target Jara version
 	 * @param disableableArg the module's ability to be disabled (This should only be used for in-built commands)
+	 * @param customCommandArg defines whether this command is a custom command, rather than a global module.
 	 * @param commandClass the class to execute a command
 	 * @param helpPage the help information
 	 * @param moduleConfigClass the module's config
 	 * @param loadClass the load callback
+	 *
 	 */
-	public ModuleAttributes(String keyArg, String descriptionArg, String[] aliasesArg, ModuleManager.Category categoryArg, String targetVersionArg, boolean disableableArg, Class<? extends ModuleCommand> commandClass, Help.HelpPage helpPage, Class<? extends ModuleConfig> moduleConfigClass, Class<? extends ModuleLoad> loadClass)
+	public ModuleAttributes(String keyArg, String descriptionArg, String[] aliasesArg, ModuleManager.Category categoryArg, String targetVersionArg, boolean disableableArg, boolean customCommandArg, Class<? extends ModuleCommand> commandClass, Help.HelpPage helpPage, Class<? extends ModuleConfig> moduleConfigClass, Class<? extends ModuleLoad> loadClass)
 	{
 		key = keyArg;
 		description = descriptionArg;
@@ -120,6 +126,7 @@ public class ModuleAttributes
 		System.arraycopy(aliasesArg, 0, aliases, 1, aliases.length - 1);
 		category = categoryArg;
 		disableable = disableableArg;
+		isCustomCommand = customCommandArg;
 		targetVersion = targetVersionArg;
 
 		//Sort aliases alphabetically
@@ -287,5 +294,14 @@ public class ModuleAttributes
 	public void setLoadClass(Class<? extends ModuleLoad> clazz)
 	{
 		this.loadClass = clazz;
+	}
+
+	/**
+	 * Gets if this module is in fact a guild-specific custom command.
+	 * @return true on custom command, false on module
+	 */
+	public boolean isCustomCommand()
+	{
+		return isCustomCommand;
 	}
 }

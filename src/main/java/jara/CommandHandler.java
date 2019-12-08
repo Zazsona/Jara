@@ -88,6 +88,10 @@ public class CommandHandler extends ListenerAdapter
 			embedBuilder.setDescription("This command module is outdated and cannot properly function.\nIt is recommended to disable this command.");
 			msgEvent.getChannel().sendMessage(embedBuilder.build()).queue();
 		}
+		catch (Exception e)
+		{
+			logger.error(attributes.getKey()+" has encountered an error in "+msgEvent.getGuild().getName()+". Details:\n", e);
+		}
 	}
 
 	/**
@@ -97,7 +101,7 @@ public class CommandHandler extends ListenerAdapter
 	 */
 	private void execute(GuildMessageReceivedEvent msgEvent, ModuleAttributes attributes, String...parameters)
 	{
-		if (SettingsUtil.getGlobalSettings().isModuleEnabled(attributes.getKey()))
+		if (!attributes.isCustomCommand() && SettingsUtil.getGlobalSettings().isModuleEnabled(attributes.getKey()) || attributes.isCustomCommand())
 		{
 			GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
 			if (guildSettings.isChannelWhitelisted(msgEvent.getChannel()))

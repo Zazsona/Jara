@@ -48,14 +48,14 @@ public class ModuleManager
 		{
 			register = new ArrayList<>();
 			Help.HelpPage AboutHelp = new Help.HelpPage("Shows the details about this bot.");
-			register.add(new ModuleAttributes("About", "Shows Bot credits.", new String[] {"Credits", "Authors"}, UTILITY, Core.getVersion(), false, About.class, AboutHelp, null, null));
+			register.add(new ModuleAttributes("About", "Shows Bot credits.", new String[] {"Credits", "Authors"}, UTILITY, Core.getVersion(), false, false, About.class, AboutHelp, null, null));
 			Help.HelpPage ConfigHelp = new Help.HelpPage("Modify bot settings. Instructions provided on the config menu.");
-			register.add(new ModuleAttributes("Config", "Modify Bot settings.", new String[] {"Settings"}, ADMIN, Core.getVersion(), false, ConfigMain.class, ConfigHelp, null, null));
+			register.add(new ModuleAttributes("Config", "Modify Bot settings.", new String[] {"Settings"}, ADMIN, Core.getVersion(), false, false, ConfigMain.class, ConfigHelp, null, null));
 			Help.HelpPage HelpHelp = new Help.HelpPage("**General**\nList categories by using Help\n List commands in a category with Help (Category). Adding 'all' lists commands you don't have permission to use.\nUse Help (Command) to find out how to use a command.\n\n**Help Pages**\nAliases: Alternate ways to use the command\nParameters: Information to give to commands\nDescription: Detailed command information.", "Help", "Help (Command)", "Help (Category) (all)");
-			register.add(new ModuleAttributes("Help", "Shows command details.", new String[] {"?", "commands"}, NOGROUP, Core.getVersion(), false, Help.class, HelpHelp, null, null));
+			register.add(new ModuleAttributes("Help", "Shows command details.", new String[] {"?", "commands"}, NOGROUP, Core.getVersion(), false, false,Help.class, HelpHelp, null, null));
 			Help.HelpPage CCMHelp = new Help.HelpPage("Configure custom commands. Instructions provided on manager menu.", "ccm", "ccm [SubMenu] (Command)", "ccm [SubMenu] [Command] [CommandSubMenu] (Value)");
-			register.add(new ModuleAttributes("CustomCommandManager", "Manage custom commands.", new String[] {"AddCustomCommand", "EditCustomCommand", "RemoveCustomCommand", "DeleteCustomCommand", "CustomCommands", "CCM"}, ADMIN, Core.getVersion(), true, CustomCommandManager.class, CCMHelp, null, null));
-			register.add(new ModuleAttributes("CustomCommand", "Custom Command Template.", new String[0], NOGROUP, Core.getVersion(), false, CustomCommand.class, new Help.HelpPage(), null, null)); //This is the interface for converting custom commands to actual commands.
+			register.add(new ModuleAttributes("CustomCommandManager", "Manage custom commands.", new String[] {"AddCustomCommand", "EditCustomCommand", "RemoveCustomCommand", "DeleteCustomCommand", "CustomCommands", "CCM"}, ADMIN, Core.getVersion(), true, false, CustomCommandManager.class, CCMHelp, null, null));
+			register.add(new ModuleAttributes("CustomCommand", "Custom Command Template.", new String[0], NOGROUP, Core.getVersion(), false, false, CustomCommand.class, new Help.HelpPage(), null, null)); //This is the interface for converting custom commands to actual commands.
 			register.addAll(ModuleLoader.loadModules(register));			//Load modules
 			register.sort(Comparator.comparing(ModuleAttributes::getKey)); //Sort the commands into alphabetical order based on their keys
 		}

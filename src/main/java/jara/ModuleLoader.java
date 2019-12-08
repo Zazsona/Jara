@@ -363,7 +363,7 @@ public class ModuleLoader
                     }
                 }
                 logger.info("These will be ignored from "+formatJarName(jarFile));
-                moduleAttributes = new ModuleAttributes(moduleAttributes.getKey(), moduleAttributes.getDescription(), aliases.toArray(new String[0]), moduleAttributes.getCategory(), moduleAttributes.getTargetVersion(), true);
+                moduleAttributes = new ModuleAttributes(moduleAttributes.getKey(), moduleAttributes.getDescription(), aliases.toArray(new String[0]), moduleAttributes.getCategory(), moduleAttributes.getTargetVersion(), true, false);
             }
         }
         return moduleAttributes;
