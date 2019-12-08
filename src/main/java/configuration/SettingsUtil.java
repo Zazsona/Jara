@@ -52,7 +52,7 @@ public class SettingsUtil
         }
         catch (IOException e)
         {
-            logger.error("Unable to access file system to establish settings.");
+            logger.error("Unable to access file system to establish settings.", e);
         }
     }
 
@@ -196,5 +196,14 @@ public class SettingsUtil
             }
         }
         logger.info("Cleared "+guildsRemoved+" guild settings from memory.");
+    }
+
+    /**
+     * Gets the number of currently cached guild settings.
+     * @return the quantity
+     */
+    public static int getActiveGuildCount()
+    {
+        return guildSettingsMap.size();
     }
 }

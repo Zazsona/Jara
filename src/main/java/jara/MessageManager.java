@@ -261,6 +261,7 @@ public class MessageManager
 	 * This method will block the thread while waiting for a message, or for the time limit to elapse.
 	 *
 	 * @param channel The channel to listen to
+	 * @param member The member to listen for
 	 * @param timeout The amount of time to record for
 	 * @return the message
 	 */
