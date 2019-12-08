@@ -42,7 +42,7 @@ public class SeasonalModuleAttributes extends ModuleAttributes implements Serial
      */
     public SeasonalModuleAttributes(String keyArg, String descriptionArg, String[] aliasesArg, ModuleManager.Category categoryArg, String targetVersionArg, boolean disableableArg, int startingDayoOfYear, int endingDayOfYear)
     {
-        super(keyArg, descriptionArg, aliasesArg, categoryArg, targetVersionArg, disableableArg);
+        super(keyArg, descriptionArg, aliasesArg, categoryArg, targetVersionArg, disableableArg, false);
         this.startingDayOfYear = startingDayoOfYear;
         this.endingDayOfYear = endingDayOfYear;
     }
@@ -64,7 +64,7 @@ public class SeasonalModuleAttributes extends ModuleAttributes implements Serial
      */
     public SeasonalModuleAttributes(String keyArg, String descriptionArg, String[] aliasesArg, ModuleManager.Category categoryArg, String targetVersionArg, boolean disableableArg, int startingDayoOfYear, int endingDayOfYear, Class<? extends ModuleCommand> commandClass, Help.HelpPage helpPage, Class<? extends ModuleConfig> moduleConfigClass, Class<? extends ModuleLoad> loadClass)
     {
-        super(keyArg, descriptionArg, aliasesArg, categoryArg, targetVersionArg, disableableArg, commandClass, helpPage, moduleConfigClass, loadClass);
+        super(keyArg, descriptionArg, aliasesArg, categoryArg, targetVersionArg, disableableArg, false, commandClass, helpPage, moduleConfigClass, loadClass);
         this.startingDayOfYear = startingDayoOfYear;
         this.endingDayOfYear = endingDayOfYear;
     }
@@ -79,7 +79,14 @@ public class SeasonalModuleAttributes extends ModuleAttributes implements Serial
         if (startingDayOfYear > 0 && endingDayOfYear > 0)
         {
             int dayOfYear = zdt.getDayOfYear();
-            return (dayOfYear >= startingDayOfYear && dayOfYear <= endingDayOfYear);
+            if (endingDayOfYear < startingDayOfYear)
+            {
+                return (dayOfYear >= startingDayOfYear || dayOfYear <= endingDayOfYear);
+            }
+            else
+            {
+                return (dayOfYear >= startingDayOfYear && dayOfYear <= endingDayOfYear);
+            }
         }
         else
         {
