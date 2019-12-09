@@ -3,6 +3,8 @@ package jara;
 import commands.CmdUtil;
 import configuration.GuildSettings;
 import configuration.SettingsUtil;
+import listeners.CommandListener;
+import listeners.ListenerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -12,10 +14,8 @@ import org.slf4j.LoggerFactory;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class CommandHandler extends ListenerAdapter
 {
@@ -117,6 +117,7 @@ public class CommandHandler extends ListenerAdapter
 							Thread commandThread = new Thread(commandRunnable);
 							commandThread.setName(msgEvent.getGuild().getName()+"-"+attributes.getKey()+"-Thread");
 							commandThread.start();
+							runListeners(msgEvent, attributes, true);
 							return;
 						}
 						else
@@ -133,6 +134,7 @@ public class CommandHandler extends ListenerAdapter
 				{
 					msgEvent.getChannel().sendMessage("This command is disabled.").queue();
 				}
+				runListeners(msgEvent, attributes, false);
 			}
 		}
 	}
@@ -169,6 +171,15 @@ public class CommandHandler extends ListenerAdapter
 		{
 			hourToCommandMap.remove(hoursSinceEpoch-24);
 		}
+	}
+
+	private void runListeners(GuildMessageReceivedEvent msgEvent, ModuleAttributes moduleAttributes, boolean commandExecutionSuccessful)
+	{
+		ConcurrentLinkedQueue<CommandListener> listeners = ListenerManager.getCommandListeners();
+		if (commandExecutionSuccessful)
+			listeners.forEach((v) -> v.onCommandSuccess(msgEvent, moduleAttributes));
+		else
+			listeners.forEach((v) -> v.onCommandFailure(msgEvent, moduleAttributes));
 	}
 
 	/**
