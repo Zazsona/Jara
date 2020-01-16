@@ -5,8 +5,16 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import configuration.SettingsUtil;
+import jara.ModuleAttributes;
+import listeners.AudioListener;
+import listeners.CommandListener;
+import listeners.ListenerManager;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ScheduleHandler extends AudioEventAdapter
 {
@@ -27,20 +35,23 @@ public class ScheduleHandler extends AudioEventAdapter
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track)
     {
+        runListeners(audio.getAudioManager().getGuild(), track, ScheduledStatus.STARTED);
     }
     @Override
     public void onPlayerPause(AudioPlayer player)
     {
         //TODO: Add a configurable timer here where after so long the track is skipped / let users to a majority vote skip/resume.
+        runListeners(audio.getAudioManager().getGuild(), player.getPlayingTrack(), ScheduledStatus.PAUSED);
     }
     @Override
     public void onPlayerResume(AudioPlayer player)
     {
-        //Audio resumed. Don't feel we really need to do anything special here. People will probably notice.
+        runListeners(audio.getAudioManager().getGuild(), player.getPlayingTrack(), ScheduledStatus.RESUMED);
     }
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason reason)
     {
+        runListeners(audio.getAudioManager().getGuild(), track, ScheduledStatus.ENDED);
         audio.resetSkipVotes();
         String userID = audio.getTrackQueue().get(0).getUserID();
         audio.getUserQueueQuantity().replace(userID, audio.getUserQueueQuantity().get(userID)-1);
@@ -52,7 +63,7 @@ public class ScheduleHandler extends AudioEventAdapter
         }
         else if (SettingsUtil.getGuildSettings(audio.getAudioManager().getGuild().getId()).isVoiceLeavingEnabled())
         {
-            new Thread(() -> audio.getAudioManager().closeAudioConnection()).start();
+            new Thread(() -> audio.getAudioManager().closeAudioConnection()).start(); //TODO: Why did I do this again?
         }
 
     }
@@ -72,6 +83,40 @@ public class ScheduleHandler extends AudioEventAdapter
         else if (SettingsUtil.getGuildSettings(audio.getAudioManager().getGuild().getId()).isVoiceLeavingEnabled())
         {
             new Thread(() -> audio.getAudioManager().closeAudioConnection()).start();
+        }
+    }
+
+    private enum ScheduledStatus
+    {
+        STARTED,
+        ENDED,
+        PAUSED,
+        RESUMED
+    }
+
+    private void runListeners(Guild guild, AudioTrack audioTrack, ScheduledStatus scheduledStatus)
+    {
+        ConcurrentLinkedQueue<AudioListener> listeners = ListenerManager.getAudioListeners();
+        if (listeners.size() > 0)
+        {
+            new Thread(() ->
+                       {
+                           switch (scheduledStatus)
+                           {
+                               case STARTED:
+                                   listeners.forEach((v) -> v.onTrackStarted(guild, audioTrack));
+                                   break;
+                               case ENDED:
+                                   listeners.forEach((v) -> v.onTrackEnded(guild, audioTrack));
+                                   break;
+                               case PAUSED:
+                                   listeners.forEach((v) -> v.onTrackPaused(guild, audioTrack));
+                                   break;
+                               case RESUMED:
+                                   listeners.forEach((v) -> v.onTrackResumed(guild, audioTrack));
+                                   break;
+                           }
+                       }).start();
         }
     }
 }

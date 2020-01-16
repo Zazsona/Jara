@@ -3,11 +3,13 @@ package listeners;
 import jara.Core;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ListenerManager
 {
     private static ConcurrentLinkedQueue<CommandListener> commandListeners = new ConcurrentLinkedQueue<>();
+    private static ConcurrentLinkedQueue<AudioListener> audioListeners = new ConcurrentLinkedQueue<>();
 
     /**
      * Registers a new JaraListener, so it will handle events
@@ -21,12 +23,16 @@ public class ListenerManager
             {
                 commandListeners.add((CommandListener) listener);
             }
+            if (listener instanceof AudioListener)
+            {
+                audioListeners.add((AudioListener) listener);
+            }
         }
     }
 
     /**
      * Deregisters a JaraListener, so it no longer triggers
-     * @param listener the listener to register
+     * @param listener the listener to remove
      */
     public static synchronized void deregisterListener(JaraListener listener)
     {
@@ -35,6 +41,10 @@ public class ListenerManager
             if (listener instanceof CommandListener)
             {
                 commandListeners.remove(listener);
+            }
+            if (listener instanceof AudioListener)
+            {
+                audioListeners.remove(listener);
             }
         }
     }
@@ -64,5 +74,14 @@ public class ListenerManager
     public static ConcurrentLinkedQueue<CommandListener> getCommandListeners()
     {
         return commandListeners;
+    }
+
+    /**
+     * Gets registered {@link AudioListener}s
+     * @return the listeners
+     */
+    public static ConcurrentLinkedQueue<AudioListener> getAudioListeners()
+    {
+        return audioListeners;
     }
 }
