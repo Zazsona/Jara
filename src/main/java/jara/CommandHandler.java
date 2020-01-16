@@ -176,10 +176,16 @@ public class CommandHandler extends ListenerAdapter
 	private void runListeners(GuildMessageReceivedEvent msgEvent, ModuleAttributes moduleAttributes, boolean commandExecutionSuccessful)
 	{
 		ConcurrentLinkedQueue<CommandListener> listeners = ListenerManager.getCommandListeners();
-		if (commandExecutionSuccessful)
-			listeners.forEach((v) -> v.onCommandSuccess(msgEvent, moduleAttributes));
-		else
-			listeners.forEach((v) -> v.onCommandFailure(msgEvent, moduleAttributes));
+		if (listeners.size() > 0)
+		{
+			new Thread(() ->
+					   {
+						   if (commandExecutionSuccessful)
+							   listeners.forEach((v) -> v.onCommandSuccess(msgEvent, moduleAttributes));
+						   else
+							   listeners.forEach((v) -> v.onCommandFailure(msgEvent, moduleAttributes));
+					   }).start();
+		}
 	}
 
 	/**
