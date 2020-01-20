@@ -161,7 +161,6 @@ public class ModuleLoader
     {
         JarFile jarFile = new JarFile(jarPath);
         Enumeration<JarEntry> entries = jarFile.entries();
-
         ModuleAttributes ma = loadClasses(jarFile, cl, entries);
         if (ma == null)
         {
@@ -170,6 +169,7 @@ public class ModuleLoader
                 warnings++;
                 logger.warn(formatJarName(jarFile) + " has no pact or load class. It cannot directly communicate with Jara.");
             }
+            return null; //Allows for MA dependant operations below this point.
         }
         else if (ma.getCommandClass() == null && ma.getLoadClass() == null && ma.getConfigClass() == null)
         {
@@ -190,6 +190,7 @@ public class ModuleLoader
         {
             //logger.info("Successfully loaded "+ formatJarName(jarFile));
         }
+        ModuleResourceLoader.registerModule(ma.getKey(), jarPath);
         return ma;
     }
 
@@ -226,7 +227,6 @@ public class ModuleLoader
                 loadClass(jarFile, cl, ma, jarEntry);
             }
             //TODO: It's possible to load in files from a module's resources using Java 7's FileSystem, however, this will require an external process.
-
         }
         return ma;
     }
