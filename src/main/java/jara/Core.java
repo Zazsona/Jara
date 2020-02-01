@@ -1,16 +1,10 @@
 package jara;
 
-import java.awt.*;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import javax.annotation.Nullable;
 import javax.security.auth.login.LoginException;
-
-import configuration.SettingsUtil;
-import exceptions.InvalidModuleException;
-import gui.headed.HeadedGUI;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;

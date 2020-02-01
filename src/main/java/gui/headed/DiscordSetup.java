@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -182,7 +183,7 @@ public class DiscordSetup extends ListenerAdapter
         }
     }
     @Override
-    public void onReady(ReadyEvent re)
+    public void onReady(@Nonnull ReadyEvent re)
     {
         Platform.runLater(() ->
                           {

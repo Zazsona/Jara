@@ -256,15 +256,11 @@ public class ConfigMainSettings
         }
 
         if (success)
-        {
             embed.setDescription("Time zone successfully set to "+guildSettings.getTimeZoneId().getDisplayName(TextStyle.FULL, Locale.ENGLISH)+"!");
-            channel.sendMessage(embed.build()).queue();
-        }
         else
-        {
             embed.setDescription("Unable to find a valid time zone.\nPlease try again, or use "+guildSettings.getCommandPrefix()+"quit to cancel.");
-            channel.sendMessage(embed.build()).queue();
-        }
+        
+        channel.sendMessage(embed.build()).queue();
         return success;
     }
 

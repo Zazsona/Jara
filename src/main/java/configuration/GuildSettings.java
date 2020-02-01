@@ -726,8 +726,7 @@ public class GuildSettings implements Serializable
      */
     public void addChannelsToWhitelist(String... channelIDs) throws IOException
     {
-        for (String channelID : channelIDs)
-            commandChannelsWhitelist.add(channelID);
+        commandChannelsWhitelist.addAll(Arrays.asList(channelIDs));
         save();
     }
 

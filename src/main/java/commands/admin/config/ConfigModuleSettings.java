@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
@@ -78,7 +79,7 @@ public class ConfigModuleSettings
      */
     private Collection<String> convertParametersToCollection(String[] parameters)
     {
-        LinkedList<String> params = new LinkedList();
+        LinkedList<String> params = new LinkedList<>();
         params.addAll(Arrays.asList(parameters).subList(3, parameters.length));
         params = (params.size() > 0) ? params : null;
         return params;
@@ -136,9 +137,9 @@ public class ConfigModuleSettings
             if (moduleConfigClass != null)
             {
                 if (parameters == null)
-                    moduleConfigClass.newInstance().run(msgEvent, guildSettings, channel, isSetup);
+                    moduleConfigClass.getConstructor().newInstance().run(msgEvent, guildSettings, channel, isSetup);
                 else
-                    moduleConfigClass.newInstance().parseAsParameters(msgEvent, parameters, guildSettings, channel);
+                    moduleConfigClass.getConstructor().newInstance().parseAsParameters(msgEvent, parameters, guildSettings, channel);
             }
             else
             {
@@ -146,7 +147,7 @@ public class ConfigModuleSettings
                 channel.sendMessage(embed.build()).queue();
             }
         }
-        catch (InstantiationException | IllegalAccessException e)
+        catch (InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e)
         {
             msgEvent.getChannel().sendMessage("Sorry, I was unable to run the config for "+ma.getKey()+".").queue();
             Logger logger = LoggerFactory.getLogger(CommandHandler.class);

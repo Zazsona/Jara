@@ -216,26 +216,14 @@ public class CmdUtil
     {
         try
         {
-            if (guildAudios.containsKey(guildID))
-            {
-                return guildAudios.get(guildID);
-            }
-            else
-            {
+            if (!guildAudios.containsKey(guildID))
                 guildAudios.put(guildID, new Audio(Core.getShardManager().getGuildById(guildID)));
-                return guildAudios.get(guildID);
-            }
+            return guildAudios.get(guildID);
         }
         catch (ConcurrentModificationException e)
         {
-            try
-            {
-                Thread.sleep(200);
-                getGuildAudio(guildID);
-            }
-            catch (InterruptedException e1)
-            {
-            }
+            try { Thread.sleep(200); } catch (InterruptedException e1) {}
+            getGuildAudio(guildID);
         }
         return null;
     }
@@ -253,14 +241,8 @@ public class CmdUtil
         }
         catch (ConcurrentModificationException e)
         {
-            try
-            {
-                Thread.sleep(200);
-                clearGuildAudio(guildID);
-            }
-            catch (InterruptedException e1)
-            {
-            }
+            try { Thread.sleep(200); } catch (InterruptedException e1) { }
+            clearGuildAudio(guildID);
         }
         return null;
     }

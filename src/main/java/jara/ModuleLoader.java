@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -101,9 +102,9 @@ public class ModuleLoader
                        {
                            try
                            {
-                               c.newInstance().load();
+                               c.getConstructor().newInstance().load();
                            }
-                           catch (InstantiationException | IllegalAccessException e)
+                           catch (InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e)
                            {
                                logger.error("Unable to instantiate "+onLoadClasses.get(c).getName()+"'s load class. There is a high risk this module will not perform correctly, if at all.");
                                errors++;

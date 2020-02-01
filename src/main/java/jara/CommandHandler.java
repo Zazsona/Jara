@@ -14,8 +14,6 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
 
 public class CommandHandler extends ListenerAdapter
 {
@@ -72,7 +70,7 @@ public class CommandHandler extends ListenerAdapter
 	{
 		try
 		{
-			attributes.getCommandClass().newInstance().run(msgEvent, parameters);
+			attributes.getCommandClass().getConstructor().newInstance().run(msgEvent, parameters);
 		}
 		catch (InstantiationException | IllegalAccessException e)
 		{
@@ -101,7 +99,7 @@ public class CommandHandler extends ListenerAdapter
 	 */
 	private void execute(GuildMessageReceivedEvent msgEvent, ModuleAttributes attributes, String...parameters)
 	{
-		if (!attributes.isCustomCommand() && SettingsUtil.getGlobalSettings().isModuleEnabled(attributes.getKey()) || attributes.isCustomCommand())
+		if (!(attributes.isCustomCommand() && SettingsUtil.getGlobalSettings().isModuleEnabled(attributes.getKey())) || attributes.isCustomCommand())
 		{
 			GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
 			if (guildSettings.isChannelWhitelisted(msgEvent.getChannel()))
@@ -162,7 +160,7 @@ public class CommandHandler extends ListenerAdapter
 	{
 		commandCount++;
 		int hoursSinceEpoch = (int) Math.floor(Instant.now().getEpochSecond()/3600.0);
-		int usesThisHour = (hourToCommandMap.containsKey(hoursSinceEpoch)) ? hourToCommandMap.get(hoursSinceEpoch) : 0;
+		int usesThisHour = hourToCommandMap.getOrDefault(hoursSinceEpoch, 0);
 		usesThisHour++;
 		hourToCommandMap.put(hoursSinceEpoch, usesThisHour);
 		if (hourToCommandMap.size() > 24)
