@@ -1,6 +1,10 @@
 package commands.admin.config;
 
 import commands.CmdUtil;
+import jara.ModuleAttributes;
+import listeners.CommandListener;
+import listeners.ConfigListener;
+import listeners.ListenerManager;
 import module.ModuleCommand;
 import configuration.GuildSettings;
 import configuration.SettingsUtil;
@@ -11,6 +15,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ConfigMain extends ModuleCommand
 {
@@ -66,6 +71,7 @@ public class ConfigMain extends ModuleCommand
                         else if (selection.equalsIgnoreCase("setup"))
                         {
                             new ConfigWizard(msgEvent, guildSettings, channel, this);
+                            runUpdateListeners(msgEvent.getGuild().getId(), guildSettings);
                             return;
                         }
                         else if (selection.equalsIgnoreCase("quit"))
@@ -73,6 +79,7 @@ public class ConfigMain extends ModuleCommand
                             embed.setDescription("Config closed.");
                             embed.clearFields();
                             channel.sendMessage(embed.build()).queue();
+                            runUpdateListeners(msgEvent.getGuild().getId(), guildSettings);
                             break;
                         }
                         else
@@ -92,6 +99,7 @@ public class ConfigMain extends ModuleCommand
             LoggerFactory.getLogger(this.getClass()).error(e.toString());
             embed.setDescription("An error occurred when saving settings.");
             channel.sendMessage(embed.build()).queue();
+            runUpdateListeners(msgEvent.getGuild().getId(), SettingsUtil.getGuildSettings(msgEvent.getGuild().getId())); //Still firing this, in case any other changes did occur, or file corruption happened.
         }
     }
 
@@ -113,26 +121,32 @@ public class ConfigMain extends ModuleCommand
             if (selection.equalsIgnoreCase("prefix") || selection.equalsIgnoreCase("timezone") || selection.equalsIgnoreCase("whitelist"))
             {
                 new ConfigMainSettings(guildSettings, channel, this).parseAsParameters(msgEvent, parameters);
+                runUpdateListeners(msgEvent.getGuild().getId(), guildSettings);
             }
             else if (selection.equalsIgnoreCase("audio"))
             {
                 new ConfigAudioSettings(guildSettings, channel, this).parseAsParameter(msgEvent, parameters);
+                runUpdateListeners(msgEvent.getGuild().getId(), guildSettings);
             }
             else if (selection.equalsIgnoreCase("games"))
             {
                 new ConfigGameSettings(guildSettings, channel, this).parseAsParameter(msgEvent, parameters);
+                runUpdateListeners(msgEvent.getGuild().getId(), guildSettings);
             }
             else if (selection.equalsIgnoreCase("commands"))
             {
                 new ConfigCommandSettings(guildSettings, channel, this).parseAsParameters(msgEvent, parameters);
+                runUpdateListeners(msgEvent.getGuild().getId(), guildSettings);
             }
             else if (selection.equalsIgnoreCase("modules"))
             {
                 new ConfigModuleSettings(guildSettings, channel, this).parseAsParameters(msgEvent, parameters);
+                runUpdateListeners(msgEvent.getGuild().getId(), guildSettings);
             }
             else if (selection.equalsIgnoreCase("setup"))
             {
                 new ConfigWizard(msgEvent, guildSettings, channel, this);
+                runUpdateListeners(msgEvent.getGuild().getId(), guildSettings);
             }
             else
             {
@@ -156,5 +170,23 @@ public class ConfigMain extends ModuleCommand
         embed.setThumbnail("https://i.imgur.com/Hb8ET7G.png");
         embed.setTitle("= Config =");
         return embed;
+    }
+
+    private void runUpdateListeners(String guildID, GuildSettings guildSettings)
+    {
+        ConcurrentLinkedQueue<ConfigListener> listeners = ListenerManager.getConfigListeners();
+        if (listeners.size() > 0)
+        {
+            new Thread(() -> { listeners.forEach((v) -> v.onUpdate(guildID, guildSettings)); }).start();
+        }
+    }
+
+    private void runResetListeners(String guildID)
+    {
+        ConcurrentLinkedQueue<ConfigListener> listeners = ListenerManager.getConfigListeners();
+        if (listeners.size() > 0)
+        {
+            new Thread(() -> { listeners.forEach((v) -> v.onReset(guildID)); }).start();
+        }
     }
 }

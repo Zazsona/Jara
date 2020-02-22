@@ -4,6 +4,8 @@ import configuration.GuildSettings;
 import jara.MessageManager;
 import jara.ModuleAttributes;
 import jara.ModuleManager;
+import listeners.ConfigListener;
+import listeners.ListenerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -11,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ConfigWizard
 {
@@ -36,6 +39,7 @@ public class ConfigWizard
         {
             this.guildSettings = guildSettings;
             this.msgEvent = msgEvent;
+            runSetupListeners(msgEvent.getGuild().getId());
             cms = new ConfigMainSettings(guildSettings, channel, configMain);
             cas = new ConfigAudioSettings(guildSettings, channel, configMain);
             cgs = new ConfigGameSettings(guildSettings, channel, configMain);
@@ -157,6 +161,15 @@ public class ConfigWizard
             {
                 cmos.loadConfig(msgEvent, ma, null, true);
             }
+        }
+    }
+
+    private void runSetupListeners(String guildID)
+    {
+        ConcurrentLinkedQueue<ConfigListener> listeners = ListenerManager.getConfigListeners();
+        if (listeners.size() > 0)
+        {
+            new Thread(() -> { listeners.forEach((v) -> v.onSetup(guildID)); }).start();
         }
     }
 

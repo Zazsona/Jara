@@ -2,6 +2,7 @@ package listeners;
 
 import jara.Core;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import sun.security.krb5.Config;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -10,6 +11,7 @@ public class ListenerManager
 {
     private static ConcurrentLinkedQueue<CommandListener> commandListeners = new ConcurrentLinkedQueue<>();
     private static ConcurrentLinkedQueue<AudioListener> audioListeners = new ConcurrentLinkedQueue<>();
+    private static ConcurrentLinkedQueue<ConfigListener> configListeners = new ConcurrentLinkedQueue<>();
 
     /**
      * Registers a new JaraListener, so it will handle events
@@ -26,6 +28,10 @@ public class ListenerManager
             if (listener instanceof AudioListener)
             {
                 audioListeners.add((AudioListener) listener);
+            }
+            if (listener instanceof ConfigListener)
+            {
+                configListeners.add((ConfigListener) listener);
             }
         }
     }
@@ -45,6 +51,10 @@ public class ListenerManager
             if (listener instanceof AudioListener)
             {
                 audioListeners.remove(listener);
+            }
+            if (listener instanceof ConfigListener)
+            {
+                configListeners.remove(listener);
             }
         }
     }
@@ -83,5 +93,14 @@ public class ListenerManager
     public static ConcurrentLinkedQueue<AudioListener> getAudioListeners()
     {
         return audioListeners;
+    }
+
+    /**
+     * Gets registered {@link ConfigListener}s
+     * @return the listeners
+     */
+    public static ConcurrentLinkedQueue<ConfigListener> getConfigListeners()
+    {
+        return configListeners;
     }
 }
