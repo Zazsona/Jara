@@ -80,10 +80,10 @@ public class ConfigAudioSettings
         String embedDescription = "What would you like to modify?\nSay `quit` to close this menu.\n**Skip Votes**\n**Voice Leaving**\n**Queue Limits**";
         embed.setDescription(embedDescription);
         channel.sendMessage(embed.build()).queue();
-
+        MessageManager mm = new MessageManager();
         while (true)
         {
-            Message msg = new MessageManager().getNextMessage(channel);
+            Message msg = mm.getNextMessage(channel);
             if (guildSettings.isPermitted(msg.getMember(), configMain.getModuleAttributes().getKey())) //If the message is from someone with config permissions
             {
                 String msgContent = msg.getContentDisplay();

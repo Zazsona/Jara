@@ -13,7 +13,7 @@ import java.time.ZoneId;
 import java.time.format.TextStyle;
 import java.util.*;
 
-public class ConfigMainSettings
+public class ConfigGeneralSettings
 {
     private final GuildSettings guildSettings;
     private final TextChannel channel;
@@ -25,11 +25,51 @@ public class ConfigMainSettings
      * @param channel the channel to run on
      * @param configMain the config root
      */
-    public ConfigMainSettings(GuildSettings guildSettings, TextChannel channel, ConfigMain configMain)
+    public ConfigGeneralSettings(GuildSettings guildSettings, TextChannel channel, ConfigMain configMain)
     {
         this.guildSettings = guildSettings;
         this.channel = channel;
         this.configMain = configMain;
+    }
+
+    public void showMenu(GuildMessageReceivedEvent msgEvent) throws IOException
+    {
+        EmbedBuilder embed = ConfigMain.getEmbedStyle(msgEvent);
+        String embedDescription = "What would you like to modify?\nSay `quit` to close this menu.\n**Prefix**\n**Channel Whitelist**\n**Timezone**";
+        embed.setDescription(embedDescription);
+        channel.sendMessage(embed.build()).queue();
+        MessageManager mm = new MessageManager();
+        while (true)
+        {
+            Message msg = mm.getNextMessage(channel);
+            if (guildSettings.isPermitted(msg.getMember(), configMain.getModuleAttributes().getKey())) //If the message is from someone with config permissions
+            {
+                String msgContent = msg.getContentDisplay();
+                if (msgContent.equalsIgnoreCase("prefix"))
+                {
+                    modifyPrefix(msgEvent);
+                }
+                else if (msgContent.equalsIgnoreCase("timezone"))
+                {
+                    modifyTimeZone(msgEvent);
+                }
+                else if (msgContent.equalsIgnoreCase("whitelist") || msgContent.equalsIgnoreCase("channel whitelist"))
+                {
+                    manageWhitelistChannels(msgEvent, mm);
+                }
+                else if (msgContent.equalsIgnoreCase(SettingsUtil.getGuildCommandPrefix(msg.getGuild().getId())+"quit") || msgContent.equalsIgnoreCase("quit"))
+                {
+                    return;
+                }
+                else
+                {
+                    embed.setDescription("Unrecognised category. Please try again.");
+                    channel.sendMessage(embed.build()).queue();
+                    embed.setDescription(embedDescription);
+                }
+                channel.sendMessage(embed.build()).queue();
+            }
+        }
     }
 
     /**
@@ -40,23 +80,23 @@ public class ConfigMainSettings
      */
     public void parseAsParameters(GuildMessageReceivedEvent msgEvent, String[] parameters) throws IOException
     {
-        if (parameters[1].equalsIgnoreCase("prefix"))
+        if (parameters[2].equalsIgnoreCase("prefix"))
         {
-            if (parameters.length > 2)
+            if (parameters.length > 3)
             {
-                setPrefix(msgEvent, parameters[2]);
+                setPrefix(msgEvent, parameters[3]);
             }
             else
             {
                 modifyPrefix(msgEvent);
             }
         }
-        else if (parameters[1].equalsIgnoreCase("timezone"))
+        else if (parameters[2].equalsIgnoreCase("timezone"))
         {
-            if (parameters.length > 2)
+            if (parameters.length > 3)
             {
                 StringBuilder sb = new StringBuilder();
-                for (int i = 2; i<parameters.length; i++)
+                for (int i = 3; i<parameters.length; i++)
                 {
                     sb.append(parameters[i]).append("_");
                 }
@@ -68,16 +108,16 @@ public class ConfigMainSettings
                 modifyTimeZone(msgEvent);
             }
         }
-        else if (parameters[1].equalsIgnoreCase("whitelist") || parameters[1].equalsIgnoreCase("channel whitelist"))
+        else if (parameters[2].equalsIgnoreCase("whitelist") || parameters[2].equalsIgnoreCase("channel whitelist"))
         {
-            if (parameters.length > 2)
+            if (parameters.length > 3)
             {
-                if (parameters[2].startsWith("add") || parameters[2].startsWith("remove"))
+                if (parameters[3].startsWith("add") || parameters[3].startsWith("remove"))
                 {
-                    boolean isAdd = parameters[2].startsWith("add");
+                    boolean isAdd = parameters[3].startsWith("add");
                     setWhitelistChannels(msgEvent, isAdd, msgEvent.getMessage().getMentionedChannels());
                 }
-                else if (parameters[2].equalsIgnoreCase("clear"))
+                else if (parameters[3].equalsIgnoreCase("clear"))
                 {
                     clearWhitelistChannels(msgEvent);
                 }

@@ -1,8 +1,6 @@
 package commands.admin.config;
 
 import commands.CmdUtil;
-import jara.ModuleAttributes;
-import listeners.CommandListener;
 import listeners.ConfigListener;
 import listeners.ListenerManager;
 import module.ModuleCommand;
@@ -31,7 +29,7 @@ public class ConfigMain extends ModuleCommand
                 MessageManager mm = new MessageManager();
                 String embedDescription = "Welcome to the Config\nPlease select a menu, or say `quit` to cancel.";
                 embed.setDescription(embedDescription);
-                embed.addField("Menus", "**Prefix**\n**Timezone**\n**Channel Whitelist**\n**Audio**\n**Games**\n**Commands**\n**Modules**\n**Setup**", true);
+                embed.addField("Menus", "**General**\n**Audio**\n**Games**\n**Commands**\n**Modules**\n**Setup**", true);
                 channel.sendMessage(embed.build()).queue();
                 while (true)
                 {
@@ -40,17 +38,9 @@ public class ConfigMain extends ModuleCommand
                     {
                         String selection = msg.getContentDisplay();
                         final GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
-                        if (selection.equalsIgnoreCase("prefix"))
+                        if (selection.equalsIgnoreCase("general"))
                         {
-                            new ConfigMainSettings(guildSettings, channel, this).modifyPrefix(msgEvent);
-                        }
-                        else if (selection.equalsIgnoreCase("timezone"))
-                        {
-                            new ConfigMainSettings(guildSettings, channel, this).modifyTimeZone(msgEvent);
-                        }
-                        else if (selection.equalsIgnoreCase("whitelist") || selection.equalsIgnoreCase("channel whitelist"))
-                        {
-                            new ConfigMainSettings(guildSettings, channel, this).manageWhitelistChannels(msgEvent, mm);
+                            new ConfigGeneralSettings(guildSettings, channel, this).showMenu(msgEvent);
                         }
                         else if (selection.equalsIgnoreCase("audio"))
                         {
@@ -118,19 +108,9 @@ public class ConfigMain extends ModuleCommand
         {
             String selection = parameters[1].toLowerCase();
             final GuildSettings guildSettings = SettingsUtil.getGuildSettings(msgEvent.getGuild().getId());
-            if (selection.equalsIgnoreCase("prefix") || selection.equalsIgnoreCase("timezone") || selection.equalsIgnoreCase("whitelist"))
+            if (selection.equalsIgnoreCase("general"))
             {
-                new ConfigMainSettings(guildSettings, channel, this).parseAsParameters(msgEvent, parameters);
-                runUpdateListeners(msgEvent.getGuild().getId(), guildSettings);
-            }
-            else if (selection.equalsIgnoreCase("audio"))
-            {
-                new ConfigAudioSettings(guildSettings, channel, this).parseAsParameter(msgEvent, parameters);
-                runUpdateListeners(msgEvent.getGuild().getId(), guildSettings);
-            }
-            else if (selection.equalsIgnoreCase("games"))
-            {
-                new ConfigGameSettings(guildSettings, channel, this).parseAsParameter(msgEvent, parameters);
+                new ConfigGeneralSettings(guildSettings, channel, this).parseAsParameters(msgEvent, parameters);
                 runUpdateListeners(msgEvent.getGuild().getId(), guildSettings);
             }
             else if (selection.equalsIgnoreCase("commands"))

@@ -19,7 +19,7 @@ public class ConfigWizard
 {
     private GuildSettings guildSettings;
     private ConfigMain configMain;
-    private ConfigMainSettings cms;
+    private ConfigGeneralSettings cms;
     private ConfigAudioSettings cas;
     private ConfigGameSettings cgs;
     private ConfigCommandSettings ccs;
@@ -40,7 +40,7 @@ public class ConfigWizard
             this.guildSettings = guildSettings;
             this.msgEvent = msgEvent;
             runSetupListeners(msgEvent.getGuild().getId());
-            cms = new ConfigMainSettings(guildSettings, channel, configMain);
+            cms = new ConfigGeneralSettings(guildSettings, channel, configMain);
             cas = new ConfigAudioSettings(guildSettings, channel, configMain);
             cgs = new ConfigGameSettings(guildSettings, channel, configMain);
             ccs = new ConfigCommandSettings(guildSettings, channel, configMain);
