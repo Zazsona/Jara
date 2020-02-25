@@ -58,12 +58,13 @@ public class MessageManager
 	{
 		if (guild == null && channel == null)
 			throw new NullPointerException("There must be at least one location to listen to.");
-		else if (channelToListen != null)
+		if (channel != null)
 			channelToListen = channel;
-		else
+		if (guild != null)
 			guildToListen = guild;
+		if (member != null)
+			memberToListen = member;
 
-		memberToListen = member;
 		messagesToGet = messageCount;
 		channel.getJDA().addEventListener(messageHandler);
 		try 
@@ -92,6 +93,8 @@ public class MessageManager
 			}
 			channel.getJDA().removeEventListener(messageHandler);
 			channelToListen = null;
+			guildToListen = null;
+			memberToListen = null;
 			if (messageLogSize != messageLog.size())
 			{
 				int msgArraySize = messageCount;
@@ -115,6 +118,8 @@ public class MessageManager
 		{
 			channel.getJDA().removeEventListener(messageHandler);
 			channelToListen = null;
+			guildToListen = null;
+			memberToListen = null;
 			return null; //Let the calling method handle this.
 		}
 	}
@@ -593,7 +598,6 @@ public class MessageManager
 						return;
 					}
 				}
-
 				if (channelToListen != null)
 				{
 					if (!channelToListen.equals(msgEvent.getChannel()))
@@ -601,7 +605,7 @@ public class MessageManager
 						return;
 					}
 				}
-				else if (guildToListen != null)									//These checks set limits on where messages can be read from and are based on what parameters
+				if (guildToListen != null)									//These checks set limits on where messages can be read from and are based on what parameters
 				{																//were passed to the previous methods.
 					if (!guildToListen.equals(msgEvent.getGuild()))
 					{
