@@ -200,6 +200,7 @@ public abstract class ModuleGameCommand extends ModuleCommand //A base class to 
 	 */
 	private void enableChannelTimeout(TextChannel channel)
 	{
+		Thread commandThread = Thread.currentThread();
 		int channelTimeout = Integer.parseInt(SettingsUtil.getGuildSettings(channel.getGuild().getId()).getGameChannelTimeout());
 		if (channelTimeout != 0)
 		{
@@ -216,6 +217,8 @@ public abstract class ModuleGameCommand extends ModuleCommand //A base class to 
 						if (!lastMessage.getTimeCreated().isBefore(timeToDelete))
 						{
 							deleteGameChannel();
+							dispose();
+							commandThread.interrupt();
 						}
 					}
 				}

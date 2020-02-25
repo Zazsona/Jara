@@ -5,20 +5,39 @@ import configuration.GuildSettings;
 import configuration.SettingsUtil;
 import listeners.CommandListener;
 import listeners.ListenerManager;
+import module.ModuleCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.Arrays;
 
 public class CommandHandler extends ListenerAdapter
 {
 	private static final Logger logger = LoggerFactory.getLogger(CommandHandler.class);
+	private static final int COMMAND_TTL_SECONDS = 60*60*2; //2 hours
+	private static final ConcurrentHashMap<Long, CommandInstance> commandInstanceMap = new ConcurrentHashMap<>();
+
+	public CommandHandler()
+	{
+		Timer purgeTimer = new Timer();
+		TimerTask tt = new TimerTask()
+		{
+			@Override
+			public void run()
+			{
+				purgeInactiveCommands();
+			}
+		};
+		purgeTimer.schedule(tt, COMMAND_TTL_SECONDS/2, COMMAND_TTL_SECONDS/2);
+	}
 
 	/**
 	 * Listen for valid command strings, and run the command launcher if one is found
@@ -69,7 +88,10 @@ public class CommandHandler extends ListenerAdapter
 	{
 		try
 		{
-			attributes.getCommandClass().getConstructor().newInstance().run(msgEvent, parameters);
+			ModuleCommand command = attributes.getCommandClass().getConstructor().newInstance();
+			Thread currentThread = Thread.currentThread();
+			commandInstanceMap.put(currentThread.getId(), new CommandInstance(command, currentThread, Instant.now().getEpochSecond()));
+			command.run(msgEvent, parameters);
 		}
 		catch (InstantiationException | IllegalAccessException e)
 		{
@@ -88,6 +110,10 @@ public class CommandHandler extends ListenerAdapter
 		catch (Exception e)
 		{
 			logger.error(attributes.getKey()+" has encountered an error in "+msgEvent.getGuild().getName()+". Details:\n", e);
+		}
+		finally
+		{
+			commandInstanceMap.remove(Thread.currentThread().getId());
 		}
 	}
 
@@ -167,6 +193,60 @@ public class CommandHandler extends ListenerAdapter
 						   else
 							   listeners.forEach((v) -> v.onCommandFailure(msgEvent, moduleAttributes));
 					   }).start();
+		}
+	}
+
+	private void purgeInactiveCommands()
+	{
+		long currentSecond = Instant.now().getEpochSecond();
+		Iterator<Map.Entry<Long, CommandInstance>> iterator = commandInstanceMap.entrySet().iterator();
+		while (iterator.hasNext())
+		{
+			Map.Entry<Long, CommandInstance> entry = iterator.next();
+			if (currentSecond-entry.getValue().getStartSecond() > COMMAND_TTL_SECONDS)
+			{
+				entry.getValue().kill();
+				iterator.remove();
+			}
+		}
+	}
+
+	private class CommandInstance
+	{
+		private ModuleCommand command;
+		private Thread thread;
+		private long startSecond;
+
+		public CommandInstance(ModuleCommand command, Thread thread, long startSecond)
+		{
+			this.command = command;
+			this.thread = thread;
+			this.startSecond = startSecond;
+		}
+
+		private long getStartSecond()
+		{
+			return startSecond;
+		}
+
+		private long getId()
+		{
+			return thread.getId();
+		}
+
+		private boolean isCommandActive()
+		{
+			return thread.isAlive();
+		}
+
+		private void kill()
+		{
+			command.dispose();
+			thread.interrupt();
+			synchronized (commandInstanceMap)
+			{
+				commandInstanceMap.remove(getId());
+			}
 		}
 	}
 

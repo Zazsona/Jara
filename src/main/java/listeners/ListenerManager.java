@@ -2,9 +2,6 @@ package listeners;
 
 import jara.Core;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import sun.security.krb5.Config;
-
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ListenerManager
