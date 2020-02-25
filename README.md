@@ -1,60 +1,24 @@
-# Jara - A Discord Bot for you
-Jara is a jack-of-all-trades Discord bot built for customisability in mind for developers, hosts, and users, so you can refine it to serve all your needs, or just use it out of the box. 
+![Jara Logo](https://i.imgur.com/ugqVJtF.png)
+<a href=https://github.com/Zazsona/Jara/releases><img src="https://i.imgur.com/ZIwLWXs.png"></a>
 
-## Commands
-- Games - Countdown, Hangman, Last Word...
-- Toys - Say, WYR, Eight Ball, Jokes...
-- Utility - Randomizer, Stats, Coin Flipper...
-- Audio - Play, Replay, Skip, Pause...
-- Admin - Permissions & Configuration
+## What is Jara?
+Jara is a [Discord](https://discordapp.com/) bot with a modular approach. Rather than having a fixed set of commands and features, you can install or create modules to suit your every need. No more will you need to manage multiple bots in a single server!
 
-Plus, make your very own right in the bot.
+Out of the box Jara provides a vast array of customisation options individual to each server, including permissions, audio settings, command settings, and more. Each module can also provide its own configuration options.
+It's also possible to create your own basic commands right in the bot, without knowing any code!
 
-## Discord Users FAQ
-Want to add Jara to your server? This is the place! 
+### What are modules?
+![enter image description here](https://i.imgur.com/Lc4p8Am.png)
+Modules are drag-and-drop .jar files that add new functionality to the bot. These could be commands, games, audio,  admin, etc, and can each be enabled/disabled on a per-server basis.
 
-**How do I add this to my server?**  
-Sorry, but no live version is currently available. However, if you wish to host it for yourself, see the hosts FAQ below.  
+As Jara is open-source, anyone is free to develop their own modules, for any functionality they may need.  
+A repository of my modules is available [here](https://github.com/Zazsona/Jara-Module-Sources).
 
-**Can I disable commands, or limit them to certain users?**  
-Yup. Commands can be disabled completely or limited to certain roles on the server.  
+### How do I get started?
 
-**How can I find out about the commands?**  
-/Help will show you a list of commands you have access to. Use /Help [Command Name] to find out how to use it.  
+Name| Specification
+--- | ---
+OS | Windows/Linux/Raspbian
+Java | Java 8 or higher
 
-**Can I make a suggestion / Submit a bug report?**  
-Sure thing! Feedback is always appreciated. For now, please start a thread in issues [here](https://github.com/Zazsona/Jara/issues/new).
-
-## Hosts FAQ
-Whether you're thinking of hosting Jara for others or just yourself, here's how.
-
-**How can I get started?**  
-Simply download a [release](https://github.com/Zazsona/Jara/releases) build, then run it and walk through the steps shown! This will also take you through setting up an account for the bot on Discord.
-
-**How do I update?**
-Download the latest [release](https://github.com/Zazsona/Jara/releases), then simply replace your old .jar. When you next run the bot it will prompt you to configure any new commands.
-
-**What are the system requirements?**  
-- OS: Windows/Linux/Raspbian
-- Java Version: Java 8+
-- CPU: 1GHz+ Single Core Processor
-- GPU: Yes. (If you can see this page, you're set)
-- RAM: 100MB or higher.
-
-**Can I limit the commands to reduce strain on my system?**  
-Yup! You can disable specific commands or entire categories such as 'Games' or 'Audio'.
-
-**Is there command line support?**
-Yes, Jara offers setup via either commandline or a desktop environment.
-
-## Developers
-Any help is always appreciated! For contributing to this base or making your own spin, here's a few pointers.
-
-**How should I add new commands?**
-- Select a category for your command and create the class file(s) in it's respective package. 
-- Have the class extend from Command and implement the required methods.
-- Index your command in the getRegister() method of the CommandRegister class
-- Write your command (It will start in the run method)
-- Add help information in the Help class.
-
-Note: The command will not be found unless you add it to the CommandRegister.
+**Video Guide Coming Soon... Probably.**
