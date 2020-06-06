@@ -1,10 +1,12 @@
 package configuration;
 
 import commands.CmdUtil;
+import gui.HeadlessGUI;
 import gui.headed.HeadedGUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
@@ -38,7 +40,10 @@ public class SettingsUtil
             boolean success = globalSettings.restore();
             if (!success)
             {
-                HeadedGUI.performFirstTimeSetup();
+                if (GraphicsEnvironment.isHeadless())
+                    HeadlessGUI.runFirstTimeSetup();
+                else
+                    HeadedGUI.performFirstTimeSetup();
             }
             Timer guildCleanTimer = new Timer();
             guildCleanTimer.schedule(new TimerTask()

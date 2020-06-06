@@ -1,6 +1,7 @@
 package jara;
 
 import configuration.SettingsUtil;
+import gui.HeadlessGUI;
 import gui.headed.HeadedGUI;
 import org.slf4j.LoggerFactory;
 
@@ -34,14 +35,14 @@ public class Boot
 				String token = "";
 				if (GraphicsEnvironment.isHeadless())
 				{
-					//token = HeadlessGUI.updateToken(); //TODO: Fix
+					token = HeadlessGUI.requestToken();
 				}
 				else
 				{
 					token = HeadedGUI.updateToken();
 				}
-
-				SettingsUtil.getGlobalSettings().setToken(token);
+				if (token.length() > 0)
+					SettingsUtil.getGlobalSettings().setToken(token);
 				loggedIn = Core.initialiseDiscordConnection(SettingsUtil.getGlobalSettings().getToken());
 				if (!loggedIn)
 				{
