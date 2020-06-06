@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.HashMap;
 
 public class GlobalSettings implements Serializable
@@ -57,11 +58,11 @@ public class GlobalSettings implements Serializable
         {
             configFile.createNewFile();
         }
-        FileOutputStream fos = new FileOutputStream(getGlobalSettingsFilePath());
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        FileOutputStream fos = new FileOutputStream(getGlobalSettingsFilePath(), false);
+        PrintWriter printWriter = new PrintWriter(fos);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        oos.writeObject(gson.toJson(this));
-        oos.close();
+        printWriter.print(gson.toJson(this));
+        printWriter.close();
         fos.close();
     }
 
@@ -72,42 +73,31 @@ public class GlobalSettings implements Serializable
      */
     public synchronized boolean restore() throws IOException
     {
-        try
+        if (new File(getGlobalSettingsFilePath()).exists())
         {
-            if (new File(getGlobalSettingsFilePath()).exists())
+            String json = new String(Files.readAllBytes(new File(getGlobalSettingsFilePath()).toPath()));
+            Gson gson = new Gson();
+            GlobalSettings gs = gson.fromJson(json, GlobalSettings.class);
+            this.token = gs.token;
+            this.moduleConfig = gs.moduleConfig;
+            if (!moduleConfig.keySet().containsAll(ModuleManager.getCommandModuleKeys()))
             {
-                FileInputStream fis = new FileInputStream(getGlobalSettingsFilePath());
-                ObjectInputStream ois = new ObjectInputStream(fis);
-                Gson gson = new Gson();
-                GlobalSettings gs = gson.fromJson((String) ois.readObject(), GlobalSettings.class);
-                this.token = gs.token;
-                this.moduleConfig = gs.moduleConfig;
-                ois.close();
-                fis.close();
-                if (!moduleConfig.keySet().containsAll(ModuleManager.getCommandModuleKeys()))
+                logger.info("Found new commands. Adding them to the config.");
+                for (String key : ModuleManager.getModuleKeys())
                 {
-                    logger.info("Found new commands. Adding them to the config.");
-                    for (String key : ModuleManager.getModuleKeys())
+                    if (!moduleConfig.keySet().contains(key))
                     {
-                        if (!moduleConfig.keySet().contains(key))
-                        {
-                            moduleConfig.put(key, true);
-                        }
+                        moduleConfig.put(key, true);
                     }
-                    save();
                 }
-                return true;
+                save();
             }
-            else
-            {
-                this.token = "";
-                this.moduleConfig = new HashMap<>();
-                return false;
-            }
+            return true;
         }
-        catch (ClassNotFoundException e)
+        else
         {
-            logger.error(e.toString());
+            this.token = "";
+            this.moduleConfig = new HashMap<>();
             return false;
         }
     }
