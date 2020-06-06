@@ -41,18 +41,7 @@ public class GlobalSettings implements Serializable
      */
     public synchronized void save() throws IOException
     {
-        if (!moduleConfig.keySet().containsAll(ModuleManager.getCommandModuleKeys()))
-        {
-            for (ModuleAttributes ma : ModuleManager.getModules())
-            {
-                if (!moduleConfig.keySet().contains(ma.getKey()))
-                {
-                    moduleConfig.put(ma.getKey(), !ma.isDisableable());
-                }
-            }
-            logger.info("Modules were missing in the config, so have been added with disabled state.");
-        }
-
+        addMissingModules();
         File configFile = new File(getGlobalSettingsFilePath());
         if (!configFile.exists())
         {
@@ -80,18 +69,9 @@ public class GlobalSettings implements Serializable
             GlobalSettings gs = gson.fromJson(json, GlobalSettings.class);
             this.token = gs.token;
             this.moduleConfig = gs.moduleConfig;
-            if (!moduleConfig.keySet().containsAll(ModuleManager.getCommandModuleKeys()))
-            {
-                logger.info("Found new commands. Adding them to the config.");
-                for (String key : ModuleManager.getModuleKeys())
-                {
-                    if (!moduleConfig.keySet().contains(key))
-                    {
-                        moduleConfig.put(key, true);
-                    }
-                }
+            boolean added = addMissingModules();
+            if (added)
                 save();
-            }
             return true;
         }
         else
@@ -100,6 +80,24 @@ public class GlobalSettings implements Serializable
             this.moduleConfig = new HashMap<>();
             return false;
         }
+    }
+
+    private boolean addMissingModules()
+    {
+        boolean added = false;
+        if (!moduleConfig.keySet().containsAll(ModuleManager.getCommandModuleKeys()))
+        {
+            added = true;
+            logger.info("Found new modules. Adding them to the config.");
+            for (String key : ModuleManager.getModuleKeys())
+            {
+                if (!moduleConfig.keySet().contains(key))
+                {
+                    moduleConfig.put(key, true);
+                }
+            }
+        }
+        return added;
     }
 
     /**
@@ -171,5 +169,20 @@ public class GlobalSettings implements Serializable
     public boolean isModuleEnabled(String key)
     {
         return moduleConfig.get(key);
+    }
+
+    /**
+     * Sets all modules to a single common state, where possible.
+     * @throws IOException
+     */
+    public void setAll(boolean enable) throws IOException
+    {
+        HashMap<String, Boolean> newCommandConfig = new HashMap<>();
+        for (ModuleAttributes ma : ModuleManager.getModules())
+        {
+            if (enable || (!enable && ma.isDisableable()))
+                newCommandConfig.put(ma.getKey(), enable);
+        }
+        setModuleConfigMap(newCommandConfig);
     }
 }
