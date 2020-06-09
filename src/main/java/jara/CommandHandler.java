@@ -122,7 +122,7 @@ public class CommandHandler extends ListenerAdapter
 	 * @param msgEvent context
 	 * @param parameters the additional data passed with the command
 	 */
-	private void execute(GuildMessageReceivedEvent msgEvent, ModuleAttributes attributes, String...parameters)
+	public void execute(GuildMessageReceivedEvent msgEvent, ModuleAttributes attributes, String...parameters)
 	{
 		if (!(attributes.isCustomCommand() && SettingsUtil.getGlobalSettings().isModuleEnabled(attributes.getKey())) || attributes.isCustomCommand())
 		{

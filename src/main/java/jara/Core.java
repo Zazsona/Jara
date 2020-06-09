@@ -24,6 +24,8 @@ public class Core //A class for covering the global manners of the bot.
 	private static final HashSet<String> supportedVersions = new HashSet<>();
 	private static final String VERSION = "0.1";
 
+	private static CommandHandler commandHandler;
+
 	/**
 	 * Gets the current Jara version
 	 * @return the version
@@ -75,7 +77,9 @@ public class Core //A class for covering the global manners of the bot.
 	 */
 	public static void enableCommands()
 	{
-		shardManager.addEventListener(new CommandHandler());
+		if (commandHandler == null)
+			commandHandler = new CommandHandler();
+		shardManager.addEventListener(commandHandler);
 	}
 
 	/**
@@ -117,4 +121,11 @@ public class Core //A class for covering the global manners of the bot.
         }
         return shardManager;
     }
+
+    public static CommandHandler getCommandHandler()
+	{
+		if (commandHandler == null)
+			commandHandler = new CommandHandler();
+		return commandHandler;
+	}
 }

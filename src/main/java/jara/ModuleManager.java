@@ -42,7 +42,7 @@ public class ModuleManager
 	 * Prepares in-built and external modules for execution.<br>
 	 *     This method locks to register, and can only run if register is null.
 	 */
-	private static void prepareModules()
+	private static synchronized void prepareModules()
 	{
 		if (register == null)
 		{
