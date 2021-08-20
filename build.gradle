@@ -1,6 +1,7 @@
 plugins {
     id 'java'
 	id 'application'
+	id 'maven-publish'
 	id "org.openjfx.javafxplugin" version "0.0.8"
 }
 
@@ -11,7 +12,6 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
-    jcenter()
 	maven {
 		url 'https://m2.dv8tion.net/releases'
 	}
@@ -34,22 +34,6 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-	classifier = 'sources'
-	from sourceSets.main.allSource
-}
-
-javadoc.failOnError = false
-task javadocJar(type: Jar, dependsOn: javadoc) {
-	classifier = 'javadoc'
-	from javadoc.destinationDir
-}
-
-artifacts {
-	archives sourcesJar
-	archives javadocJar
-}
-
 javafx {
 	version = "13"
 	modules = [ 'javafx.base', 'javafx.controls', 'javafx.fxml' ]
@@ -67,4 +51,22 @@ jar {
 
 application {
 	mainClassName = 'jara.Boot'
+}
+
+publishing {
+	repositories {
+		maven {
+			name = "GitHubPackages"
+			url = uri("https://maven.pkg.github.com/zazsona/jara")
+			credentials {
+				username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USERNAME")
+				password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+			}
+		}
+	}
+	publications {
+		gpr(MavenPublication) {
+			from(components.java)
+		}
+	}
 }
