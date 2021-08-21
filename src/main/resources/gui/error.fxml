@@ -6,7 +6,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-<HBox fx:id="root" alignment="CENTER" focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="400.0" style="-fx-background-color: #36393F;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.headed.ErrorPane">
+<HBox fx:id="root" alignment="CENTER" focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="400.0" style="-fx-background-color: #36393F;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.zazsona.jara.gui.headed.ErrorPane">
    <children>
       <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
          <children>

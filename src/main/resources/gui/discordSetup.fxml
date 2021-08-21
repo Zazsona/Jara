@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.*?>
-<VBox fx:id="discordSetupScreen" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.headed.DiscordSetup">
+<VBox fx:id="discordSetupScreen" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.zazsona.jara.gui.headed.DiscordSetup">
    <children>
       <BorderPane fx:id="titleBar" maxHeight="80.0" minHeight="80.0" prefHeight="80.0" prefWidth="1280.0" style="-fx-background-color: #23272A;">
          <center>
@@ -109,7 +109,7 @@
                         <Pane prefHeight="8.0" prefWidth="100.0" />
                         <ImageView fitHeight="101.0" fitWidth="194.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../how-to/0.png" />
+                              <Image url="@../how-to/0.PNG" />
                            </image></ImageView>
                         <Pane prefHeight="37.0" prefWidth="200.0" />
                         <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Go to the Discord Developer portal by clicking the button below." textAlignment="CENTER" wrappingWidth="195.974609375" />
@@ -135,7 +135,7 @@
                         <Pane prefHeight="8.0" prefWidth="100.0" />
                         <ImageView fitHeight="125.0" fitWidth="184.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../how-to/1.png" />
+                              <Image url="@../how-to/1.PNG" />
                            </image>
                         </ImageView>
                         <Pane prefHeight="37.0" prefWidth="200.0" />
@@ -152,7 +152,7 @@
                         <Pane prefHeight="8.0" prefWidth="100.0" />
                         <ImageView fitHeight="120.0" fitWidth="133.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../how-to/2.png" />
+                              <Image url="@../how-to/2.PNG" />
                            </image>
                         </ImageView>
                         <Pane prefHeight="37.0" prefWidth="200.0" />
@@ -169,7 +169,7 @@
                         <Pane prefHeight="32.0" prefWidth="200.0" />
                         <ImageView fitHeight="147.0" fitWidth="180.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../how-to/3.png" />
+                              <Image url="@../how-to/3.PNG" />
                            </image>
                         </ImageView>
                         <Pane prefHeight="63.0" prefWidth="200.0" />
